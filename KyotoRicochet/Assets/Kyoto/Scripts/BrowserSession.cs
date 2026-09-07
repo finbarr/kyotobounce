@@ -11,7 +11,7 @@ namespace Kyoto
     {
         [Serializable] public class Command
         {
-            public string type,id,request;
+            public string type,id,request,powerRange;
             public float x,z,yaw,pitch,top,kick,power;
             public bool fast;
             public Vector3 origin,direction;public float radius;public string slot;
@@ -19,7 +19,7 @@ namespace Kyoto
         }
         [Serializable] public class PlayerState
         {
-            public string id;
+            public string id,powerRange="full";
             public Vector3 feet,release,movement;
             public float walked;
             public float yaw,pitch=15,top,kick,power;
@@ -122,6 +122,7 @@ namespace Kyoto
                     if(!InStart(p)){Note(c.id,"Stand inside the start circle on its selected floor.");break;}
                     attempt=c.request;
                     if(!p.walker.TryRelease(p.state.yaw,p.state.pitch,out _,state.radius)){Note(c.id,"Move away from the wall before throwing.");break;}
+                    p.state.powerRange=c.powerRange=="precision"?"precision":"full";
                     owner=p;state.owner=c.id;state.phase="Charging";chargeAt=StationMotion.Time(gameObject.scene);state.chargeTime=chargeAt;p.move=Vector2.zero;
                     break;
                 case "release":
@@ -185,7 +186,8 @@ namespace Kyoto
         {
             float precision=Mathf.Lerp(.5f,12f,power*power);
             // Old challenge revisions retain their original launch rule and board.
-            string model=activeChallenge==null?"robot-v3":activeChallenge.throwModel;
+            string model=activeChallenge==null?"robot-v4":activeChallenge.throwModel;
+            if(model=="robot-v4")return Mathf.Lerp(.5f,owner.state.powerRange=="precision"?12f:100f,power);
             if(model!="robot-v2"&&model!="robot-v3")return precision;
             // Keep the precision range through 40%. Full power is 100 m/s,
             // just over twice elite human release speed; v2 retains 32 m/s.

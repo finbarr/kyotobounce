@@ -54,8 +54,6 @@ export function competitionUI({scene,send,cancel,notice,getGuestId,getLiveTime,g
   $('course-title').textContent=state.selected?.name||'PICK YOUR LINE.';$('challenge-detail').hidden=!state.selected;
   if(state.selected){$('challenge-description').textContent=`Start within ${state.selected.start.radius.toFixed(2)} m · settle inside ${state.selected.goal.radius.toFixed(2)} m${state.selected.requiredSurface?' · hit the moving escalator first':''}`;state.hint=state.selected.hint||null;$('use-hint').hidden=!state.hint;$('hint-note').textContent=state.hint?.note||'';$('edit-challenge').hidden=state.selected.creator!==getGuestId();}
   if(state.mode==='play')drawDisks(state.selected);
-  powerMarker.hidden=!state.selected?.hint;$('hint-power-label').hidden=powerMarker.hidden;
-  if(state.selected?.hint){const suggested=state.selected.hint.holdMs/((state.selected.allowedInputs?.chargeSeconds||2.8)*10);powerMarker.style.left=`${suggested}%`;$('hint-power-label').textContent=`WHITE MARK · SUGGESTED ${Math.round(suggested)}% POWER`;powerMarker.setAttribute('aria-hidden','true');}
   $('timing-hint').hidden=!state.selected?.hint?.period;
   $('score-guide').hidden=state.selected?.scoring==='distinct-v1';
   $('show-overview').disabled=session.busy||session.restoring;

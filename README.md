@@ -37,6 +37,7 @@ Open **http://127.0.0.1:4173/**. The first Unity import/build can take several m
 | Q / E, Z / C | Adjust top/backspin and sidespin |
 | X | Clear spin |
 | H | Apply the challenge hint when available |
+| P | Switch between precision (12 m/s) and robot (100 m/s) power before charging |
 | R | Recall the ball and forfeit the current attempt |
 | Escape | Release the mouse / cancel the windup |
 

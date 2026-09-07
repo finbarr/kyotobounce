@@ -3,7 +3,7 @@ import {Client,delay} from './api-client.mjs';
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173';
 const c=new Client(origin.replace(/^http/,'ws'));
 try{
- await c.join();const course=c.messages.find(m=>m.type==='catalog').challenges.find(c=>c.id==='atrium-first-bank');
+ await c.join();const course=c.messages.findLast(m=>m.type==='catalog').challenges.find(c=>c.id==='atrium-first-bank');
  await c.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');
  const aim={yaw:90,pitch:15,top:30,kick:-20};c.input(aim);await delay(120);
  c.send('charge',{challengeId:course.id,revision:course.revision,layout:course.layout,physics:course.physics});await delay(850);

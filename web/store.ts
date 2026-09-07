@@ -2,6 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { randomUUID } from 'node:crypto';
 import type { Challenge,Guest,NativeResult } from './types.ts';
 import { withChallengeRules,SCORING_VERSION,THROW_MODEL,CHARGE_SECONDS,RECORDED_PHYSICS } from './types.ts';
+import {throwSpeed,powerForSpeed} from './public/throw-power.js';
 export class Store {
  db:DatabaseSync;
  constructor(path:string){
@@ -33,7 +34,17 @@ export class Store {
   // New launch power means a new competition revision, never mixed old scores.
   this.db.exec('BEGIN IMMEDIATE');
   try{
-   for(const c of this.list())if(c.throwModel!==THROW_MODEL)this.saveChallenge({...c,revision:c.revision+1,throwModel:THROW_MODEL});
+   for(const c of this.list())if(c.throwModel!==THROW_MODEL){
+    let hint=c.hint;
+    if(hint){
+     const seconds=c.allowedInputs?.chargeSeconds||1.2;
+     const speed=throwSpeed(hint.holdMs/(seconds*1000),'full',c.throwModel||'precision-v1');
+     const powerRange=speed<=12?'precision':'full';
+     // Preserve release speed, including when scoring later changes charge time.
+     hint={...hint,powerRange,holdMs:powerForSpeed(speed,powerRange)*seconds*1000,note:hint.note.replace(/(?:release|hold) near \d+% power/gi,'release at the suggested speed')};
+    }
+    this.saveChallenge({...c,revision:c.revision+1,throwModel:THROW_MODEL,hint});
+   }
    this.db.exec('COMMIT');
   }catch(error){this.db.exec('ROLLBACK');throw error;}
  }

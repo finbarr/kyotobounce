@@ -1,3 +1,4 @@
+import {THROW_MODEL,throwSpeed} from './throw-power.js';
 import {BallRotationBuffer,rotationBetween,rotationSpeed,spinMarkOpacity} from './ball-rotation.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -35,7 +36,7 @@ let station,robotAsset,motion,loaded=false,guestId='',identityId='',snapshot=nul
 const history=[],ballRotations=new BallRotationBuffer();
 let spinExposure=1/60;
 let yaw=180,pitch=12,top=0,kick=0,azimuth=-Math.PI,elevation=.006,distance=3.8,manualCamera=false,chargeStarted=0;
-let aimDistance=30;
+let aimDistance=30,powerRange='full',powerLevel='';
 let rightDrag=false,lastPointer=null,lastPhase='',lockRequested=false;
 let lastThrowAim=null,aimOrbit=null,ballCameraActive=false,flightPending=false,returnRequested=false;
 const avatars=new Map(),keys=new Set(),caster=new THREE.Raycaster();caster.firstHitOnly=true;
@@ -55,6 +56,7 @@ socket.addEventListener('open',()=>send('hello',{token:localStorage.getItem('kyo
 socket.addEventListener('close',()=>{workerReady=false;workerStatus='disconnected';cancel();notice('Connection lost. Reload to rejoin.',1e8);$('connection').textContent='Disconnected';});
 socket.addEventListener('message',event=>{
   const m=JSON.parse(event.data);ui?.message(m);
+  if(m.type==='session'){const level=`${m.challenge?.id||''}:${m.challenge?.revision||''}`;if(level!==powerLevel){powerLevel=level;setPowerRange(m.challenge?.hint?.powerRange||'full',true);}}
   if(m.type==='welcome'){guestId=m.sessionId;identityId=m.id;localStorage.setItem('kyoto-guest',m.token);$('nickname').value=m.name;workerReady=m.worker;}
   if(m.type==='worker-status'){
     const recovering=workerStatus==='recovering';workerStatus=m.status;
@@ -83,8 +85,16 @@ function startCharge(){
   if(briefing?.blocked||!loaded||!workerReady||!snapshot||chargeStarted||ui.state.mode!=='play')return;
   if(ui.state.session?.busy||ui.state.session?.restoring||['Release','Flight'].includes(snapshot.phase))return;
   if(snapshot.phase==='Result'){returnRequested=true;restoreThrowAim();}
-  sound.unlock();sound.startCharge(ui.state.selected?.allowedInputs?.chargeSeconds||2.8);ui.dismissResult();sendInput();send('charge',{challengeId:ui.state.selected?.id||null,revision:ui.state.selected?.revision||null,layout:snapshot.layout,physics:snapshot.physics});chargeStarted=performance.now();canvas.focus();
+  sound.unlock();sound.startCharge(ui.state.selected?.allowedInputs?.chargeSeconds||2.8);ui.dismissResult();sendInput();send('charge',{challengeId:ui.state.selected?.id||null,revision:ui.state.selected?.revision||null,layout:snapshot.layout,physics:snapshot.physics,powerRange});chargeStarted=performance.now();canvas.focus();
 }
+function setPowerRange(range,force=false){
+  if(!force&&(chargeStarted||flightPending||['Charging','Release','Flight'].includes(snapshot?.phase)||ui?.state.mode==='replay'))return;
+  powerRange=range==='precision'?'precision':'full';
+  for(const value of ['precision','full'])$('power-'+value).setAttribute('aria-pressed',String(value===powerRange));
+  document.querySelectorAll('.power-ticks span').forEach((tick,i)=>{tick.textContent=String(Number(throwSpeed(i/4,powerRange).toFixed(1)))+(i===4?' m/s':'');});
+}
+for(const range of ['precision','full'])$('power-'+range).onclick=()=>{setPowerRange(range);canvas.focus();};
+setPowerRange('full');
 function release(){stopChargeSound();if(chargeStarted){lastThrowAim={yaw,pitch,distance};sound.cue('throw');sendInput();send('release');flightPending=true;chargeStarted=0;}}
 function pointerLocked(){return document.pointerLockElement===canvas;}
 function cancel(){stopChargeSound();flightPending=false;if(ui?.state.mode!=='replay')send('cancel');chargeStarted=0;keys.clear();rightDrag=false;lastPointer=null;lockRequested=false;if(pointerLocked())document.exitPointerLock();}
@@ -163,6 +173,7 @@ window.addEventListener('keydown',e=>{
   keys.add(e.code);if(e.repeat)return;
   if(e.code==='KeyH'&&ui.state.hint&&ui.state.mode==='play')$('use-hint').click();
   if(e.code==='Space'){captureMouse();startCharge();}if(e.code==='Escape')cancel();if(e.code==='KeyR')recall();
+  if(e.code==='KeyP')setPowerRange(powerRange==='full'?'precision':'full');
   if(e.code==='KeyX')$('clear-spin').click();
   if(['KeyQ','KeyE','KeyZ','KeyC'].includes(e.code)){
     const control=$(['KeyQ','KeyE'].includes(e.code)?'top':'kick');control.value=THREE.MathUtils.clamp(Number(control.value)+(['KeyQ','KeyZ'].includes(e.code)?-25:25),-200,200);syncSpin();
@@ -227,7 +238,7 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
 }});
 ui=competitionUI({overview:c=>briefing.open(c),sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>snapshot?.phase,getLiveTime:()=>snapshot?snapshot.stationTime+(performance.now()-received)/1000:0,resetView:reason=>{if(reason==='level'){lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;}centerOnAim();distance=3.8;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 window.addEventListener('kyoto:retry',()=>{recall();captureMouse();canvas.focus();});
-window.addEventListener('kyoto:hint',event=>{const h=event.detail;yaw=h.yaw;pitch=h.pitch;top=h.top;kick=h.kick;$('top').value=top;$('kick').value=kick;syncSpin();centerOnAim();notice(`Suggested aim set. Release at the white ${Math.round(h.holdMs/((ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*10))}% mark.`,7000);canvas.focus();});
+window.addEventListener('kyoto:hint',event=>{const h=event.detail;setPowerRange(h.powerRange||'precision');yaw=h.yaw;pitch=h.pitch;top=h.top;kick=h.kick;$('top').value=top;$('kick').value=kick;syncSpin();centerOnAim();notice(`Suggested aim set. Release at the white ${throwSpeed(h.holdMs/((ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*1000),h.powerRange||'precision').toFixed(1)} m/s mark.`,7000);canvas.focus();});
 let lastFrame=performance.now(),frames=0,frameSum=0,frameSample=performance.now(),lastTelemetry=0;
 const frameTimes=[];
 let qualityCheck=0,qualityGoodSince=0;
@@ -286,10 +297,16 @@ function animate(now){
     $('throw-panel').hidden=inFlight;$('flight-panel').hidden=!inFlight||!!ui.state.selected;$('surfaces').textContent=snapshot.surfaces;
     $('phase-label').textContent=phase==='Charging'?'WINDING UP':phase==='Release'?'RELEASING':ui.state.selected?'READY TO THROW':'FREE EXPLORATION';
     const power=chargeStarted?Math.min(1,(now-chargeStarted)/((ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*1000)):phase==='Release'||phase==='Charging'?snapshot.power:0;
-    $('power-fill').style.width=`${power*100}%`;document.querySelector('.power-track').setAttribute('aria-valuenow',String(Math.round(power*100)));$('power-control').classList.toggle('charging',power>0);$('power-number').textContent=`${Math.round(power*100)}%`;$('power-label').textContent=power>=1?'FULL POWER · RELEASE TO THROW':power>0?'RELEASE TO THROW':'HOLD TO WIND UP';
-    const model=ui.state.selected?.throwModel||'robot-v3',extra=model==='robot-v3'?88:model==='robot-v2'?20:0;
-    const speed=.5+11.5*power*power+extra*Math.max(0,(power-.4)/.6)**2;
-    $('release-speed').textContent=power>0?`${speed.toFixed(1)} m/s · ${Math.round(speed*3.6)} km/h`:`Up to ${12+extra} m/s`;
+    const model=ui.state.selected?.throwModel||THROW_MODEL,speed=throwSpeed(power,powerRange,model),maximum=throwSpeed(1,powerRange,model);
+    $('power-fill').style.width=`${power*100}%`;
+    const meter=document.querySelector('.power-track');meter.setAttribute('aria-valuemin','0.5');meter.setAttribute('aria-valuemax',String(maximum));meter.setAttribute('aria-valuenow',speed.toFixed(1));meter.setAttribute('aria-valuetext',`${speed.toFixed(1)} metres per second`);
+    $('power-control').classList.toggle('charging',power>0);$('power-number').textContent=power>0?`${speed.toFixed(1)} m/s`:`0.5–${maximum} m/s`;
+    $('power-label').textContent=power>=1?'FULL POWER · RELEASE':power>0?'RELEASE TO THROW':'HOLD TO WIND UP';
+    $('release-speed').textContent=power>0?`${Math.round(power*100)}% · ${Math.round(speed*3.6)} km/h`:'';
+    for(const range of ['precision','full'])$('power-'+range).disabled=!!chargeStarted||['Charging','Release','Flight'].includes(phase)||flightPending||replaying;
+    const hint=ui.state.selected?.hint,marker=$('hint-power-marker');
+    marker.hidden=!hint||(hint.powerRange||'precision')!==powerRange;$('hint-power-label').hidden=!hint;
+    if(hint){const hp=hint.holdMs/((ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*1000),hs=throwSpeed(hp,hint.powerRange||'precision',model);marker.style.left=`${hp*100}%`;marker.setAttribute('aria-hidden','true');$('hint-power-label').textContent=marker.hidden?`SUGGESTED ${hs.toFixed(1)} m/s · H TO SET RANGE & AIM`:`WHITE MARK · SUGGESTED ${hs.toFixed(1)} m/s`;}
     guide.visible=!inFlight&&!!p&&ui.state.mode==='play';
   }
   // Use native subframes, not a shortest rotation between coarse network frames.

@@ -1,6 +1,6 @@
 # Kyoto Bounce: combo arcade update
 
-The power gauge is 590 px wide on desktop, 36 px tall, with quarter-power labels and the course's suggested release mark. A full windup takes 2.8 seconds instead of 1.2. Release speed and the 100 m/s maximum are unchanged. Starter hints are rescaled automatically when their course revision upgrades.
+The power gauge is 590 px wide on desktop and 36 px tall. Its primary number and tick labels show release speed in m/s. A full windup takes 2.8 seconds; speed increases evenly from 0.5 m/s to either 12 m/s (Precision) or 100 m/s (Robot). Press P or use the range buttons before winding up. Range locks at charge start, and server timing determines release speed without coarse power steps. The `robot-v4` rule creates fresh challenge revisions while preserving old boards and replays. Starter hints retain their previous launch speeds and select the appropriate range.
 
 ## Score
 
@@ -27,4 +27,4 @@ New replays preserve the authoritative score timeline alongside their full-rate 
 
 - `node web/tests/scoring.mjs`: archived accuracy-v3 behavior and historical replay preservation.
 - `node web/tests/combo-scoring.mjs`: million-point lines, rings, swept targets, anti-farming rules, live/final parity, and idempotent revision/hint migration.
-- `node web/tests/combo-runtime.mjs`: actual native perfect/near/tag shots, full-rest completion, authoritative power timing, score timelines, replay parity and score-spoof rejection. Set `KYOTO_TEST_ORIGIN` for the deployed HTTPS address and `KYOTO_TEST_OUTPUT` for a separate receipt.
+- `node web/tests/combo-runtime.mjs`: actual native perfect/near/tag shots, full-rest completion, authoritative power timing, score timelines, replay parity and score-spoof rejection. Set `KYOTO_TEST_ORIGIN` to an isolated local server and `KYOTO_TEST_OUTPUT` for a separate receipt.

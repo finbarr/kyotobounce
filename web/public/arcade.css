@@ -63,3 +63,12 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
 .is-ball-camera #flight-panel .style-reminder{display:none}
 @media(max-width:800px){#combo-hud{left:14px;bottom:65px;width:310px;max-width:calc(100vw - 28px);padding:10px 13px}#combo-total{font-size:36px}}
 @media(max-height:520px){#combo-hud{top:auto;bottom:36px;left:12px;padding:7px 12px;width:300px}.combo-heading{display:none}#combo-total{font-size:30px;line-height:1;margin:0 0 4px}#combo-factors{font-size:8px}.combo-landing{margin-top:4px;padding-top:4px}#combo-trick{height:14px;line-height:14px;margin-top:2px;font-size:8px}}
+
+.power-ranges{display:flex;gap:8px;margin-bottom:12px;pointer-events:auto}
+.power-ranges button{flex:1;padding:6px 8px;border:1px solid #8094b64d;background:#10192a;color:#aebfd4;font:10px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.3px;cursor:pointer}
+.power-ranges button[aria-pressed="true"]{color:#10192a;background:var(--gold);border-color:var(--gold)}
+.power-ranges button:disabled{cursor:default;opacity:.65}
+#power-number{white-space:nowrap}
+.is-playing .power-ranges{pointer-events:none}
+
+.range-key{align-self:center;color:#b0c5d5;font:8px/1.5 ui-monospace,Menlo,monospace;text-align:center}

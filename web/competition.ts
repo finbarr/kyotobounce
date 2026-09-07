@@ -85,7 +85,7 @@ export class Competition {
   const id=member.id;
   if(member.restoring)throw new Error('Your attempt is being restored. Try again in a moment.');
   if(m.type==='charge'||m.type==='release'){
-   const allowed=m.type==='charge'?['type','challengeId','revision','layout','physics']:['type'];
+   const allowed=m.type==='charge'?['type','challengeId','revision','layout','physics','powerRange']:['type'];
    if(Object.keys(m).some(key=>!allowed.includes(key)))throw new Error('Send throw intent only. Launch position, power, timing and results are authoritative.');
   }
   if(m.type==='place'){
@@ -105,7 +105,7 @@ export class Competition {
    if(member.attempt||member.selecting)throw new Error('Finish your throw or level change first');
    const challenge=m.challengeId?this.store.challenge(String(m.challengeId),Number(m.revision)||undefined):null;
    if(m.challengeId&&!challenge)throw new Error('Level not found');
-   if(challenge&&(challenge.scoring!==SCORING_VERSION||challenge.physics!==this.physics))throw new Error('This ruleset is archived. Select the current challenge revision to throw; historical replays are still available.');
+   if(challenge&&(challenge.scoring!==SCORING_VERSION||challenge.physics!==this.physics||challenge.throwModel!==THROW_MODEL))throw new Error('This ruleset is archived. Select the current challenge revision to throw; historical replays are still available.');
    member.selecting=true;try{await this.worker.request({type:'select',id,challenge});}finally{member.selecting=false;}
    member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
   }
@@ -118,15 +118,16 @@ export class Competition {
    return {type:'replay',replay};
   }
   if(m.type==='charge'){
+   if(m.powerRange!==undefined&&!['precision','full'].includes(m.powerRange))throw new Error('Choose precision or full power');
    if(member.attempt||member.selecting)throw new Error('Your attempt or level change is already active');
    if((m.challengeId||null)!==(member.selected?.id||null)||(m.revision||null)!==(member.selected?.revision||null)||m.layout!==this.layout||m.physics!==this.physics)throw new Error('Refresh the current level: its version changed');
    member.combo=member.selected?new ComboTracker(member.selected):undefined;member.scoreFrames=[];
    member.chargeAt=performance.now();member.attempt=randomUUID();this.pending.set(member.attempt,{id,challenge:member.selected});
-   this.worker.send({type:'charge',id,request:member.attempt});this.sync(member);return;
+   this.worker.send({type:'charge',id,request:member.attempt,powerRange:m.powerRange||'full'});this.sync(member);return;
   }
   if(m.type==='release'){
    if(!member.attempt||member.chargeAt===undefined)return;
-   const charge=Math.min(1,Math.max(0,(performance.now()-member.chargeAt)/((member.selected?.allowedInputs?.chargeSeconds||CHARGE_SECONDS)*1000))),power=Math.round(charge*200)/200;
+   const power=Math.min(1,Math.max(0,(performance.now()-member.chargeAt)/((member.selected?.allowedInputs?.chargeSeconds||CHARGE_SECONDS)*1000)));
    member.chargeAt=undefined;this.worker.send({type:'release',id,power});return;
   }
   if(m.type==='cancel'){
