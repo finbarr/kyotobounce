@@ -1,4 +1,4 @@
-import { readFile, mkdir, stat, copyFile, mkdtemp, rm } from 'node:fs/promises';
+import { readFile, mkdir, stat, copyFile, mkdtemp, rm, rename } from 'node:fs/promises';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
@@ -35,7 +35,8 @@ if(!cached||await hash(archive)!==manifest.archive.sha256){
   try{
     await pipeline(response.body,createWriteStream(partial));
     if(await hash(partial)!==manifest.archive.sha256)throw new Error('Asset archive checksum mismatch');
-    await copyFile(partial,archive);
+    // Publish atomically: another worktree must never read a half-written cache entry.
+    await rename(partial,archive);
   }finally{await rm(partial,{force:true});}
 }
 const temp=await mkdtemp(join(tmpdir(),'kyoto-assets-'));
