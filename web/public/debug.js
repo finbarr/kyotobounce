@@ -19,7 +19,7 @@ export function shotDetails(cancel){
     const d=s?.diagnostics,active=['Flight','Result'].includes(s?.phase);
     if(active)lastFlight=report;
     // Inspect through the DOM without an executable browser debugging backdoor.
-    output.dataset.report=JSON.stringify({phase:s?.phase,aim:{yaw:render?.yaw,pitch:render?.pitch},thrower:s?.players?.find(p=>p.id===s.id),camera:render?.camera,ball:s?.ball,renderBall:render?.renderBall,diagnostics:d,lastShot:lastFlight?{phase:lastFlight.snapshot?.phase,ball:lastFlight.snapshot?.ball,diagnostics:lastFlight.snapshot?.diagnostics}:null});
+    output.dataset.report=JSON.stringify({phase:s?.phase,aim:{yaw:render?.yaw,pitch:render?.pitch},thrower:s?.players?.find(p=>p.id===s.id),camera:render?.camera,rotationSamples:render?.rotationSampleCount,renderedSpin:render?.renderedSpin,spinMarkOpacity:render?.spinMarkOpacity,spin:s?.spin,ball:s?.ball,renderBall:render?.renderBall,diagnostics:d,lastShot:lastFlight?{phase:lastFlight.snapshot?.phase,ball:lastFlight.snapshot?.ball,diagnostics:lastFlight.snapshot?.diagnostics}:null});
     output.textContent=s?[
       `Session: ${s.id}`,
       `View: ${render?.mode||'play'} · Worker: ${worker}`,
@@ -30,6 +30,8 @@ export function shotDetails(cancel){
       `Position (m): ${vector(s.ball)}`,
       `Velocity (m/s): ${vector(s.velocity)}`,
       `Speed: ${speed(s.velocity)} m/s · Spin: ${speed(s.spin)} rad/s`,
+      `Angular velocity (rad/s): ${vector(s.spin)}`,
+      `Rendered spin: ${number(render?.renderedSpin)} rad/s · Rotation samples: ${render?.rotationSampleCount??0}`,
       `Supported: ${active?String(d?.supported??false):'—'}`,
       `Last surface: ${active?d?.lastSurface||'—':'—'}`,
       `Last contact slope: ${active&&d?.contactAge>=0?number(d.slopeDegrees)+'°':'—'}`,

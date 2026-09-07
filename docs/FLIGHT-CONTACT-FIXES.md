@@ -23,3 +23,11 @@ Physics version `kyoto-p3-2` creates a new challenge revision with a fresh leade
 Focused Unity verification uses `Kyoto.Editor.BatchTasks.FlightContacts`, with `KYOTO_LAYOUT` set to the canonical layout path and `KYOTO_CONTACT_REPORT` set to an output JSON path. Run it with Unity's `-batchmode -nographics -executeMethod` options, without `-quit` (the play-mode task exits itself).
 
 Service checks: `npm run typecheck`, `npm test`, `npm run build:web`. After rebuilding the native worker, run `npm run test:runtime` and `node web/tests/flight-controls.mjs` against an isolated `KYOTO_TEST_ORIGIN`.
+
+## Apparent spin reversals
+
+Live snapshots arrive at 30 Hz. Interpolating their endpoint quaternions by the shortest path loses full rotations: at +150 rad/s, one update spans +5 radians, but the old interpolation travels -1.283 radians. Its halfway orientation is -0.642 radians instead of +2.5. This can make steady deceleration appear to stop and reverse.
+
+The service now sends the existing native 180 Hz orientation samples (positions remain private), and the renderer interpolates those smaller intervals. The physical trajectory and score are unchanged. The ball's repeating seam markings soften with angular speed and display exposure time before they alias into a reversing wheel. Live exposure uses actual native angular speed, including impacts faster than the launch limit. Replays already contain the fine orientation samples and get the same marking treatment.
+
+The stationary-spin Unity checks cover 85.679 and 200 rad/s: each decreases monotonically, never reverses, and never gains spin after stopping. Browser rotation tests cover both signs, whole turns, irregular packet delivery, deceleration and a genuine collision reversal that must remain visible. The maximum-spin floor case stops at 7.87 seconds.

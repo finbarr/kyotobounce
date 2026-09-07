@@ -1,3 +1,4 @@
+import {BallRotationBuffer,rotationBetween,rotationSpeed,spinMarkOpacity} from './ball-rotation.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -26,12 +27,13 @@ const ballCamera=aimCamera.clone();
 let camera=aimCamera;
 const toThree=p=>new THREE.Vector3(p.x,p.y,-p.z);
 const ball=new THREE.Mesh(new THREE.SphereGeometry(.023,24,16),new THREE.MeshStandardMaterial({color:0xf1673d,roughness:.42,metalness:.04}));
-for(const axis of [0,1]){const ring=new THREE.Mesh(new THREE.TorusGeometry(.0231,.0012,6,48),new THREE.MeshStandardMaterial({color:0x34252c,roughness:.65}));ring.rotation.x=axis*Math.PI/2;ball.add(ring);}scene.add(ball);
+for(const axis of [0,1]){const ring=new THREE.Mesh(new THREE.TorusGeometry(.0231,.0012,6,48),new THREE.MeshStandardMaterial({color:0x34252c,roughness:.65,transparent:true,depthWrite:false}));ring.rotation.x=axis*Math.PI/2;ball.add(ring);}scene.add(ball);
 const guide=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:0xe8cba0,transparent:true,opacity:.45}));scene.add(guide);
 const trailPositions=new Float32Array(180*3),trailGeometry=new THREE.BufferGeometry();trailGeometry.setAttribute('position',new THREE.BufferAttribute(trailPositions,3));trailGeometry.setDrawRange(0,0);
 const trail=new THREE.Line(trailGeometry,new THREE.LineBasicMaterial({color:0xf49368,transparent:true,opacity:.35,depthWrite:false}));trail.frustumCulled=false;scene.add(trail);let trailCount=0;
 let station,robotAsset,motion,loaded=false,guestId='',identityId='',snapshot=null,previous=null,received=0,workerReady=false;
-const history=[];
+const history=[],ballRotations=new BallRotationBuffer();
+let spinExposure=1/60;
 let yaw=180,pitch=12,top=0,kick=0,azimuth=-Math.PI,elevation=.006,distance=3.8,manualCamera=false,chargeStarted=0;
 let aimDistance=30;
 let rightDrag=false,lastPointer=null,lastPhase='',lockRequested=false;
@@ -66,7 +68,7 @@ socket.addEventListener('message',event=>{
     }
   }
   if(m.type==='ready')workerReady=true;
-  if(m.type==='state'){if(m.phase==='Flight')flightPending=false;previous=snapshot;snapshot=m;received=performance.now();history.push(m);if(history.length>30)history.shift();workerReady=true;}
+  if(m.type==='state'){ballRotations.add(m);if(m.phase==='Flight')flightPending=false;previous=snapshot;snapshot=m;received=performance.now();history.push(m);if(history.length>30)history.shift();workerReady=true;}
   if(m.type==='error'||m.type==='notice'){if(!m.id||m.id===guestId){if(m.type==='error')flightPending=false;notice(m.message);stopChargeSound();chargeStarted=0;}}
   if(m.type==='impact'){lastImpact=m;$('last-impact').textContent=m.label;if(m.qualifying)sound.cue('impact',m);}
 });
@@ -290,6 +292,17 @@ function animate(now){
     $('release-speed').textContent=power>0?`${speed.toFixed(1)} m/s · ${Math.round(speed*3.6)} km/h`:`Up to ${12+extra} m/s`;
     guide.visible=!inFlight&&!!p&&ui.state.mode==='play';
   }
+  // Use native subframes, not a shortest rotation between coarse network frames.
+  let visibleSpin=0;
+  if(inFlight&&snapshot){
+    if(!replaying&&ballRotations.sample(timeline.time,ball.quaternion))visibleSpin=ballRotations.speed;
+    else if(previous){rotationBetween(ball.quaternion,previous.rotation,snapshot.rotation,alpha);visibleSpin=rotationSpeed(previous.rotation,snapshot.rotation,snapshot.stationTime-previous.stationTime);}
+    // Impacts can exceed the launch-spin limit. Use actual native angular speed
+    // for exposure blur even when a full turn fits inside one physics subframe.
+    if(!replaying&&snapshot.spin){const magnitude=w=>Math.hypot(w.x,w.y,w.z);visibleSpin=Math.max(visibleSpin,THREE.MathUtils.lerp(magnitude(previous?.spin||snapshot.spin),magnitude(snapshot.spin),alpha));}
+  }
+  spinExposure=THREE.MathUtils.lerp(spinExposure,Math.min(.1,rawDt),1-Math.exp(-dt*8));
+  for(const marking of ball.children)marking.material.opacity=spinMarkOpacity(visibleSpin,spinExposure);
   const poseDone=performance.now();
   if(inFlight!==ballCameraActive){
     if(inFlight){
@@ -356,7 +369,7 @@ function animate(now){
       if(now-qualityGoodSince>12000&&ratio<limit){renderer.setPixelRatio(Math.min(limit,ratio*1.1));qualityGoodSince=now;}
     }else qualityGoodSince=0;
   }
-  if(now-lastTelemetry>15){lastTelemetry=now;window.kyotoState={briefing:briefing.active,briefingTransition:briefing.blocked&&!briefing.active,audio:sound.state,result:ui.state.lastResult,mode:ui.state.mode,pointerLocked:pointerLocked(),charging:!!chargeStarted,viewerFeet:self()?.feet,challenge:ui.state.selected,busy:ui.state.session?.busy,replayTime:ui.state.replayTime,board:ui.state.board,startupMs,ready:loaded&&workerReady&&!!p,phase,diagnostics:snapshot?.diagnostics,feet:p?.feet,ball:snapshot?.ball,velocity:snapshot?.velocity,spin:snapshot?.spin,flightTime:snapshot?.flightTime,stationTime:snapshot?.stationTime,surfaces:snapshot?.surfaces,impacts:snapshot?.impacts,yaw,pitch,top,kick,guestId,identityId,avatarCount:avatars.size,robotVisible:avatars.get(guestId)?.group.visible,cameraClearance,robotWalk:avatars.get(guestId)?.walkBlend,robotFeet:['L','R'].map(side=>avatars.get(guestId)?.bones[`foot.${side}`]?.getWorldPosition(new THREE.Vector3()).toArray()),lastImpact,held:avatars.get(guestId)?.held.toArray(),renderBall:ball.position.toArray(),renderTime:timeline.time,releaseTime:snapshot?.releaseTime,releaseError:avatars.get(guestId)?.releaseError,camera:{mode:inFlight?'ball':'aim',savedAim:lastThrowAim,position:camera.position.toArray(),target:briefing.active?toThree(ui.state.selected.start.center).lerp(toThree(ui.state.selected.goal.center),.5).toArray():lookTarget.toArray(),up:camera.up.toArray(),manual:manualCamera,azimuth,elevation},render:{pixelRatio:renderer.getPixelRatio(),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frameMs:frameTimes.slice(-120)}};}
+  if(now-lastTelemetry>15){lastTelemetry=now;window.kyotoState={briefing:briefing.active,briefingTransition:briefing.blocked&&!briefing.active,audio:sound.state,result:ui.state.lastResult,mode:ui.state.mode,pointerLocked:pointerLocked(),charging:!!chargeStarted,viewerFeet:self()?.feet,challenge:ui.state.selected,busy:ui.state.session?.busy,replayTime:ui.state.replayTime,board:ui.state.board,startupMs,ready:loaded&&workerReady&&!!p,phase,diagnostics:snapshot?.diagnostics,feet:p?.feet,ball:snapshot?.ball,velocity:snapshot?.velocity,spin:snapshot?.spin,flightTime:snapshot?.flightTime,stationTime:snapshot?.stationTime,surfaces:snapshot?.surfaces,impacts:snapshot?.impacts,yaw,pitch,top,kick,rotationSampleCount:ballRotations.samples.length,renderedSpin:visibleSpin,spinMarkOpacity:ball.children[0].material.opacity,guestId,identityId,avatarCount:avatars.size,robotVisible:avatars.get(guestId)?.group.visible,cameraClearance,robotWalk:avatars.get(guestId)?.walkBlend,robotFeet:['L','R'].map(side=>avatars.get(guestId)?.bones[`foot.${side}`]?.getWorldPosition(new THREE.Vector3()).toArray()),lastImpact,held:avatars.get(guestId)?.held.toArray(),renderBall:ball.position.toArray(),renderTime:timeline.time,releaseTime:snapshot?.releaseTime,releaseError:avatars.get(guestId)?.releaseError,camera:{mode:inFlight?'ball':'aim',savedAim:lastThrowAim,position:camera.position.toArray(),target:briefing.active?toThree(ui.state.selected.start.center).lerp(toThree(ui.state.selected.goal.center),.5).toArray():lookTarget.toArray(),up:camera.up.toArray(),manual:manualCamera,azimuth,elevation},render:{pixelRatio:renderer.getPixelRatio(),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frameMs:frameTimes.slice(-120)}};}
   updateShotDetails({snapshot,render:window.kyotoState,lastImpact,result:ui.state.lastResult,worker:workerStatus});
 }
 window.addEventListener('resize',()=>{for(const view of [aimCamera,ballCamera]){view.aspect=innerWidth/innerHeight;view.updateProjectionMatrix();}renderer.setPixelRatio(Math.min(renderer.getPixelRatio(),pixelRatioLimit()));renderer.setSize(innerWidth,innerHeight);});

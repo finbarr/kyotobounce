@@ -14,7 +14,10 @@ try{
   const live=c.messages.filter(m=>m.type==='state'&&m.liveScore).map(m=>m.liveScore);
   assert.ok(live.length>10);assert.ok(live.some(m=>m.potential>10000));assert.ok(live.some(m=>m.styleBanks>0));
   assert.equal(r.breakdown.outcome,name);assert.equal(shot.state.diagnostics.sleeping,true);assert.ok(Math.hypot(...Object.values(shot.state.velocity))<1e-5);assert.ok(Math.hypot(...Object.values(shot.state.spin))<1e-5);
-  assert.equal(c.messages.some(m=>'scorePoses' in m),false,'Private 180 Hz telemetry must not be broadcast');
+  assert.equal(c.messages.some(m=>'scorePoses' in m),false,'Private positions must not be broadcast');
+  const rotationFrames=c.messages.filter(m=>m.type==='state'&&m.rotationSamples?.length);
+  assert.ok(rotationFrames.some(m=>m.rotationSamples.length>=5),'Render orientations must retain native subframes');
+  assert.ok(rotationFrames.every(m=>m.rotationSamples.length<=90&&m.rotationSamples.every(s=>Object.keys(s).sort().join(',')==='q,t')),'Only bounded orientation samples are public');
   const replay=(await c.request('replay',{attempt:r.attempt},'replay')).replay;
   assert.ok(replay.scoreFrames.length>20);assert.deepEqual(replay.scoreFrames.at(-1).score,r.breakdown);assert.deepEqual(scoreAttempt(replay),r.breakdown);assert.equal(replay.score,r.score);
   assert.ok(Math.abs(live.at(-1).potential-r.breakdown.potential)<=1,'Live multiplier exactly agrees with final replay');

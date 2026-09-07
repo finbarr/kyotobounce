@@ -51,7 +51,9 @@ export class Competition {
    }
    m.snapshot=message;m.snapshotAt=Date.now();
   }
-  // Full-rate poses are private worker telemetry; send only the small score summary.
+  // Keep full-rate positions private; orientations need 180 Hz samples to avoid
+  // shortest-path interpolation reversing high spin between 30 Hz snapshots.
+  message.rotationSamples=(message.scorePoses||[]).slice(-90).map((p:any)=>({t:p.t,q:p.q}));
   delete message.scorePoses;
  }
  impact(message:any){this.members.get(message.id)?.combo?.contact(message);}
