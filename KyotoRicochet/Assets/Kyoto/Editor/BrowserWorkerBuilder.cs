@@ -19,9 +19,13 @@ namespace Kyoto.Editor
         static void BuildFor(BuildTarget target,string output,BuildOptions options)
         {
             string scenePath="Assets/Kyoto/Scenes/BrowserWorker.unity";
+            Directory.CreateDirectory(Path.GetDirectoryName(scenePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output)));
+            AssetDatabase.Refresh();
             var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
             new GameObject("Local physics authority").AddComponent<BrowserPhysicsWorker>();
-            EditorSceneManager.SaveScene(scene,scenePath);
+            if(!EditorSceneManager.SaveScene(scene,scenePath))
+                throw new InvalidOperationException("Could not save generated worker scene: "+scenePath);
             bool server=target==BuildTarget.StandaloneLinux64;
             var namedTarget=server?NamedBuildTarget.Server:NamedBuildTarget.Standalone;
             var oldBackend=PlayerSettings.GetScriptingBackend(namedTarget);
