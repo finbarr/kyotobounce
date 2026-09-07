@@ -1,7 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { randomUUID } from 'node:crypto';
 import type { Challenge,Guest,NativeResult } from './types.ts';
-import { withChallengeRules,SCORING_VERSION,THROW_MODEL,CHARGE_SECONDS } from './types.ts';
+import { withChallengeRules,SCORING_VERSION,THROW_MODEL,CHARGE_SECONDS,RECORDED_PHYSICS } from './types.ts';
 export class Store {
  db:DatabaseSync;
  constructor(path:string){
@@ -41,6 +41,15 @@ export class Store {
   this.db.exec('BEGIN IMMEDIATE');
   try{for(const c of this.list())if(c.scoring!==SCORING_VERSION)this.saveChallenge({...c,revision:c.revision+1,scoring:SCORING_VERSION,allowedInputs:{...withChallengeRules(c).allowedInputs!,chargeSeconds:CHARGE_SECONDS},hint:c.hint?{...c.hint,holdMs:Math.round(c.hint.holdMs*CHARGE_SECONDS/(c.allowedInputs?.chargeSeconds||1.2))}:undefined});this.db.exec('COMMIT');}
   catch(error){this.db.exec('ROLLBACK');throw error;}
+ }
+ upgradePhysics(layout:string,physics:string){
+  if(!RECORDED_PHYSICS.includes(physics))return;
+  this.db.exec('BEGIN IMMEDIATE');
+  try{
+   for(const c of this.list())if(c.layout===layout&&c.physics!==physics&&RECORDED_PHYSICS.includes(c.physics))
+    this.saveChallenge({...c,revision:c.revision+1,physics});
+   this.db.exec('COMMIT');
+  }catch(error){this.db.exec('ROLLBACK');throw error;}
  }
  setting(key:string){const r=this.db.prepare('SELECT value FROM settings WHERE key=?').get(key);return r?JSON.parse(r.value as string):null;}
  setSetting(key:string,value:unknown){this.db.prepare('INSERT OR REPLACE INTO settings VALUES (?,?)').run(key,JSON.stringify(value));}

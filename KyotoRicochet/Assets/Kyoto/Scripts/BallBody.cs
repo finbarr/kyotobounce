@@ -147,7 +147,7 @@ namespace Kyoto
             previousPosition=Body.position;previousRotation=Body.rotation;Clock+=dt;
             bool movingWorld=StationMotion.Active(gameObject.scene);
             double worldTime=StationMotion.Time(gameObject.scene);
-            if(Sleeping&&!StationMotion.Near(gameObject.scene,Body.position,Profile.radius_m+.05f))
+            if(Sleeping&&!(movingWorld&&StationMotion.Sweep(gameObject.scene,Body.position,Vector3.zero,Profile.radius_m+Skin,worldTime,dt,out _)))
             {if(movingWorld){StationMotion.Advance(gameObject.scene,dt);if(StationMotion.UpdatesGeometry(gameObject.scene))Physics.SyncTransforms();}return;}
             Sleeping=false;
             var scene=gameObject.scene.GetPhysicsScene();
@@ -199,7 +199,7 @@ namespace Kyoto
                         profileId=Profile.id,surfaceId=surface?surface.surfaceId:"unclassified" });
                     LastContactTime=Clock;ContactNormal=normal;contactSurfaceVelocity=surfaceVelocity;CurrentRollingResistance=surface?surface.rollingResistance:.012f;
                     LastContactSurface=surface?surface.surfaceId:"unclassified";
-                    CurrentTorsionalResistance=surface?surface.torsionalResistance:.002f;
+                    CurrentTorsionalResistance=surface?surface.torsionalResistance:Surface.DefaultTorsionalResistance;
                     if(-vn>.28f)Impact?.Invoke(surface,point,-vn);
                 }
                 remaining-=Mathf.Max(time,Mathf.Min(remaining,dt*.002f));
@@ -225,7 +225,9 @@ namespace Kyoto
                 AngularVelocity=Vector3.MoveTowards(rollingSpin,Vector3.zero,CurrentRollingResistance*torqueScale)
                     +Vector3.MoveTowards(normalSpin,Vector3.zero,CurrentTorsionalResistance*torqueScale);
                 // Ignore sub-millimeter normal motion across the query skin when sleeping.
-                bool quiet=!StationMotion.Near(gameObject.scene,position,Profile.radius_m+.05f)
+                // A nearby escalator envelope is not contact. Fixed trim and landings
+                // may rest normally; an actual incoming tread wakes the sphere above.
+                bool quiet=contactSurfaceVelocity.sqrMagnitude<1e-8f
                     &&Vector3.ProjectOnPlane(Velocity-contactSurfaceVelocity,ContactNormal).magnitude<.025f
                     &&Mathf.Abs(Vector3.Dot(Velocity-contactSurfaceVelocity,ContactNormal))<.10f&&AngularVelocity.magnitude<.75f;
                 restingTime=quiet?restingTime+dt:0;

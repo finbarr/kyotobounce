@@ -37,6 +37,7 @@ docs/*
 !docs/ARCADE-SCORING.md
 !docs/PARALLEL_DEVELOPMENT.md
 !docs/DEPLOYING.md
+!docs/FLIGHT-CONTACT-FIXES.md
 tools/*
 !tools/assets.mjs
 !tools/asset-paths.mjs

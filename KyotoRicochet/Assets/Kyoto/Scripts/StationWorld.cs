@@ -127,8 +127,13 @@ namespace Kyoto
                 var mesh=new Mesh{name=p.id,indexFormat=p.vertices.Length>65535?IndexFormat.UInt32:IndexFormat.UInt16};mesh.vertices=p.vertices;mesh.triangles=p.triangles;
                 if(p.normals!=null&&p.normals.Length==p.vertices.Length)mesh.normals=p.normals;else mesh.RecalculateNormals();
                 mesh.RecalculateBounds();
+                // Authored escalator skirts and undertrays are closed convex prisms.
+                // Solid collision recovers an interior overlap at a grazing seam.
+                // Their convex hull uses the same eight corners as the visible mesh.
+                bool solidEscalator=p.id.Contains("-escalator-")
+                    &&(p.role=="escalator-body"||p.id.Contains("-skirt-"))&&p.vertices.Length<=36;
                 Vector3 meshOrigin=Vector3.zero;
-                if(p.role=="city-ground")
+                if(p.role=="city-ground"||solidEscalator)
                 {
                     // Keep the narrow curb faces near their collider's origin.
                     // World-coordinate vertices caused millimetre-scale PhysX
@@ -162,7 +167,7 @@ namespace Kyoto
                 if(p.playerOnly)obj.layer=CollisionLayers.WalkingAssist;else if(p.ballStairs)obj.layer=CollisionLayers.BallStairs;
                 if((p.playerOnly?walking:collision)&&p.collision)
                 {
-                    var collider=obj.AddComponent<MeshCollider>();collider.sharedMesh=mesh;collider.sharedMaterial=Physical(p.material);collider.contactOffset=.001f;
+                    var collider=obj.AddComponent<MeshCollider>();collider.sharedMesh=mesh;collider.convex=solidEscalator;collider.sharedMaterial=Physical(p.material);collider.contactOffset=.001f;
                     if(!p.playerOnly)
                     {
                     var surface=obj.AddComponent<Surface>();surface.surfaceId=p.id;

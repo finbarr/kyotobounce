@@ -11,7 +11,7 @@ namespace Kyoto
     {public string id,name,layout,physics,requiredSurface,throwModel;public int revision;public BrowserDisk start,goal;}
     public sealed partial class BrowserSession
     {
-        public const string SimulationVersion="kyoto-p3-1";
+        public const string SimulationVersion="kyoto-p3-2";
         [Serializable] class RpcReply
         {public string type="reply",request,message;public bool ok;public BrowserDisk disk;public BrowserChallenge challenge;}
         [Serializable] public class ReplayPose

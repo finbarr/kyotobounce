@@ -50,7 +50,7 @@ namespace Kyoto
         {
             public bool simulating,sleeping,supported;
             public string lastSurface,endReason;
-            public float contactAge,slopeDegrees,rollingResistance,endedAt;
+            public float contactAge,slopeDegrees,rollingResistance,torsionalResistance,endedAt;
             public Vector3 contactNormal,surfaceVelocity;
             public int contactBudgetExhaustions,overlapRecoveries;
         }
@@ -110,7 +110,7 @@ namespace Kyoto
                 case "input":
                     p.lastInput=Time.realtimeSinceStartupAsDouble;
                     p.move=Vector2.ClampMagnitude(new Vector2(c.x,c.z),1);p.fast=c.fast;
-                    if(owner!=p||state.phase!="Release")
+                    if(owner!=p||(state.phase!="Release"&&state.phase!="Flight"&&state.phase!="Result"))
                     {
                         p.state.yaw=Mathf.Repeat(c.yaw+180,360)-180;p.state.pitch=Mathf.Clamp(c.pitch,-65,80);
                         p.state.top=Mathf.Clamp(c.top,-200,200);p.state.kick=Mathf.Clamp(c.kick,-200,200);
@@ -169,7 +169,7 @@ namespace Kyoto
             else StationMotion.Advance(gameObject.scene,BallBody.Step);
             foreach(var p in players.Values)
             {
-                bool frozen=p==owner&&(state.phase=="Charging"||state.phase=="Release");
+                bool frozen=p==owner&&(state.phase=="Charging"||state.phase=="Release"||state.phase=="Flight"||state.phase=="Result");
                 var move=frozen||Time.realtimeSinceStartupAsDouble-p.lastInput>.3?Vector2.zero:p.move;
                 Vector3 previousFeet=p.walker.transform.position;
                 p.walker.Move(move,p.state.yaw,p.fast,BallBody.Step);ConstrainWalker(p,previousFeet);
@@ -213,7 +213,7 @@ namespace Kyoto
             d.contactAge=ball.LastContactTime<0?-1:ball.Clock-ball.LastContactTime;
             d.contactNormal=ball.ContactNormal;d.surfaceVelocity=ball.ContactSurfaceVelocity;
             d.slopeDegrees=ball.LastContactTime<0?0:Vector3.Angle(ball.ContactNormal,-Physics.gravity);
-            d.rollingResistance=ball.CurrentRollingResistance;
+            d.torsionalResistance=ball.CurrentTorsionalResistance;d.rollingResistance=ball.CurrentRollingResistance;
             d.contactBudgetExhaustions=ball.ContactBudgetExhaustions;d.overlapRecoveries=ball.StaticOverlapRecoveries;
             bool recording=state.phase=="Flight"||state.phase=="Result";
             state.scorePoses=recording?replayPoses.GetRange(scorePoseCursor,replayPoses.Count-scorePoseCursor).ToArray():Array.Empty<ReplayPose>();

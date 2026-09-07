@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { Store } from './store.ts';
 import { PhysicsWorker } from './worker.ts';
 import type { Guest,Challenge,Disk,NativeResult } from './types.ts';
-import { SCORING_VERSION,SUPPORTED_SCORING,THROW_MODEL,CHARGE_SECONDS } from './types.ts';
+import { SCORING_VERSION,SUPPORTED_SCORING,THROW_MODEL,CHARGE_SECONDS,RECORDED_PHYSICS } from './types.ts';
 
 export type Member={id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>};
 export class Competition {
@@ -28,6 +28,8 @@ export class Competition {
  remove(id:string){const m=this.members.get(id);if(!m)return;this.clearAttempt(m);this.members.delete(id);this.worker.send({type:'leave',id});}
  clearAttempt(m:Member){if(m.attempt)this.pending.delete(m.attempt);m.attempt=undefined;m.chargeAt=undefined;m.combo=undefined;m.scoreFrames=undefined;}
  async restore(m:Member){
+  const latest=m.selected?this.store.challenge(m.selected.id):null;
+  if(latest&&latest.layout===this.layout&&latest.physics===this.physics&&m.selected?.physics!==this.physics){m.selected=latest;this.remember(m);}
   m.restoring=true;this.sync(m);this.worker.send({type:'join',id:m.id});
   try{
    if(m.selected){if(!SUPPORTED_SCORING.includes(m.selected.scoring||'distinct-v1'))throw new Error('Scoring version changed');await this.worker.request({type:'select',id:m.id,challenge:m.selected});}
@@ -38,7 +40,7 @@ export class Competition {
   if(!this.members.has(m.id)||!this.worker.ready)return;
   m.restoring=false;this.sync(m);this.board(m);
  }
- async ready(message:any){this.layout=message.layout;this.physics=message.physics;await Promise.all([...this.members.values()].map(m=>this.restore(m)));this.publish(this.catalog());}
+ async ready(message:any){this.layout=message.layout;this.physics=message.physics;this.store.upgradePhysics(this.layout,this.physics);await Promise.all([...this.members.values()].map(m=>this.restore(m)));this.publish(this.catalog());}
  state(message:any){
   const m=this.members.get(message.id);
   if(m){
@@ -101,7 +103,7 @@ export class Competition {
    if(member.attempt||member.selecting)throw new Error('Finish your throw or level change first');
    const challenge=m.challengeId?this.store.challenge(String(m.challengeId),Number(m.revision)||undefined):null;
    if(m.challengeId&&!challenge)throw new Error('Level not found');
-   if(challenge&&challenge.scoring!==SCORING_VERSION)throw new Error('This ruleset is archived. Select the current challenge revision to throw; historical replays are still available.');
+   if(challenge&&(challenge.scoring!==SCORING_VERSION||challenge.physics!==this.physics))throw new Error('This ruleset is archived. Select the current challenge revision to throw; historical replays are still available.');
    member.selecting=true;try{await this.worker.request({type:'select',id,challenge});}finally{member.selecting=false;}
    member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
   }
@@ -110,7 +112,7 @@ export class Competition {
   }
   if(m.type==='replay'){
    const replay=this.store.replay(String(m.attempt));if(!replay)throw new Error('Replay not found');
-   if(replay.layout!==this.layout||replay.physics!==this.physics||!['ori-grip-v1',this.animation].includes(replay.animation)||!SUPPORTED_SCORING.includes(replay.scoring||'distinct-v1'))throw new Error('Replay is incompatible with the current station, animation or scoring version');
+   if(replay.layout!==this.layout||(replay.physics!==this.physics&&!RECORDED_PHYSICS.includes(replay.physics))||!['ori-grip-v1',this.animation].includes(replay.animation)||!SUPPORTED_SCORING.includes(replay.scoring||'distinct-v1'))throw new Error('Replay is incompatible with the current station, animation or scoring version');
    return {type:'replay',replay};
   }
   if(m.type==='charge'){

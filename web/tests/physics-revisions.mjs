@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {Store} from '../store.ts';
+import {Competition} from '../competition.ts';
+import {SCORING_VERSION,THROW_MODEL} from '../types.ts';
+const store=new Store(':memory:');
+try{
+ const guest=store.guest(),disk={center:{x:0,y:0,z:0},radius:1,surface:'floor'};
+ const old={id:'contact-fixture',revision:1,creator:guest.id,name:'Contact fixture',start:disk,goal:disk,layout:'station',physics:'kyoto-p3-1',scoring:SCORING_VERSION,throwModel:THROW_MODEL};
+ store.saveChallenge(old);store.saveChallenge({...old,id:'other-station',layout:'other'});
+ store.saveResult({attempt:'historic',id:guest.id,challenge:old,layout:old.layout,physics:old.physics,score:10000,success:true,surfaces:0,duration:4,poses:[{t:0,p:{x:0,y:1,z:0},q:{x:0,y:0,z:0,w:1}}],contacts:[]},'ori-carry-v2');
+ const historic=JSON.stringify(store.replay('historic'));
+ store.setSetting(`selected:${guest.id}`,{id:old.id,revision:1});
+ const requests=[],worker={ready:false,send:m=>requests.push(m),request:async m=>{requests.push(m);return {ok:true};}};
+ const competition=new Competition(store,worker,()=>{});
+ const member=await competition.add(guest,'session');
+ worker.ready=true;await competition.ready({layout:'station',physics:'kyoto-p3-2'});
+ const latest=store.challenge(old.id);
+ assert.equal(latest.revision,2);assert.equal(latest.physics,'kyoto-p3-2');assert.deepEqual(latest.goal,old.goal);
+ assert.equal(member.selected.revision,2,'An existing connection restores the current physics revision');
+ assert.equal(requests.find(m=>m.type==='select').challenge.physics,'kyoto-p3-2');
+ assert.equal(store.challenge('other-station').revision,1,'Never migrate a different station');
+ assert.equal(store.challenge(old.id,1).physics,'kyoto-p3-1');
+ assert.equal(store.leaderboard(latest).length,0);assert.equal(store.leaderboard(old).length,1);
+ assert.equal(JSON.stringify(store.replay('historic')),historic,'Old replay is immutable');
+ const replay=await competition.command(member,{type:'replay',attempt:'historic'});assert.equal(replay.replay.physics,'kyoto-p3-1','Recorded old poses remain playable');
+ await assert.rejects(competition.command(member,{type:'select-challenge',challengeId:old.id,revision:1}),/archived/);
+ await competition.ready({layout:'station',physics:'kyoto-p3-2'});assert.equal(store.challenge(old.id).revision,2,'Restart is idempotent');
+ const reconnect=await competition.add(guest,'reconnected');assert.equal(reconnect.selected.revision,2);
+ competition.physics='unknown';store.upgradePhysics('station','unknown');assert.equal(store.challenge(old.id).revision,2,'Unknown versions require an explicit migration');
+ console.log('PASS physics revisions, separate boards, replay compatibility, reconnect and restart');
+}finally{store.close();}
