@@ -1,0 +1,46 @@
+{
+  "name": "kyotobounce",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "start": "node web/server.ts",
+    "stop": "node web/stop.mjs",
+    "build:web": "node web/build-browser.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:browser": "node web/tests/browser-smoke.mjs",
+    "build:worker": "node web/build-worker.mjs",
+    "build:unity-web:legacy": "node web/build.mjs",
+    "test:traversal": "node web/tests/browser-traversal.mjs",
+    "test:spin": "node web/tests/browser-spin.mjs",
+    "test:avatar": "node web/tests/avatar-release.mjs",
+    "setup": "npm ci && npm run assets:fetch && npm run build:worker && npm run build:web",
+    "assets:fetch": "node tools/assets.mjs fetch",
+    "assets:verify": "node tools/assets.mjs verify",
+    "assets:pack": "node tools/pack-assets.mjs",
+    "dev": "node tools/dev.mjs",
+    "test": "node web/tests/store.mjs && node web/tests/scoring.mjs && node web/tests/combo-scoring.mjs",
+    "test:runtime": "node web/tests/combo-runtime.mjs"
+  },
+  "dependencies": {
+    "three": "0.185.1",
+    "three-mesh-bvh": "0.9.14",
+    "ws": "8.21.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "@types/ws": "8.18.1",
+    "playwright": "1.63.0",
+    "typescript": "7.0.2"
+  },
+  "license": "MIT",
+  "description": "An arcade bank-shot game inside a Kyoto Station inspired atrium",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/finbarr/kyotobounce.git"
+  },
+  "homepage": "https://kyotobounce.com"
+}

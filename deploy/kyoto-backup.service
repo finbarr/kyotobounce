@@ -1,0 +1,9 @@
+[Unit]
+Description=Consistent Kyoto Bounce database backup
+
+[Service]
+Type=oneshot
+User=kyoto
+Group=kyoto
+UMask=0077
+ExecStart=/opt/kyoto/current/deploy/backup.sh

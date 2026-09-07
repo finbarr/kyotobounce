@@ -1,0 +1,14 @@
+import {Client} from './api-client.mjs';
+import {Store} from '../store.ts';
+import {readFile,writeFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const out='artifacts/phase3/native-score-flow',progress=JSON.parse(await readFile(`${out}/progress.json`,'utf8')),probe=progress.checks.find(c=>c.name==='fixed-stair-probe'),store=new Store('web/data/kyoto.sqlite');
+const guest=store.db.prepare('SELECT token FROM guests WHERE id=?').get(probe.result.id),draft=store.list().find(c=>c.creator===probe.result.id&&c.name==='Stair Bank');store.close();
+const client=new Client();try{
+ await client.join(guest.token);const start=await client.place({x:18.8,y:0,z:4.65},.25,'start');const setup=await client.request('save-challenge',{name:'Stair Bank',editId:draft.id,start,goal:draft.goal},'saved-challenge');await client.request('select-challenge',{challengeId:setup.challenge.id,revision:setup.challenge.revision},'selected');await client.request('select-challenge',{challengeId:null},'selected');
+ const settings={yaw:90,pitch:-30,top:-200,kick:0},returned=await client.throw(525,settings);console.log('Stair-riser bank',returned.result.surfaces,JSON.stringify(returned.final));await writeFile(`${out}/return-probe.json`,JSON.stringify({result:returned.result,final:returned.final},null,2));
+ const goal=await client.place(returned.final,1,'goal');const saved=await client.request('save-challenge',{name:'Stair Bank',editId:draft.id,start,goal},'saved-challenge');await client.request('select-challenge',{challengeId:saved.challenge.id,revision:saved.challenge.revision},'selected');
+ const shot=await client.throw(525,settings);assert.equal(shot.result.success,true);assert.ok(shot.result.score>=1200);const board=await client.request('leaderboard',{challengeId:saved.challenge.id,revision:saved.challenge.revision},'leaderboard');assert.equal(board.entries[0].score,shot.result.score);
+ const replay=(await client.request('replay',{attempt:shot.result.attempt},'replay')).replay,ids=[...new Set(replay.contacts.filter(c=>c.qualifying).map(c=>c.surface))];assert.equal(ids.length,shot.result.surfaces);assert.equal(shot.result.score,1000+100*ids.length);
+ progress.checks.push({name:'successful-multiple-surfaces',challenge:saved.challenge,result:shot.result,qualifyingIds:ids,board:board.entries});await writeFile(`${out}/result.json`,JSON.stringify({status:'pass',scope:'Native-authoritative protocol shots: airborne goal crossing is not success; a successful fixed-stair bank earns more than the one-surface starter',checks:progress.checks},null,2));console.log('PASS airborne crossing rejected and',shot.result.score,'points for',ids.join(', '));
+}catch(error){await writeFile(`${out}/completion-failure.json`,JSON.stringify({error:String(error),latest:client.state},null,2));throw error;}finally{client.close();}

@@ -1,0 +1,173 @@
+[
+  {
+    "id": "atrium-first-bank",
+    "revision": 1,
+    "name": "First Bank",
+    "creator": "station",
+    "order": 0,
+    "start": {
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 20
+      },
+      "radius": 0.75,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": 8.876934051513672,
+        "y": 0,
+        "z": 19.780000686645508
+      },
+      "radius": 1.25,
+      "surface": "concourse"
+    },
+    "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+    "physics": "kyoto-p3-1",
+    "hint": {
+      "yaw": 90,
+      "pitch": 15,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 365,
+      "note": "A gentle floor bank. Set the suggested aim and release near 30% power."
+    },
+    "scoring": "distinct-v1",
+    "allowedInputs": {
+      "chargeSeconds": 1.2,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "throwModel": "precision-v1"
+  },
+  {
+    "id": "atrium-return-ticket",
+    "revision": 1,
+    "name": "Return Ticket",
+    "creator": "station",
+    "order": 1,
+    "start": {
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 20
+      },
+      "radius": 0.75,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": -5.037579536437988,
+        "y": 0,
+        "z": 19.780000686645508
+      },
+      "radius": 0.6499999761581421,
+      "surface": "concourse"
+    },
+    "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+    "physics": "kyoto-p3-1",
+    "hint": {
+      "yaw": 90,
+      "pitch": 15,
+      "top": -200,
+      "kick": 0,
+      "holdMs": 298,
+      "note": "Strong backspin brings the ball back. Release near 25% power."
+    },
+    "scoring": "distinct-v1",
+    "allowedInputs": {
+      "chargeSeconds": 1.2,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "throwModel": "precision-v1"
+  },
+  {
+    "id": "atrium-moving-return",
+    "revision": 3,
+    "name": "Catch the Lift",
+    "creator": "station",
+    "order": 2,
+    "start": {
+      "center": {
+        "x": 17.919998168945312,
+        "y": 0,
+        "z": 6.373336315155029
+      },
+      "radius": 0.25,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": 30.617856979370117,
+        "y": 5.5,
+        "z": 6.153565406799316
+      },
+      "radius": 0.5,
+      "surface": "east-ground-second-landing"
+    },
+    "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+    "physics": "kyoto-p3-1",
+    "hint": {
+      "yaw": 90,
+      "pitch": -30,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 420,
+      "period": 0.7900353236922196,
+      "releasePhase": 0.2,
+      "note": "Pitch down with backspin to catch an ascending tread. Hold near 35% power and release at the green mark; the ball rides to the first landing."
+    },
+    "requiredSurface": "east-concourse-lower-escalator-1",
+    "scoring": "distinct-v1",
+    "allowedInputs": {
+      "chargeSeconds": 1.2,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "throwModel": "precision-v1"
+  }
+]

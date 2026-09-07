@@ -1,0 +1,14 @@
+{
+  "name": "ORI",
+  "author": "Original procedural Blender model for Kyoto Ricochet",
+  "boneCount": 50,
+  "vertices": 10086,
+  "polygons": 10796,
+  "actions": [
+    "Idle",
+    "Throw",
+    "Windup"
+  ],
+  "status": "Relaxed waist-height carry, continuous windup and validated native release grips",
+  "animation": "ori-carry-v2"
+}

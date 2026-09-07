@@ -1,0 +1,12 @@
+import {Client} from './api-client.mjs';
+import {readFile,writeFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const out='artifacts/phase3/native-score-flow',progress=JSON.parse(await readFile(`${out}/progress.json`,'utf8')),client=new Client();
+try{
+ await client.join();const start=await client.place({x:2.5,y:0,z:12.648147},.5,'start'),goal=await client.place({x:0,y:0,z:20},1,'goal');
+ const draft=(await client.request('save-challenge',{name:'Column Bank',start,goal},'saved-challenge')).challenge;await client.request('select-challenge',{challengeId:draft.id,revision:draft.revision},'selected');await client.request('select-challenge',{challengeId:null},'selected');
+ const settings={yaw:90,pitch:15,top:0,kick:0},probe=await client.throw(365,settings);const ids=[...new Set(probe.contacts.filter(c=>c.qualifying&&c.stationTime>=probe.result.releaseTime).map(c=>c.surface))];console.log('Column bank',probe.result.surfaces,JSON.stringify(probe.final),ids.join(', '));await writeFile(`${out}/column-probe.json`,JSON.stringify({result:probe.result,final:probe.final,qualifyingIds:ids},null,2));assert.ok(probe.result.surfaces>=2);
+ const target=await client.place(probe.final,1,'goal'),saved=(await client.request('save-challenge',{name:'Column Bank',editId:draft.id,start,goal:target},'saved-challenge')).challenge;await client.request('select-challenge',{challengeId:saved.id,revision:saved.revision},'selected');const shot=await client.throw(365,settings);assert.ok(shot.result.success);assert.ok(shot.result.score>=1200);
+ const replay=(await client.request('replay',{attempt:shot.result.attempt},'replay')).replay,qualifyingIds=[...new Set(replay.contacts.filter(c=>c.qualifying).map(c=>c.surface))];assert.equal(shot.result.score,1000+100*qualifyingIds.length);const board=(await client.request('leaderboard',{challengeId:saved.id,revision:saved.revision},'leaderboard')).entries;assert.equal(board[0].score,shot.result.score);
+ const checks=[progress.checks[0],{name:'successful-column-and-floor-bank',challenge:saved,result:shot.result,qualifyingIds,board}];await writeFile(`${out}/result.json`,JSON.stringify({status:'pass',scope:'Real native protocol shots: an airborne goal crossing stays a miss; a successful column/floor bank earns more points than a one-surface starter',checks},null,2));console.log('PASS',shot.result.score,'points for',qualifyingIds.join(', '));
+}catch(error){await writeFile(`${out}/column-failure.json`,JSON.stringify({error:String(error),latest:client.state},null,2));throw error;}finally{client.close();}

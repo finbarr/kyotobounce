@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kyoto Bounce — Station Arcade</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/arcade.css">
+<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/","three-mesh-bvh":"/vendor/bvh/build/index.module.js"}}</script></head>
+<body>
+<canvas id="game" tabindex="0" aria-label="Kyoto Bounce game"></canvas>
+<header><div class="identity"><span class="seal">京都<br><b>跳</b></span><div><h1>KYOTO <strong>BOUNCE</strong></h1><p>STATION ARCADE <span>•</span> 京都バウンス</p></div></div><div class="session"><div class="audio-controls"><button id="sound-toggle" aria-pressed="true">SOUND ON</button><button id="music-toggle" aria-pressed="true">♫ MUSIC ON</button></div><span class="dot" id="connection-dot"></span><span id="connection">Connecting</span><input id="nickname" aria-label="Your nickname" maxlength="32" placeholder="Your name"></div></header>
+<div id="loading"><span class="eyebrow">KYOTO STATION / 京都駅</span><h2>KYOTO<br><strong>BOUNCE.</strong></h2><p id="loading-message">Opening the atrium…</p><div class="load-track"><i id="load-progress"></i></div></div>
+<div id="arcade-hud" hidden><span id="hud-course">FREE PLAY</span><div><span>BEST <b id="hud-best">000000</b></span><span id="hud-target">FIND YOUR LINE</span></div></div>
+<div id="reticle" aria-hidden="true"><i></i></div>
+<div id="notice" role="status" aria-live="polite">Loading the station</div>
+<aside id="throw-panel"><div class="panel-top"><span class="eyebrow" id="phase-label">FREE EXPLORATION</span><button id="home" title="Return to the atrium entrance">↶ Entrance</button></div><h2>ONE BALL.<br>ENDLESS ANGLES.</h2>
+<label class="spin-row"><span>BACK <b id="top-value">0</b> TOP</span><input id="top" aria-label="Backspin and topspin" type="range" min="-200" max="200" step="5" value="0"></label>
+<label class="spin-row"><span>LEFT <b id="kick-value">0</b> RIGHT</span><input id="kick" aria-label="Left and right rebound kick" type="range" min="-200" max="200" step="5" value="0"></label>
+<div class="actions"><button id="retry">↻ Retry <kbd>R</kbd></button><button id="clear-spin">Clear spin <kbd>X</kbd></button><button id="recenter">Recenter</button></div>
+</aside>
+<aside id="power-control"><div class="power-label"><span id="power-label">HOLD TO WIND UP</span><b id="power-number">0%</b></div><div class="power-track" role="meter" aria-label="Throw power" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="power-fill"></i></div><div class="power-ticks"><span>0</span><span>25</span><span>50</span><span>75</span><span>100%</span></div><div class="power-caption"><span>HOLD SPACE / CLICK · RELEASE TO THROW</span><output id="release-speed">Up to 100 m/s</output></div>
+</aside>
+<aside id="flight-panel" hidden><span class="eyebrow" id="flight-label">IN FLIGHT</span><div class="stat"><b id="surfaces">0</b><span>SURFACES HIT</span></div><p id="last-impact">Find another angle.</p><p class="style-reminder">Build the combo. Stick the landing.</p><button id="flight-retry">Recall ball <kbd>R</kbd></button></aside>
+<details id="shot-details"><summary>Shot details</summary><pre id="shot-state">Waiting for the game…</pre><button id="save-shot-report">Save shot report</button></details>
+<footer><span><kbd>W A S D</kbd> Walk <kbd>SHIFT</kbd> Faster</span><span><kbd id="mouse-mode">CLICK TO AIM</kbd> <kbd>ESC</kbd> Menus <kbd>SPACE / CLICK</kbd> Hold & release</span><span><kbd>ARROWS / RIGHT DRAG</kbd> Orbit <kbd>SCROLL</kbd> Zoom</span><span><kbd>Q E</kbd> Topspin <kbd>Z C</kbd> Sidespin</span><span id="performance"></span></footer>
+<script type="module" src="/game.js"></script>
+</body></html>

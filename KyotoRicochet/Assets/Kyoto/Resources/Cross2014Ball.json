@@ -1,0 +1,17 @@
+{
+  "id": "cross-2014-solid-superball-granite-candidate",
+  "display_name": "P5 Superball / granite \u2014 candidate",
+  "mass_kg": 0.0462,
+  "radius_m": 0.023,
+  "inertia_factor": 0.4,
+  "maximum_launch_spin_rad_s": 200,
+  "response": {
+    "normal_restitution": 0.908534399633196,
+    "sliding_friction": 0.4039374184278683,
+    "grip_restitution": 0.8384479790366468,
+    "normal_offset_fraction_of_radius": 0.06649987783625151
+  },
+  "fitting_source": "art-source/physics/cross-2014-observations.json",
+  "comparison_sha256": "39e35a89af91bf5fcac32a89c91c9269a0cb7cb9208d4088e84023dfffde883e",
+  "status": "development candidate, two training spin misses; not final calibration"
+}

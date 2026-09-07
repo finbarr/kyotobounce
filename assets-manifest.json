@@ -1,0 +1,123 @@
+{
+  "version": "assets-v1",
+  "license": "MIT",
+  "archive": {
+    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v1/kyoto-assets-v1.tar.gz",
+    "bytes": 133442942,
+    "sha256": "ea84c31da65deda48e9d5bbc801d4db4a40599678d196b73d6d250bbf4f8e873"
+  },
+  "files": {
+    "web/public/assets/atrium-detail.glb": {
+      "bytes": 2411184,
+      "sha256": "f1e6533cfb927b3faa86042f45a03ee2c981fe3bfa6101c00b98388f913b9f5e"
+    },
+    "web/public/assets/atrium-detail.json": {
+      "bytes": 10834,
+      "sha256": "39e3468ab8fff4b1219fee520c23c927f1cecf27eb9b8742b13fee1977269e86"
+    },
+    "web/public/assets/atrium.glb": {
+      "bytes": 199672132,
+      "sha256": "0526fe7dbeef084d922e53028d3e2f63012fe7f7efbd3e840f3049552107a487"
+    },
+    "web/public/assets/ori.glb": {
+      "bytes": 885204,
+      "sha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4"
+    },
+    "web/public/assets/station.json": {
+      "bytes": 1239920,
+      "sha256": "a9bfbfd5aae6e943a785dcbe52c6753f876ea68ce6c74836e95c8e1426683cdd"
+    },
+    "runtime/station-layout.json": {
+      "bytes": 66400670,
+      "sha256": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2"
+    },
+    "runtime/textures/174d2dd1ba175c20fde33781.png": {
+      "bytes": 234110,
+      "sha256": "174d2dd1ba175c20fde3378195b2b59c7858bf65056695d31a13eaaea2faa02f"
+    },
+    "runtime/textures/1fd95771b6b554b4ac50fbe9.png": {
+      "bytes": 1349666,
+      "sha256": "1fd95771b6b554b4ac50fbe9a9869ecf51e610e72e3f911ab770db6cc3fe902d"
+    },
+    "runtime/textures/32764c949989e03d690d63b3.png": {
+      "bytes": 1483372,
+      "sha256": "32764c949989e03d690d63b3776aae28bc71b630ce0fac2323f38f7f5ded6678"
+    },
+    "runtime/textures/bd55eee417aefa59dfadb4ef.png": {
+      "bytes": 1064528,
+      "sha256": "bd55eee417aefa59dfadb4ef641ada9bf26a23ed7debdf5078cd4699fb7ef5a5"
+    },
+    "runtime/textures/c36557ce27295231bf916cae.png": {
+      "bytes": 1482775,
+      "sha256": "c36557ce27295231bf916cae0db02d4b87b744c1f0ae0f394145c98ba334552c"
+    },
+    "runtime/textures/d625591f1625d333747e06dc.png": {
+      "bytes": 1349158,
+      "sha256": "d625591f1625d333747e06dcc8bb33559e9a21f86d7289906880e93fc9854a94"
+    },
+    "runtime/textures/ee1cab81b42f7d59648a39fc.png": {
+      "bytes": 223359,
+      "sha256": "ee1cab81b42f7d59648a39fc6e34f684fef9636a9310ca46b7d8a65e82dfb174"
+    },
+    "runtime/textures/f90c6a709644fb0809f0cee3.png": {
+      "bytes": 20066785,
+      "sha256": "f90c6a709644fb0809f0cee303783fd469ced136f1cf33cc61a919fcdca39358"
+    },
+    "runtime/textures/fbfd11801789ea10c6928957.png": {
+      "bytes": 223370,
+      "sha256": "fbfd11801789ea10c69289576dc3339b92e79ac23b1471d7cb0ef04ea81a12a5"
+    },
+    "art-source/atrium/KyotoAtrium.blend": {
+      "bytes": 33569488,
+      "sha256": "a4cbf457391ddec271d4086405ea47154949a0e3c70e2a36aef76662ec9b88ba"
+    },
+    "art-source/phase3/robot/ORI.blend": {
+      "bytes": 418574,
+      "sha256": "cd2de40ebd5b86fbdb0c4053bcc73be32129fec8b16d7fc9719f32854b9b0c62"
+    },
+    "art-source/phase3/atrium-detail/AtriumHardware.blend": {
+      "bytes": 254058,
+      "sha256": "b236e1d0a10a407091d4ada64b1f0c842df6de4b1c9440c19fb3e3c04c772f32"
+    },
+    "art-source/materials/stairs/EscalatorTreadColor.png": {
+      "bytes": 386640,
+      "sha256": "f769e025d4d66b35e3a29c31198080c195baa887a0ad207ad332339daa66baf9"
+    },
+    "art-source/materials/stairs/EscalatorTreadMask.png": {
+      "bytes": 264209,
+      "sha256": "b9e90cf97720f94c7ae1500f08974a23dc87bdef4406bc100819ec1e8ada425d"
+    },
+    "art-source/materials/stairs/EscalatorTreadNormal.png": {
+      "bytes": 5573,
+      "sha256": "050f3e9a7701fef4c6aeac55b274ccd22fa5e944b4a1b4f5d448d1544d4af76b"
+    },
+    "art-source/materials/stairs/StairStoneColor.png": {
+      "bytes": 1349158,
+      "sha256": "d625591f1625d333747e06dcc8bb33559e9a21f86d7289906880e93fc9854a94"
+    },
+    "art-source/materials/stairs/StairStoneMask.png": {
+      "bytes": 223359,
+      "sha256": "ee1cab81b42f7d59648a39fc6e34f684fef9636a9310ca46b7d8a65e82dfb174"
+    },
+    "art-source/materials/stairs/StairStoneNormal.png": {
+      "bytes": 1064528,
+      "sha256": "bd55eee417aefa59dfadb4ef641ada9bf26a23ed7debdf5078cd4699fb7ef5a5"
+    },
+    "art-source/materials/stairs/StairTreadColor.png": {
+      "bytes": 1349666,
+      "sha256": "1fd95771b6b554b4ac50fbe9a9869ecf51e610e72e3f911ab770db6cc3fe902d"
+    },
+    "art-source/materials/stairs/StairTreadMask.png": {
+      "bytes": 223370,
+      "sha256": "fbfd11801789ea10c69289576dc3339b92e79ac23b1471d7cb0ef04ea81a12a5"
+    },
+    "art-source/materials/stairs/StairTreadNormal.png": {
+      "bytes": 1064528,
+      "sha256": "bd55eee417aefa59dfadb4ef641ada9bf26a23ed7debdf5078cd4699fb7ef5a5"
+    },
+    "art-source/materials/stairs/material-spec.json": {
+      "bytes": 2615,
+      "sha256": "1dc0acce96d1b56d5f7604d7a16a107495496d2bef571f3b60109e342aa7cf55"
+    }
+  }
+}

@@ -1,0 +1,461 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-09-05T05:31:57.782243+00:00",
+  "source_id": "P5",
+  "citation": {
+    "author": "Rod Cross",
+    "title": "Oblique bounce of a rubber ball",
+    "year": 2014,
+    "journal": "Experimental Mechanics",
+    "volume": 54,
+    "pages": "1523-1536",
+    "doi": "10.1007/s11340-014-9938-3",
+    "article_url": "https://link.springer.com/article/10.1007/s11340-014-9938-3",
+    "figure_url": "https://media.springernature.com/lw1200/springer-static/image/art%3A10.1007%2Fs11340-014-9938-3/MediaObjects/11340_2014_9938_Fig3_HTML.gif",
+    "manuscript_url": "https://www.researchgate.net/publication/278104773_Oblique_Bounce_of_a_Rubber_Ball",
+    "figure": "3(a,c,d)",
+    "image_sha256": "2835de17ba873d68b54fa3438e3f5d149b3a83dbe84fbfcc58157022dfc9cc6a",
+    "image_size_px": [
+      706,
+      1036
+    ],
+    "cache_path": "tmp/phase2-research/cross-2014-fig3.gif"
+  },
+  "specimen": {
+    "id": "cross-2014-solid-superball-granite",
+    "type": "solid rubber Superball",
+    "mass_kg": 0.0462,
+    "radius_m": 0.023,
+    "inertia_factor": 0.4,
+    "inertia_status": "homogeneous solid sphere assumption; not separately measured",
+    "surface": "polished granite",
+    "incident_speed_mps_interval": [
+      4,
+      6.5
+    ],
+    "incident_spin_constraint": "abs(omega1) < 0.15 abs(omega2)",
+    "reported_max_component_measurement_relative_error": 0.02
+  },
+  "extraction": {
+    "method": "Manual review of original 706x1036 publisher figure; 3x3 color-mask erosion helped locate filled dots. Pixel centers are retained. Thin fit curves are excluded. Marker identification is not based on agreement with a model.",
+    "marker_pixel_error_bound": 2,
+    "axis_pixel_error_bound": 0.5,
+    "angle_definition": "degrees above the surface tangent; 90 is normal incidence",
+    "axes": {
+      "a": {
+        "x0": 61,
+        "x100": 331,
+        "ymin": 0.4,
+        "ymax": 1.1,
+        "y_at_min": 293,
+        "y_at_max": 24
+      },
+      "c": {
+        "x0": 61.5,
+        "x100": 332.5,
+        "ymin": -0.5,
+        "ymax": 2.5,
+        "y_at_min": 645,
+        "y_at_max": 374.5
+      },
+      "d": {
+        "x0": 424.5,
+        "x100": 693.5,
+        "ymin": 0,
+        "ymax": 1,
+        "y_at_min": 645,
+        "y_at_max": 375
+      }
+    },
+    "observables": {
+      "a_blue": "vx2/vx1",
+      "a_black": "vy2/vy1",
+      "c_blue": "(R*omega2-vx2)/(vx1-R*omega1)",
+      "c_black": "R*omega2/vx2",
+      "d_black": "R*(omega2-omega1)/v1"
+    },
+    "selection": "13 oblique impacts with distinguishable markers and panel associations, plus two normal restitution impacts. Dense overlapping groups near 14,18-23,49-61 degrees omitted because their pairing is ambiguous. The 16-degree case is sufficiently isolated in horizontal order.",
+    "holdout_rule": "Four cases reserved before any model fitting: P5-03 (~29 deg), P5-07 (~43 deg), P5-11 (~69 deg), P5-15 (90 deg). Never include these in parameter fitting.",
+    "limitations": [
+      "No per-trial dimensional incident speed is published in this figure. Reconstruct only dimensionless speeds/spins; do not assign exact raw incident velocities.",
+      "The omega1 estimate is algebraically derived from three digitized observables and is uncertain; it is not a raw video measurement. Retain the author incident-spin bound.",
+      "Two normal-incidence points constrain restitution only; tangential ratios are undefined there.",
+      "Panel associations may be revisited only with visual evidence, never to improve a model score."
+    ]
+  },
+  "observations": [
+    {
+      "id": "P5-01",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          105.17,
+          149.0
+        ],
+        "a_black": [
+          105.0,
+          67.0
+        ],
+        "c_blue": [
+          104.33,
+          610.67
+        ],
+        "c_black": [
+          104.5,
+          523.0
+        ],
+        "d_black": [
+          467.5,
+          495.0
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-02",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          133.0,
+          201.0
+        ],
+        "a_black": [
+          132.5,
+          100.0
+        ],
+        "c_blue": [
+          133.0,
+          590.0
+        ],
+        "c_black": [
+          133.5,
+          495.0
+        ],
+        "d_black": [
+          496.5,
+          465.0
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-03",
+      "split": "holdout",
+      "pixel_centers": {
+        "a_blue": [
+          139.0,
+          226.5
+        ],
+        "a_black": [
+          139.0,
+          91.5
+        ],
+        "c_blue": [
+          139.5,
+          566.0
+        ],
+        "c_black": [
+          139.5,
+          450.0
+        ],
+        "d_black": [
+          502.67,
+          414.33
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-04",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          160.0,
+          248.0
+        ],
+        "a_black": [
+          160.5,
+          100.0
+        ],
+        "c_blue": [
+          161.0,
+          549.5
+        ],
+        "c_black": [
+          161.0,
+          419.0
+        ],
+        "d_black": [
+          524.0,
+          433.5
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-05",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          164.5,
+          239.0
+        ],
+        "a_black": [
+          164.5,
+          94.0
+        ],
+        "c_blue": [
+          165.0,
+          562.0
+        ],
+        "c_black": [
+          165.0,
+          442.0
+        ],
+        "d_black": [
+          528.0,
+          450.5
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-06",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          167.0,
+          251.5
+        ],
+        "a_black": [
+          167.75,
+          101.25
+        ],
+        "c_blue": [
+          168.0,
+          542.0
+        ],
+        "c_black": [
+          168.0,
+          404.5
+        ],
+        "d_black": [
+          531.0,
+          429.0
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-07",
+      "split": "holdout",
+      "pixel_centers": {
+        "a_blue": [
+          176.0,
+          245.5
+        ],
+        "a_black": [
+          176.33,
+          95.33
+        ],
+        "c_blue": [
+          177.0,
+          539.5
+        ],
+        "c_black": [
+          177.0,
+          410.5
+        ],
+        "d_black": [
+          540.0,
+          453.5
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-08",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          180.33,
+          262.33
+        ],
+        "a_black": [
+          180.5,
+          101.0
+        ],
+        "c_blue": [
+          181.33,
+          538.67
+        ],
+        "c_black": [
+          181.0,
+          388.5
+        ],
+        "d_black": [
+          544.33,
+          436.67
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-09",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          188.5,
+          258.0
+        ],
+        "a_black": [
+          188.8,
+          102.4
+        ],
+        "c_blue": [
+          189.5,
+          549.0
+        ],
+        "c_black": [
+          189.0,
+          411.25
+        ],
+        "d_black": [
+          552.67,
+          462.67
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-10",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          230.8,
+          250.4
+        ],
+        "a_black": [
+          230.6,
+          100.2
+        ],
+        "c_blue": [
+          231.5,
+          540.5
+        ],
+        "c_black": [
+          231.6,
+          407.8
+        ],
+        "d_black": [
+          594.2,
+          525.4
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-11",
+      "split": "holdout",
+      "pixel_centers": {
+        "a_blue": [
+          247.0,
+          234.5
+        ],
+        "a_black": [
+          247.0,
+          108.5
+        ],
+        "c_blue": [
+          248.5,
+          554.0
+        ],
+        "c_black": [
+          248.0,
+          438.5
+        ],
+        "d_black": [
+          611.5,
+          562.0
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-12",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          254.0,
+          239.5
+        ],
+        "a_black": [
+          254.0,
+          102.0
+        ],
+        "c_blue": [
+          254.5,
+          541.0
+        ],
+        "c_black": [
+          254.2,
+          417.2
+        ],
+        "d_black": [
+          618.0,
+          561.5
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-13",
+      "split": "fit",
+      "pixel_centers": {
+        "a_blue": [
+          271.5,
+          258.0
+        ],
+        "a_black": [
+          271.67,
+          104.67
+        ],
+        "c_blue": [
+          272.0,
+          545.5
+        ],
+        "c_black": [
+          272.5,
+          415.0
+        ],
+        "d_black": [
+          635.5,
+          595.0
+        ]
+      },
+      "pairing": "Common incidence angle across panels a, c, d; close adjacent markers kept in their observed horizontal order. Cross-panel association is inferred, not an author supplied trial ID."
+    },
+    {
+      "id": "P5-14",
+      "split": "fit",
+      "pixel_centers": {
+        "a_black": [
+          304.4,
+          95.2
+        ]
+      },
+      "pairing": "Normal restitution only. Two separate 90-degree dots are kept distinct; no spin data associated."
+    },
+    {
+      "id": "P5-15",
+      "split": "holdout",
+      "pixel_centers": {
+        "a_black": [
+          304.4,
+          105.2
+        ]
+      },
+      "pairing": "Normal restitution only. Two separate 90-degree dots are kept distinct; no spin data associated."
+    }
+  ]
+}
