@@ -148,7 +148,10 @@ function applyWalk(a,player,mode,time){
   if(gait.swing){gait.swing.start.y+=delta.y;if(gait.swing.landing)gait.swing.landing.y+=delta.y;}
   if(!gait.swing){
     let side=gait.started?gait.next:(localDirection.x<0?'R':'L');
-    if(!moving)side=['L','R'].find(s=>gait.feet[s].plant.distanceTo(neutral[s])>.018);
+    // Settle the most displaced shoe first. Always choosing L can starve R
+    // after a turn: L's separation constraint keeps it outside the misplaced
+    // R shoe, so it never reaches neutral and R never gets a settling step.
+    if(!moving)side=['L','R'].sort((l,r)=>gait.feet[r].plant.distanceTo(neutral[r])-gait.feet[l].plant.distanceTo(neutral[l])).find(s=>gait.feet[s].plant.distanceTo(neutral[s])>.018);
     if(side){
       const foot=gait.feet[side];
       gait.swing={side,start:foot.plant.clone(),progress:0,settling:!moving,travel:gait.started?stride:.20,lead:stride*.5,direction:gait.direction.clone()};gait.started=true;
