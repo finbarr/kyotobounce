@@ -1,14 +1,37 @@
 import * as THREE from 'three';
 
-// Three 0.185's default PCF uses five rotated hardware samples (20 depth
-// comparisons) per shaded pixel. One hardware-filtered sample is sufficient
-// for this static 4K architectural map and avoids expensive grain on the glass.
-// Keep this application-local; the installed Three source is not modified.
+// Four fixed hardware-PCF taps soften texel stair steps without the default
+// per-screen-pixel random rotation. The kernel lives in shadow-map coordinates,
+// so moving the camera does not rotate the architectural shadow pattern.
 const architecturalShadow=THREE.ShaderChunk.shadowmap_pars_fragment.replace(
   /shadow = \(\s*texture\( shadowMap, vec3\( shadowCoord\.xy \+ vogelDiskSample[\s\S]*?\) \* 0\.2;/,
-  'shadow = texture( shadowMap, shadowCoord.xyz );'
+  `vec2 offset = texelSize * shadowRadius * .75;
+  shadow = (
+    texture( shadowMap, vec3( shadowCoord.xy + vec2(-offset.x,-offset.y), shadowCoord.z ) ) +
+    texture( shadowMap, vec3( shadowCoord.xy + vec2( offset.x,-offset.y), shadowCoord.z ) ) +
+    texture( shadowMap, vec3( shadowCoord.xy + vec2(-offset.x, offset.y), shadowCoord.z ) ) +
+    texture( shadowMap, vec3( shadowCoord.xy + vec2( offset.x, offset.y), shadowCoord.z ) )
+  ) * .25;`
 );
 THREE.ShaderChunk.shadowmap_pars_fragment=architecturalShadow;
+
+// Fit once to the complete retained architecture, with a margin for actors.
+// This stays fixed while walking: no camera-following shadow projection, no
+// sacrificed rooftop coverage, and no increase to the existing 4096 map.
+export function fitStationShadowCamera(sun,station){
+  const camera=sun.shadow.camera,world=new THREE.Box3().setFromObject(station);
+  camera.position.copy(sun.position);camera.lookAt(sun.target.position);camera.updateMatrixWorld(true);
+  const lightBounds=new THREE.Box3();
+  for(const x of [world.min.x,world.max.x])for(const y of [world.min.y,world.max.y])for(const z of [world.min.z,world.max.z]){
+    lightBounds.expandByPoint(new THREE.Vector3(x,y,z).applyMatrix4(camera.matrixWorldInverse));
+  }
+  Object.assign(camera,{left:Math.floor(lightBounds.min.x-4),right:Math.ceil(lightBounds.max.x+4),
+    bottom:Math.floor(lightBounds.min.y-4),top:Math.ceil(lightBounds.max.y+4),
+    near:Math.max(.1,Math.floor(-lightBounds.max.z-4)),far:Math.ceil(-lightBounds.min.z+4)});
+  camera.updateProjectionMatrix();
+  return {width:camera.right-camera.left,height:camera.top-camera.bottom,near:camera.near,far:camera.far,
+    texelMeters:[(camera.right-camera.left)/sun.shadow.mapSize.x,(camera.top-camera.bottom)/sun.shadow.mapSize.y]};
+}
 
 // Architectural finish layer. It uses the exported station's real coordinates;
 // none of these material changes replace walking or ball collision surfaces.
@@ -104,6 +127,54 @@ function skyTexture(){
   const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;return t;
 }
 
+// Keep fixture identities through rank swaps. A slot fades fully out before it
+// moves to a different fixture, then fades in; two shadowless shader lights stay
+// allocated throughout. Time rollback cannot leave the selector waiting forever.
+export function createStationLightPool(scene,authoredLights){
+  const fixtures=authoredLights.filter(l=>l.position.y<15);
+  const slots=Array.from({length:2},()=>{
+    const light=new THREE.SpotLight(0xffdab0,0,15,Math.PI/3,.8,2);scene.add(light,light.target);
+    return {light,fixture:null,desired:null,level:0};
+  });
+  let previousTime=null,nextSelection=0;
+  const stats={selections:0,reassignments:0,clockResets:0,activeFixtures:[]};
+  function assign(slot,fixture){
+    slot.fixture=fixture;
+    if(!fixture)return;
+    const l=slot.light;stats.reassignments++;
+    l.position.set(fixture.position.x,fixture.position.y-.08,-fixture.position.z);
+    l.target.position.copy(l.position).add(new THREE.Vector3(fixture.direction.x,fixture.direction.y,-fixture.direction.z));
+    l.distance=Math.min(19,fixture.range+5);
+  }
+  function update(position,time){
+    const reset=previousTime!==null&&time<previousTime;
+    if(reset){stats.clockResets++;nextSelection=time;}
+    const dt=previousTime===null||reset?0:Math.max(0,Math.min(.1,time-previousTime));previousTime=time;
+    if(time>=nextSelection){
+      nextSelection=time+.25;stats.selections++;
+      const retained=new Set(slots.map(s=>s.fixture));
+      // A fixed squared-distance margin avoids excessive retention under tall
+      // ceilings, where multiplying the vertical distance can hide new fixtures.
+      const ranked=fixtures.map(f=>({f,d:(f.position.x-position.x)**2+(f.position.y-position.y)**2+(-f.position.z-position.z)**2}))
+        .filter(r=>r.d<Math.min(19,r.f.range+5)**2)
+        .sort((a,b)=>(a.d-(retained.has(a.f)?4:0))-(b.d-(retained.has(b.f)?4:0)));
+      const selected=ranked.slice(0,slots.length).map(r=>r.f);
+      // Preserve slot identity when the first and second nearest trade places.
+      const remaining=selected.filter(f=>!slots.some(s=>s.fixture===f));
+      for(const slot of slots)slot.desired=selected.includes(slot.fixture)?slot.fixture:(remaining.shift()||null);
+    }
+    for(const slot of slots){
+      if(slot.fixture!==slot.desired){
+        slot.level=Math.max(0,slot.level-dt/.35);
+        if(slot.level===0)assign(slot,slot.desired);
+      }else slot.level=slot.fixture?Math.min(1,slot.level+dt/.5):0;
+      slot.light.intensity=slot.fixture?Math.min(180,slot.fixture.intensity*8)*slot.level:0;
+    }
+    stats.activeFixtures=slots.map(s=>({id:s.fixture?.id||null,desired:s.desired?.id||null,level:s.level,intensity:s.light.intensity}));
+  }
+  return {update,lights:slots.map(s=>s.light),stats};
+}
+
 export function dressStation(renderer,scene,sun,station,data){
   renderer.toneMappingExposure=1.05;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
@@ -111,8 +182,8 @@ export function dressStation(renderer,scene,sun,station,data){
   for(const light of scene.children)if(light.isHemisphereLight){light.color.set(0xdde9f3);light.groundColor.set(0x72746b);light.intensity=.72;}
   sun.color.set(0xfff2df);sun.intensity=2.4;sun.position.set(-55,110,-65);sun.target.position.set(-20,0,0);scene.add(sun.target);
   sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);
-  Object.assign(sun.shadow.camera,{left:-165,right:165,top:115,bottom:-115,near:1,far:300});
-  sun.shadow.bias=-.00012;sun.shadow.normalBias=.04;sun.shadow.camera.updateProjectionMatrix();
+  const shadowCoverage=fitStationShadowCamera(sun,station);
+  sun.shadow.radius=1.2;sun.shadow.bias=-.00004;sun.shadow.normalBias=.015;
   const done=new Set();
   station.traverse(o=>{
     if(!o.isMesh)return;
@@ -156,19 +227,8 @@ export function dressStation(renderer,scene,sun,station,data){
     m.needsUpdate=true;
   });
 
-  // Select the nearest practical lights at runtime, keeping shader light count
-  // fixed. All visible fixtures emit, including those outside this small pool.
-  const fixtures=data.authoredLights.filter(l=>l.position.y<15);
-  const pool=Array.from({length:2},()=>{const l=new THREE.SpotLight(0xffdab0,0,15,Math.PI/3,.8,2);scene.add(l,l.target);return l;});
-  let nextLightUpdate=0;
-  function updateLights(position,time){
-    if(time<nextLightUpdate)return;nextLightUpdate=time+.4;
-    const nearest=fixtures.map(l=>({l,d:(l.position.x-position.x)**2+(l.position.y-position.y)**2+(-l.position.z-position.z)**2})).sort((a,b)=>a.d-b.d).slice(0,pool.length);
-    pool.forEach((light,i)=>{const rec=nearest[i];if(!rec){light.intensity=0;return;}const l=rec.l;
-      light.position.set(l.position.x,l.position.y-.08,-l.position.z);light.intensity=Math.min(180,l.intensity*8);light.distance=Math.min(19,l.range+5);
-      light.target.position.copy(light.position).add(new THREE.Vector3(l.direction.x,l.direction.y,-l.direction.z));
-    });
-  }
+  const fixtureLighting=createStationLightPool(scene,data.authoredLights);
+  const updateLights=fixtureLighting.update;
 
   // A static HDR probe captures this station's trusses, windows and floor.
   // Unlike the old generic room environment, highlights now describe the hall.
@@ -183,7 +243,7 @@ export function dressStation(renderer,scene,sun,station,data){
     // moving actors are updated separately, so there is no frozen actor shadow.
     renderer.shadowMap.autoUpdate=false;
   }
-  return {updateLights,captureEnvironment,stats:{finishedMaterials:done.size,shadowMap:4096,reflectionProbe:256}};
+  return {updateLights,captureEnvironment,stats:{finishedMaterials:done.size,shadowMap:4096,reflectionProbe:256,shadowCoverage,shadowFilterTaps:4,fixtureLighting:fixtureLighting.stats}};
 }
 
 export function contactShadow(scene,station){
