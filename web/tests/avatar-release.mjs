@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const out='artifacts/phase3/avatar-release';await mkdir(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROME_EXECUTABLE||(process.platform==='linux'?'/usr/bin/google-chrome':'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),headless:true,args:process.platform==='linux'?['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']});
 try{
- const page=await browser.newPage();await page.goto('http://127.0.0.1:4173');
+ const page=await browser.newPage();await page.route('**/robot-test',r=>r.fulfill({contentType:'text/html',body:'<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>'}));await page.goto('http://127.0.0.1:4173/robot-test');
  const result=await page.evaluate(async()=>{
   const THREE=await import('/vendor/three/build/three.module.js');
   const {GLTFLoader}=await import('/vendor/three/examples/jsm/loaders/GLTFLoader.js');

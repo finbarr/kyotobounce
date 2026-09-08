@@ -99,32 +99,98 @@ function applyGaze(a,player,mode,state,time){
   a.head.quaternion.multiply(a.gaze);
 }
 
-// Distance-driven steps: walls and start-circle limits stop the feet as well as
-// translation. Opposite legs/arms, knee flexion and ankle roll keep a carrying gait.
+// Visual-only foot placement. Progress comes from rendered authoritative travel,
+// so an input velocity at a wall cannot run the gait in place. One foot stays
+// planted while the other swings; stopping completes only the settling steps.
 function applyWalk(a,player,mode,time){
-  const dt=a.lastPoseTime===null?0:THREE.MathUtils.clamp(time-a.lastPoseTime,0,.1);a.lastPoseTime=time;
-  const movement=player.movement||{x:0,y:0,z:0},speed=Math.hypot(movement.x,movement.z);
-  const walking=player.grounded&&speed>.08&&!['Charging','Release'].includes(mode);
-  a.walkBlend=THREE.MathUtils.damp(a.walkBlend,walking?Math.min(1,speed/.7):0,16,dt);
-  if(a.walkBlend<.00001){a.walkBlend=0;return;}
+  const elapsed=a.lastPoseTime===null?0:time-a.lastPoseTime;a.lastPoseTime=time;
+  const dt=THREE.MathUtils.clamp(elapsed,0,.1);
   a.group.updateWorldMatrix(true,true);
-  const stanceHeight=Math.min(worldPosition(a.bones['foot.L']).y,worldPosition(a.bones['foot.R']).y);
-  const phase=(player.walked||0)/1.45*Math.PI*2,weight=a.walkBlend;
-  const yaw=player.yaw*Math.PI/180,forward=Math.sin(yaw)*movement.x+Math.cos(yaw)*movement.z;
-  const direction=forward<-.05?-1:1;
-  const rotate=(name,axis,angle)=>a.bones[name]?.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(axis,angle*weight));
-  for(const [side,offset]of [['L',0],['R',Math.PI]]){
-    const cycle=phase+offset,swing=Math.sin(cycle),lift=Math.max(0,Math.cos(cycle));
-    rotate(`thigh.${side}`,unitX,.48*swing*direction);
-    rotate(`shin.${side}`,unitX,-.62*lift);
-    rotate(`foot.${side}`,unitX,-.20*swing*direction+.28*lift);
-    rotate(`thigh.${side}`,unitZ,(side==='L'?1:-1)*.035*Math.cos(cycle));
+  const root=worldPosition(a.group),rotation=a.group.getWorldQuaternion(new THREE.Quaternion());
+  let gait=a.gait;
+  const delta=gait?root.clone().sub(gait.root):new THREE.Vector3(),distance=Math.hypot(delta.x,delta.z);
+  const allowed=player.grounded&&!['Charging','Release'].includes(mode);
+  if(!gait||elapsed<0||elapsed>.5||distance>.8||!allowed){
+    a.gait={root,feet:{},next:'L',swing:null,direction:new THREE.Vector3(0,0,1),started:false};gait=a.gait;
+    for(const side of ['L','R']){
+      const foot=a.bones[`foot.${side}`];if(!foot)return;
+      const position=worldPosition(foot);
+      gait.feet[side]={plant:position.clone(),target:position.clone(),local:a.group.worldToLocal(position.clone()),rotation:rotation.clone().invert().multiply(foot.getWorldQuaternion(new THREE.Quaternion()))};
+    }
+    a.walkBlend=0;return;
   }
-  rotate('hips',unitZ,.028*Math.sin(phase));rotate('chest',unitY,-.035*Math.sin(phase));
-  if(a.bones.hips)a.bones.hips.position.y+=.025*(1-Math.cos(phase*2))*weight;
-  rotate('upper_arm.L',unitX,-.38*Math.sin(phase));rotate('forearm.L',unitX,-.12);
-  rotate('upper_arm.R',unitX,.10*Math.sin(phase));
+  gait.root.copy(root);
+  const travelled=distance>.00001&&dt>0;
+  if(travelled)gait.lastTravelTime=time;
+  const moving=travelled||time-(gait.lastTravelTime??-Infinity)<.08;
+  if(travelled)gait.direction.set(delta.x,0,delta.z).normalize();
+  const localDirection=gait.direction.clone().applyQuaternion(rotation.clone().invert());
+  const lateral=Math.abs(localDirection.x),stride=THREE.MathUtils.lerp(THREE.MathUtils.clamp(.50+(distance/Math.max(dt,.001)-1.4)*.06,.44,.68),THREE.MathUtils.clamp(.36-(distance/Math.max(dt,.001)-1.4)*.05,.24,.36),lateral);
+  const neutral={};
+  for(const side of ['L','R']){
+    const foot=gait.feet[side];neutral[side]=a.group.localToWorld(foot.local.clone());
+    // The service supplies the ground height (including stairs), not a browser
+    // raycast or an independently simulated character root.
+    foot.plant.y+=delta.y;foot.target.y+=delta.y;
+  }
+  if(gait.swing){gait.swing.start.y+=delta.y;if(gait.swing.landing)gait.swing.landing.y+=delta.y;}
+  if(!gait.swing){
+    let side=gait.started?gait.next:(localDirection.x<0?'R':'L');
+    if(!moving)side=['L','R'].find(s=>gait.feet[s].plant.distanceTo(neutral[s])>.018);
+    if(side){
+      const foot=gait.feet[side];
+      gait.swing={side,start:foot.plant.clone(),progress:0,settling:!moving,travel:gait.started?stride:.20,lead:stride*.5,direction:gait.direction.clone()};gait.started=true;
+      gait.next=side==='L'?'R':'L';
+    }
+  }
+  if(gait.swing){
+    const step=gait.swing,foot=gait.feet[step.side];
+    if((!moving&&!step.settling)||(moving&&step.direction.dot(gait.direction)<.5)){
+      step.start.copy(foot.target);step.progress=0;step.settling=!moving;step.travel=.20;step.direction.copy(gait.direction);step.landing=null;
+    }
+    // Stride grows with speed; side steps and the first step stay shorter.
+    step.progress=Math.min(1,step.progress+(moving&&!step.settling?distance/step.travel:dt/.20));
+    const t=step.progress,smooth=t*t*(3-2*t),target=step.landing?.clone()||neutral[step.side].clone();
+    if(!step.landing&&moving&&!step.settling)target.addScaledVector(gait.direction,step.travel+step.lead-distance);
+    // Side steps keep the shoes on their own side of the supporting shoe.
+    const other=gait.feet[step.side==='L'?'R':'L'],localTarget=a.group.worldToLocal(target.clone()),localOther=a.group.worldToLocal(other.plant.clone());
+    localTarget.x=step.side==='L'?Math.max(localTarget.x,localOther.x+.17):Math.min(localTarget.x,localOther.x-.17);
+    target.copy(a.group.localToWorld(localTarget));
+    step.landing=target.clone();
+    foot.target.copy(step.start).lerp(target,smooth);
+    foot.target.y+=Math.sin(Math.PI*t)**2*(step.settling?.035:.065);
+    if(t===1){foot.plant.copy(foot.target);gait.swing=null;}
+  }
+  for(const side of ['L','R'])if(gait.swing?.side!==side)gait.feet[side].target.copy(gait.feet[side].plant);
+  a.walkBlend=THREE.MathUtils.damp(a.walkBlend,moving||gait.swing?1:0,14,dt);
+  if(a.walkBlend<.00001){a.walkBlend=0;if(!moving&&!gait.swing)gait.started=false;}
+  // Lower the visual pelvis just enough to reach both ankles; planted shoes
+  // stay flat. The resting crouch fades after the feet settle under the body.
+  let crouch=.045*a.walkBlend;
+  for(const side of ['L','R']){
+    const hip=worldPosition(a.bones[`thigh.${side}`]),target=gait.feet[side].target;
+    const horizontal=(hip.x-target.x)**2+(hip.z-target.z)**2;
+    crouch=Math.max(crouch,hip.y-target.y-Math.sqrt(Math.max(.01,.779**2-horizontal)));
+  }
+  a.bones.hips.position.y-=crouch;
   a.group.updateWorldMatrix(true,true);
-  const lowestFoot=Math.min(worldPosition(a.bones['foot.L']).y,worldPosition(a.bones['foot.R']).y);
-  if(a.bones.hips)a.bones.hips.position.y+=stanceHeight-lowestFoot;
+  const pole=new THREE.Vector3(0,0,1).applyQuaternion(rotation);
+  for(const side of ['L','R']){
+    const foot=gait.feet[side];
+    plantLeg(a,side,foot.target,pole,rotation.clone().multiply(foot.rotation));
+  }
+  const swing=gait.swing,arm=swing?Math.sin(Math.PI*swing.progress)*(swing.side==='L'?1:-1)*a.walkBlend:0;
+  a.bones['upper_arm.L']?.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-.12*arm));
+  a.bones['upper_arm.R']?.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,.035*arm));
+}
+
+function plantLeg(a,side,target,pole,footRotation){
+  const thigh=a.bones[`thigh.${side}`],shin=a.bones[`shin.${side}`],foot=a.bones[`foot.${side}`];
+  const hip=worldPosition(thigh),knee=worldPosition(shin),ankle=worldPosition(foot);
+  const l1=hip.distanceTo(knee),l2=knee.distanceTo(ankle),direction=target.clone().sub(hip);
+  const distance=THREE.MathUtils.clamp(direction.length(),.05,l1+l2-.0001);direction.normalize();
+  const along=(l1*l1-l2*l2+distance*distance)/(2*distance);
+  const bend=pole.clone().addScaledVector(direction,-pole.dot(direction)).normalize();
+  const kneeTarget=hip.clone().addScaledVector(direction,along).addScaledVector(bend,Math.sqrt(Math.max(0,l1*l1-along*along)));
+  pointBone(thigh,shin,kneeTarget);pointBone(shin,foot,hip.clone().addScaledVector(direction,distance));setWorldRotation(foot,footRotation);
 }
