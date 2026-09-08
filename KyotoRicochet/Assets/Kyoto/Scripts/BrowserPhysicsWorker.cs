@@ -25,6 +25,32 @@ namespace Kyoto
         TcpClient socket;StreamWriter output;Thread reader;
         volatile bool disconnected;
         StationLayout layout;string hash;double nextSend;
+        // Opt-in local diagnostics only: no telemetry or protocol payload changes.
+        readonly bool timing=Environment.GetEnvironmentVariable("KYOTO_NATIVE_TIMING")=="1";
+        readonly Samples updateGaps=new Samples(),publicationMs=new Samples(),serializeMs=new Samples(),writeMs=new Samples();
+        const double PublishInterval=1.0/30;
+        double lastUpdate,reportAt;int queueHighWater,publications,skippedPublications,lastGC;
+        sealed class Samples
+        {
+            readonly List<double> values=new List<double>(512);
+            public void Add(double value){if(values.Count<4096)values.Add(value);}
+            public object Take(){values.Sort();int n=values.Count;double sum=0;foreach(double value in values)sum+=value;
+                var result=new TimingMetric{count=n,mean=n>0?sum/n:0,p50=n>0?values[n/2]:0,p99=n>0?values[Math.Min(n-1,(int)(n*.99))]:0,max=n>0?values[n-1]:0};values.Clear();return result;}
+        }
+        [Serializable] sealed class TimingMetric {public int count;public double mean,p50,p99,max;}
+        [Serializable] sealed class TimingReport
+        {
+            public string type="native-timing";public double wallTime;public int sessions,queueHighWater,publications,skippedPublications,collections;public long heapBytes;
+            public TimingMetric updateGapMs,publicationMs,serializationMs,writeMs;
+        }
+        static double Milliseconds()=>System.Diagnostics.Stopwatch.GetTimestamp()*1000.0/System.Diagnostics.Stopwatch.Frequency;
+        void ReportTiming(double now)
+        {
+            if(now<reportAt)return;reportAt=now+5;
+            int collections=GC.CollectionCount(0);
+            Debug.Log("KYOTO_NATIVE_TIMING "+JsonUtility.ToJson(new TimingReport{wallTime=now,sessions=sessions.Count,queueHighWater=queueHighWater,publications=publications,skippedPublications=skippedPublications,collections=collections-lastGC,heapBytes=GC.GetTotalMemory(false),updateGapMs=(TimingMetric)updateGaps.Take(),publicationMs=(TimingMetric)publicationMs.Take(),serializationMs=(TimingMetric)serializeMs.Take(),writeMs=(TimingMetric)writeMs.Take()}));
+            queueHighWater=publications=skippedPublications=0;lastGC=collections;
+        }
         void Start()
         {
             try
@@ -61,10 +87,19 @@ namespace Kyoto
             catch(Exception){}
             disconnected=true;
         }
-        void Send(object data){try{output?.WriteLine(JsonUtility.ToJson(data));}catch(IOException){disconnected=true;}}
+        void Send(object data)
+        {
+            try{
+                if(!timing){output?.WriteLine(JsonUtility.ToJson(data));return;}
+                double begin=Milliseconds();string json=JsonUtility.ToJson(data);double serialized=Milliseconds();
+                output?.WriteLine(json);serializeMs.Add(serialized-begin);writeMs.Add(Milliseconds()-serialized);
+            }catch(IOException){disconnected=true;}
+        }
         void Update()
         {
             if(disconnected){Application.Quit();return;}
+            double frameStart=timing?Milliseconds():0;
+            if(timing){if(lastUpdate>0)updateGaps.Add(frameStart-lastUpdate);lastUpdate=frameStart;queueHighWater=Math.Max(queueHighWater,commands.Count);}
             int budget=128;
             while(budget-->0&&commands.TryDequeue(out var command))
             {
@@ -77,8 +112,23 @@ namespace Kyoto
                 if(command.type=="leave"){session.Dispose();sessions.Remove(command.id);continue;}
                 session.Handle(command);
             }
-            if(Time.realtimeSinceStartupAsDouble>=nextSend)
-            {nextSend=Time.realtimeSinceStartupAsDouble+1.0/30;foreach(var session in sessions.Values)session.Publish();}
+            double now=Time.realtimeSinceStartupAsDouble;
+            if(now>=nextSend)
+            {
+                // Advance the deadline, not the observed frame time: small frame
+                // jitter must not accumulate into a permanent 24-26 Hz stream.
+                // Publish only one current batch per Update. After a long stall,
+                // discard missed slots and rebase; never replay stale snapshots.
+                if(nextSend==0)nextSend=now+PublishInterval;
+                else{
+                    nextSend+=PublishInterval;
+                    if(nextSend<=now){if(timing)skippedPublications+=(int)Math.Floor((now-nextSend)/PublishInterval)+1;nextSend=now+PublishInterval;}
+                }
+                double begin=timing?Milliseconds():0;
+                foreach(var session in sessions.Values)session.Publish();
+                if(timing){publicationMs.Add(Milliseconds()-begin);publications++;}
+            }
+            if(timing)ReportTiming(Time.realtimeSinceStartupAsDouble);
         }
         void FixedUpdate(){if(!disconnected)foreach(var session in sessions.Values)session.Step();}
         void OnDestroy(){disconnected=true;socket?.Close();}
