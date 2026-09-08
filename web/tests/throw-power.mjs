@@ -7,7 +7,10 @@ import {throwSpeed} from '../public/throw-power.js';
 const starters=JSON.parse(await readFile(new URL('../starter-challenges.json',import.meta.url),'utf8'));
 const store=new Store(':memory:');
 try{
- for(const c of starters)store.saveChallenge(c);
+ // Exercise the historical upgrade path independently of newer bundled revisions.
+ const legacyStarters=starters.filter(c=>c.throwModel==='precision-v1');
+ assert.ok(legacyStarters.length>0,'Keep historical launch fixtures');
+ for(const c of legacyStarters)store.saveChallenge(c);
  const old=store.list();store.upgradeThrowModels();store.upgradeScoring();
  for(const c of old){
   const latest=store.challenge(c.id);
@@ -22,6 +25,10 @@ try{
  assert.equal(updated.throwModel,THROW_MODEL);assert.equal(updated.hint.powerRange,'full');
  assert.ok(Math.abs(throwSpeed(.625,'full','robot-v3')-throwSpeed(updated.hint.holdMs/2800,updated.hint.powerRange))<1e-8);
  const revisions=JSON.stringify(store.list());store.upgradeThrowModels();store.upgradeScoring();assert.equal(JSON.stringify(store.list()),revisions);
+ for(const c of starters.filter(c=>c.throwModel===THROW_MODEL))store.saveChallenge(c);
+ const current=JSON.stringify(store.list());
+ store.upgradeThrowModels();store.upgradeScoring();
+ assert.equal(JSON.stringify(store.list()),current,'Proved current starter hints must not be migrated again');
  const sent=[],worker={ready:false,send:m=>sent.push(m),request:async()=>({ok:true})};
  const competition=new Competition(store,worker,()=>{}),guest=store.guest(),member=await competition.add(guest,'power-fixture');
  member.restoring=false;competition.layout='station';competition.physics='kyoto-p3-2';
