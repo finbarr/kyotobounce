@@ -1,0 +1,11 @@
+<!doctype html><meta charset="utf-8"><title>K026 station materials comparison</title>
+<style>body{margin:24px;background:#172024;color:#edf2ee;font:16px system-ui}header{display:flex;gap:24px;align-items:center;flex-wrap:wrap}select,input{font:inherit}main{position:relative;max-width:1280px;margin-top:20px;aspect-ratio:1.6;background:#000}img{position:absolute;width:100%;height:100%;object-fit:contain}#after{clip-path:inset(0 0 0 50%)}.labels{display:flex;justify-content:space-between;max-width:1280px}pre{white-space:pre-wrap}a{color:#9cd3de}</style>
+<header><b>K026 · materials and daylight</b><label>View <select id="view"></select></label><label>Compare <input id="split" type="range" min="0" max="100" value="50"></label><label><input id="moving" type="checkbox"> After movement</label></header>
+<p>Fixed 1280×800 full-game views. Left: baseline. Right: candidate. Native-world starts and aim match; gameplay, layout and archived asset bytes are retained.</p>
+<div class="labels"><span>BASELINE</span><span>CANDIDATE</span></div><main><img id="before"><img id="after"></main><pre id="stats"></pre>
+<p>Linux SwiftShader is diagnostic only. Final fixed-resolution Mac/Metal gate remains coordinator-owned. <a href="archive-browser.json">Old-layout read-only replay verification</a></p>
+<script>
+const views=['hall','escalator-lower','escalator-upper','doorway','garden','shop-gallery'];for(const v of views)view.add(new Option(v,v));let receipts;
+async function update(){const name=view.value,suffix=moving.checked?'-moving':'';before.src=`baseline/${name}${suffix}.png`;after.src=`candidate/${name}${suffix}.png`;after.style.clipPath=`inset(0 0 0 ${split.value}%)`;if(receipts){const lines=receipts.map((r,i)=>{const s=r.samples.find(s=>s.label===name);return `${i?'Candidate':'Baseline'}: ${s.state.render.calls} draws · ${s.state.render.triangles.toLocaleString()} rendered triangles · ${s.memory.textures} textures · ${s.drawingBuffer.join('×')}`});stats.textContent=lines.join('\n');}}
+view.onchange=moving.onchange=split.oninput=update;update();Promise.all(['baseline','candidate'].map(v=>fetch(`${v}/receipt.json`).then(r=>r.json()))).then(r=>{receipts=r;update();}).catch(()=>stats.textContent='Capture receipts pending.');
+</script>

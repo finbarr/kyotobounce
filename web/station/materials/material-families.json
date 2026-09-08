@@ -1,0 +1,18 @@
+{
+  "version": "K026-1",
+  "units": "meters; physical micro-detail is independent of exported UV scale",
+  "families": {
+    "floor": {"cue":"honed granite; retained original albedo/normal plus crystalline microstructure", "metalness":0, "roughness":0.32, "grainTileMeters":0.32},
+    "wall": {"cue":"pale mineral cladding; fine grain and restrained panel joints", "metalness":0, "roughness":0.56, "grainTileMeters":0.32},
+    "stone": {"cue":"dark mineral base and polished granite", "metalness":0, "roughness":0.4, "grainTileMeters":0.32},
+    "paving": {"cue":"garden pale slabs and dark insets", "metalness":0, "roughness":0.65, "grainTileMeters":0.32},
+    "stair": {"cue":"retained nosing/granite maps and subdued micro-detail", "metalness":0, "roughness":0.6, "grainTileMeters":0.32},
+    "stainless": {"cue":"directional satin stainless; broad environment highlights", "metalness":1, "roughness":0.28, "brushTileMeters":0.12},
+    "paint": {"cue":"painted trusses, mullions, steel fixtures and safety enamel", "metalness":0, "roughness":0.43},
+    "guard": {"cue":"clear guard/shop glazing with Fresnel alpha; no refraction prepass", "metalness":0, "roughness":0.09, "iorEquivalent":1.5},
+    "facade": {"cue":"coated blue-green dielectric facade; stronger reflection", "metalness":0, "roughness":0.14, "iorEquivalent":1.5}
+  },
+  "protected": ["sign artwork", "wayfinding", "tactile", "nosing albedo and normal", "lamp emission", "robot", "game effects"],
+  "reflectionZones": ["hall", "west gallery", "garden"],
+  "retained": {"shadowSize":4096, "shadowTaps":4, "practicalLights":2}
+}
