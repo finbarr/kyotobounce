@@ -17,7 +17,7 @@ def mat(name,color,metal=0,rough=.5,emission=0):
  m=bpy.data.materials.new(name);m.diffuse_color=(*color,1);m.use_nodes=True;n=m.node_tree.nodes.get('Principled BSDF');n.inputs['Base Color'].default_value=(*color,1);n.inputs['Metallic'].default_value=metal;n.inputs['Roughness'].default_value=rough
  if emission:n.inputs['Emission Color'].default_value=(*color,1);n.inputs['Emission Strength'].default_value=emission
  return m
-materials={'stone':mat('Warm ivory tile',(.58,.54,.46)), 'wall':mat('Warm interior panels',(.72,.70,.64)), 'frame':mat('Brushed metal frames',(.29,.31,.31),.8,.3), 'glass':mat('Shop window glazing',(.11,.18,.17),.3,.15), 'green':mat('Green sign band',(.015,.32,.13),emission=.35), 'orange':mat('Orange sign band',(.9,.28,.025),emission=.35), 'red':mat('Red sign band',(.62,.025,.025),emission=.35), 'mat':mat('Receiving mat adaptation',(.16,.23,.2)), 'sign':mat('Ivory signage',(.9,.86,.7),emission=.3)}
+materials={'stone':mat('K025 warm ivory tile',(.58,.54,.46)), 'wall':mat('K025 warm interior panels',(.72,.70,.64)), 'frame':mat('Brushed metal frames',(.29,.31,.31),.8,.3), 'glass':mat('Shop window glazing',(.11,.18,.17),.3,.15), 'green':mat('Green sign band',(.015,.32,.13),emission=.35), 'orange':mat('Orange sign band',(.9,.28,.025),emission=.35), 'red':mat('Red sign band',(.62,.025,.025),emission=.35), 'mat':mat('Receiving mat adaptation',(.16,.23,.2)), 'sign':mat('Ivory signage',(.9,.86,.7),emission=.3)}
 # Windows remain visibly distinct and solid, with translucent GLB glazing.
 materials['glass'].node_tree.nodes['Principled BSDF'].inputs['Alpha'].default_value=.32
 materials['glass'].diffuse_color=(.11,.18,.17,.32)
@@ -40,13 +40,12 @@ for side in [-1,1]:
  box('door-jamb-'+str(side),side*(dw/2+.04),dh/2,-.025,.08,dh,t+.05,'frame','steel')
 box('front-header',0,(h+dh)/2,0,w,h-dh,t,'frame','steel')
 box('ceiling',0,h+t/2,d/2,w,t,d,'wall')
-# Bands lie on the visible header; they are finish, not hidden collision geometry.
-for i,color in enumerate(['red','green','orange']):box('band-'+color,0,dh+.18+i*.13,-t/2-.012,w-.2,.09,.015,color,collision=False)
-# Mat is a flush finish on the supporting floor, not an elevated catch plane.
+# Original authored fixtures and identity; no downloaded textures.
+sys.dont_write_bytecode=True
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'station/heart-in'))
+from fixtures import furnish
+furnish(box,mat,materials,position,angle,cfg)
 box('receiving-mat',0,.0015,cfg['matDepth'],2*cfg['matRadius'],.003,2*cfg['matRadius'],'mat',collision=False)
-# A simple readable identity sign; simplified interior deliberately makes no shelf claims.
-bpy.ops.object.text_add();label=bpy.context.object;label.name='konbini-shop-name';label.data.body='Heart-in  /  WEST EXIT 2F';label.data.align_x='CENTER';label.data.size=.19;label.data.extrude=0
-q=position(0,dh+.63,-t/2-.025);label.location=(q['x'],q['z'],q['y']);label.rotation_euler=(math.pi/2,0,-angle);label.data.materials.append(materials['sign']);bpy.ops.object.convert(target='MESH')
 # Local audit camera only, excluded from browser export.
 from mathutils import Vector
 q=position(6,4,-9);bpy.ops.object.camera_add(location=(q['x'],q['z'],q['y']));cam=bpy.context.object;target=position(0,1.2,1.8);cam.rotation_euler=(Vector((target['x'],target['z'],target['y']))-cam.location).to_track_quat('-Z','Y').to_euler();root.camera=cam
