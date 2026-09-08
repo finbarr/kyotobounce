@@ -1,0 +1,166 @@
+{
+  "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+  "courses": [
+    {
+      "id": "atrium-staircase-special",
+      "revision": 1,
+      "repeat": 5,
+      "shot": {
+        "speed": 2,
+        "range": "precision",
+        "input": {
+          "yaw": 90,
+          "pitch": -20,
+          "top": -100,
+          "kick": 0
+        },
+        "observeSeconds": 65
+      },
+      "neighbors": [
+        {
+          "speed": 1.97,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 65
+        },
+        {
+          "speed": 2,
+          "range": "precision",
+          "input": {
+            "yaw": 90.15,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 65
+        },
+        {
+          "speed": 2,
+          "range": "precision",
+          "input": {
+            "yaw": 89.85,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 65
+        }
+      ]
+    },
+    {
+      "id": "atrium-moving-return",
+      "revision": 10,
+      "repeat": 5,
+      "shot": {
+        "speed": 2.5,
+        "range": "precision",
+        "input": {
+          "yaw": 90,
+          "pitch": -30,
+          "top": -50,
+          "kick": 0
+        },
+        "period": 0.7900353236922196,
+        "phase": 0.2,
+        "observeSeconds": 65
+      },
+      "neighbors": [
+        {
+          "speed": 2.45,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0
+          },
+          "period": 0.7900353236922196,
+          "phase": 0.2,
+          "observeSeconds": 65
+        },
+        {
+          "speed": 2.55,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0
+          },
+          "period": 0.7900353236922196,
+          "phase": 0.2,
+          "observeSeconds": 65
+        },
+        {
+          "speed": 2.5,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0
+          },
+          "period": 0.7900353236922196,
+          "phase": 0.25,
+          "observeSeconds": 65
+        }
+      ]
+    },
+    {
+      "id": "atrium-last-order",
+      "revision": 1,
+      "repeat": 5,
+      "shot": {
+        "speed": 29.65,
+        "range": "full",
+        "input": {
+          "yaw": 93.2,
+          "pitch": 5,
+          "top": -100,
+          "kick": 0
+        },
+        "observeSeconds": 55
+      },
+      "neighbors": [
+        {
+          "speed": 29.6,
+          "range": "full",
+          "input": {
+            "yaw": 93.2,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 55
+        },
+        {
+          "speed": 29.7,
+          "range": "full",
+          "input": {
+            "yaw": 93.2,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 55
+        },
+        {
+          "speed": 29.65,
+          "range": "full",
+          "input": {
+            "yaw": 93.1,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 55
+        }
+      ]
+    }
+  ]
+}
