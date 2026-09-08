@@ -1,0 +1,306 @@
+[
+  {
+    "id": "lift--130-0.02",
+    "start": [
+      17.919998168945312,
+      0,
+      6.373336315155029
+    ],
+    "yaw": 90,
+    "pitch": -30,
+    "top": -130,
+    "power": 0.1225,
+    "powerRange": "precision",
+    "seconds": 45,
+    "phase": 0.02,
+    "period": 0.7900353236922196,
+    "challenge": {
+      "id": "atrium-moving-return",
+      "revision": 6,
+      "name": "Catch the Lift",
+      "creator": "station",
+      "order": 2,
+      "start": {
+        "center": {
+          "x": 17.919998168945312,
+          "y": 0,
+          "z": 6.373336315155029
+        },
+        "radius": 0.25,
+        "surface": "concourse"
+      },
+      "goal": {
+        "center": {
+          "x": 30.617856979370117,
+          "y": 5.5,
+          "z": 6.153565406799316
+        },
+        "radius": 0.5,
+        "surface": "east-ground-second-landing"
+      },
+      "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+      "physics": "kyoto-p3-2",
+      "hint": {
+        "yaw": 90,
+        "pitch": -30,
+        "top": -100,
+        "kick": 0,
+        "holdMs": 343,
+        "period": 0.7900353236922196,
+        "releasePhase": 0.2,
+        "note": "Pitch down with backspin to catch an ascending tread. release at the suggested speed and release at the green mark; the ball rides to the first landing.",
+        "powerRange": "precision"
+      },
+      "requiredSurface": "east-concourse-lower-escalator-1",
+      "scoring": "combo-v4",
+      "allowedInputs": {
+        "chargeSeconds": 2.8,
+        "power": [
+          0,
+          1
+        ],
+        "pitch": [
+          -65,
+          80
+        ],
+        "top": [
+          -200,
+          200
+        ],
+        "kick": [
+          -200,
+          200
+        ]
+      },
+      "throwModel": "robot-v4"
+    }
+  },
+  {
+    "id": "lift--130-0.2",
+    "start": [
+      17.919998168945312,
+      0,
+      6.373336315155029
+    ],
+    "yaw": 90,
+    "pitch": -30,
+    "top": -130,
+    "power": 0.1225,
+    "powerRange": "precision",
+    "seconds": 45,
+    "phase": 0.2,
+    "period": 0.7900353236922196,
+    "challenge": {
+      "id": "atrium-moving-return",
+      "revision": 6,
+      "name": "Catch the Lift",
+      "creator": "station",
+      "order": 2,
+      "start": {
+        "center": {
+          "x": 17.919998168945312,
+          "y": 0,
+          "z": 6.373336315155029
+        },
+        "radius": 0.25,
+        "surface": "concourse"
+      },
+      "goal": {
+        "center": {
+          "x": 30.617856979370117,
+          "y": 5.5,
+          "z": 6.153565406799316
+        },
+        "radius": 0.5,
+        "surface": "east-ground-second-landing"
+      },
+      "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+      "physics": "kyoto-p3-2",
+      "hint": {
+        "yaw": 90,
+        "pitch": -30,
+        "top": -100,
+        "kick": 0,
+        "holdMs": 343,
+        "period": 0.7900353236922196,
+        "releasePhase": 0.2,
+        "note": "Pitch down with backspin to catch an ascending tread. release at the suggested speed and release at the green mark; the ball rides to the first landing.",
+        "powerRange": "precision"
+      },
+      "requiredSurface": "east-concourse-lower-escalator-1",
+      "scoring": "combo-v4",
+      "allowedInputs": {
+        "chargeSeconds": 2.8,
+        "power": [
+          0,
+          1
+        ],
+        "pitch": [
+          -65,
+          80
+        ],
+        "top": [
+          -200,
+          200
+        ],
+        "kick": [
+          -200,
+          200
+        ]
+      },
+      "throwModel": "robot-v4"
+    }
+  },
+  {
+    "id": "lift--130-0.4",
+    "start": [
+      17.919998168945312,
+      0,
+      6.373336315155029
+    ],
+    "yaw": 90,
+    "pitch": -30,
+    "top": -130,
+    "power": 0.1225,
+    "powerRange": "precision",
+    "seconds": 45,
+    "phase": 0.4,
+    "period": 0.7900353236922196,
+    "challenge": {
+      "id": "atrium-moving-return",
+      "revision": 6,
+      "name": "Catch the Lift",
+      "creator": "station",
+      "order": 2,
+      "start": {
+        "center": {
+          "x": 17.919998168945312,
+          "y": 0,
+          "z": 6.373336315155029
+        },
+        "radius": 0.25,
+        "surface": "concourse"
+      },
+      "goal": {
+        "center": {
+          "x": 30.617856979370117,
+          "y": 5.5,
+          "z": 6.153565406799316
+        },
+        "radius": 0.5,
+        "surface": "east-ground-second-landing"
+      },
+      "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+      "physics": "kyoto-p3-2",
+      "hint": {
+        "yaw": 90,
+        "pitch": -30,
+        "top": -100,
+        "kick": 0,
+        "holdMs": 343,
+        "period": 0.7900353236922196,
+        "releasePhase": 0.2,
+        "note": "Pitch down with backspin to catch an ascending tread. release at the suggested speed and release at the green mark; the ball rides to the first landing.",
+        "powerRange": "precision"
+      },
+      "requiredSurface": "east-concourse-lower-escalator-1",
+      "scoring": "combo-v4",
+      "allowedInputs": {
+        "chargeSeconds": 2.8,
+        "power": [
+          0,
+          1
+        ],
+        "pitch": [
+          -65,
+          80
+        ],
+        "top": [
+          -200,
+          200
+        ],
+        "kick": [
+          -200,
+          200
+        ]
+      },
+      "throwModel": "robot-v4"
+    }
+  },
+  {
+    "id": "lift--130-0.6",
+    "start": [
+      17.919998168945312,
+      0,
+      6.373336315155029
+    ],
+    "yaw": 90,
+    "pitch": -30,
+    "top": -130,
+    "power": 0.1225,
+    "powerRange": "precision",
+    "seconds": 45,
+    "phase": 0.6,
+    "period": 0.7900353236922196,
+    "challenge": {
+      "id": "atrium-moving-return",
+      "revision": 6,
+      "name": "Catch the Lift",
+      "creator": "station",
+      "order": 2,
+      "start": {
+        "center": {
+          "x": 17.919998168945312,
+          "y": 0,
+          "z": 6.373336315155029
+        },
+        "radius": 0.25,
+        "surface": "concourse"
+      },
+      "goal": {
+        "center": {
+          "x": 30.617856979370117,
+          "y": 5.5,
+          "z": 6.153565406799316
+        },
+        "radius": 0.5,
+        "surface": "east-ground-second-landing"
+      },
+      "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+      "physics": "kyoto-p3-2",
+      "hint": {
+        "yaw": 90,
+        "pitch": -30,
+        "top": -100,
+        "kick": 0,
+        "holdMs": 343,
+        "period": 0.7900353236922196,
+        "releasePhase": 0.2,
+        "note": "Pitch down with backspin to catch an ascending tread. release at the suggested speed and release at the green mark; the ball rides to the first landing.",
+        "powerRange": "precision"
+      },
+      "requiredSurface": "east-concourse-lower-escalator-1",
+      "scoring": "combo-v4",
+      "allowedInputs": {
+        "chargeSeconds": 2.8,
+        "power": [
+          0,
+          1
+        ],
+        "pitch": [
+          -65,
+          80
+        ],
+        "top": [
+          -200,
+          200
+        ],
+        "kick": [
+          -200,
+          200
+        ]
+      },
+      "throwModel": "robot-v4"
+    }
+  }
+]
