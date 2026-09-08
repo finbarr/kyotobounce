@@ -169,5 +169,119 @@
       ]
     },
     "throwModel": "precision-v1"
+  },
+  {
+    "id": "atrium-first-bank",
+    "revision": 8,
+    "name": "First Bank",
+    "creator": "station",
+    "order": 0,
+    "start": {
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 20
+      },
+      "radius": 0.75,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": 8.876934051513672,
+        "y": 0,
+        "z": 19.780000686645508
+      },
+      "radius": 1.25,
+      "surface": "concourse"
+    },
+    "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+    "physics": "kyoto-p3-2",
+    "hint": {
+      "yaw": 90,
+      "pitch": 15,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 259,
+      "note": "A gentle floor bank. Set the suggested aim and release at the suggested speed.",
+      "powerRange": "precision"
+    },
+    "scoring": "combo-v5",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "throwModel": "robot-v4"
+  },
+  {
+    "id": "atrium-return-ticket",
+    "revision": 8,
+    "name": "Return Ticket",
+    "creator": "station",
+    "order": 1,
+    "start": {
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 20
+      },
+      "radius": 0.75,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": -5.037579536437988,
+        "y": 0,
+        "z": 19.780000686645508
+      },
+      "radius": 0.6499999761581421,
+      "surface": "concourse"
+    },
+    "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+    "physics": "kyoto-p3-2",
+    "hint": {
+      "yaw": 90,
+      "pitch": 15,
+      "top": -200,
+      "kick": 0,
+      "holdMs": 173,
+      "note": "Strong backspin brings the ball back. release at the suggested speed.",
+      "powerRange": "precision"
+    },
+    "scoring": "combo-v5",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "throwModel": "robot-v4"
   }
 ]
