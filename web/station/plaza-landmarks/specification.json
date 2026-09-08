@@ -1,0 +1,16 @@
+{
+  "task": "K028",
+  "status": "Authored interpretation; dimensions and exact placement inferred, not surveyed",
+  "references": {
+    "areas": "https://www.kyoto-station-building.co.jp/service/square/",
+    "diagram": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_maparea_map_2.png",
+    "shukobu": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_muromachisquare_01.jpg",
+    "space": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_karasumasquare_01.jpg",
+    "kyoto": "https://www.kyoto-station-building.co.jp/news/kyotomonument/"
+  },
+  "landmarks": [
+    {"id":"k028-shukobu","name":"朱甲舞","support":"muromachi-square","anchor":[-63.5,19.585964912280705,3.5],"yaw":0,"rationale":"North side of west 4F square opposite Grand Staircase, set back inside actual plaza polygon; central event area kept open."},
+    {"id":"k028-space","name":"Space","support":"east-4f-terrace","anchor":[63,20.5,-7],"yaw":0,"rationale":"Atrium edge of the east 4F terrace, west of east-court lower escalators; distinct from east 7F court."},
+    {"id":"k028-kyoto","name":"KYOTO","support":"east-4f-terrace","anchor":[67,20.5,-2],"yaw":0,"rationale":"North viewing end of east 4F terrace; letter frontage faces south approach. December 25 2025 installation, absent from older photos. Original seasonal artwork."}
+  ]
+}
