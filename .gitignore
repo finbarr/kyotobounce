@@ -38,6 +38,9 @@ docs/*
 !docs/PARALLEL_DEVELOPMENT.md
 !docs/DEPLOYING.md
 !docs/FLIGHT-CONTACT-FIXES.md
+!docs/FLEET_QUEUE.md
+!docs/PERFORMANCE-AUDIT.md
+!docs/STATION-DETAIL-BACKLOG.md
 tools/*
 !tools/assets.mjs
 !tools/asset-paths.mjs

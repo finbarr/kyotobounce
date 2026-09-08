@@ -1,0 +1,102 @@
+# Kyoto development fleet
+
+Coordinator: this Codex conversation. Started 2026-09-07.
+
+New observations are appended with stable IDs, then assigned to the owner of
+the affected files. Status progresses through queued, running, blocked, review,
+integrated and verified. A launched agent is not a completed task. The coordinator
+reviews diffs and runtime evidence before integration. Feature machines never
+deploy to production.
+
+## Machines
+
+The fleet is capped at five machines per the user's current preference. All
+five start from team image `244559976`, on source `bcd27c8`. Each has its
+own branch, worktree, writable assets, database, worker and logs. Initial plan:
+`medium` (4 vCPU, 8 GB RAM, 160 GB disk), $0.20/hour each; $1.00/hour combined
+at the current BoxHaven rate. The image provides 16 GB swap. Heavy Blender
+exports run on the station lane without simultaneous Unity imports.
+
+| Box | Branch | Initial work | Codex configuration | State |
+| --- | --- | --- | --- | --- |
+| [kyoto-robot](https://harbor-cloud-bce90a.at.boxhaven.dev) | fleet/robot-20260907 | K001, K002 | gpt-6-astra, medium effort, standard service | online; agent executing |
+| [kyoto-camera](https://opal-cloud-4468d3.at.boxhaven.dev) | fleet/camera-20260907 | K003, K005 | gpt-6-astra, medium effort, standard service | online; agent executing |
+| [kyoto-station](https://opal-ridge-d24d72.at.boxhaven.dev) | fleet/station-20260907 | K006 | gpt-6-astra, high effort, standard service | online; agent executing |
+| [kyoto-physics](https://banana-orbit-9c461b.at.boxhaven.dev) | fleet/physics-20260907 | K007 | gpt-6-astra, high effort, standard service | online; agent executing |
+| [kyoto-audio](https://golden-orbit-acc224.at.boxhaven.dev) | fleet/audio-20260907 | K013 | gpt-6-astra, low effort, standard service | online; agent launch in progress |
+
+## Queue
+
+| ID | Observation and acceptance criteria | Owner | Status |
+| --- | --- | --- | --- |
+| K001 | Robot gaze follows the bouncing ball with smooth, anatomically limited head motion; returns naturally to aiming; works during replays and preserves grip/release. | robot | running |
+| K002 | Replace unnatural walking with a coherent carrying gait: grounded stance, reduced foot sliding, sensible backward/sideways motion, smooth starts/stops and no changes to authoritative movement. Verify video and collision boundaries. | robot | running |
+| K003 | Flight camera begins aligned with the launch trajectory, smoothly follows the ball's direction with stable world-up and collision clearance, and yields immediately to manual mouse/orbit input until the next throw. Preserve the saved throw aim and replay/recall behavior. | camera | running |
+| K004 | Diagnose kyotobounce.com lag using actual host and service evidence; distinguish CPU/memory/worker limits from browser or network cost. Prepare and verify a concrete capacity or code fix without production load tests or deployment. | coordinator; next free dev box for benchmark | idle audit complete; isolated benchmark queued |
+| K005 | Make the launch-speed/power control substantially smaller and unobtrusive at desktop and mobile sizes; preserve readable speed, ranges, charge feedback, keyboard access and existing controls. | camera | running |
+| K006 | Sustained Kyoto Station fidelity lane: first compare current art against reliable station references, prioritize visible omissions, and deliver a substantial first detail pass with before/after views and render-cost measurements. Keep exact collision/visual agreement; propose later passes as explicit queued tasks. | station | running |
+| K007 | Priority: audit and repair unintended floor/landing gaps where balls escape below the station. Record coordinates and reproducible cases; preserve intentional voids, restore correct floors below them, and verify matching visual/collision geometry plus native throws/traversal. No invisible catch planes or arbitrary shot timeouts. | physics | running; K016 top landing reproduction first |
+| K008 | Restore the missing upstairs garden: reference its location, elevation, access, planting, furniture and railings; author a separate candidate and integrate its walkable floor/collision through the structural owner. | station; physics integration | queued behind current detail baseline; reference/candidate work may proceed |
+| K009 | Priority: user clarified the entire game is jittery, including escalators. Diagnose shared render/snapshot timing across robot, ball, camera and escalators; measure authoritative feet, interpolation, input/state pacing and frame time. Fix the demonstrated cause without crossing collision boundaries or masking latency with excessive smoothing. | camera/control + coordinator performance; robot checks pose jitter | priority clarification dispatched |
+| K010 | Yellow tactile paving must be physically raised: distinct warning dots and directional bars with reference-backed dimensions, matching visible/contact geometry, and native rolling/bounce tests showing engagement. A flat texture alone is insufficient. | physics contact candidate + station visual candidate | queued after gap repair; references/visual design can proceed |
+| K011 | Escalator lower curved rails are visibly segmented, and steps protrude through the building bottom. Repair continuous rail geometry and contained tread entry/return paths, with matched collision, traversable landings and full-cycle evidence at both ends. | physics/structural, including escalators.js | queued immediately after floor gaps |
+| K012 | Shadow edges are jagged. Improve shadow-map coverage/filtering/bias with stable edges over gameplay areas; compare matched screenshots and frame cost, without blindly escalating GPU memory/resolution. | station/rendering | dispatched as separate bounded rendering fix |
+| K013 | Music is too repetitive. Add coherent original synthesized phrases/sections, evolving melody/rhythm/orchestration and smooth transitions over minutes; preserve audible gameplay cues, mute/unlock controls and bounded audio-node use. Capture before/after audio and browser checks. | audio | assigned with K018; agent launching |
+| K014 | Space advances to the next challenge from a completed-level result without releasing pointer lock. Preserve normal Space-to-throw, ignore key repeats/editable fields, prevent accidental multiple advances, and show the shortcut on the next-challenge action. Verify completion, retry and final-level behavior. | camera/control; narrow competition.js ownership added | queued as small separate input/UI fix |
+| K015 | Priority: timer points stop accruing while a ball is still moving toward/in the goal center. Diagnose goal-contact/prediction/time-bonus freeze; keep accruing according to the corrected movement rule until true rest, preserve final authority and immutable old replay scores, and version changed scoring behavior. | dedicated scoring worktree; coordinator review | b0597d8 native regression passed; browser integration underway |
+
+| K016 | Concrete K007/K011 reproduction: ball falls through the TOP of the escalator on Catch the Lift. Reproduce with actual stage and varied release phases, repair upper comb/landing/side support and tread turnover, then verify continuous support at both ends through full cycles. | physics | priority update dispatched |
+| K017 | Give the robot a coherent Japanese arcade/mecha/toy-robot identity with expressive face, strong silhouette and intentional color/material accents. Preserve rig/release/gaze/gait, verify actual browser views, and deliver original art as a candidate asset handoff if needed. | robot | queued after movement verification; direction dispatched |
+| K018 | Bold pachinko/game-show spectacle: HUGE bouncing multiplier numbers on actual multiplier jumps, escalating scale/pitch/LED chase and rich bank/goal/result fanfares. Milestones must feel progressively more extreme. Maintain score authority, readable flight, audio controls and bounded resources; verify a real audiovisual chain, plus reduced-motion behavior. | audio and feedback visuals | explicit user clarification included in initial assignment |
+| K019 | Design and build better challenges around meaningful station spaces. First finite design pass: top deck to authentic station konbini plus two distinct routes; verify geography, throw feasibility and readable progression, gate final coordinates on detailed matched geometry, and publish only new challenge revisions. | local level-design worktree; station/physics handoffs | design and location study running; playable implementation follows geometry |
+
+## Current findings
+
+- All five boxes have the source-compatible Linux worker and an active local game
+  service. Four agent sessions are executing; the fifth (audio/effects) is launching.
+  Codex 0.153.3 uses persistent `boxhaven` tmux sessions, effort overrides and
+  `service_tier=default`. Actual browser startup and throws passed on the first four;
+  audio preview verification follows its agent launch.
+- No Unity activation is required for the initial browser/Blender work. An
+  editor/native rebuild will be called out when it is actually needed.
+- [Production audit](PERFORMANCE-AUDIT.md): the idle 2-vCPU/4-GB host had 99%
+  idle CPU, 2.9 GiB available RAM and no current-service restarts. This neither
+  reproduces gameplay lag nor proves capacity under traffic. Benchmark the
+  serial Unity worker, input/state pacing, network and browser frame time on
+  an isolated development instance before selecting a remediation.
+
+- K015: native perfect-shot timer now continues from first goal entry at 10.78 s
+  through 16.41 active seconds; identical stationary tail poses add nothing.
+  Archived v4 score objects were byte-identical on three native trajectories.
+- [Official station retail map](https://www.dailyservice.co.jp/shop/map?type=kyoto)
+  (July 2026) confirms several station 7-Eleven Heart-in shops, including the 2F
+  west entrance. Actual doorway alignment and a top-deck shot path still need
+  geometry registration; current cafe geometry is not evidence of a 7-Eleven.
+
+## Ownership and handoffs
+
+- Robot owns `web/public/avatar.js`, robot-only browser tests, and robot
+  source/export scripts if required. It must request edits to `game.js` through
+  the coordinator; the existing `poseAvatar` arguments already include ball state.
+- Camera owns `web/public/game.js`, `style.css`, `arcade.css`, `index.html` and
+  camera/power-specific browser tests, plus narrow `competition.js` changes for
+  K014 result-keyboard flow. It preserves other gameplay and avatar APIs.
+- Audio owns `web/public/arcade-audio.js`, `arcade-feedback.js` and audio/feedback-only
+  tests. Its public API remains compatible with camera/gameplay callers. Shared
+  CSS/game/build manifest hooks require a coordinator patch handoff.
+- Station owns station art scripts, station-only rendering modules and candidate
+  decorative outputs, plus a standalone upstairs-garden candidate. Physics owns
+  the structural `KyotoAtrium.blend`, `tools/export_atrium_layout.py`,
+  `web/public/escalators.js` and candidate
+  floor/collision repairs; station must not edit that same structural source.
+  `runtime/station-layout.json`, native physics, asset manifests,
+  package manifests and asset releases require an explicit integration handoff.
+- Shared contracts, production changes, published asset packs and PR integration
+  belong to the coordinator. Never upload `.local/`, secrets, research images,
+  Unity binaries or large asset originals into Git.
+- Agents record progress and blockers in `.local/fleet/STATUS.md`, and deliver
+  `.local/fleet/RESULT.md` with commits, tests, screenshots/video and limitations.
+  Report Unity licensing only when it blocks an actual editor/build operation.
+- The coordinator keeps the operational manifest, logs and task prompts in the
+  ignored `.local/fleet/` directory in this coordination worktree. Future turns
+  read this queue and live box status before assigning more work.
