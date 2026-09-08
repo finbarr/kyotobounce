@@ -1,0 +1,62 @@
+{
+  "coordinateSystem": "native Y-up; feet and yaw/pitch for isolated native inspection courses",
+  "views": [
+    [
+      "hall",
+      1,
+      0,
+      -15,
+      90,
+      0
+    ],
+    [
+      "escalator-lower",
+      17.8,
+      0,
+      4.65,
+      90,
+      12
+    ],
+    [
+      "escalator-upper",
+      30,
+      5.5,
+      4.65,
+      -90,
+      -20
+    ],
+    [
+      "doorway",
+      -85.2,
+      23.97193,
+      -17.1,
+      150,
+      -12
+    ],
+    [
+      "garden",
+      -156,
+      54.4982456,
+      -20.4,
+      0,
+      -10
+    ],
+    [
+      "shop-gallery",
+      -55.3,
+      7.35,
+      -18,
+      90,
+      0
+    ],
+    [
+      "shop-interior",
+      -52,
+      7.35,
+      -18,
+      -90,
+      0
+    ]
+  ],
+  "currentLayout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775"
+}
