@@ -43,16 +43,16 @@ exports run on the station lane without simultaneous Unity imports.
 | K012 | Shadow edges are jagged. Improve shadow-map coverage/filtering/bias with stable edges over gameplay areas; compare matched screenshots and frame cost, without blindly escalating GPU memory/resolution. | station/rendering | integrated and Mac moving-view checked; 16.6–16.7ms medians; atrium p99 remains noisier (24.2 vs18.8ms) |
 | K013 | Music is too repetitive. Add coherent original synthesized phrases/sections, evolving melody/rhythm/orchestration and smooth transitions over minutes; preserve audible gameplay cues, mute/unlock controls and bounded audio-node use. Capture before/after audio and browser checks. | audio | e031384 integrated; 192s music comparison,125s audio endurance and native browser evidence passed remotely |
 | K014 | Space advances to the next challenge from a completed-level result without releasing pointer lock. Preserve normal Space-to-throw, ignore key repeats/editable fields, prevent accidental multiple advances, and show the shortcut on the next-challenge action. Verify completion, retry and final-level behavior. | camera/control; narrow competition.js ownership added | verified; actual Mac pointer-lock/Space/repeat/retry checks passed |
-| K015 | Priority: timer points stop accruing while a ball is still moving toward/in the goal center. Diagnose goal-contact/prediction/time-bonus freeze; keep accruing according to the corrected movement rule until true rest, preserve final authority and immutable old replay scores, and version changed scoring behavior. | dedicated scoring worktree; coordinator review | verified in coordination branch; native and real-browser timer/result/replay checks passed; not deployed |
+| K015 | Priority: timer points stop accruing while a ball is still moving toward/in the goal center. Diagnose goal-contact/prediction/time-bonus freeze; keep accruing according to the corrected movement rule until true rest, preserve final authority and immutable old replay scores, and version changed scoring behavior. | dedicated scoring worktree; coordinator review | verified in coordination branch; native and real-browser timer/result/replay checks passed; deployed 2026-09-08 |
 | K016 | Concrete K007/K011 reproduction: ball falls through the TOP of the escalator on Catch the Lift. Reproduce with actual stage and varied release phases, repair upper comb/landing/side support and tread turnover, then verify continuous support at both ends through full cycles. | physics | baseline top-runout sinking reproduced; candidate passes four release phases, matching rays and walking; native and actual browser course/replay checks pass |
 | K017 | Give the robot a coherent Japanese arcade/mecha/toy-robot identity with expressive face, strong silhouette and intentional color/material accents. Preserve rig/release/gaze/gait, verify actual browser views, and deliver original art as a candidate asset handoff if needed. | robot | verified; all three characters pass native full-game record, replay and interruption checks |
 | K018 | Bold pachinko/game-show spectacle: HUGE bouncing multiplier numbers on actual multiplier jumps, escalating scale/pitch/LED chase and rich bank/goal/result fanfares. Milestones must feel progressively more extreme. Maintain score authority, readable flight, audio controls and bounded resources; verify a real audiovisual chain, plus reduced-motion behavior. | audio and feedback visuals | e031384 and70bdb4e integrated; actual Mac classic and waypoint jackpot chains passed; route-miss celebration corrected |
 | K019 | Design and build better challenges around meaningful station spaces. First finite design pass: top deck to authentic station konbini plus two distinct routes; verify geography, throw feasibility and readable progression, gate final coordinates on detailed matched geometry, and publish only new challenge revisions. | kyoto-camera levels worktree; station/physics handoffs | verified; all24 native course samples and full-game completion/replay/retry pass; optional destination bonus misses keep waypoint points |
 | K020 | User screenshot shows striped doorway-threshold bleed and floor patches that flicker/stutter with camera movement. Identify actual overlapping geometry, depth precision, shadow or material cause; repair it and verify continuous movement at near/far views. Preserve matching structure and collision. | station/rendering; physics/camera handoffs if needed | verified; four coplanar triangles/.935947m² clipped; actual final Mac moving doorway views pass |
 | K021 | Lighting pops into existence inconsistently while moving and appears to cause stutter. Reproduce the current two-light pool's 0.4-second full-intensity reassignment, stabilize lighting with measured frame cost, and verify traversal plus clock/replay resets. | station/rendering | verified in actual native walk; 4 relocations while lit became 0; two-light count unchanged; clock rollback/fade checks pass |
-| K022 | New waypoint-v1 scoring: optional once-only surface waypoints and at most one optional destination. Preserve waypoint points when destination missed, add landing bonus, keep full native rest/authority and immutable classic replays. Author/play/replay both course forms; see WAYPOINT-SCORING.md. | local native/backend + browser worktrees; audio handoff | backend5796125 and UI63bebe5 integrated; rebuilt native suites plus actual Chrome editor/play/replay and delayed-placement checks passed; not deployed |
+| K022 | New waypoint-v1 scoring: optional once-only surface waypoints and at most one optional destination. Preserve waypoint points when destination missed, add landing bonus, keep full native rest/authority and immutable classic replays. Author/play/replay both course forms; see WAYPOINT-SCORING.md. | local native/backend + browser worktrees; audio handoff | backend5796125 and UI63bebe5 integrated; rebuilt native suites plus actual Chrome editor/play/replay and delayed-placement checks passed; deployed 2026-09-08 |
 | K023 | Three selectable original Japanese arcade robot characters with distinct silhouettes/personalities and high-score dances. Preserve identical physics/release/gait and replay compatibility, persist cosmetic choice, verify real record-driven celebrations and reset. | robot; browser integration | verified; actual records for all three characters, saved choice, replay suppression, reduced motion and desktop/mobile winner visibility pass |
-| K024 | Score/waypoint-driven ball heat: charged color/glow, fire/embers/trail, then extreme jackpot state. Synchronize with sound/multiplier spectacle; preserve physical core, visibility, timing and bounded render cost. | waypoint browser presentation + audio | verified; actual native12.6m and combined169.8m stress shots, visible fire/bursts, replay resets and all tiers verified; not deployed |
+| K024 | Score/waypoint-driven ball heat: charged color/glow, fire/embers/trail, then extreme jackpot state. Synchronize with sound/multiplier spectacle; preserve physical core, visibility, timing and bounded render cost. | waypoint browser presentation + audio | verified; actual native12.6m and combined169.8m stress shots, visible fire/bursts, replay resets and all tiers verified; deployed 2026-09-08 |
 
 ## Current findings
 
@@ -182,6 +182,25 @@ files remain byte-identical. Asset originals, geometry and native workers are fr
 Current definitions have one source in web/starter-challenges.json; authoring
 helpers derive fixtures from that file and retain no duplicate catalog or seeder.
 
-Implementation and acceptance are complete. The local preview is
-http://127.0.0.1:4192. The prepared assets-v2 and Linux runtime packages remain
-local; no production deployment or asset release publication has been performed.
+Implementation, acceptance and the explicitly authorized production deployment
+are complete. https://kyotobounce.com is running release
+`2026-09-08T07-32-04-588Z`, activated 2026-09-08 at 15:06 UTC from source
+`35f6b5405759f450b7e0bbc84c26b1e79f202ee2`. Source is on `main` and
+[CI passed](https://github.com/finbarr/kyotobounce/actions/runs/34242196161).
+[assets-v2](https://github.com/finbarr/kyotobounce/releases/tag/assets-v2) is
+published; its public download matches the archive SHA above.
+
+The staged dedicated Linux service selected all five current courses and
+completed a real First Bank shot for 41,424 points, with native rest and exact
+authoritative replay parity, using a disposable database. After activation,
+all 238 packaged files and 26 public browser/asset responses matched their
+expected hashes. All 22 preexisting challenge rows and 18 attempts stayed
+byte-identical; guest count remained 45. Chrome played and scrubbed an existing
+55,410-point Catch the Lift replay with its original station assets, no live
+WebSocket and no browser errors.
+
+The production service has no restarts, and the backup timer and a fresh backup
+integrity check pass. Temporary test services/data and six obsolete releases
+were removed. The current and immediate previous releases remain, with a frozen
+database and rollback configuration under
+`/var/lib/kyoto/deployments/2026-09-08T07-32-04-588Z`.
