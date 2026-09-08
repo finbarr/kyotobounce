@@ -35,7 +35,19 @@ To export collision geometry after editing the atrium, use a fresh output direct
 blender --background art-source/atrium/KyotoAtrium.blend --python tools/export_atrium_layout.py -- --output artifacts/layout-candidate
 ```
 
-Review that candidate, then copy its layout and textures into `runtime/` and rebuild the browser station. Geometry changes alter the layout hash and therefore need challenge/replay compatibility review. Never replace a layout underneath existing scoreboards without a deliberate revision/migration plan.
+Export a matching browser candidate without replacing current assets:
+
+```sh
+blender --background --python tools/export_browser_art.py -- \
+  --source path/to/candidate/KyotoAtrium.blend \
+  --layout artifacts/layout-candidate/station-layout.json \
+  --output artifacts/browser-candidate
+```
+
+The exporter reads textures beside the selected layout and writes its audit receipt
+inside the selected output. With no options, the original paths remain unchanged.
+Review both candidates, then copy the layout/textures into `runtime/` and the
+matching browser exports into `web/public/assets/`. Geometry changes alter the layout hash and therefore need challenge/replay compatibility review. Never replace a layout underneath existing scoreboards without a deliberate revision/migration plan.
 
 `art-source/phase3/robot/build_robot.py` generates the original rig; `tools/build_atrium_detail.py` generates hardware. `tools/build_stair_materials.py` generates textures using Python, NumPy and Pillow. The Blender source remains the editable authority for manually authored station geometry.
 

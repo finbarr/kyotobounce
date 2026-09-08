@@ -2,12 +2,17 @@
 The source blend is read-only. Collision and moving-lane definitions stay in Unity.
 """
 from pathlib import Path
-import bpy,json,math,hashlib
+import bpy,json,math,hashlib,argparse,sys
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[1]
-SOURCE=ROOT/'art-source/atrium/KyotoAtrium.blend'
-LAYOUT=ROOT/'runtime/station-layout.json'
-OUT=ROOT/'web/public/assets';OUT.mkdir(parents=True,exist_ok=True)
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--source',type=Path,default=ROOT/'art-source/atrium/KyotoAtrium.blend')
+parser.add_argument('--layout',type=Path,default=ROOT/'runtime/station-layout.json')
+parser.add_argument('--output',type=Path)
+args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+SOURCE=args.source.resolve();LAYOUT=args.layout.resolve()
+OUT=(args.output or ROOT/'web/public/assets').resolve();OUT.mkdir(parents=True,exist_ok=True)
+REPORT=OUT/'atrium-export.json' if args.output else ROOT/'artifacts/phase3/art/export.json'
 bpy.ops.wm.open_mainfile(filepath=str(SOURCE));source_scene=bpy.context.scene
 layout=json.loads(LAYOUT.read_text());records={m['label']:m for m in layout['authoredMaterials']}
 def enable(layer):
@@ -137,6 +142,6 @@ public={k:layout[k] for k in ['spawn','escalators','authoredLights','authoredMat
 public.update(layoutSha256=hashlib.sha256(LAYOUT.read_bytes()).hexdigest(),coordinateMapping='Unity (x,y,z) -> Three (x,y,-z)')
 (OUT/'station.json').write_text(json.dumps(public,separators=(',',':')))
 counts.update(batches=len(groups),materials=len(mats),glbBytes=(OUT/'atrium.glb').stat().st_size,sourceSha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),layoutSha256=public['layoutSha256'])
-(ROOT/'artifacts/phase3/art').mkdir(parents=True,exist_ok=True)
-(ROOT/'artifacts/phase3/art/export.json').write_text(json.dumps(counts,indent=2)+'\n')
+REPORT.parent.mkdir(parents=True,exist_ok=True)
+REPORT.write_text(json.dumps(counts,indent=2)+'\n')
 print('KYOTO_BROWSER_ART_READY',json.dumps(counts),flush=True)
