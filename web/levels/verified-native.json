@@ -585,9 +585,7 @@
         "kick": 0,
         "holdMs": 486.95652173913044,
         "powerRange": "precision",
-        "period": 0.7900353236922196,
-        "releasePhase": 0.2,
-        "note": "Ride the ascending lane. Stop on the clear stone before the tactile strip."
+        "note": "Catch the rising step. Roll onto the stone landing."
       },
       "receiptDirectory": ".local/proofs/lift-final-proof-01",
       "summarySha256": "c971f05506d2bf27520b72f2aad6c238d017c17317892e11a5df23de0c512a2f",
