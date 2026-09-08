@@ -1,11 +1,20 @@
-// Original 112 BPM pentatonic arcade score. Generated locally; no audio downloads.
+// Original 112 BPM arcade score: eight-bar phrases, arranged across a 32-phrase suite.
 export function arcadeAudio(){
  let ctx,master,musicBus,sfxBus,compressor,timer,next=0,step=0,charge=null,lastImpact=0,white,travel,travelGain,travelFilter;
  const cues={};
  let prefs;try{prefs=JSON.parse(localStorage.getItem('kyoto-audio')||'null');}catch{}
  prefs={muted:false,music:true,...prefs};
  const tones=[0,3,5,7,10],root=57,beat=60/112/2;
- const melody=[0,2,3,4,3,2,1,-1,0,2,3,5,4,3,2,-1,1,3,4,6,4,3,2,-1,0,2,1,3,2,1,0,-1];
+ // Related call/response motifs; rests leave room for the physical game cues.
+ const phrases=[
+  [0,-1,2,3,-1,2,1,-1,0,2,-1,5,4,-1,2,-1],
+  [3,4,-1,6,5,-1,3,-1,2,-1,1,3,-1,2,0,-1],
+  [5,-1,3,-1,2,3,-1,4,6,-1,5,3,-1,2,1,-1],
+  [0,1,2,-1,4,-1,3,2,1,-1,3,-1,2,1,0,-1],
+  [7,-1,5,4,-1,3,5,-1,6,5,-1,3,2,-1,0,-1],
+  [2,-1,-1,3,5,-1,4,-1,3,-1,1,-1,0,-1,-1,-1]
+ ];
+ const arrangement=[0,1,2,3,5,2,4,1,3,0,5,4,2,1,4,3,5,0,2,4,1,3,0,5,4,2,3,1,0,4,5,2];
  const notes=n=>440*2**((n-69)/12),pent=n=>root+tones[n%5]+12*Math.floor(n/5);
  function save(){try{localStorage.setItem('kyoto-audio',JSON.stringify(prefs));}catch{}update();}
  function tone(freq,t,duration,volume=.06,type='triangle',bus=sfxBus,endFreq){
@@ -26,18 +35,28 @@ export function arcadeAudio(){
   if(next<ctx.currentTime)next=ctx.currentTime+.04;
   while(next<ctx.currentTime+.15){
    if(prefs.music&&!prefs.muted){
-    const m=melody[step%32],bar=Math.floor(step/8)%4,bass=[45,41,48,43][bar];
-    if(m>=0){tone(notes(pent(m)),next,.16,.026,'square',musicBus);tone(notes(pent(m)),next+.11,.21,.011,'triangle',musicBus);}
-    if(step%2===0)tone(notes(bass+(step%8===6?12:0)),next,.22,.13,'triangle',musicBus);
-    if(step%8===0)for(const semitone of [0,7,12])tone(notes(bass+12+semitone),next,.9,.018,'triangle',musicBus);
-    if(step%4===0)tone(105,next,.14,.18,'sine',musicBus,36);
-    noise(next,step%4===2?.09:.025,step%4===2?.065:.028);
+    const phrase=Math.floor(step/64),section=Math.floor(phrase/2)%4,part=Math.floor(step/16)%4;
+    const motif=phrases[arrangement[phrase%arrangement.length]],index=step%16;
+    // Responses vary contour and register at musical boundaries, never random notes.
+    let m=motif[index];if(m>=0&&part===1)m=Math.max(0,m-1);if(m>=0&&part===3)m=index>11?[2,-1,1,0][index-12]:m+1;
+    const bar=Math.floor(step/8)%8,bass=[45,45,41,41,48,48,43,43][bar],space=section===2;
+    if(m>=0&&(!space||step%2===0)){
+     const register=section===3?5:0;
+     tone(notes(pent(m+register)),next,space?.38:.17,section===3?.024:.031,section===0?'triangle':'sine',musicBus);
+     if(section===1||section===3)tone(notes(pent(m)),next+.12,.24,.009,'triangle',musicBus);
+    }
+    if(step%(space?4:2)===0)tone(notes(bass+(step%8===6?12:0)),next,.25,.105,'triangle',musicBus);
+    if(step%8===0)for(const semitone of [0,7,12])tone(notes(bass+12+semitone),next,1.35,.015,'sine',musicBus);
+    if(step%4===0&&(!space||step%8===0))tone(105,next,.14,.14,'sine',musicBus,36);
+    if(!space||step%4===2)noise(next,step%4===2?.075:.025,step%4===2?.044:.018);
+    if(section===3&&step%8===7)tone(notes(bass+24),next,.1,.018,'triangle',musicBus);
+
    }
    step++;next+=beat;
   }
  }
  function update(){
-  if(ctx){master.gain.setTargetAtTime(prefs.muted?0:.52,ctx.currentTime,.035);musicBus.gain.setTargetAtTime(prefs.music?.65:0,ctx.currentTime,.035);}
+  if(ctx){musicBus.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(prefs.muted?0:.52,ctx.currentTime,.035);musicBus.gain.setTargetAtTime(prefs.music?.65:0,ctx.currentTime,.035);}
   const mute=document.getElementById('sound-toggle'),music=document.getElementById('music-toggle');
   if(mute){mute.textContent=prefs.muted?'SOUND OFF':'SOUND ON';mute.setAttribute('aria-pressed',String(!prefs.muted));}
   if(music){music.textContent=prefs.music?'♫ MUSIC ON':'♫ MUSIC OFF';music.setAttribute('aria-pressed',String(prefs.music));}
@@ -83,13 +102,21 @@ export function arcadeAudio(){
    else tone(480,t,.035,volume*.2,'triangle',sfxBus,150);
   }
   if(name==='bank'){
-   duck();const climb=Math.min(12,Math.max(0,value-1))*2;
-   burst(t,.065,.085,3200);tone(notes(64+climb),t,.12,.095,'square');tone(notes(71+climb),t+.04,.2,.08,'triangle');tone(92,t,.12,.12,'sine',sfxBus,45);
+   duck();const mult=typeof value==='object'?value.multiplier:1+value*.75;
+   const level=Math.min(6,Math.max(0,Math.floor(Math.log2(Math.max(1,mult))))),climb=Math.min(30,Math.round(9*Math.log2(Math.max(1,mult))));
+   const count=3+level,spacing=.065-level*.005;
+   burst(t,.06,.065,3200);tone(92,t,.14,.12,'sine',sfxBus,45);
+   for(let i=0;i<count;i++){
+    const f=notes(60+climb+[0,3,5,7,10,12,15,17,19][i]);
+    tone(f,t+i*spacing,.24,.065,'triangle');tone(f*2.12,t+i*spacing,.13,.012,'sine');
+   }
   }
   if(name==='goal'){
    duck();burst(t,.28,.14,4800,'highpass');tone(82,t,.24,.24,'sine',sfxBus,38);
-   [72,79,84,88].forEach((n,i)=>{tone(notes(n),t+i*.055,.42,.11,'triangle');tone(notes(n+12),t+i*.055+.02,.22,.025,'sine');});
-   tone(1200,t+.22,.33,.045,'sine',sfxBus,2400);
+   [72,76,79,84,88,91,96].forEach((n,i)=>{tone(notes(n),t+i*.055,.42,.11,'triangle');tone(notes(n+12),t+i*.055+.02,.22,.025,'sine');});
+   tone(1200,t+.22,.33,.035,'sine',sfxBus,3000);
+   [60,67,72,76].forEach(n=>tone(notes(n),t+.48,.8,.055,'triangle'));
+   [0,1,2].forEach(i=>burst(t+.48+i*.12,.07,.045,4800));
   }
   if(name==='result'){
    duck();if(value==='perfect'||value==='tagged'){burst(t,.2,.1,3000);tone(90,t,.2,.18,'sine',sfxBus,38);}
