@@ -39,6 +39,7 @@ let yaw=180,pitch=12,top=0,kick=0,azimuth=-Math.PI,elevation=.006,distance=3.8,m
 let aimDistance=30,powerRange='full',powerLevel='';
 let rightDrag=false,lastPointer=null,lastPhase='',lockRequested=false;
 let lastThrowAim=null,aimOrbit=null,ballCameraActive=false,flightPending=false,returnRequested=false;
+let flightManual=false;
 const avatars=new Map(),keys=new Set(),caster=new THREE.Raycaster();caster.firstHitOnly=true;
 const cameraTarget=new THREE.Vector3(0,1.3,-20),followTarget=cameraTarget.clone(),desired=new THREE.Vector3(),lookTarget=new THREE.Vector3();
 camera.position.set(-3.8,2.3,-20);camera.lookAt(cameraTarget);
@@ -95,7 +96,7 @@ function setPowerRange(range,force=false){
 }
 for(const range of ['precision','full'])$('power-'+range).onclick=()=>{setPowerRange(range);canvas.focus();};
 setPowerRange('full');
-function release(){stopChargeSound();if(chargeStarted){lastThrowAim={yaw,pitch,distance};sound.cue('throw');sendInput();send('release');flightPending=true;chargeStarted=0;}}
+function release(){stopChargeSound();if(chargeStarted){lastThrowAim={yaw,pitch,distance};flightManual=false;sound.cue('throw');sendInput();send('release');flightPending=true;chargeStarted=0;}}
 function pointerLocked(){return document.pointerLockElement===canvas;}
 function cancel(){stopChargeSound();flightPending=false;if(ui?.state.mode!=='replay')send('cancel');chargeStarted=0;keys.clear();rightDrag=false;lastPointer=null;lockRequested=false;if(pointerLocked())document.exitPointerLock();}
 function pointerLockFailed(error){
@@ -127,20 +128,21 @@ for(const id of ['top','kick'])$(id).addEventListener('input',syncSpin);
 $('clear-spin').onclick=()=>{$('top').value=0;$('kick').value=0;syncSpin();canvas.focus();};
 $('home').onclick=()=>{send('home');lastThrowAim=null;returnRequested=true;yaw=180;pitch=12;centerOnAim();canvas.focus();};
 for(const id of ['retry','flight-retry'])$(id).onclick=()=>{recall();canvas.focus();};
-$('recenter').onclick=()=>{if(flightControls()){azimuth=-(lastThrowAim?.yaw??yaw)*Math.PI/180;elevation=.24;distance=2.8;}else{centerOnAim();distance=3.8;}canvas.focus();};
+$('recenter').onclick=()=>{if(flightControls()){azimuth=-(lastThrowAim?.yaw??yaw)*Math.PI/180;elevation=-(lastThrowAim?.pitch??pitch)*Math.PI/180;distance=2.8;takeCameraControl();}else{centerOnAim();distance=3.8;}canvas.focus();};
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('mousedown',event=>{
   if(briefing?.blocked)return;
   canvas.focus();
   // The first click only captures the cursor; it must never release a weak shot.
   if(ui.state.mode==='play'&&!pointerLocked()){if(event.button===0)captureMouse();return;}
-  if(event.button===2){rightDrag=true;lastPointer={x:event.clientX,y:event.clientY};manualCamera=true;}
+  if(event.button===2){rightDrag=true;lastPointer={x:event.clientX,y:event.clientY};}
   if(event.button===0){caster.setFromCamera(new THREE.Vector2(event.clientX/innerWidth*2-1,1-event.clientY/innerHeight*2),camera);const ray={origin:{x:caster.ray.origin.x,y:caster.ray.origin.y,z:-caster.ray.origin.z},direction:{x:caster.ray.direction.x,y:caster.ray.direction.y,z:-caster.ray.direction.z}};if(!ui.pointer(event,ray))startCharge();}
 });
 document.addEventListener('mouseup',event=>{if(event.button===0)release();if(event.button===2)rightDrag=false;});
 canvas.addEventListener('pointercancel',cancel);
 canvas.addEventListener('mouseenter',event=>{lastPointer={x:event.clientX,y:event.clientY};});
 canvas.addEventListener('mouseleave',()=>{if(!rightDrag)lastPointer=null;});
+function takeCameraControl(){manualCamera=true;if(flightControls())flightManual=true;}
 function centerOnAim(){manualCamera=false;azimuth=-yaw*Math.PI/180;elevation=THREE.MathUtils.clamp(.10-pitch*Math.PI/180*.45,-.2,.8);}
 document.addEventListener('mousemove',event=>{
   if(briefing?.blocked)return;
@@ -149,14 +151,14 @@ document.addEventListener('mousemove',event=>{
   const dx=locked?event.movementX:lastPointer?event.clientX-lastPointer.x:0,dy=locked?event.movementY:lastPointer?event.clientY-lastPointer.y:0;
   lastPointer={x:event.clientX,y:event.clientY};
   if(!dx&&!dy)return;
-  if(rightDrag||flightControls()){azimuth-=dx*.005;elevation=THREE.MathUtils.clamp(elevation+dy*.004,-.2,1.25);manualCamera=true;return;}
+  if(rightDrag||flightControls()){azimuth-=dx*.005;elevation=THREE.MathUtils.clamp(elevation+dy*.004,-.95,1.25);takeCameraControl();return;}
   if(ui.state.mode==='play'){
     // The arrows temporarily orbit away from aim. Mouse motion returns to the
     // reticle. Flight orbit never changes the robot's saved throw direction.
     yaw=THREE.MathUtils.euclideanModulo(yaw+dx*.18+180,360)-180;
     pitch=THREE.MathUtils.clamp(pitch-dy*.14,-65,80);centerOnAim();
   }else if(ui.state.mode==='replay'){
-    azimuth-=dx*.005;elevation=THREE.MathUtils.clamp(elevation+dy*.004,-.2,1.25);manualCamera=true;
+    azimuth-=dx*.005;elevation=THREE.MathUtils.clamp(elevation+dy*.004,-.95,1.25);manualCamera=true;
   }
   // The designer retains a free cursor for clicking its start and goal circles.
 });
@@ -247,7 +249,7 @@ function animate(now){
   if(!loaded){renderer.render(scene,camera);return;}
   if(!rightDrag){
     const turn=Number(keys.has('ArrowRight'))-Number(keys.has('ArrowLeft')),tilt=Number(keys.has('ArrowUp'))-Number(keys.has('ArrowDown'));
-    if(turn||tilt){manualCamera=true;azimuth-=turn*1.3*dt;elevation=THREE.MathUtils.clamp(elevation+tilt*.9*dt,-.2,1.25);}
+    if(turn||tilt){takeCameraControl();azimuth-=turn*1.3*dt;elevation=THREE.MathUtils.clamp(elevation+tilt*.9*dt,-.95,1.25);}
   }
   ui.update(dt);const replaying=ui.state.mode==='replay';
   const timeline=ui.timeline()||renderTimeline(now),snapshot=timeline.after,previous=timeline.before;
@@ -324,12 +326,36 @@ function animate(now){
   if(inFlight!==ballCameraActive){
     if(inFlight){
       aimOrbit={azimuth,elevation,distance,manualCamera};
-      azimuth=-(replaying?p?.yaw??yaw:lastThrowAim?.yaw??yaw)*Math.PI/180;elevation=.24;distance=2.8;manualCamera=false;
+      if(!flightManual||replaying){
+        // Continue the outgoing view, including its launch pitch. Never flatten
+        // the view on the first Flight frame.
+        const heading=aimCamera.getWorldDirection(new THREE.Vector3());
+        if(replaying){
+          const launchYaw=(p?.yaw??yaw)*Math.PI/180,launchPitch=(p?.pitch??pitch)*Math.PI/180;
+          heading.set(Math.sin(launchYaw)*Math.cos(launchPitch),Math.sin(launchPitch),-Math.cos(launchYaw)*Math.cos(launchPitch));
+        }
+        azimuth=Math.atan2(-heading.x,-heading.z);
+        elevation=THREE.MathUtils.clamp(-Math.asin(heading.y),-.95,.95);
+        manualCamera=false;
+      }
+      distance=2.8;
     }else{
       if(aimOrbit){({azimuth,elevation,distance,manualCamera}=aimOrbit);}
       if(ui.state.mode==='play')restoreThrowAim();
     }
     cameraClearance=distance;cameraTarget.copy(followTarget);ballCameraActive=inFlight;
+  }
+  if(inFlight&&!manualCamera&&phase==='Flight'&&snapshot?.velocity){
+    const velocity=toThree(snapshot.velocity),horizontal=Math.hypot(velocity.x,velocity.z);
+    // Hold heading at rest and near vertical flight. Impacts use the shortest
+    // yaw arc with bounded angular speed, so a reversal cannot whip the view.
+    const approach=(current,target,rate)=>current+THREE.MathUtils.clamp((target-current)*(1-Math.exp(-dt*3)),-rate*dt,rate*dt);
+    if(horizontal>.75){
+      const heading=Math.atan2(-velocity.x,-velocity.z);
+      const delta=Math.atan2(Math.sin(heading-azimuth),Math.cos(heading-azimuth));
+      azimuth=approach(azimuth,azimuth+delta,1.2);
+    }
+    if(velocity.length()>.75)elevation=approach(elevation,THREE.MathUtils.clamp(-Math.atan2(velocity.y,horizontal),-.95,.95),.8);
   }
   camera=inFlight?ballCamera:aimCamera;
   if(inFlight)cameraTarget.copy(followTarget);
