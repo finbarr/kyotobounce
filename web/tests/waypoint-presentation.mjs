@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {scoreAt,heatTier,collectedIds} from '../public/waypoint-score.js';
+import {routeBounds} from '../public/waypoint-targets.js';
+import {ballHeat} from '../public/ball-heat.js';
+import * as THREE from 'three';
+const frames=[{t:0,score:{version:'waypoint-v1',total:0,waypointIds:[]}},{t:2,score:{version:'waypoint-v1',total:310000,waypointIds:['a','b']}}];
+assert.equal(scoreAt(frames,-1),null);assert.equal(scoreAt(frames,1).total,0);assert.equal(scoreAt(frames,2).total,310000);assert.deepEqual([...collectedIds(scoreAt(frames,1))],[]);assert.deepEqual([...collectedIds(scoreAt(frames,3))],['a','b']);
+assert.equal(heatTier({version:'waypoint-v1',total:0,potential:100000000,waypointMultiplier:1024}),0,'hypothetical and next award cannot heat the ball');
+assert.equal(heatTier({version:'distinct-v1',total:100000000}),0,'legacy score does not adopt new heat thresholds');
+for(const [total,tier]of [[99999,0],[100000,1],[1000000,2],[10000000,3]])assert.equal(heatTier({version:'waypoint-v1',total}),tier);
+const start={center:{x:0,y:0,z:0},radius:1};const bounds=routeBounds({start,goal:null,waypoints:[{center:{x:20,y:15,z:-8},radius:2}]});assert.ok(bounds.box.containsPoint(new THREE.Vector3(22,17,10)),'framing includes off-axis wall/ceiling patch bounds');
+const scene=new THREE.Scene(),ball=new THREE.Mesh(new THREE.SphereGeometry(.023),new THREE.MeshStandardMaterial({color:0xf1673d})),trail=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial());scene.add(ball,trail);const scale=ball.scale.clone(),radius=ball.geometry.parameters.radius,heat=ballHeat({scene,ball,trail});
+for(let i=0;i<400;i++)heat.update({score:{version:'waypoint-v1',total:10000000},attempt:'a',mode:'play',time:i/60},1/60,'Flight');
+assert.equal(heat.state.tier,3);assert.ok(heat.state.activeParticles<=72);assert.equal(scene.children.filter(o=>o.isLight).length,0);assert.ok(ball.scale.equals(scale));assert.equal(ball.geometry.parameters.radius,radius);
+heat.update({score:{version:'waypoint-v1',total:10000000},attempt:'a',mode:'replay',time:4},1/60,'Flight',true);assert.equal(heat.state.activeParticles,0,'reduced motion keeps tint without particles');
+heat.update({score:null,attempt:'a',mode:'replay',time:-1},1/60,'Charging');assert.equal(heat.state.tier,0,'scrub before shot clears heat');
+heat.update({score:{version:'waypoint-v1',total:10000000},attempt:'b',mode:'play',time:2},1/60,'Flight');heat.update({score:null,attempt:'b',mode:'play',time:3},1/60,'Aim');assert.equal(heat.state.tier,0,'recall resets heat');
+heat.dispose();assert.equal(scene.children.length,2);console.log('PASS waypoint score-frame selection, route bounds and bounded heat lifecycle');

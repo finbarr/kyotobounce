@@ -80,3 +80,17 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
   #throw-panel,body:not(.is-playing) #throw-panel{bottom:280px}
   body:not(.is-playing) #competition{max-height:calc(100vh - 390px)}
 }
+
+/* Optional waypoint authoring and collection. */
+#waypoint-progress{position:fixed;left:50%;top:82px;transform:translateX(-50%);max-width:calc(100vw - 28px);padding:9px 14px;border:1px solid #af94ff;background:#17172de8;color:#d9d1ff;font:700 12px monospace;text-align:center;z-index:8;pointer-events:none;border-radius:4px}
+#destination-toggle{display:flex;align-items:center;gap:8px;margin:16px 0;color:#ffe3a2}
+#waypoint-editor{margin:14px 0;padding-top:12px;border-top:1px solid #ffffff25}
+#waypoint-list{max-height:170px;overflow-y:auto;margin:9px 0}
+.waypoint-row{display:flex;gap:5px;margin:5px 0}.waypoint-row button:first-child{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.waypoint-row button[aria-pressed=true]{border-color:#b599ff;background:#61508666}
+#waypoint-editor p{font-size:12px;color:#c5badf}
+#editor-view{max-height:calc(100dvh - 120px);overflow-y:auto}
+#result-card[data-rank=chain] .result-rank{color:#b59aff}
+@media(max-width:600px){#waypoint-progress{top:62px;font-size:10px;padding:7px 10px}#editor-view{max-height:calc(100dvh - 90px)}}
+#challenge-scoring{width:100%;padding:9px 6px;background:#263247;color:#f3eee2;border:1px solid #a58aff88;font:11px monospace}
+body.is-briefing #waypoint-progress{display:none}
