@@ -1,9 +1,9 @@
 {
-  "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+  "layout": "485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d",
   "courses": [
     {
       "id": "atrium-staircase-special",
-      "revision": 1,
+      "revision": 2,
       "repeat": 5,
       "shot": {
         "speed": 2,
@@ -54,7 +54,7 @@
     },
     {
       "id": "atrium-moving-return",
-      "revision": 10,
+      "revision": 11,
       "repeat": 5,
       "shot": {
         "speed": 2.5,
@@ -113,7 +113,7 @@
     },
     {
       "id": "atrium-last-order",
-      "revision": 1,
+      "revision": 2,
       "repeat": 5,
       "shot": {
         "speed": 29.65,
