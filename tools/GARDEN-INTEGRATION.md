@@ -55,7 +55,7 @@ node tools/verify_structural_candidate.mjs artifacts/tactile-candidate/station-l
 blender -b --python-exit-code 1 --python tools/verify_garden_candidate.py -- artifacts/garden-final
 KYOTO_WORKER_EXECUTABLE=/opt/boxhaven/workers/waypoint-timing-20260908/KyotoPhysicsWorker.x86_64 node tools/probe_structural_native.mjs artifacts/garden-final/station-layout.json tools/garden-native-cases.json artifacts/garden-native.json
 node tools/check_garden_evidence.mjs artifacts/garden-native.json artifacts/garden-acceptance.json
-blender -b --python-exit-code 1 --python tools/export_structural_browser.py -- artifacts/garden-final/KyotoAtrium.blend artifacts/garden-final/station-layout.json artifacts/garden-browser
+blender -b --python-exit-code 1 --python tools/export_browser_art.py -- --source artifacts/garden-final/KyotoAtrium.blend --layout artifacts/garden-final/station-layout.json --output artifacts/garden-browser
 ```
 
 The native worker input is explicitly selected, isolated and immutable for this
