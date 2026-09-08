@@ -29,6 +29,8 @@ This family coexists with classic courses; it never rewrites their revisions, bo
 
 The live HUD shows the growing combo, bank/time multipliers, landing percentage and provisional cash-out. Banks pop the number and surface name. First target entry turns the floor target and HUD green with a single expanding ring and a rising chord. Reduced-motion settings remove number scaling and ring expansion.
 
+Ball heat follows the versioned earned score: gold glow at100,000 points, orange fire at1million, white-lavender jackpot fire at10million. The three-draw-call effect uses a fixed72-particle pool, preserves physical size/spin marks and adds no dynamic lights. Reduced motion and slow frames retain the color/halo while disabling animated fire and embers. Recall, course changes and backward replay scrubs reset the effect.
+
 Sound effects are original synthesized layers: rolling/air texture, a throw whoosh, distinct stone/metal/glass impacts, ascending bank cues, target stingers and result chords. Major cues briefly lower the music. The existing sound/music switches remain independent.
 
 New replays preserve the authoritative score timeline alongside their full-rate trajectory, so the combo is visible during playback. Scoring is versioned as `combo-v5`; upgrading creates new course revisions. Earlier revisions, scores and replay records are not rewritten or mixed into the new boards. Archived `combo-v4` retains its original first-entry timer freeze and 0.35 m/s threshold when rescored.

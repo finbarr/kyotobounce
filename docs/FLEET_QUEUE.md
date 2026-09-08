@@ -23,7 +23,7 @@ exports run on the station lane without simultaneous Unity imports.
 | [kyoto-camera](https://opal-cloud-4468d3.at.boxhaven.dev) | fleet/camera-20260907 → fleet/capacity-20260907 | K004 benchmark; camera/input fixes under integration review | gpt-6-astra, medium effort, standard service | online; agent executing |
 | [kyoto-station](https://opal-ridge-d24d72.at.boxhaven.dev) | fleet/station-20260907 | K006 | gpt-6-astra, high effort, standard service | online; agent executing |
 | [kyoto-physics](https://banana-orbit-9c461b.at.boxhaven.dev) | fleet/physics-20260907 | K007 | gpt-6-astra, high effort, standard service | online; agent executing |
-| [kyoto-audio](https://golden-orbit-acc224.at.boxhaven.dev) | fleet/audio-20260907 | K013 | gpt-6-astra, low effort, standard service | online; agent executing |
+| [kyoto-audio](https://golden-orbit-acc224.at.boxhaven.dev) | fleet/audio-20260907 | K013 | gpt-6-astra, low effort, standard service | online; K013/K018/K022 audio delivered and integrated |
 
 ## Queue
 
@@ -46,13 +46,13 @@ exports run on the station lane without simultaneous Unity imports.
 | K015 | Priority: timer points stop accruing while a ball is still moving toward/in the goal center. Diagnose goal-contact/prediction/time-bonus freeze; keep accruing according to the corrected movement rule until true rest, preserve final authority and immutable old replay scores, and version changed scoring behavior. | dedicated scoring worktree; coordinator review | integrated in coordination branch; native and real-browser timer/result/replay checks passed; not deployed |
 | K016 | Concrete K007/K011 reproduction: ball falls through the TOP of the escalator on Catch the Lift. Reproduce with actual stage and varied release phases, repair upper comb/landing/side support and tread turnover, then verify continuous support at both ends through full cycles. | physics | baseline top-runout sinking reproduced; candidate-v3 passes four release phases, matching rays and walking; integration pending |
 | K017 | Give the robot a coherent Japanese arcade/mecha/toy-robot identity with expressive face, strong silhouette and intentional color/material accents. Preserve rig/release/gaze/gait, verify actual browser views, and deliver original art as a candidate asset handoff if needed. | robot | initial mascot9141295 verified; three-character expansion running |
-| K018 | Bold pachinko/game-show spectacle: HUGE bouncing multiplier numbers on actual multiplier jumps, escalating scale/pitch/LED chase and rich bank/goal/result fanfares. Milestones must feel progressively more extreme. Maintain score authority, readable flight, audio controls and bounded resources; verify a real audiovisual chain, plus reduced-motion behavior. | audio and feedback visuals | e031384 integrated; waypoint-v1 follow-up running; integrated Mac audiovisual check pending |
+| K018 | Bold pachinko/game-show spectacle: HUGE bouncing multiplier numbers on actual multiplier jumps, escalating scale/pitch/LED chase and rich bank/goal/result fanfares. Milestones must feel progressively more extreme. Maintain score authority, readable flight, audio controls and bounded resources; verify a real audiovisual chain, plus reduced-motion behavior. | audio and feedback visuals | e031384 and70bdb4e integrated; actual Mac classic and waypoint jackpot chains passed; route-miss celebration corrected |
 | K019 | Design and build better challenges around meaningful station spaces. First finite design pass: top deck to authentic station konbini plus two distinct routes; verify geography, throw feasibility and readable progression, gate final coordinates on detailed matched geometry, and publish only new challenge revisions. | local level-design worktree; station/physics handoffs | three-course design drafted in LEVEL-DESIGN.md; playable implementation follows geometry |
 | K020 | User screenshot shows striped doorway-threshold bleed and floor patches that flicker/stutter with camera movement. Identify actual overlapping geometry, depth precision, shadow or material cause; repair it and verify continuous movement at near/far views. Preserve matching structure and collision. | station/rendering; physics/camera handoffs if needed | exact coplanar doorway-cap overlap confirmed; visual exporter clipping and moving-view proof running |
 | K021 | Lighting pops into existence inconsistently while moving and appears to cause stutter. Reproduce the current two-light pool's 0.4-second full-intensity reassignment, stabilize lighting with measured frame cost, and verify traversal plus clock/replay resets. | station/rendering | light reassignment discontinuity confirmed in code; station agent acknowledged |
-| K022 | New waypoint-v1 scoring: optional once-only surface waypoints and at most one optional destination. Preserve waypoint points when destination missed, add landing bonus, keep full native rest/authority and immutable classic replays. Author/play/replay both course forms; see WAYPOINT-SCORING.md. | local native/backend + browser worktrees; audio handoff | backend5796125 integrated; rebuilt floor/wall/ceiling, once-only, bonus/miss, full-rest and legacy parity passed; actual editor/play/replay acceptance running |
+| K022 | New waypoint-v1 scoring: optional once-only surface waypoints and at most one optional destination. Preserve waypoint points when destination missed, add landing bonus, keep full native rest/authority and immutable classic replays. Author/play/replay both course forms; see WAYPOINT-SCORING.md. | local native/backend + browser worktrees; audio handoff | backend5796125 and UI63bebe5 integrated; rebuilt native suites plus actual Chrome editor/play/replay and delayed-placement checks passed; not deployed |
 | K023 | Three selectable original Japanese arcade robot characters with distinct silhouettes/personalities and high-score dances. Preserve identical physics/release/gait and replay compatibility, persist cosmetic choice, verify real record-driven celebrations and reset. | robot; browser integration | expands K017; three-character cast acknowledged and running |
-| K024 | Score/waypoint-driven ball heat: charged color/glow, fire/embers/trail, then extreme jackpot state. Synchronize with sound/multiplier spectacle; preserve physical core, visibility, timing and bounded render cost. | waypoint browser presentation + audio | three bounded tiers implemented; reduced-motion/reset fixtures passed; actual native-score browser evidence running |
+| K024 | Score/waypoint-driven ball heat: charged color/glow, fire/embers/trail, then extreme jackpot state. Synchronize with sound/multiplier spectacle; preserve physical core, visibility, timing and bounded render cost. | waypoint browser presentation + audio | integrated; actual native12.6m and combined169.8m stress shots, visible fire/bursts, replay resets and all tiers verified; not deployed |
 
 ## Current findings
 
@@ -90,6 +90,15 @@ exports run on the station lane without simultaneous Unity imports.
   ceiling fixtures passed, including backside/nearby rejection,32targets,
   slow contacts and recall. Archived v4/v5 score objects remained identical.
   Actual Chrome author/play/replay acceptance runs in an isolated local lane.
+
+- Combined K018/K022/K024 browser acceptance on the coordinator: a deliberately
+  overlapping12-target local stress course earned169,830,720 authoritative
+  points, displayed the earned ×2,048 burst, entered jackpot heat, saved/replayed
+  and reset cleanly. This is stress evidence, not a designed or published course.
+  Missing-required-route results now suppress both success animation and music.
+- Robot lane received an unmodified41,440-point live result plus its stopped
+  native snapshot for the new record API; personalBest=true/courseBest=false.
+  This unblocks final cast celebration evidence without a remote Unity rebuild.
 
 ## Ownership and handoffs
 

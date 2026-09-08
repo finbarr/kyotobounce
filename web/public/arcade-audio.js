@@ -122,7 +122,7 @@ export function arcadeAudio(){
   }
   if(name==='result'){
    // A missed optional destination does not negate an earned waypoint chain.
-   if(waypointRun&&!['perfect','forfeit'].includes(value))value='tagged';waypointRun=false;
+   if(waypointRun&&!['perfect','forfeit','route-missed'].includes(value))value='tagged';waypointRun=false;
    duck();if(value==='perfect'||value==='tagged'){burst(t,.2,.1,3000);tone(90,t,.2,.18,'sine',sfxBus,38);}
    const line=value==='perfect'?[69,73,76,81,85]:value==='tagged'?[69,76,81,80]:value==='near'?[69,73,76]:[64,61,57];
    line.forEach((n,i)=>tone(notes(n),t+i*.095,i===line.length-1?.6:.18,.07,'triangle'));

@@ -81,7 +81,7 @@ export function arcadeFeedback(sound){
   result(result){if(result.breakdown)this.accept(result.breakdown,result.attempt);
    if(current?.version==='waypoint-v1'){
     pending=null;
-    if(result.breakdown?.outcome==='forfeit'){clearAnimations();spectacleTime=0;spectacle.hidden=true;return;}
+    if(['forfeit','route-missed'].includes(result.breakdown?.outcome)||!(current.total>0)){clearAnimations();spectacleTime=0;spectacle.hidden=true;return;}
     if(current.waypointCount||current.destinationReached){celebrate(Math.max(1,current.waypointMultiplier/2),'goal','',false);$('combo-call').textContent=current.destinationReached?'CHAIN + DESTINATION':'WAYPOINT POINTS BANKED';setNumber(format(current.total));$('combo-sub').textContent=current.destinationReached?`INCLUDES +${format(current.destinationBonus)} DESTINATION BONUS`:'POINTS KEPT · DESTINATION IS EXTRA';}
     return;
    }
