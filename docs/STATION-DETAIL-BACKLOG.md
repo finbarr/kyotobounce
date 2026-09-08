@@ -1,5 +1,68 @@
 # Station detail pass
 
+## New research and assignments — 2026-09-08
+
+The user rejected the first pass as visually too sparse after deployment. This
+second assignment is substantial visible scene work, with five independent jobs
+starting from deployed source `4ee2976` and `assets-v2`. Prior acceptance below
+describes the earlier bounded pass; it does not establish visual completeness.
+
+### Evidence and missing features
+
+| Feature | Current-model evidence | Reference and decision |
+| --- | --- | --- |
+| West Exit 7-Eleven Heart-in | `build-konbini.py` deliberately creates an empty shell. Its only text is small `Heart-in / WEST EXIT 2F`; final approach/interior captures show a generic gray box and dark room. | [Retail operator](https://www.dailyservice.co.jp/shop?stations%5B0%5D=%E4%BA%AC%E9%83%BD), [JR map](https://www.jr-odekake.net/station/img/premises/0610116.pdf), [branch exterior photographs](https://tabelog.com/kyoto/A2601/A260101/26033019/dtlphotolst/4/smp2/). Keep the 2F West Exit branch; add identity, glazing, furnished interior and discoverable approach. Interior arrangement is an authored approximation. |
+| East Square tree, stepped seats and globe gazebo | The east court floor and enclosure exist, but the named fixture/landmark inventory lacks these features. A visual baseline is required before editing. | [Operator East Square photograph](https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_eastsquare_01.jpg). Author the planting, support stakes, pale stepped seating and white openwork gazebo as a coherent court. |
+| West 4F 朱甲舞 sculpture | `muromachi-square` exists; no corresponding sculpture in the canonical named geometry. | [Operator photograph](https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_muromachisquare_01.jpg). Add the recognizable vermilion curved silhouette and plinth. |
+| East 4F Space sculpture | No corresponding sculpture in the named geometry. | [Operator photograph](https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_karasumasquare_01.jpg). Add the pale asymmetric frame and colored circular elements. |
+| East 4F KYOTO letters | No letter monument in the named geometry. Older reference photos omit this addition. | [Operator announcement](https://www.kyoto-station-building.co.jp/news/kyotomonument/) documents the permanent December 2025 installation. Author freestanding letters and original seasonal surface artwork. |
+| East 7F grand and West Exit 2F upright pianos | No piano IDs in canonical boxes/beams/panels. | [Operator installation page](https://www.kyoto-station-building.co.jp/service/special_setting/) documents both types and locations. Model their distinct cases, keyboards, pedals, seats and surroundings; musical interaction is outside this job. |
+| East Square miniature station exhibit | No miniature exhibit in the named geometry. | The same installation page documents a 4.8 × 1.0 × 0.72 m miniature. Inspect enclosure photos before authoring an original simplified station model, display base and enclosure. |
+| Registered station wayfinding and retail identity | `station-details.js` contains generic substring labels, including a west-side fallback to Kyoto Theater. Current frontage assignment needs an audit. | [Official floor guide](https://www.kyoto-station-building.co.jp/floorguide/). Queue a separate identity/location audit and bounded signage correction after the first wave. |
+| Stone, metal, glazing and daylight | `station-look.js` removes granite color/normal maps; finishes rely on repeating diffuse grids. Garden/shop glass bypass generic glass treatment. One central reflection capture serves all elevations; hardware is outside the main finish traversal. | Dedicated PBR job using original material maps and [Three.js color management](https://threejs.org/manual/en/color-management.html), [physical materials](https://threejs.org/docs/pages/MeshPhysicalMaterial.html), and [filtered environment capture](https://threejs.org/docs/pages/PMREMGenerator.html). |
+
+The operator's [plaza guide](https://www.kyoto-station-building.co.jp/service/square/)
+and [installation map](https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/special_setting/img/img_aboutlegobrickarea_map.png)
+establish floor/area relationships. They do not establish surveyed game coordinates.
+Named-ID absence is a research lead, not a substitute for inspecting the full
+scene. Each job must capture the current full-game view and inspect its references
+before modeling. Research photographs remain reference-only and outside Git/assets.
+
+### First wave and acceptance
+
+| ID | Machine / branch | Owned implementation | Acceptance |
+| --- | --- | --- | --- |
+| K025 | kyoto-camera / `fleet/heart-in-20260908` | Existing konbini builder, registration and audit; new `web/station/heart-in/` source. | Recognizable 7-Eleven/Heart-in branding from the west public approach; illuminated shelves, product categories, refrigerators and checkout; continuous walking route; doorway, gallery and fixture contact proofs; preserve playable receiving space. |
+| K026 | kyoto-station / `fleet/photorealism-20260908` | `station-look.js`, new station material/light helpers and original texture source. | Distinct meter-scaled stone, satin metal and transparent glazing; readable sheltered spaces; appropriate static reflections for hall/gallery/garden; matched moving browser views and reported render/memory/download cost. |
+| K027 | kyoto-robot / `fleet/east-square-20260908` | New `web/station/east-square/` generator and candidate layer. | Recognizable tree, stepped seating and globe gazebo in three reference-matched views; open circulation and substantial visible/contact geometry agreement. |
+| K028 | kyoto-physics / `fleet/plaza-landmarks-20260908` | New `web/station/plaza-landmarks/` generators and separate landmark layers. | Three recognizable 4F landmarks with open silhouette details, supported bases, correct area registration and native contact tests. |
+| K029 | kyoto-audio / `fleet/station-exhibits-20260908` | New `web/station/exhibits/` generator and three separate prop layers. | Distinct grand/upright pianos with close-view detail; recognizable miniature station/display; approach clearance and native contacts. |
+| K030 | queued; next available feature machine | Registered signage/frontage audit, then bounded corrections. | Source-backed labels and directions for modeled destinations, readable at gameplay distance; no generic wrong-side name substitutions. |
+
+Every geometry job owns a separate candidate blend, visual export and matching
+collision proposal, never the shared canonical blend/layout or exporter. Reserve
+the East Square core for K027 and boundary exhibit niches for K029; both submit
+an anchor/occupied-volume receipt derived from existing floor triangles and the
+official spatial diagram. Integration resolves transforms before either combined
+collision layout or final asset pack is accepted.
+
+Deliver reference comparisons, normal full-game wide/close screenshots and a
+moving inspection; isolated bright workbench shots alone do not pass. Record
+triangle/batch/texture deltas and browser errors. Geometry acceptance requires
+actual candidate worker contacts, not just visual overlap. Preserve existing
+routes, scores and immutable archived bundles. Photorealism keeps the accepted
+fixed shadow filter and bounded practical-light pool, uses at most three static
+reflection zones, and reports Linux software rendering separately from final
+Mac/Metal validation (target warmed median ≤18 ms, p99 ≤25 ms at fixed resolution).
+
+All five jobs use their own worktree, port 4281–4285, database and logs. Four use
+medium reasoning; photorealism uses high; all use standard service. Reuse the five
+existing 4-vCPU/8-GB machines (current combined rate $1/hour). Notify the user of
+an actual Unity authentication requirement. Feature jobs do not deploy. Keep
+only reproducible source, final candidate assets and compact review evidence.
+
+## Earlier shipped pass
+
 Bounded scope: K006 hardware/finishes, K008 rooftop garden, K010 tactile paving,
 K012 shadows, K020 doorway artifacts and K021 practical lighting. Final status is
 tracked in [FLEET_QUEUE.md](FLEET_QUEUE.md). This is an independently modeled

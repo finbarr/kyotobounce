@@ -10,6 +10,13 @@ deploy to production.
 
 ## Machines
 
+The new station-detail assignment (2026-09-08) reuses the same five machines.
+Each has a fresh worktree from deployed `4ee2976`, verified `assets-v2`, and the
+compatible dedicated Linux worker. Current jobs are K025–K029 below; K030 is
+queued for the next available feature machine. See the reference audit and
+acceptance criteria in [STATION-DETAIL-BACKLOG.md](STATION-DETAIL-BACKLOG.md).
+New tasks do not deploy. The table below records the earlier fleet delivery.
+
 The fleet is capped at five machines per the user's current preference. All
 five start from team image `244559976`, on source `bcd27c8`. Each has its
 own branch, worktree, writable assets, database, worker and logs. Initial plan:
@@ -53,11 +60,19 @@ exports run on the station lane without simultaneous Unity imports.
 | K022 | New waypoint-v1 scoring: optional once-only surface waypoints and at most one optional destination. Preserve waypoint points when destination missed, add landing bonus, keep full native rest/authority and immutable classic replays. Author/play/replay both course forms; see WAYPOINT-SCORING.md. | local native/backend + browser worktrees; audio handoff | backend5796125 and UI63bebe5 integrated; rebuilt native suites plus actual Chrome editor/play/replay and delayed-placement checks passed; deployed 2026-09-08 |
 | K023 | Three selectable original Japanese arcade robot characters with distinct silhouettes/personalities and high-score dances. Preserve identical physics/release/gait and replay compatibility, persist cosmetic choice, verify real record-driven celebrations and reset. | robot; browser integration | verified; actual records for all three characters, saved choice, replay suppression, reduced motion and desktop/mobile winner visibility pass |
 | K024 | Score/waypoint-driven ball heat: charged color/glow, fire/embers/trail, then extreme jackpot state. Synchronize with sound/multiplier spectacle; preserve physical core, visibility, timing and bounded render cost. | waypoint browser presentation + audio | verified; actual native12.6m and combined169.8m stress shots, visible fire/bursts, replay resets and all tiers verified; deployed 2026-09-08 |
+| K025 | User says the 7-Eleven still appears missing. Replace the generic empty Heart-in shell with a recognizable photo-informed storefront, illuminated furnished interior and clear public approach. Preserve gallery support, entrance/aisle clearance and the playable receiving space; prove visible fixture/native contact agreement. | kyoto-camera; fleet/heart-in-20260908; port4281 | running; prompt acknowledged and research/baseline tool execution verified |
+| K026 | Substantial photorealism pass: physically plausible stone/metal/glass, original meter-scaled albedo/roughness/normal detail, coherent daylight and static reflection zones. Preserve geometry, fixed shadow filter, bounded practical lights, arcade effects and archived assets. Require matched moving views and measured render/memory cost. | kyoto-station; fleet/photorealism-20260908; port4282 | running; prompt acknowledged and research/baseline tool execution verified |
+| K027 | Furnish 7F East Square with the reference-backed tree/support stakes, pale stepped seating and white openwork globe gazebo. Register on supported court geometry, keep routes clear, coordinate boundary space with K029 and prove native contacts. | kyoto-robot; fleet/east-square-20260908; port4283 | running; prompt acknowledged and research/baseline tool execution verified |
+| K028 | Add distinct 4F plaza landmarks: west 朱甲舞 sculpture, east Space sculpture and the current KYOTO letter monument. Preserve recognizable curved/open silhouettes, source-backed area identity, supported bases and circulation; deliver separate visual/collision candidate layers. | kyoto-physics; fleet/plaza-landmarks-20260908; port4284 | running; prompt acknowledged and research/baseline tool execution verified |
+| K029 | Add East Square grand piano, West Exit upright piano and East Square miniature-station exhibit with appropriate display furniture. Inspect current references, preserve circulation and distinct silhouettes, and prove substantial fixture contacts. Musical interaction is outside this job. | kyoto-audio; fleet/station-exhibits-20260908; port4285 | running; prompt acknowledged and research/baseline tool execution verified |
+| K030 | Audit registered station signs and retail frontage identities against current floor plans; replace generic/wrong-side label fallbacks and add readable direction cues for modeled destinations. | next available feature machine | queued after the five active assignments; evidence lead in station-details.js |
 
 ## Current findings
 
-- All five boxes have the source-compatible Linux worker and an active local game
-  service. All feature delivery and cleanup are complete. Final rendering, archive replay and existing/fresh course startup passed.
+- The first fleet delivery and cleanup are complete and deployed. New station
+  jobs K025–K029 have separate source-compatible worktrees and dedicated workers;
+  their candidates are not yet accepted. Earlier final rendering, archive replay
+  and existing/fresh course startup passed.
   Codex 0.153.3 uses persistent `boxhaven` tmux sessions, effort overrides and
   `service_tier=default`. Actual browser startup and throws passed on all five development previews.
 - No Unity authentication is currently blocking fleet work. The new waypoint
