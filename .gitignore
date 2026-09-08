@@ -90,3 +90,5 @@ KyotoRicochet/Assets/Kyoto/Resources/*
 # Editor studies are source-only; rendered reflection probes stay local.
 KyotoRicochet/Assets/Kyoto/Editor/*/
 KyotoRicochet/Assets/Kyoto/Editor/ReflectionStudy17.meta
+
+!docs/LEVEL-DESIGN.md
