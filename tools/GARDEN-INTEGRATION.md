@@ -95,3 +95,8 @@ The previously documented tactile/Catch the Lift disk overlap remains relevant:
 new level placement/hints must be reviewed for the new layout. No old challenge
 or historical replay bytes are rewritten here. Station integration must remove
 old painted tactile relief planes when using the actual raised source meshes.
+
+K019 supersedes the garden-only generated binaries with the full combined shop
+candidate. The authorized final cleanup removes those intermediate binaries;
+`garden-completion-receipt.json` retains their hashes and completed proof.
+Original assets, supplied source handoffs and earlier evidence remain available.

@@ -5,7 +5,10 @@ const report=JSON.parse(await readFile(candidateDir+'/candidate.json')),added=ne
 for(const kind of ['boxes','beams','panels','flights','escalators'])assert.deepEqual(after[kind].filter(p=>!added.has(p.id)),before[kind].filter(p=>!removed.has(p.id)),`${kind}: preserve all unrelated canonical records`);
 const material=new THREE.MeshBasicMaterial({side:THREE.DoubleSide});
 const meshes=after.panels.filter(p=>added.has(p.id)).map(p=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p.vertices.flatMap(v=>[v.x,v.y,v.z]),3));g.setIndex(p.triangles);g.computeVertexNormals();const m=new THREE.Mesh(g,material);m.name=p.id;return m;});
-const bytes=await readFile(candidateDir+'/repair-overlay.glb');const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');gltf.scene.updateMatrixWorld(true);
+const bytes=await readFile(candidateDir+'/repair-overlay.glb');
+// This Node audit checks actual mesh geometry; image decoding belongs to the real browser check.
+const loader=new GLTFLoader();loader.register(()=>({name:'GeometryAuditMaterial',loadMaterial:()=>Promise.resolve(new THREE.MeshBasicMaterial({side:THREE.DoubleSide}))}));
+const gltf=await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');gltf.scene.updateMatrixWorld(true);
 let checks=0;const rays=[];
 for(const m of meshes){
  const visual=gltf.scene.getObjectByName(m.name);assert(visual,`Matching visual ${m.name}`);

@@ -1,0 +1,183 @@
+{
+  "status": "verified-candidate-no-publication",
+  "files": {
+    "artifacts/k019/final/KyotoAtrium.blend": {
+      "bytes": 36029830,
+      "sha256": "5ecd5884db55ba85199b5577f135a94ff61c1d7a076a81ed8a161425a16049e4"
+    },
+    "artifacts/k019/final/station-layout.json": {
+      "bytes": 172047941,
+      "sha256": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775"
+    },
+    "artifacts/k019/browser-final/atrium.glb": {
+      "bytes": 166133128,
+      "sha256": "5d6c9a08c0d2d418af65fd0b186dd54df61d83fb182ea6b5f1e37314a2bfae13"
+    },
+    "artifacts/k019/browser-final/station.json": {
+      "bytes": 1245576,
+      "sha256": "79cd76de34385ba6535b3b06b9edf9d79b1a206e1b01c674c4aa45f201e5ab2b"
+    },
+    "artifacts/k019/browser-final/atrium-detail.glb": {
+      "bytes": 5568348,
+      "sha256": "a4825e5adcadaeffd50c04642c7673b74780a6ac3115a455b5e7f0dc42c2a1a6"
+    },
+    "artifacts/k019/browser-final/atrium-detail.json": {
+      "bytes": 27455,
+      "sha256": "e1648dc55f97c6dc995965ef005a8e295dbc2af0d771afef2243494aceeabffe"
+    },
+    "artifacts/k019/hardware-source/AtriumHardware.blend": {
+      "bytes": 1022788,
+      "sha256": "df519c2476fde6870db11073c087ffd8778cd64fb4bf23b587b845036afd5db8"
+    }
+  },
+  "native": {
+    "status": "pass",
+    "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+    "baselineUnsupportedApproachReproduced": true,
+    "continuousWalkCheckpoints": [
+      {
+        "feet": {
+          "x": -55.29999923706055,
+          "y": 7.374999523162842,
+          "z": -18.144445419311523
+        },
+        "expected": [
+          -55.3,
+          7.375,
+          -18
+        ]
+      },
+      {
+        "feet": {
+          "x": -51.96333312988281,
+          "y": 7.374999523162842,
+          "z": -18.16777801513672
+        },
+        "expected": [
+          -52,
+          7.375,
+          -18
+        ]
+      },
+      {
+        "feet": {
+          "x": -55.27666473388672,
+          "y": 7.375000476837158,
+          "z": -18.16777801513672
+        },
+        "expected": [
+          -55.3,
+          7.375,
+          -18
+        ]
+      },
+      {
+        "feet": {
+          "x": -55.323333740234375,
+          "y": 7.374999523162842,
+          "z": -12.046666145324707
+        },
+        "expected": [
+          -55.3,
+          7.375,
+          -12
+        ]
+      }
+    ],
+    "shots": 8,
+    "ballMinimumY": 7.373000621795654,
+    "endedShotsPhysicallyRested": true
+  },
+  "geometry": {
+    "status": "pass",
+    "floorAndHeadroomSamples": {
+      "public-gallery": 7546,
+      "shop-interior": 9462,
+      "threshold": 1120
+    },
+    "doorwayBallSamples": 27,
+    "originalNearbyGeometry": [
+      {
+        "id": "west-2f-landing",
+        "bounds": [
+          [
+            -72.9203,
+            -26.5
+          ],
+          [
+            6.85,
+            7.35
+          ],
+          [
+            -21.0,
+            9.4283
+          ]
+        ]
+      }
+    ],
+    "conservativeBeamClashes": [],
+    "doorwayClearWidthM": 1.8,
+    "doorwayClearHeightM": 2.25,
+    "publicCirculationClearWidthM": 2.4,
+    "failures": []
+  },
+  "meshParity": {
+    "matchedMeshes": 19,
+    "unchangedPriorRecords": true
+  },
+  "export": {
+    "sourceObjects": 49559,
+    "triangles": 1327885,
+    "skippedDynamic": 4522,
+    "skippedProxies": 57,
+    "doorCapDeduplication": {
+      "objects": [
+        "west-south-slab-edge-3-2-2",
+        "west-south-substrate-2-2"
+      ],
+      "support": "west-south-floor-03",
+      "trianglesTrimmed": 4,
+      "coveredAreaM2": 0.9359471030911664
+    },
+    "batches": 587,
+    "materials": 75,
+    "glbBytes": 166133128,
+    "sourceSha256": "5ecd5884db55ba85199b5577f135a94ff61c1d7a076a81ed8a161425a16049e4",
+    "layoutSha256": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775"
+  },
+  "exporterCoordinatorCommit": "5a88c1b",
+  "inputShopChecksums": {
+    "colliders.json": "276dac67e66b5956bdb5f270366034230525db6f6b5b0a986afe1cab6149e8d9",
+    "candidate.png": "823056e32e91c3040261604ac90ee76c5c163cffb6e8027ec1c6ff54eb46468d",
+    "WestExitHeartIn.blend": "128c2577c3dfd705df2d1729923e57819ce25d8d2a1e6ea7901689773ef012b5",
+    "konbini.glb": "4ef362cf255eae128963ae4e8525a07c24572291feaa97c39c458ee569bf52d9"
+  },
+  "workerAssemblySha256": "9a8f2f06a928fb15d42b799a093c95eb7bb62fbbc3afd5f03bb1eebf34025fef",
+  "checks": [
+    "native-acceptance.json",
+    "final/shop-verification.json",
+    "final/verification.json",
+    "runtime-final.json",
+    "typecheck.log",
+    "test.log",
+    "build-web.log"
+  ],
+  "visuals": [
+    "shop-walking-view.png",
+    "shop-doorway-view.png"
+  ],
+  "publicServiceChanged": false,
+  "removedSupersededBytes": 948152585,
+  "exportProcessNote": "Main exporter completed GLB and provenance report; process terminated during memory-heavy post-export shutdown. Hardware completed with exit0.",
+  "evidenceHashes": {
+    "native-acceptance.json": "deb2f1d423ccf8ee3accff440e06035d44cbb4038404b7f761581c310c8a5002",
+    "final/shop-verification.json": "e29bc4d8f72368c32fed488d59976cc65e3a4d93f6976c85a3ddd2929699cb85",
+    "final/verification.json": "1105a6a3e21dd4b444725c62ec2c878be3b2aa46b2abeeb4388fcac5066de640",
+    "runtime-final.json": "be9eefdebce9c45b3887f981cf56cfd8c2213b291c50c14f27551649dc2726bc",
+    "typecheck.log": "72e08e9eb73a07b366856961269fb8ee423b9cc7e2a5967b06b65c184597c29c",
+    "test.log": "53f425fffe07db1b56d62bbeb002ee82c6d9b215945fd32df1d8f501d0ba2b8c",
+    "build-web.log": "bd518414771f7b385931538dca89ddb4ac995d0228fcedd4cbc467e152db8fb1",
+    "shop-walking-view.png": "19d21fe347a93347a01439aad96b3cfaa30ddea2d866fb48a6b1c3022f0c6921",
+    "shop-doorway-view.png": "9dd7cb5acd1d63a67fe67bd63e23f0919b8b14fbd3bb1b496004e2ac93fac1d4"
+  }
+}
