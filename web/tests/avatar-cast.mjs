@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import { mkdir,writeFile,readFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import { Client } from './api-client.mjs';
-const origin='http://127.0.0.1:4273',out='artifacts/robot/cast-menu';await mkdir(out,{recursive:true});
+const origin=process.env.KYOTO_TEST_URL||'http://127.0.0.1:4173',out='artifacts/robot/cast-menu';await mkdir(out,{recursive:true});
 // The celebration demonstration consumes an actual saved native result and its
 // authoritative record flags, rather than a made-up score or a flight timer.
 let trigger;
@@ -25,7 +25,7 @@ assert.ok(trigger.result.records?.personalBest||trigger.result.records?.courseBe
 assert.equal(trigger.snapshot.attempt,trigger.result.attempt);assert.equal(trigger.snapshot.phase,'Result');assert.equal(trigger.snapshot.diagnostics.sleeping,true);
 assert.equal(Math.hypot(...Object.values(trigger.snapshot.velocity),...Object.values(trigger.snapshot.spin)),0);
 await writeFile(`${out}/authoritative-trigger.json`,JSON.stringify(trigger,null,2));
-const browser=await chromium.launch({executablePath:process.env.CHROME_EXECUTABLE||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const browser=await chromium.launch({executablePath:process.env.CHROME_EXECUTABLE||(process.platform==='linux'?'/usr/bin/google-chrome':'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const context=await browser.newContext({viewport:{width:1200,height:760},recordVideo:{dir:out,size:{width:1200,height:760}}}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 await page.route('**/cast-lab',r=>r.fulfill({contentType:'text/html',body:'<meta charset="utf-8"><style>body{margin:0;background:#263842;color:#ffe8c2;font:15px system-ui}#menu{position:absolute;left:14px;top:0;width:310px}#controls{position:absolute;right:20px;top:20px}button{padding:8px}#score{position:absolute;left:410px;top:18px}</style><div id="menu"></div><div id="score"></div><div id="controls"><button id="celebrate">Celebrate record</button><button id="retry">Retry</button><button id="replay">Replay</button></div><script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>'}));
 async function load(){

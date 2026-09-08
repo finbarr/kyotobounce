@@ -5,9 +5,10 @@ import assert from 'node:assert/strict';
 import {createAvatar,poseAvatar,setAvatarCharacter,celebrateAvatar,cancelAvatarCelebration,isAvatarCelebrating} from '../public/avatar.js';
 const trigger=JSON.parse(await readFile('artifacts/robot/cast-menu/authoritative-trigger.json','utf8'));
 const bytes=await readFile('web/public/assets/ori.glb'),asset=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
-// Explicit contract fixtures exercise flags supplied by the newer backend. The
-// score/rest trajectory above remains the unmodified native test recording.
-const recordResult={...trigger.result,records:{personalBest:true,courseBest:false}};
+// Use an unmodified saved native record for the successful celebration.
+// Variants below exercise rejection and alternate record flags.
+const recordResult=trigger.result;
+assert.ok(recordResult.saved&&(recordResult.records?.personalBest||recordResult.records?.courseBest));
 const state=trigger.snapshot,p=state.players.find(p=>p.id===state.owner),results=[];
 function make(character){const a=createAvatar(asset,{character});a.group.position.set(p.feet.x,p.feet.y,-p.feet.z);a.group.rotation.y=Math.PI-p.yaw*Math.PI/180;return a;}
 const pos=(a,name)=>a.bones[name].getWorldPosition(new T.Vector3());

@@ -2,9 +2,9 @@ import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import { mkdir,writeFile } from 'node:fs/promises';
 const out='artifacts/robot/gaze';await mkdir(out,{recursive:true});
-const browser=await chromium.launch({executablePath:process.env.CHROME_EXECUTABLE||'/usr/bin/google-chrome',args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const browser=await chromium.launch({executablePath:process.env.CHROME_EXECUTABLE||(process.platform==='linux'?'/usr/bin/google-chrome':'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 try{
- const page=await browser.newPage();await page.route('**/robot-test',r=>r.fulfill({contentType:'text/html',body:'<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>'}));await page.goto('http://127.0.0.1:4173/robot-test');
+ const page=await browser.newPage();await page.route('**/robot-test',r=>r.fulfill({contentType:'text/html',body:'<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>'}));await page.goto(`${process.env.KYOTO_TEST_URL||'http://127.0.0.1:4173'}/robot-test`);
  const result=await page.evaluate(async()=>{
   const T=await import('three'),{GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js'),{createAvatar,poseAvatar}=await import('/avatar.js');
   const asset=await new GLTFLoader().loadAsync('/assets/ori.glb'),rows=[];
