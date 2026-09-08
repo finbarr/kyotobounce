@@ -12,8 +12,9 @@ deploy to production.
 
 The new station-detail assignment (2026-09-08) reuses the same five machines.
 Each has a fresh worktree from deployed `4ee2976`, verified `assets-v2`, and the
-compatible dedicated Linux worker. Station candidates K025–K029 are below. K025 and K029 have handed off source;
-their free workers are running K031 movement regression and K030 wayfinding. See the reference audit and
+compatible dedicated Linux worker. Station candidates K025–K031 are below. K025, K028, K029, K030 and K031 have
+handed off source for coordinator review; K026 materials and K027 East Square
+are finishing their bounded candidate checks. See the reference audit and
 acceptance criteria in [STATION-DETAIL-BACKLOG.md](STATION-DETAIL-BACKLOG.md).
 New tasks do not deploy. The table below records the earlier fleet delivery.
 
@@ -61,23 +62,31 @@ exports run on the station lane without simultaneous Unity imports.
 | K023 | Three selectable original Japanese arcade robot characters with distinct silhouettes/personalities and high-score dances. Preserve identical physics/release/gait and replay compatibility, persist cosmetic choice, verify real record-driven celebrations and reset. | robot; browser integration | verified; actual records for all three characters, saved choice, replay suppression, reduced motion and desktop/mobile winner visibility pass |
 | K024 | Score/waypoint-driven ball heat: charged color/glow, fire/embers/trail, then extreme jackpot state. Synchronize with sound/multiplier spectacle; preserve physical core, visibility, timing and bounded render cost. | waypoint browser presentation + audio | verified; actual native12.6m and combined169.8m stress shots, visible fire/bursts, replay resets and all tiers verified; deployed 2026-09-08 |
 | K025 | User says the 7-Eleven still appears missing. Replace the generic empty Heart-in shell with a recognizable photo-informed storefront, illuminated furnished interior and clear public approach. Preserve gallery support, entrance/aisle clearance and the playable receiving space; prove visible fixture/native contact agreement. | kyoto-camera; fleet/heart-in-20260908; port4281 | source pushed d250b64; native/scoring pass; normal-browser visual motion blocked by 1-2 s/frame software rendering |
-| K026 | Substantial photorealism pass: physically plausible stone/metal/glass, original meter-scaled albedo/roughness/normal detail, coherent daylight and static reflection zones. Preserve geometry, fixed shadow filter, bounded practical lights, arcade effects and archived assets. Require matched moving views and measured render/memory cost. | kyoto-station; fleet/photorealism-20260908; port4282 | material/daylight candidate implemented; six baseline views complete; candidate captures and final handoff in progress |
-| K027 | Furnish 7F East Square with the reference-backed tree/support stakes, pale stepped seating and white openwork globe gazebo. Register on supported court geometry, keep routes clear, coordinate boundary space with K029 and prove native contacts. | kyoto-robot; fleet/east-square-20260908; port4283 | tree/seating/globe layer built with support and geometry parity; full-scene export/browser/native checks in progress |
-| K028 | Add distinct 4F plaza landmarks: west 朱甲舞 sculpture, east Space sculpture and the current KYOTO letter monument. Preserve recognizable curved/open silhouettes, source-backed area identity, supported bases and circulation; deliver separate visual/collision candidate layers. | kyoto-physics; fleet/plaza-landmarks-20260908; port4284 | landmarks built; 22 native checks and scoring pass; final corrected browser captures in progress |
+| K026 | Substantial photorealism pass: physically plausible stone/metal/glass, original meter-scaled albedo/roughness/normal detail, coherent daylight and static reflection zones. Preserve geometry, fixed shadow filter, bounded practical lights, arcade effects and archived assets. Require matched moving views and measured render/memory cost. | kyoto-station; fleet/photorealism-20260908; port4282 | materials/daylight implemented; hall/doorway/garden comparison capture progress; remaining candidate/archive checks and source handoff in progress |
+| K027 | Furnish 7F East Square with the reference-backed tree/support stakes, pale stepped seating and white openwork globe gazebo. Register on supported court geometry, keep routes clear, coordinate boundary space with K029 and prove native contacts. | kyoto-robot; fleet/east-square-20260908; port4283 | native walking/contacts/scoring passed before final gazebo-door frame correction; correction exported with matching collision, final checks and handoff in progress |
+| K028 | Add distinct 4F plaza landmarks: west 朱甲舞 sculpture, east Space sculpture and the current KYOTO letter monument. Preserve recognizable curved/open silhouettes, source-backed area identity, supported bases and circulation; deliver separate visual/collision candidate layers. | kyoto-physics; fleet/plaza-landmarks-20260908; port4284 | 43e4107 source pushed; candidate geometry, 22 native cases, scoring and isolated visual checks pass; ready for coordinator hardware/integration review |
 | K029 | Add East Square grand piano, West Exit upright piano and East Square miniature-station exhibit with appropriate display furniture. Inspect current references, preserve circulation and distinct silhouettes, and prove substantial fixture contacts. Musical interaction is outside this job. | kyoto-audio; fleet/station-exhibits-20260908; port4285 | source pushed b1a42b3; exhibit candidate and isolated checks complete, awaiting coordinator review |
-| K030 | Audit registered station signs and retail frontage identities against current floor plans; replace generic/wrong-side label fallbacks and add readable direction cues for modeled destinations. | kyoto-audio; fleet/wayfinding-20260908; port4286 | running; assignment read and reference/source audit verified |
-| K031 | Priority regression: user reports frequent one-sided robot lean at fresh start and janky walking. Reproduce initial/retry/character-change poses and directional movement; fix the demonstrated pose/reset or gait cause, keep upright balanced idle and stable feet without changing authoritative motion, and preserve gaze/grip/celebrations/replays. Require before/after normal-game evidence across all three robots. Reopens K002/K009 acceptance for this symptom. | kyoto-camera; fleet/robot-movement-20260908; port4287 | running; assignment read and reproduction/source inspection verified; priority regression |
+| K030 | Audit registered station signs and retail frontage identities against current floor plans; replace generic/wrong-side label fallbacks and add readable direction cues for modeled destinations. | kyoto-audio; fleet/wayfinding-20260908; port4286 | 45b5d71 candidate pushed by coordinator; registration/artwork/native/build checks pass; hardware moving-readability review pending |
+| K031 | Priority regression: user reports frequent one-sided robot lean at fresh start and janky walking. Reproduce initial/retry/character-change poses and directional movement; fix the demonstrated pose/reset or gait cause, keep upright balanced idle and stable feet without changing authoritative motion, and preserve gaze/grip/celebrations/replays. Require before/after normal-game evidence across all three robots. Reopens K002/K009 acceptance for this symptom. | kyoto-camera; fleet/robot-movement-20260908; port4287 | b0ce316 candidate pushed by coordinator; reproduced foot-settling starvation; 90 rig cases pass locally; Mac all-character turn/retry and shot/replay flows observed, final reload/review-harness gate open |
 
 ## Current findings
 
-- Live follow-up: K029 exhibits source is pushed and its isolated checks pass;
-  K025 Heart-in source is pushed and native/scoring checks pass, but normal
-  browser movement acceptance is blocked by 1–2 s/frame software rendering.
-  K026–K028 are finishing their candidate verification. K030 signage and the
-  new priority K031 spawn-lean/walking regression are executing on the freed
-  audio/camera machines in fresh worktrees. Still five machines total; no new
-  station-detail candidates have been deployed. New session WebSocket timeouts
-  recovered via HTTPS; both sessions acknowledged prompts and executed tools.
+- Latest follow-up: five source candidates are in coordinator review; only K026
+  materials and K027 East Square are still implementing/checking. K028 landmarks
+  now pass their isolated geometry, native/scoring and visual checks. K030
+  signage source/native checks pass; normal moving readability remains open.
+- K031 reproduced the startup 180-degree heading change trapping both feet on one
+  side: always settling L starved R. The candidate settles the most displaced
+  foot first. Baseline fails 78/90 rig cases; candidate passes all 90, including
+  the coordinator's local run. The Mac browser exercised all three characters'
+  turn/stop/retry and a shot/result/replay-return sequence near 60 FPS. The final
+  reload/receipt stage failed in the review harness; checkpoint/readiness fixes
+  are on review/robot-movement-20260908, with a complete revised run still pending.
+  This is source progress, not deployment or final movement acceptance.
+- K030 and K031 remote pushes lacked credentials. The coordinator imported
+  verified source-only bundles and successfully pushed exact commits 45b5d71 and
+  b0ce316; no user login is needed for those handoffs. All five VMs remain online.
+  New feature deployment and combined art/hardware acceptance remain separate.
 
 - The first fleet delivery and cleanup are complete and deployed. New station
   jobs K025–K029 have separate source-compatible worktrees and dedicated workers;
