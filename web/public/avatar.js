@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 const unitX=new THREE.Vector3(1,0,0),unitY=new THREE.Vector3(0,1,0),unitZ=new THREE.Vector3(0,0,1);
 const grip=new THREE.Vector3(0,.082,-.029);
@@ -30,7 +31,8 @@ export function createAvatar(asset){
   for(const clip of asset.animations){const action=mixer.clipAction(clip);action.play();action.paused=true;actions[clip.name]=action;}
   const bones={},baseRotations=new Map(),basePositions=new Map();model.traverse(o=>{if(o.isBone){bones[o.name]=o;if(o.userData.name)bones[o.userData.name]=o;baseRotations.set(o,o.quaternion.clone());basePositions.set(o,o.position.clone());}});
   for(const name of ['upper_arm.R','forearm.R','hand.R'])if(!bones[name])throw new Error(`Robot rig missing ${name}`);
-  return {group,model,mixer,actions,bones,baseRotations,basePositions,walkBlend:0,lastPoseTime:null,head:bones.head,upper:bones['upper_arm.R'],forearm:bones['forearm.R'],hand:bones['hand.R'],held:new THREE.Vector3(),releaseError:0};
+  const avatar={group,model,mixer,actions,bones,baseRotations,basePositions,walkBlend:0,lastPoseTime:null,head:bones.head,upper:bones['upper_arm.R'],forearm:bones['forearm.R'],hand:bones['hand.R'],held:new THREE.Vector3(),releaseError:0};
+  styleRobot(avatar);return avatar;
 }
 export function poseAvatar(a,player,phase,state,stationTime){
   const owner=player.id===state.owner,mode=owner?phase:'Aim';
@@ -67,6 +69,7 @@ export function poseAvatar(a,player,phase,state,stationTime){
   }
   for(let i=1;i<=3;i++)a.bones[`thumb${i}.R`].quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-.6*(1-opened)));
   applyGaze(a,player,mode,state,stationTime);
+  animateFace(a,mode,stationTime);
   a.group.updateWorldMatrix(true,true);
   a.held.copy(grip);a.hand.localToWorld(a.held);
   if(mode==='Release'){
@@ -193,4 +196,66 @@ function plantLeg(a,side,target,pole,footRotation){
   const bend=pole.clone().addScaledVector(direction,-pole.dot(direction)).normalize();
   const kneeTarget=hip.clone().addScaledVector(direction,along).addScaledVector(bend,Math.sqrt(Math.max(0,l1*l1-along*along)));
   pointBone(thigh,shin,kneeTarget);pointBone(shin,foot,hip.clone().addScaledVector(direction,distance));setWorldRotation(foot,footRotation);
+}
+
+// Original arcade mascot trim, attached in the authored bind frame. The imported
+// rig, hands and collision scale remain the authority for every moving part.
+function styleRobot(a){
+  const enamel=(color)=>new THREE.MeshPhysicalMaterial({color,metalness:.25,roughness:.3,clearcoat:.45,clearcoatRoughness:.25});
+  const cream=enamel(0xefe4cd),red=enamel(0xd94930),indigo=enamel(0x1b2b4c),gold=new THREE.MeshStandardMaterial({color:0xd6b574,metalness:.65,roughness:.32});
+  const face=new THREE.MeshStandardMaterial({color:0x061722,roughness:.3}),glow=new THREE.MeshStandardMaterial({color:0xa4f4df,emissive:0x78ddc7,emissiveIntensity:1.1,roughness:.3});
+  const palette={'Warm porcelain':cream,'Vermilion enamel':red,'Graphite joints':indigo,'Soft cyan display':glow};
+  a.model.traverse(o=>{if(o.isMesh&&palette[o.material.name])o.material=palette[o.material.name];});
+  a.group.updateWorldMatrix(true,true);
+  function attach(bone,geometry,material,position,rotation=new THREE.Quaternion()){
+    const mesh=new THREE.Mesh(geometry,material);mesh.name='ORI arcade trim';
+    mesh.position.copy(a.bones[bone].worldToLocal(new THREE.Vector3(...position)));
+    mesh.quaternion.copy(a.bones[bone].getWorldQuaternion(new THREE.Quaternion()).invert().multiply(rotation));
+    a.bones[bone].add(mesh);return mesh;
+  }
+  const box=(bone,size,material,position,rotation)=>attach(bone,new RoundedBoxGeometry(...size,2,.008),material,position,rotation);
+  const turnX=new THREE.Quaternion().setFromAxisAngle(unitZ,Math.PI/2);
+  // Broad enamel brow and concentric ear receivers give a toy-mecha silhouette.
+  box('head',[.275,.036,.048],red,[0,1.702,.083]);
+  box('head',[.065,.025,.16],cream,[0,1.729,.005]);
+  box('head',[.022,.016,.026],glow,[0,1.747,.064]);
+  for(const sign of [-1,1]){
+    attach('head',new THREE.CylinderGeometry(.071,.071,.038,20),indigo,[sign*.142,1.605,-.002],turnX);
+    attach('head',new THREE.CylinderGeometry(.052,.052,.043,20),red,[sign*.155,1.605,-.002],turnX);
+    attach('head',new THREE.CylinderGeometry(.024,.024,.046,16),gold,[sign*.163,1.605,-.002],turnX);
+    box('head',[.034,.012,.01],gold,[sign*.092,1.565,.135]);
+    const side=sign>0?'L':'R',tilt=new THREE.Quaternion().setFromAxisAngle(unitZ,-sign*.14);
+    box(`shoulder.${side}`,[.14,.095,.19],red,[sign*.264,1.419,0],tilt);
+    box(`shoulder.${side}`,[.099,.018,.17],cream,[sign*.266,1.468,0],tilt);
+    box(`foot.${side}`,[.12,.024,.065],red,[sign*.115,.16,.119]);
+    box(`foot.${side}`,[.105,.012,.014],gold,[sign*.115,.067,.184]);
+  }
+  // A compact instrument bib and rear vent repeat the receiver's indigo/brass.
+  box('chest',[.12,.079,.012],indigo,[0,1.279,.146]);
+  box('chest',[.068,.02,.014],glow,[0,1.295,.156]);
+  for(const sign of [-1,1])box('chest',[.02,.066,.012],cream,[sign*.088,1.276,.147],new THREE.Quaternion().setFromAxisAngle(unitZ,sign*.2));
+  box('chest',[.04,.009,.015],gold,[0,1.248,.156]);
+  box('chest',[.21,.18,.025],indigo,[0,1.287,-.126]);
+  for(const y of [1.25,1.28,1.31])box('chest',[.12,.012,.011],red,[0,y,-.143]);
+  // A larger dark display covers the original two pixels. Eyes and smile are
+  // geometry, so the face remains crisp without fonts, textures or asset packs.
+  box('head',[.223,.108,.014],face,[0,1.606,.152]);
+  const eyes=[];
+  for(const sign of [-1,1]){
+    const eye=box('head',[.033,.026,.006],glow,[sign*.048,1.617,.163]);eyes.push(eye);
+    box('head',[.012,.009,.006],glow,[sign*.083,1.594,.163]);
+  }
+  const smile=new THREE.CatmullRomCurve3([new THREE.Vector3(-.022,1.588,.163),new THREE.Vector3(0,1.581,.164),new THREE.Vector3(.022,1.588,.163)]);
+  attach('head',new THREE.TubeGeometry(smile,10,.0028,5,false),glow,[0,0,0]);
+  a.face={eyes};
+}
+
+function animateFace(a,mode,time){
+  if(!a.face)return;
+  const blink=((time%4.8)+4.8)%4.8;
+  const opening=blink<.14?.12+.88*Math.abs(blink-.07)/.07:1;
+  for(const [i,eye]of a.face.eyes.entries()){
+    eye.scale.y=opening*(mode==='Charging'?.65:mode==='Result'?.65:1);
+    eye.rotation.z=(i===0?1:-1)*(mode==='Result'?.18:mode==='Charging'?-.12:0);
+  }
 }

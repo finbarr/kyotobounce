@@ -4,12 +4,12 @@ import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const baseline=process.argv.includes('--baseline');
-const out=`artifacts/robot/${baseline?'baseline':process.argv.includes('--gaze')?'gaze-motion':'improved'}`;await mkdir(out,{recursive:true});
+const out=`artifacts/robot/${baseline?'baseline':process.argv.includes('--gaze')?'gaze-motion':process.argv.includes('--style')?'mascot':'improved'}`;await mkdir(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROME_EXECUTABLE||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const context=await browser.newContext({viewport:{width:1200,height:650},recordVideo:{dir:out,size:{width:1200,height:650}}});
 const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
- await page.route('**/robot-lab',route=>route.fulfill({contentType:'text/html',body:'<style>body{margin:0;background:#202830;color:white;font:18px sans-serif}p{position:absolute;left:20px}</style><p>Robot motion: front / side / rear • W/S forward/back • A/D strafe • B ball • X wall</p><script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>'}));
+ await page.route('**/robot-lab',route=>route.fulfill({contentType:'text/html',body:'<meta charset="utf-8"><style>body{margin:0;background:#202830;color:white;font:18px sans-serif}p{position:absolute;left:20px}</style><p>Robot motion: front / side / rear • W/S forward/back • A/D strafe • B ball • X wall</p><script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>'}));
  await page.goto('http://127.0.0.1:4173/robot-lab');
  await page.evaluate(async()=>{
   const T=await import('three'),{GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js'),{createAvatar,poseAvatar}=await import('/avatar.js');
@@ -25,15 +25,15 @@ try{
    const x=Number(keys.has('KeyD'))-Number(keys.has('KeyA')),z=Number(keys.has('KeyW'))-Number(keys.has('KeyS')),speed=keys.has('ShiftLeft')?4.2:1.4,wall=keys.has('KeyX');
    p.movement={x:wall?0:x*speed,z:wall?0:-z*speed};p.feet.x+=p.movement.x*dt;p.feet.z+=p.movement.z*dt;p.walked+=Math.hypot(p.movement.x,p.movement.z)*dt;
    a.group.position.set(p.feet.x,0,-p.feet.z);a.group.rotation.y=Math.PI-p.yaw*Math.PI/180;light.position.copy(a.group.position).add(new T.Vector3(3,5,4));light.target.position.copy(a.group.position);
-   const b={x:p.feet.x+Math.sin(time*1.3)*2,y:.12+Math.abs(Math.sin(time*2.6))*2,z:p.feet.z-2};ball.position.set(b.x,b.y,-b.z);ball.visible=keys.has('KeyB');
-   poseAvatar(a,p,ball.visible?'Flight':'Aim',{owner:'robot',releaseTime:0,ball:b},time);
+   const b={x:p.feet.x+Math.sin(time*1.3)*2,y:.12+Math.abs(Math.sin(time*2.6))*2,z:p.feet.z-2};ball.position.set(b.x,b.y,-b.z);ball.visible=keys.has('KeyB')||keys.has('KeyR');p.power=keys.has('KeyC')?.8:0;
+   poseAvatar(a,p,keys.has('KeyC')?'Charging':keys.has('KeyR')?'Result':ball.visible?'Flight':'Aim',{owner:'robot',releaseTime:0,ball:b},time);
    const feet=['L','R'].map(s=>a.bones[`foot.${s}`].getWorldPosition(new T.Vector3()).toArray());
    window.lab.rows.push({time,keys:[...keys],feet,root:a.group.position.toArray(),blend:a.walkBlend,head:a.head.getWorldQuaternion(new T.Quaternion()).toArray()});
    renderer.setScissorTest(true);cameras.forEach((c,i)=>{c.position.copy(a.group.position).add(c.userData.offset);c.lookAt(a.group.position.clone().add(new T.Vector3(0,.95,0)));renderer.setViewport(i*400,0,400,650);renderer.setScissor(i*400,0,400,650);renderer.render(scene,c);});requestAnimationFrame(frame);
   }requestAnimationFrame(frame);
  });
  console.log('Rig',await page.evaluate(()=>window.lab.rig));
- for(const [name,keys,duration] of [['idle',[],600],['forward',['KeyW'],2400],['wall',['KeyW','KeyX'],1000],['backward',['KeyS'],2000],['stop',[],900],['strafe',['KeyD'],2000],['diagonal',['KeyW','KeyA'],1700],['fast',['KeyW','ShiftLeft'],1700],['ball',['KeyB'],3000],['return',[],1200]]){
+ for(const [name,keys,duration] of [['idle',[],600],['forward',['KeyW'],2400],['wall',['KeyW','KeyX'],1000],['backward',['KeyS'],2000],['stop',[],900],['strafe',['KeyD'],2000],['diagonal',['KeyW','KeyA'],1700],['fast',['KeyW','ShiftLeft'],1700],['ball',['KeyB'],3000],['return',[],1200],['charging',['KeyC'],1000],['result',['KeyR'],1200]]){
   for(const k of keys)await page.keyboard.down(k);await page.waitForTimeout(duration);await page.screenshot({path:`${out}/${name}.png`});for(const k of keys)await page.keyboard.up(k);
  }
  const results=await page.evaluate(()=>{
