@@ -51,6 +51,36 @@ diffuseColor.rgb*=mix(.92,1.04,panel)*mix(1.0,.32,joint);
 // A modest darker foot course gives the cladding a grounded, maintained finish.
 diffuseColor.rgb*=mix(.87,1.0,smoothstep(0.0,1.2,mod(vFinishPosition.y,7.35)));
 `;
+    if(kind==='cassette')detail=`
+// Photo-guided mineral cassette grid: joints and recessed square vent fields.
+// Surface-only shading, kept off glass, signs, columns and the curved canopy.
+vec2 module=vec2(1.44,1.44);
+vec2 local=fract(fp/module+.5)*module;
+float joint=finishJoint(fp,module,.007);
+float panel=finishHash(floor(fp/module+.5));
+vec2 field=abs(local-vec2(.72));
+vec2 aa=max(fwidth(fp),vec2(.001));
+float ventField=(1.0-smoothstep(.46,.46+aa.x,field.x))*(1.0-smoothstep(.46,.46+aa.y,field.y));
+// Sparse repeating service panels within a restrained mineral-cladding field.
+vec2 cell=floor(fp/module+.5);
+float service=step(.5,mod(cell.x,5.0))*step(mod(cell.x,5.0),1.5);
+service*=step(.5,mod(cell.y,6.0))*step(mod(cell.y,6.0),3.5);
+vec2 hole=abs(fract((local-.24)/.16+.5)-.5)*.16;
+vec2 aperture=1.0-smoothstep(vec2(.043),vec2(.043)+aa,hole);
+// Only vertical upper facade zones carry service grilles. Never stamp the
+// pattern onto soffits, caps, floor slabs or small ground-level enclosures.
+float facade=step(fn.y,.3)*step(8.0,vFinishPosition.y)*step(18.0,abs(vFinishPosition.x));
+float holes=aperture.x*aperture.y*ventField*service*facade;
+float fade=1.0-smoothstep(.035,.10,max(aa.x,aa.y));
+diffuseColor.rgb*=mix(.94,1.04,panel)*mix(1.0,.38,joint)*mix(1.0,.22,holes*fade);
+`;
+    if(kind==='stair')detail=`
+// Metric joints/grain on the retained treads. The baked UV nosing stays intact.
+float joint=finishJoint(fp,vec2(.6),.0015)*step(.65,fn.y);
+float grain=finishHash(floor(fp*600.0));
+float fade=1.0-smoothstep(.002,.012,max(fwidth(fp.x),fwidth(fp.y)));
+diffuseColor.rgb*=mix(1.0,.65,joint)*(1.0+(grain-.5)*.12*fade);
+`;
     if(kind==='metal')detail=`
 float joint=finishJoint(fp,vec2(2.88,.72),.003);
 diffuseColor.rgb*=mix(1.0,.55,joint);
@@ -63,7 +93,7 @@ diffuseColor.rgb*=mix(.94,1.06,finishHash(floor(fp/vec2(.9,.45)+.5)))*mix(1.0,.4
     if(kind==='floor')shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
 roughnessFactor=clamp(roughnessFactor+(tile-.5)*.08+joint*.24+inset*.08,.18,.65);`);
   };
-  material.customProgramCacheKey=()=>`kyoto-finish-3-${kind}`;
+  material.customProgramCacheKey=()=>`kyoto-finish-4-${kind}`;
 }
 
 function skyTexture(){
@@ -95,7 +125,9 @@ export function dressStation(renderer,scene,sun,station,data){
       m.map=null;m.normalMap=null;m.color.set(0x343b3c);m.roughness=.29;m.metalness=.04;m.envMapIntensity=.65;finish(m,'floor');
     }else if(/Canopy steel/.test(name)){
       m.color.set(0x555f61);m.metalness=.65;m.roughness=.32;m.envMapIntensity=.85;
-    }else if(/Pale cladding|Facade -|enclosure mineral|pale mineral|structural mineral/.test(name)){
+    }else if(/^Pale cladding|enclosure mineral|East frontage \| structural mineral/.test(name)){
+      m.color.set(0xa8aba5);m.metalness=.08;m.roughness=.53;finish(m,'cassette');
+    }else if(/Facade -|pale mineral|structural mineral/.test(name)){
       m.color.set(0xa8aba5);m.metalness=.08;m.roughness=.53;finish(m,'panel');
     }else if(/Silver facade|brushed balcony|satin mullions/.test(name)){
       m.color.set(0x969fa0);m.metalness=.72;m.roughness=.3;finish(m,'metal');
@@ -109,8 +141,11 @@ export function dressStation(renderer,scene,sun,station,data){
       m.color.set(0x879f9e);m.metalness=.88;m.roughness=.085;m.envMapIntensity=1.25;
     }else if(/Glass -/.test(name)){
       m.color.set(0x9db9b3);m.opacity=.23;m.metalness=.5;m.roughness=.1;m.depthWrite=false;m.envMapIntensity=1.1;
-    }else if(/Stair stone|East stair/.test(name)){
-      m.color.set(0xc1c6c3);m.roughness=.57;m.normalScale.setScalar(.35);
+    }else if(/Stair stone|Stair nosing finish|East stair/.test(name)){
+      // Honor the original metric granite and 25 mm pale nosing texture. The
+      // nosing family previously missed this finish branch on the west stairs.
+      m.color.set(0x969f9b);m.roughness=.66;m.metalness=.02;
+      m.normalScale.setScalar(.45);finish(m,'stair');
     }else if(/Rubber handrail/.test(name)){
       m.color.set(0x171c1d);m.roughness=.52;
     }

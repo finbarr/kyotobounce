@@ -4,7 +4,7 @@ function artwork(width,height,paint){
   const c=document.createElement('canvas');c.width=width;c.height=height;paint(c.getContext('2d'),width,height);
   const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;
 }
-const font='"Hiragino Kaku Gothic ProN", "Yu Gothic", Arial, sans-serif';
+const font='"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans CJK JP", Arial, sans-serif';
 function labelTexture(id){
   const board=id==='central-hall-information-board-structure',gate=id==='central-hall-central-gate-sign';
   return artwork(2048,board?192:128,(ctx,w,h)=>{
