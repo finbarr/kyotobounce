@@ -1,0 +1,7 @@
+import assert from 'node:assert/strict';import{Client}from'./api-client.mjs';import{writeFile}from'node:fs/promises';import{scoreAttempt}from'../scoring.ts';
+const c=new Client('ws://127.0.0.1:4281');try{await c.join();const start=await c.place({x:-55.3,y:7.35,z:-18},.3,'start'),goal=await c.place({x:-52,y:7.35,z:-18},.9);
+const {challenge}=await c.request('save-challenge',{name:'K025 private receiving proof',start,goal},'saved-challenge');await c.request('select-challenge',{challengeId:challenge.id},'selected');
+const shot=await c.throw(430,{yaw:90,pitch:-45,powerRange:'precision'});assert.equal(shot.state.phase,'Result');assert(shot.state.diagnostics.sleeping);assert.equal(Math.hypot(...Object.values(shot.state.velocity)),0);assert.equal(Math.hypot(...Object.values(shot.state.spin)),0);assert(Math.hypot(shot.final.x+52,shot.final.z+18)<.9);assert(shot.result.score>0);
+const {replay}=await c.request('replay',{attempt:shot.result.attempt},'replay');assert.deepEqual(scoreAttempt(replay),shot.result.breakdown);await writeFile('.local/station-detail/evidence/receiving-score.json',JSON.stringify({status:'pass',layout:challenge.layout,challenge,shot,replayScoreParity:true},null,2));
+await writeFile('.local/station-detail/gameplay-session.json',JSON.stringify({token:c.token,challenge}));console.log('PASS authoritative shop entry, receiving rest, positive score and replay parity',shot.result.score);
+}finally{c.close();}

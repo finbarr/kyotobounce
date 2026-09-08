@@ -1,0 +1,179 @@
+[
+  {
+    "id": "continuous-shop-walk",
+    "start": [
+      -55.3,
+      7.35,
+      -12
+    ],
+    "walkRoute": [
+      {
+        "yaw": 180,
+        "seconds": 4.3,
+        "target": [
+          -55.3,
+          7.375,
+          -18
+        ],
+        "tolerance": 0.45
+      },
+      {
+        "yaw": 90,
+        "seconds": 2.3,
+        "target": [
+          -52,
+          7.375,
+          -18
+        ],
+        "tolerance": 0.5
+      },
+      {
+        "yaw": -90,
+        "seconds": 2.3,
+        "target": [
+          -55.3,
+          7.375,
+          -18
+        ],
+        "tolerance": 0.5
+      },
+      {
+        "yaw": 0,
+        "seconds": 4.3,
+        "target": [
+          -55.3,
+          7.375,
+          -12
+        ],
+        "tolerance": 0.5
+      }
+    ],
+    "minFeetY": 7.34
+  },
+  {
+    "id": "repaired-approach-ball",
+    "start": [
+      -55.3,
+      7.35,
+      -12
+    ],
+    "yaw": 180,
+    "pitch": -65,
+    "power": 0.008,
+    "seconds": 18,
+    "minY": 7.35,
+    "contact": "k019-west-2f-gallery"
+  },
+  {
+    "id": "doorway-entry-ball",
+    "start": [
+      -55.3,
+      7.35,
+      -18
+    ],
+    "yaw": 90,
+    "pitch": -45,
+    "power": 0.018,
+    "seconds": 18,
+    "minY": 7.35,
+    "contact": "konbini-floor"
+  },
+  {
+    "id": "gallery-west-guard",
+    "start": [
+      -55.3,
+      7.35,
+      -18
+    ],
+    "yaw": -90,
+    "pitch": -65,
+    "power": 0.008,
+    "seconds": 18,
+    "minY": 7.35,
+    "contact": "k019-gallery-west-guard"
+  },
+  {
+    "id": "gallery-south-guard",
+    "start": [
+      -55.3,
+      7.35,
+      -20
+    ],
+    "yaw": 180,
+    "pitch": -65,
+    "power": 0.008,
+    "seconds": 18,
+    "minY": 7.35,
+    "contact": "k019-gallery-south-guard"
+  },
+  {
+    "id": "shelf-contact",
+    "start": [
+      -51.5,
+      7.35,
+      -18
+    ],
+    "yaw": 180,
+    "pitch": -10,
+    "power": 0.025,
+    "seconds": 18,
+    "contact": "konbini-shelf-deck-1-0",
+    "minY": 7.35
+  },
+  {
+    "id": "checkout-contact",
+    "start": [
+      -53.2,
+      7.35,
+      -18
+    ],
+    "yaw": 180,
+    "pitch": -30,
+    "power": 0.015,
+    "seconds": 18,
+    "contact": "konbini-checkout-base",
+    "minY": 7.35
+  },
+  {
+    "id": "fridge-glass-contact",
+    "start": [
+      -52,
+      7.35,
+      -18
+    ],
+    "yaw": 90,
+    "pitch": -10,
+    "power": 0.05,
+    "seconds": 18,
+    "contact": "konbini-fridge-glass-1",
+    "minY": 7.35
+  },
+  {
+    "id": "front-glass-contact",
+    "start": [
+      -52.8,
+      7.35,
+      -16.7
+    ],
+    "yaw": -90,
+    "pitch": -10,
+    "power": 0.025,
+    "seconds": 18,
+    "contact": "konbini-front-pane--1",
+    "minY": 7.35
+  },
+  {
+    "id": "back-wall-contact",
+    "start": [
+      -50.1,
+      7.35,
+      -20.6
+    ],
+    "yaw": 90,
+    "pitch": -10,
+    "power": 0.025,
+    "seconds": 18,
+    "contact": "konbini-back",
+    "minY": 7.35
+  }
+]

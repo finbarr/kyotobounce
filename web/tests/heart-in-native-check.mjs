@@ -1,0 +1,7 @@
+import assert from 'node:assert/strict';import{gunzipSync}from'node:zlib';import{readFile,writeFile}from'node:fs/promises';
+const path=process.argv[2]||'.local/station-detail/evidence/native.json',bytes=await readFile(path),r=JSON.parse(path.endsWith('.gz')?gunzipSync(bytes):bytes);
+assert.equal(r.results.length,10);for(const s of r.results)assert(!s.error&&!s.failure,`${s.id}: ${s.error||s.failure}`);
+const walk=r.results.find(s=>s.id==='continuous-shop-walk');assert.equal(walk.checkpoints.length,4);
+const entry=r.results.find(s=>s.id==='doorway-entry-ball');assert(entry.trace.states.some(s=>s.phase==='Flight'&&s.ball.x>-53.8&&Math.abs(s.ball.z+18)<.9),'Ball physically entered shop');
+assert(Math.hypot(entry.final.ball.x+52,entry.final.ball.z+18)<.9,'Entry rests inside original receiving disk');assert.equal(entry.final.phase,'Result');assert(entry.final.diagnostics.sleeping);assert(Math.hypot(...Object.values(entry.final.velocity))<1e-5);assert(Math.hypot(...Object.values(entry.final.spin))<1e-5);
+const report={status:'pass',layout:r.layoutSha256,walk:walk.checkpoints,entryRest:{ball:entry.final.ball,velocity:entry.final.velocity,spin:entry.final.spin,sleeping:true},contacts:r.results.filter(s=>s!==walk).map(s=>({id:s.id,surfaces:s.surfaces,phase:s.final.phase}))};await writeFile(path.replace(/\.json(?:\.gz)?$/,'-acceptance.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
