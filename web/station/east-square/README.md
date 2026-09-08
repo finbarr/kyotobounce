@@ -96,3 +96,16 @@ geometry checks sequentially. Stop the task preview first.
 the scoring receipt to the worker layout identity checked before and after.
 The globe portals connect every clipped rib/hoop to a continuous arched trim,
 retaining the 1.35m minimum opening at the ground fittings.
+
+## Final integration handoff
+
+The retained candidate includes the demonstrated gazebo-door correction: continuous
+arched portal trims join clipped meridians and hoops. Final exports and native
+walking, opening, structure-contact and scoring checks passed on layout
+`8c2b2186437e367986e2d9ebe1d2255e41bbfa095bf9fe7fcf58f6de123d9855`.
+Submitted transforms are frozen following coordinator registration review: no
+K027/K029 AABB overlaps; miniature-to-south-seat separation is 3.555m.
+Coordinator Mac review owns final moving-view acceptance and combined circulation,
+visual and collision acceptance. Linux software captures remain supporting evidence.
+Deployment is authorized for the assembly integrator; this feature session does
+not deploy. Keep this one final layer and matching collision proposal for assembly.
