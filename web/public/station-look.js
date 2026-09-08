@@ -3,9 +3,10 @@ import * as THREE from 'three';
 // Four fixed hardware-PCF taps soften texel stair steps without the default
 // per-screen-pixel random rotation. The kernel lives in shadow-map coordinates,
 // so moving the camera does not rotate the architectural shadow pattern.
+// Keep the footprint tight: wider offsets self-shadow steep receiver planes.
 const architecturalShadow=THREE.ShaderChunk.shadowmap_pars_fragment.replace(
   /shadow = \(\s*texture\( shadowMap, vec3\( shadowCoord\.xy \+ vogelDiskSample[\s\S]*?\) \* 0\.2;/,
-  `vec2 offset = texelSize * shadowRadius * .75;
+  `vec2 offset = texelSize * shadowRadius * .25;
   shadow = (
     texture( shadowMap, vec3( shadowCoord.xy + vec2(-offset.x,-offset.y), shadowCoord.z ) ) +
     texture( shadowMap, vec3( shadowCoord.xy + vec2( offset.x,-offset.y), shadowCoord.z ) ) +
@@ -183,7 +184,9 @@ export function dressStation(renderer,scene,sun,station,data){
   sun.color.set(0xfff2df);sun.intensity=2.4;sun.position.set(-55,110,-65);sun.target.position.set(-20,0,0);scene.add(sun.target);
   sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);
   const shadowCoverage=fitStationShadowCamera(sun,station);
-  sun.shadow.radius=1.2;sun.shadow.bias=-.00004;sun.shadow.normalBias=.015;
+  // Preserve the old world-space depth offset when fitting the near/far planes.
+  // The old camera spanned 300 - 1 = 299 m; normalized bias scales with that range.
+  sun.shadow.radius=1.2;sun.shadow.bias=-.00012*299/(sun.shadow.camera.far-sun.shadow.camera.near);sun.shadow.normalBias=.04;
   const done=new Set();
   station.traverse(o=>{
     if(!o.isMesh)return;
