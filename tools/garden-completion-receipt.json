@@ -1,0 +1,115 @@
+{
+  "status": "verified-candidate-no-publication",
+  "files": {
+    "artifacts/k008/final/KyotoAtrium.blend": {
+      "bytes": 35932318,
+      "sha256": "9f5b1e4bf01af8877dcf4b04935e40ba8423f604d864d30b7a9abecf7654fb1e"
+    },
+    "artifacts/k008/final/station-layout.json": {
+      "bytes": 171684419,
+      "sha256": "bc31325997d0d642712cbe1fc9451f78e41f7d942edf98279ac527c6cb0b89c0"
+    },
+    "artifacts/k008/final/repair-overlay.glb": {
+      "bytes": 1405188,
+      "sha256": "69c583d019cf830923ca860a851e5c4ed25151f21d2cfb7d33ea094c100d63d2"
+    },
+    "artifacts/k008/browser-final/atrium.glb": {
+      "bytes": 166018240,
+      "sha256": "84f6e6b1db4e455258996cfd6478f1f040dbd00d2a0db9ef5a7c3bfaa5f5e31c"
+    },
+    "artifacts/k008/browser-final/station.json": {
+      "bytes": 1243405,
+      "sha256": "12c0b58a99c0cfe18fff709f38e9743d8a8119281ec5f181ca9559821e5451cd"
+    },
+    ".local/fleet/garden-handoff/RoofGardenCandidate.blend": {
+      "bytes": 467731,
+      "sha256": "9f879e236ca4e9cc3003a1d049c43a58fa4c52e775ab0ca1043aee1e3520a38a"
+    },
+    ".local/fleet/garden-handoff/garden-candidate.json": {
+      "bytes": 56720,
+      "sha256": "4444230e2d26dc57516996f8f19d3b3e55597c533f63585636194313d006f4d3"
+    }
+  },
+  "workerArchiveSha256": "7dda5a50df0b432ae0def01f1b2b7f0c6dfd1caeecdc510f8a2884dbdaaf82ec",
+  "workerAssemblySha256": "9a8f2f06a928fb15d42b799a093c95eb7bb62fbbc3afd5f03bb1eebf34025fef",
+  "checks": [
+    "final/verification.json",
+    "final/garden-verification.json",
+    "native-acceptance.json",
+    "runtime-final.json",
+    "typecheck.log",
+    "tests.log",
+    "build-web.log"
+  ],
+  "visuals": [
+    "garden-overview-final.png",
+    "access-walking-view.png"
+  ],
+  "publicServiceChanged": false,
+  "removedSupersededBytes": 1467200007,
+  "native": {
+    "status": "pass",
+    "layout": "bc31325997d0d642712cbe1fc9451f78e41f7d942edf98279ac527c6cb0b89c0",
+    "continuousWalkCheckpoints": [
+      {
+        "feet": {
+          "x": -155.99667358398438,
+          "y": 49.6109619140625,
+          "z": -32.29999923706055
+        },
+        "expected": [
+          -156,
+          49.61096491228072,
+          -32.3
+        ]
+      },
+      {
+        "feet": {
+          "x": -156.02000427246094,
+          "y": 54.52324295043945,
+          "z": -20.244443893432617
+        },
+        "expected": [
+          -156,
+          54.523245614035105,
+          -20.4
+        ]
+      },
+      {
+        "feet": {
+          "x": -152.35667419433594,
+          "y": 54.52324295043945,
+          "z": -20.22110939025879
+        },
+        "expected": [
+          -152.5,
+          54.523245614035105,
+          -20.4
+        ]
+      }
+    ],
+    "floorSections": 4,
+    "perimeterSides": 4,
+    "shots": 8,
+    "ballMinimumY": 54.52124786376953,
+    "endedShotsPhysicallyRested": true
+  },
+  "geometry": {
+    "status": "pass",
+    "gardenFloorSamples": 55186,
+    "treadSupportAndHeadroomSamples": 700,
+    "turnSamples": 625,
+    "clearWidth": 2.4,
+    "bodyHeadroom": 1.8,
+    "failures": []
+  },
+  "receiptHashes": {
+    "final/verification.json": "c34f098b41b863d37f457ef6342a2e52f3a4f294583d4049961352c9b063ac97",
+    "final/garden-verification.json": "e137adbed7e3a559c455faabacd79031d72fe7c5351d51a1e563c4667538478d",
+    "native-acceptance.json": "995056079681d415e750577c716e9174117ddbf9903b28094682032c57d74028",
+    "runtime-final.json": "3a0e96169b7c985c3e1bb9d118a214d5ee1f07451a26049d81b46d4be1d55dd2",
+    "typecheck.log": "72e08e9eb73a07b366856961269fb8ee423b9cc7e2a5967b06b65c184597c29c",
+    "tests.log": "a3167b053c900750f73ab5dd5aa21e21f72f826653506ad13b0f5c3f6c7ce24b",
+    "build-web.log": "bd518414771f7b385931538dca89ddb4ac995d0228fcedd4cbc467e152db8fb1"
+  }
+}
