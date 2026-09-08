@@ -13,6 +13,7 @@ The pack includes:
 - `art-source/phase3/atrium-detail/AtriumHardware.blend`: editable station fixtures and signs.
 - `art-source/materials/stairs/`: original generated stair/escalator texture maps.
 - `runtime/station-layout.json` and `runtime/textures/`: canonical native collision layout and material maps.
+- `web/public/assets/layouts/<hash>/`: immutable prior collision and browser assets for historical revisions and replay viewing.
 - `web/public/assets/`: exported GLBs, station metadata and hardware metadata used by the browser.
 
 The initial runtime layout retains its existing byte-for-byte SHA-256 so deployed challenges and old replays keep the same layout identity. Some provenance strings inside it refer to historical authoring paths; these are metadata, not files required to run the public project.

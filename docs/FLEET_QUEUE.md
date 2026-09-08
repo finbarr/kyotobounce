@@ -66,8 +66,8 @@ exports run on the station lane without simultaneous Unity imports.
   editor/build activation requirement promptly, per the user's request.
 - [Production audit](PERFORMANCE-AUDIT.md): the idle 2-vCPU/4-GB host had 99%
   idle CPU, 2.9 GiB available RAM and no current-service restarts. This neither
-  reproduces gameplay lag nor proves capacity under traffic. Benchmark the
-  serial Unity worker and16normal clients have since passed isolated Linux
+  reproduces gameplay lag nor proves capacity under traffic. The
+  serial Unity worker and 16 normal clients have since passed isolated Linux
   capacity checks; measured cadence loss was fixed and verified with rebuilt
   native workers. See web/bench/CAPACITY.md and NATIVE-PUBLICATION.md.
 

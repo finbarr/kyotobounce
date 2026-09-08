@@ -391,7 +391,7 @@ function animate(now){
   }
   camera=inFlight?ballCamera:aimCamera;
   const resultAvatar=avatars.get(guestId),showRobotResult=!replaying&&phase==='Result'&&avatarWantsResultView(resultAvatar);
-  if(showRobotResult&&!robotResultCamera){azimuth=resultAvatar.group.rotation.y+.25;elevation=.10;distance=3.4;manualCamera=false;}
+  if(showRobotResult&&!robotResultCamera){azimuth=resultAvatar.group.rotation.y+.25;elevation=.10;distance=3.4;cameraClearance=distance;manualCamera=false;}
   robotResultCamera=showRobotResult;
   if(showRobotResult)cameraTarget.copy(resultAvatar.group.position).add(new THREE.Vector3(0,1.05,0));
   else if(inFlight)cameraTarget.copy(followTarget);
