@@ -1,0 +1,67 @@
+[
+  {
+    "id": "bars-bounce",
+    "start": [
+      -1.25,
+      0,
+      -5.03
+    ],
+    "yaw": 90,
+    "pitch": -65,
+    "powerRange": "precision",
+    "power": 0.01,
+    "seconds": 10
+  },
+  {
+    "id": "dots-bounce",
+    "start": [
+      -1.25,
+      0,
+      4.25
+    ],
+    "yaw": 90,
+    "pitch": -65,
+    "powerRange": "precision",
+    "power": 0.01,
+    "seconds": 10
+  },
+  {
+    "id": "dots-fast-impact",
+    "start": [
+      -2.6783,
+      0,
+      4.25
+    ],
+    "yaw": 90,
+    "pitch": -65,
+    "powerRange": "precision",
+    "power": 0.5,
+    "seconds": 5
+  },
+  {
+    "id": "bars-rolling",
+    "start": [
+      -2.71,
+      0,
+      -5.03
+    ],
+    "yaw": 90,
+    "pitch": -65,
+    "powerRange": "precision",
+    "power": 0.05,
+    "seconds": 18
+  },
+  {
+    "id": "dots-rolling",
+    "start": [
+      -2.865,
+      0,
+      4.25
+    ],
+    "yaw": 90,
+    "pitch": -65,
+    "powerRange": "precision",
+    "power": 0.05,
+    "seconds": 18
+  }
+]
