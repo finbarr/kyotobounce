@@ -39,6 +39,139 @@ def box(group,mat,center,size,u=(1,0,0)):
         # The axis swap changes handedness; this order is outward in Blender.
         g['f'].append(tuple(base+i for i in face))
 
+def build_garden_candidate(output):
+    """Standalone K008 authoring proposal; never included in live hardware.
+
+    Run: blender --background --python tools/build_atrium_detail.py --
+         --garden-output artifacts/k008-garden
+    Physics must integrate the deck/access/obstacles as one versioned layout.
+    """
+    import random
+    rng=random.Random(8006);output.mkdir(parents=True,exist_ok=True)
+    floor=next(d['elevation'] for d in p['levelDatums'] if d['id']=='rooftop-garden')
+    lower=next(d['elevation'] for d in p['levelDatums'] if d['id']=='west-11f')
+    colliders=[];garden_counts={'bambooStems':0,'leafClusters':0,'benches':0,'planters':0,'lamps':0}
+    palette=[('Garden pale paving',(.43,.40,.34),0,.8),('Garden dark insets',(.16,.19,.19),0,.7),
+        ('Garden lawn',(.15,.24,.045),0,.95),('Garden bamboo foliage',(.20,.33,.045),0,.9),
+        ('Garden leaf highlights',(.31,.40,.07),0,.9),('Garden bamboo stems',(.39,.40,.10),0,.75),
+        ('Garden yellow beds and rails',(.57,.46,.08),.25,.55),('Garden timber seats',(.34,.18,.085),0,.75),
+        ('Garden mineral curbs',(.39,.37,.31),0,.85),('Garden red lamp',(.58,.045,.015),.35,.4),
+        ('Garden blue lamp',(.06,.25,.36),.35,.4),('Garden steel',(.4,.46,.48),.7,.35),
+        ('Garden guard glazing',(.35,.53,.54),.25,.2)]
+    for name,color,metal,rough in palette:
+        m=bpy.data.materials.new(name);m.diffuse_color=(*color,1);m.use_nodes=True
+        bsdf=m.node_tree.nodes.get('Principled BSDF');bsdf.inputs['Base Color'].default_value=(*color,1)
+        bsdf.inputs['Metallic'].default_value=metal;bsdf.inputs['Roughness'].default_value=rough;materials[name]=m
+    glass=materials['Garden guard glazing'];glass.diffuse_color=(*glass.diffuse_color[:3],.3)
+    glass.node_tree.nodes['Principled BSDF'].inputs['Alpha'].default_value=.3;glass.surface_render_method='DITHERED'
+    def block(name,mat,x,y,z,sx,sy,sz,solid=True):
+        box(name,mat,(x,y,z),(sx,sy,sz))
+        if solid:colliders.append({'id':'k008-%04d'%len(colliders),'meshGroup':name,'shape':'box','center':{'x':x,'y':y,'z':z},'size':{'x':sx,'y':sy,'z':sz}})
+    def rod(name,mat,a,b,radius,solid=True,sides=10):
+        a=Vector(a);b=Vector(b);direction=(b-a).normalized();cross=direction.cross(Vector((0,0,1)))
+        if cross.length<.1:cross=direction.cross(Vector((1,0,0)))
+        cross.normalize();other=direction.cross(cross)
+        g=groups.setdefault((name,mat),{'v':[],'f':[]});base=len(g['v'])
+        for c in [a,b]:
+            for i in range(sides):
+                v=c+radius*(cross*math.cos(2*math.pi*i/sides)+other*math.sin(2*math.pi*i/sides));g['v'].append((v.x,v.z,v.y))
+        g['f'].append(tuple(base+i for i in range(sides)))
+        g['f'].append(tuple(base+sides+i for i in reversed(range(sides))))
+        for i in range(sides):j=(i+1)%sides;g['f'].append((base+i,base+sides+i,base+sides+j,base+j))
+        if solid:colliders.append({'id':'k008-%04d'%len(colliders),'meshGroup':name,'shape':'capsule','a':dict(zip(('x','y','z'),a)),'b':dict(zip(('x','y','z'),b)),'radius':radius})
+    # Four pieces leave the agreed 2.4 x 8.68 m stair opening genuinely open.
+    for name,x0,x1,z0,z1 in [('west',-168,-157.2,-35,-9),('east',-154.8,-142,-35,-9),
+                            ('south',-157.2,-154.8,-35,-34),('arrival',-157.2,-154.8,-25.32,-9)]:
+        block('Garden deck '+name,'Garden pale paving',(x0+x1)/2,floor-.15,(z0+z1)/2,x1-x0,.3,z1-z0)
+    for i in range(28):
+        top=lower+(i+1)*(floor-lower)/28
+        block('Garden access tread %02d'%i,'Garden pale paving',-156,top-.15,-34+(i+.5)*.31,2.4,.3,.31)
+    for side in [-1,1]:
+        x=-156+side*1.2
+        rod('Garden access rail','Garden steel',(x,lower+.95,-34),(x,floor+.95,-25.32),.035)
+        for i in range(0,29,4):
+            y=lower+i*(floor-lower)/28;z=-34+i*.31
+            rod('Garden access posts','Garden steel',(x,y,z),(x,y+.95,z),.025)
+    # Guard the deck edge around the stair well as well as the sloping flight.
+    for a,b in [((-157.2,-34),(-157.2,-25.32)),((-154.8,-34),(-154.8,-25.32)),((-157.2,-34),(-154.8,-34))]:
+        block('Garden stair well glass','Garden guard glazing',(a[0]+b[0])/2,floor+.55,(a[1]+b[1])/2,max(.018,abs(b[0]-a[0])),1.1,max(.018,abs(b[1]-a[1])))
+        rod('Garden stair well rail','Garden steel',(a[0],floor+1.15,a[1]),(b[0],floor+1.15,b[1]),.032)
+        n=math.ceil(math.dist(a,b)/2)
+        for i in range(n+1):
+            x=a[0]+(b[0]-a[0])*i/n;z=a[1]+(b[1]-a[1])*i/n
+            rod('Garden stair well posts','Garden steel',(x,floor,z),(x,floor+1.15,z),.025)
+    # Lawn and paving are coplanar finish skins, not new raised floor platforms.
+    for x in [-165,-145]:block('Garden lawn strip','Garden lawn',x,floor+.001,-22,4,.002,22,False)
+    for x in [-161,-159,-153,-151]:
+        for z in [-23,-21,-19,-17,-15]:
+            if (int(x+z)%3)==0:block('Garden inset paving','Garden dark insets',x,floor+.001,-abs(z),.55,.002,.55,False)
+    for x,z in [(-165,-31),(-145,-31),(-165,-13),(-145,-13)]:
+        garden_counts['planters']+=1
+        block('Bamboo bed','Garden yellow beds and rails',x,floor+.18,z,2.8,.36,2.8)
+        block('Bamboo soil','Garden lawn',x,floor+.361,z,2.62,.002,2.62,False)
+        for j in range(14):
+            sx=x+rng.uniform(-1,1);sz=z+rng.uniform(-1,1);height=rng.uniform(2.2,4.1)
+            rod('Bamboo culms','Garden bamboo stems',(sx,floor+.36,sz),(sx,floor+height,sz),.018,False,7);garden_counts['bambooStems']+=1
+            for h in range(1,int(height/.38)):
+                rod('Bamboo nodes','Garden leaf highlights',(sx,floor+h*.38,sz),(sx,floor+h*.38+.022,sz),.022,False,7)
+            for k in range(7):
+                y=floor+height*.48+k*height*.07;angle=rng.random()*math.tau;length=rng.uniform(.35,.85)
+                tip=Vector((sx+math.cos(angle)*length,y+.18,sz+math.sin(angle)*length))
+                rod('Bamboo branches','Garden bamboo stems',(sx,y,sz),tip,.004,False,5)
+                # Original narrow lanceolate leaves; no photo/alpha textures.
+                g=groups.setdefault(('Bamboo leaves','Garden bamboo foliage' if k%2 else 'Garden leaf highlights'),{'v':[],'f':[]})
+                for leaf in range(5):
+                    root=Vector((sx,y,sz)).lerp(tip,(leaf+1)/6);d=Vector((math.cos(angle+leaf*.8)*.25,.06,math.sin(angle+leaf*.8)*.25));w=Vector((-d.z,0,d.x)).normalized()*.032
+                    base=len(g['v'])
+                    for v in [root,root+d*.55+w,root+d,root+d*.55-w]:g['v'].append((v.x,v.z,v.y))
+                    g['f'].append((base,base+1,base+2,base+3))
+                garden_counts['leafClusters']+=1
+    for x,z in [(-161,-22),(-149,-22),(-161,-17),(-149,-17)]:
+        block('Low herb bed','Garden mineral curbs',x,floor+.08,z,1.65,.16,1.65)
+        block('Low herb planting','Garden lawn',x,floor+.19,z,1.46,.22,1.46,False);garden_counts['planters']+=1
+    for x,z in [(-162,-33.4),(-147,-33.4),(-160,-10.6),(-150,-10.6)]:
+        for j in range(5):block('Bench timber slats','Garden timber seats',x,floor+.45,z+(j-2)*.105,2.4,.06,.095)
+        for end in [-1,1]:block('Bench steel legs','Garden steel',x+end*.87,floor+.21,z,.055,.42,.42)
+        garden_counts['benches']+=1
+    # Continuous perimeter guard: source proposal carries its own collision list.
+    for a,b in [((-168,-35),(-142,-35)),((-142,-35),(-142,-9)),((-142,-9),(-168,-9)),((-168,-9),(-168,-35))]:
+        length=math.dist(a,b);n=math.ceil(length/2)
+        for i in range(n+1):
+            x=a[0]+(b[0]-a[0])*i/n;z=a[1]+(b[1]-a[1])*i/n
+            rod('Perimeter guard posts','Garden steel',(x,floor,z),(x,floor+1.15,z),.025)
+        rod('Perimeter continuous rail','Garden steel',(a[0],floor+1.15,a[1]),(b[0],floor+1.15,b[1]),.032)
+        block('Perimeter guard glass','Garden guard glazing',(a[0]+b[0])/2,floor+.55,(a[1]+b[1])/2,max(.018,abs(b[0]-a[0])),1.1,max(.018,abs(b[1]-a[1])))
+    for i,(x,z) in enumerate([(-167,-25),(-143,-25),(-167,-18),(-143,-18)]):
+        mat='Garden red lamp' if i%2 else 'Garden blue lamp'
+        rod('Garden lamp columns','Garden steel',(x,floor,z),(x,floor+3.2,z),.105)
+        block('Garden lamp bracket',mat,x+.28,floor+3.05,z,.7,.06,.07)
+        # Perforated circular canopy: annular grid cutouts, no boolean operation.
+        g=groups.setdefault(('Garden perforated lamp shades',mat),{'v':[],'f':[]})
+        for ring in range(5):
+            for j in range(48):
+                if ring in [1,3] and j%3:continue
+                base=len(g['v'])
+                for radius,angle in [(ring*.12,j*math.tau/48),((ring+1)*.12,j*math.tau/48),((ring+1)*.12,(j+1)*math.tau/48),(ring*.12,(j+1)*math.tau/48)]:
+                    g['v'].append((x+.7+radius*math.cos(angle),z+radius*math.sin(angle),floor+3.24))
+                g['f'].append((base,base+1,base+2) if ring==0 else (base,base+1,base+2,base+3))
+        garden_counts['lamps']+=1
+    for (name,mat),g in groups.items():
+        mesh=bpy.data.meshes.new(name);mesh.from_pydata(g['v'],[],g['f']);mesh.update()
+        o=bpy.data.objects.new(name,mesh);bpy.context.collection.objects.link(o);mesh.materials.append(materials[mat]);o['integration']='K008 standalone proposal; needs matching physics/layout revision'
+    bpy.ops.wm.save_as_mainfile(filepath=str(output/'RoofGardenCandidate.blend'))
+    bpy.ops.export_scene.gltf(filepath=str(output/'roof-garden-candidate.glb'),export_format='GLB',export_yup=True,export_animations=False,export_extras=True)
+    meta={'status':'standalone proposal, not live','coordinateMapping':'Unity (x,y,z) -> Blender (x,z,y) -> Three (x,y,-z)',
+        'layoutSha256':hashlib.sha256(LAYOUT.read_bytes()).hexdigest(),'generatorSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        'footprint':{'x':[-168,-142],'z':[-35,-9],'floorY':floor},'access':{'lowerY':lower,'steps':28,'rise':(floor-lower)/28,'run':.31,'width':2.4,'voidX':[-157.2,-154.8],'voidZ':[-34,-25.32]},
+        'counts':garden_counts,'colliderProposals':colliders,'additionalMeshColliderGroups':['Garden perforated lamp shades','Garden perforated lamp shades.001'],'source':'https://www.kyoto-station-building.co.jp/service/square/',
+        'scope':'Independently modeled photo-guided rooftop interpretation. Placement/dimensions are inferred, not surveyed. Integrate all solid surfaces with physics before gameplay.'}
+    (output/'garden-candidate.json').write_text(json.dumps(meta,indent=2)+'\n');print('K008_GARDEN_CANDIDATE',garden_counts,flush=True)
+
+import sys
+if '--garden-output' in sys.argv:
+    build_garden_candidate(Path(sys.argv[sys.argv.index('--garden-output')+1]).resolve())
+    raise SystemExit(0)
+
 def comb_support(lane_id,end,origin,u,v,along,height,width):
     """Use the canonical transfer footprint when physics has supplied it.
 
