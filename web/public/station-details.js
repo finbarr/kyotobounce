@@ -27,7 +27,6 @@ function labelTexture(id){
 
 export function addStationDetails(scene,meta){
   const group=new THREE.Group();group.name='Atrium signs and flush floor finishes';scene.add(group);
-  const reusable=new Map();
   for(const sign of meta.signs){
     const b=sign.bounds,dx=b[0][1]-b[0][0],dy=b[1][1]-b[1][0],dz=b[2][1]-b[2][0];
     const xFace=dx<dz;
@@ -57,29 +56,8 @@ export function addStationDetails(scene,meta){
     poster.name='Glazed destination poster '+i;poster.position.set(26.16+i*1.48,1.53,-4.856);group.add(poster);
   }
 
-  const tactileMap=artwork(256,256,(ctx,w,h)=>{
-    ctx.fillStyle='#c3a240';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#8d7635';ctx.lineWidth=3;ctx.strokeRect(1,1,w-2,h-2);
-    for(let x=24;x<w;x+=42)for(let y=24;y<h;y+=42){ctx.fillStyle='#877334';ctx.beginPath();ctx.arc(x+2,y+3,10,0,Math.PI*2);ctx.fill();ctx.fillStyle='#dfbd59';ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();}
-  });
-  const ribs=artwork(256,256,(ctx,w,h)=>{
-    ctx.fillStyle='#baa04a';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#8b773d';ctx.lineWidth=2;ctx.strokeRect(1,1,w-2,h-2);
-    for(let x=20;x<w;x+=43){ctx.fillStyle='#8d7739';ctx.fillRect(x+3,13,17,232);ctx.fillStyle='#d9ba5d';ctx.fillRect(x,10,17,232);ctx.fillStyle='#e2c971';ctx.fillRect(x,10,3,232);}
-  });
-  function floorPatch(position,width,length,map,rotation=0){
-    const key=`${map.uuid}:${width}:${length}`;
-    let mat=reusable.get(key);if(!mat){const t=map.clone();t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(width/.3,length/.3);t.needsUpdate=true;
-      mat=new THREE.MeshStandardMaterial({map:t,roughness:.73,metalness:0,polygonOffset:true,polygonOffsetFactor:-2});reusable.set(key,mat);}
-    const plane=new THREE.Mesh(new THREE.PlaneGeometry(width,length),mat);plane.rotation.set(-Math.PI/2,0,rotation);
-    plane.position.set(position.x,position.y,-position.z);plane.receiveShadow=true;group.add(plane);
-  }
-  for(const landing of meta.landings){
-    const angle=-Math.atan2(landing.uphill.x,landing.uphill.z);
-    floorPatch(landing.position,landing.width,.3,tactileMap,angle);
-  }
-  // A restrained tactile spine makes the public entrance legible. Locations
-  // are photo-guided within the retained floor, not an accessibility survey.
-  floorPatch({x:0,y:.004,z:-5},.3,38,ribs);
-  floorPatch({x:8.5,y:.004,z:4},.3,17,ribs,Math.PI/2);
-  floorPatch({x:0,y:.006,z:4},.6,.6,tactileMap);
-  return {group,stats:{signFaces:meta.signs.length,posters:2,warningPads:meta.landings.length,...meta.counts}};
+  // K010 bases (floor + 0.1 mm) and 5 mm raised contact profiles now come
+  // from the canonical station mesh. Painted +3/+4/+6 mm overlays would
+  // cover that relief. Keep those meshes and their native layout paired.
+  return {group,stats:{signFaces:meta.signs.length,posters:2,warningPads:0,tactileSource:'canonical station mesh',...meta.counts}};
 }
