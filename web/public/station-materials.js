@@ -50,8 +50,13 @@ export function createStationTextures(renderer){
   return {stoneColor,stoneSurface,steelSurface,textures,bytesWithMipmaps:Math.round((size*size*8+n*n*4)*4/3),dispose(){textures.forEach(t=>t.dispose());}};
 }
 
+// These separately authored fixture palettes include products, sculpture, signs
+// and emissive shop trim. Generic station finishes must not reinterpret them.
+export const isAuthoredStationFixture=name=>/^k02[5789][- ]/i.test(name);
+
 // Ordered, explicit recognition covers current exports AND retained old names.
 export function stationMaterialFamily(name){
+  if(isAuthoredStationFixture(name))return null;
   if(/tactile|nosing.*yellow|lettering|sign|indicator|diffuser|lens|lamp|poster|information/i.test(name))return null;
   if(/Garden guard glazing|Shop window glazing|Glass -/i.test(name))return 'guard';
   if(/Reflective facade glazing|North courtyard coated glazing/i.test(name))return 'facade';

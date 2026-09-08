@@ -5,7 +5,11 @@ function artwork(width,height,paint){
   const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;
 }
 // Original procedural artwork and exact registrations; audit: web/station/wayfinding/README.md.
-export const wayfindingLayout='7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775';
+export const wayfindingLayout='485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d';
+// Both exports retain the audited sign faces and wall anchors. Historical650
+// predates this registration and must not receive these fixed-position overlays.
+const registeredLayouts=new Set([wayfindingLayout,'7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775']);
+export const hasStationWayfinding=layout=>registeredLayouts.has(layout);
 export const wayfindingFont='"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans CJK JP", "Noto Sans JP", Arial, sans-serif';
 const font=wayfindingFont;
 // Facing is the outward normal in native coordinates (+X east, +Z north).
@@ -59,8 +63,8 @@ function labelTexture(registration,width,height){
 
 export function addStationDetails(scene,meta){
   const group=new THREE.Group();group.name='Atrium signs and flush floor finishes';scene.add(group);
-  // Never apply today's registration or fixed poster positions to an archived bundle.
-  if(meta.sourceLayoutSha256!==wayfindingLayout)return {group,stats:{signFaces:0,posters:0,wayfinding:'unregistered layout'}};
+  // Retain verified registrations on matching current or historical geometry only.
+  if(!hasStationWayfinding(meta.sourceLayoutSha256))return {group,stats:{signFaces:0,posters:0,wayfinding:'unregistered layout'}};
   const seen=new Set(),textures=[];let signFaces=0;
   for(const registration of wayfindingRegistrations){
     if(!registration.rows.length||seen.has(registration.id))continue;

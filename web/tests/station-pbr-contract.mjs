@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {readFile,open} from 'node:fs/promises';
+import {readFile,open,mkdir} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import * as THREE from 'three';
@@ -47,5 +47,6 @@ for(const bundle of Object.values(registry.layouts))for(const asset of Object.va
 }
 assert.equal(hash(await readFile('runtime/station-layout.json')),JSON.parse(await readFile('web/public/assets/station.json','utf8')).layoutSha256,'current browser/native layout identity');
 textures.dispose();reflections.dispose();
+await mkdir('artifacts/station-detail/photorealism',{recursive:true});
 await (await import('node:fs/promises')).writeFile('artifacts/station-detail/photorealism/material-audit.json',JSON.stringify({audits,generatedTextureBytes:textures.bytesWithMipmaps,archives:'all six byte-identical'},null,2));
 console.log('PASS current/historical family mapping, original map preservation, physical data textures, fixed shadows and light pool, archived/current geometry bytes');
