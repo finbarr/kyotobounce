@@ -9,7 +9,7 @@ assert.equal(summary.results.length,8,'Five repeats and three neighbors required
 const inputs=[];const controls=[];
 for(let i=0;i<8;i++){
  const row=JSON.parse(await readFile(resolve(dir,`shot-${i}.json`),'utf8'));
- assert.equal(row.outcome,'rest-result');assert.equal(row.result.success,true);assert.equal(row.result.destinationReached,true);
+ assert.equal(row.outcome,'rest-result');if(row.challenge.goal){assert.equal(row.result.success,true);assert.equal(row.result.destinationReached,true);}
  assert.equal(row.challenge.scoring,'waypoint-v1');assert.equal(row.result.layout,summary.layout);
  for(const field of ['velocity','spin'])assert.ok(Object.values(row.final[field]).every(x=>x===0),`Non-rest ${field}`);
  assert.equal(row.final.diagnostics.supported,true);

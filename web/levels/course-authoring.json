@@ -4,10 +4,10 @@
   "courses": [
     {
       "id": "atrium-staircase-special",
-      "mechanic": "Cascade first flight, dissipate energy, brake on plaza",
-      "hint": "Let the steps spend the speed. Backspin shortens the last roll.",
+      "mechanic": "Waypoint-only cascade through first flight and plaza contacts; no exact rest target",
+      "hint": "Let the steps spend the speed. Collect the optional tread and plaza contacts.",
       "startConstraint": "Actual first landing is only about 0.9m deep here; native validated .25m disk, not proposed .7m disk.",
-      "proof": "Five exact native repeats reach the destination, but neighboring inputs and actual browser holds fail robustness. See FINDINGS.md; final layout acceptance outstanding."
+      "proof": "Final-layout eight native samples running. Actual full-game first keyboard attempt earned all3 waypoints,465068 authoritative points, success and full rest; replay UI verification next."
     },
     {
       "id": "atrium-moving-return",

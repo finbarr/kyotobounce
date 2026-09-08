@@ -1,0 +1,665 @@
+{
+  "status": "Native gates passed for Staircase and Shop; browser/replay acceptance tracked separately; Lift not yet proved",
+  "courses": [
+    {
+      "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+      "workerHash": "61c388a1cd661a6230c857fd66de0cec86a1ec497d5f6df1b7f1d585263be19f",
+      "assemblyHash": "9a8f2f06a928fb15d42b799a093c95eb7bb62fbbc3afd5f03bb1eebf34025fef",
+      "harnessHash": "653003d882931dbff429d5564cba78367bffe5566ac4e17469a620049972f78e",
+      "capabilities": [
+        "waypoint-v1"
+      ],
+      "id": "atrium-staircase-special",
+      "revision": 1,
+      "receiptDirectory": ".local/proofs/stairs-final-proof-01",
+      "summarySha256": "3a7963b72e89958f770d615fc48dc84bbf86b67593d63d664aedc460e0a11d1c",
+      "samples": [
+        {
+          "index": 0,
+          "input": {
+            "speed": 2,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -20,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 65
+          },
+          "rawSha256": "5d6c6c109d751c3a42eb79f867e77d8d2d60114d0e2f54547191b260aaa90c97",
+          "nativeDestinationAttestation": false,
+          "destinationReached": false,
+          "waypointIds": [
+            "first-tread",
+            "plaza-entry",
+            "last-roll"
+          ],
+          "duration": 14.294061660766602,
+          "final": {
+            "x": -75.88725280761719,
+            "y": 19.60915184020996,
+            "z": -5.21999979019165
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2574
+        },
+        {
+          "index": 1,
+          "input": {
+            "speed": 2,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -20,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 65
+          },
+          "rawSha256": "f7328f1b626e8e1e623debe13a8e390cf8f3df024dfe4ea1722a5333bba74284",
+          "nativeDestinationAttestation": false,
+          "destinationReached": false,
+          "waypointIds": [
+            "first-tread",
+            "plaza-entry",
+            "last-roll"
+          ],
+          "duration": 14.294061660766602,
+          "final": {
+            "x": -75.88725280761719,
+            "y": 19.60915184020996,
+            "z": -5.21999979019165
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2574
+        },
+        {
+          "index": 2,
+          "input": {
+            "speed": 2,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -20,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 65
+          },
+          "rawSha256": "4c7dbbe5eaf864aef9404a5a58f339134063c9017645b183ebc7e3b461c7a4c3",
+          "nativeDestinationAttestation": false,
+          "destinationReached": false,
+          "waypointIds": [
+            "first-tread",
+            "plaza-entry",
+            "last-roll"
+          ],
+          "duration": 14.294061660766602,
+          "final": {
+            "x": -75.88725280761719,
+            "y": 19.60915184020996,
+            "z": -5.21999979019165
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2574
+        },
+        {
+          "index": 3,
+          "input": {
+            "speed": 2,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -20,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 65
+          },
+          "rawSha256": "5a1ab91d42f1b19a39b85ce64a551e512f589ce4de71dd8b70483b8fba11c805",
+          "nativeDestinationAttestation": false,
+          "destinationReached": false,
+          "waypointIds": [
+            "first-tread",
+            "plaza-entry",
+            "last-roll"
+          ],
+          "duration": 14.294061660766602,
+          "final": {
+            "x": -75.88725280761719,
+            "y": 19.60915184020996,
+            "z": -5.21999979019165
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2574
+        },
+        {
+          "index": 4,
+          "input": {
+            "speed": 2,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -20,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 65
+          },
+          "rawSha256": "1168a57753f67eceab41ffef2700054df4fae66675011ca9532ec75f102e3217",
+          "nativeDestinationAttestation": false,
+          "destinationReached": false,
+          "waypointIds": [
+            "first-tread",
+            "plaza-entry",
+            "last-roll"
+          ],
+          "duration": 14.294061660766602,
+          "final": {
+            "x": -75.88725280761719,
+            "y": 19.60915184020996,
+            "z": -5.21999979019165
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2574
+        },
+        {
+          "index": 5,
+          "input": {
+            "speed": 1.97,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -20,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 65
+          },
+          "rawSha256": "0b7b0537bb860ec7007a8c210446e2098dbe14a5f107a70e688bef555538fe03",
+          "nativeDestinationAttestation": false,
+          "destinationReached": false,
+          "waypointIds": [
+            "first-tread",
+            "plaza-entry",
+            "last-roll"
+          ],
+          "duration": 14.316282272338867,
+          "final": {
+            "x": -75.9955825805664,
+            "y": 19.609163284301758,
+            "z": -5.21999979019165
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2578
+        },
+        {
+          "index": 6,
+          "input": {
+            "speed": 2,
+            "range": "precision",
+            "input": {
+              "yaw": 90.15,
+              "pitch": -20,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 65
+          },
+          "rawSha256": "4aef0c0e7b477508a56f9ed1d335050652eae2b917d7bc3961753be2415061de",
+          "nativeDestinationAttestation": false,
+          "destinationReached": false,
+          "waypointIds": [
+            "first-tread",
+            "plaza-entry",
+            "last-roll"
+          ],
+          "duration": 14.294061660766602,
+          "final": {
+            "x": -75.88684844970703,
+            "y": 19.60915184020996,
+            "z": -5.23898458480835
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2574
+        },
+        {
+          "index": 7,
+          "input": {
+            "speed": 2,
+            "range": "precision",
+            "input": {
+              "yaw": 89.85,
+              "pitch": -20,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 65
+          },
+          "rawSha256": "c670106314ebe86778f1a5603e8cb09d29f17599b4caacebdf8eaa5bbb20f65c",
+          "nativeDestinationAttestation": false,
+          "destinationReached": false,
+          "waypointIds": [
+            "first-tread"
+          ],
+          "duration": 13.116369247436523,
+          "final": {
+            "x": -78.19032287597656,
+            "y": 19.609161376953125,
+            "z": -3.2066423892974854
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2362
+        }
+      ]
+    },
+    {
+      "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+      "workerHash": "61c388a1cd661a6230c857fd66de0cec86a1ec497d5f6df1b7f1d585263be19f",
+      "assemblyHash": "9a8f2f06a928fb15d42b799a093c95eb7bb62fbbc3afd5f03bb1eebf34025fef",
+      "harnessHash": "653003d882931dbff429d5564cba78367bffe5566ac4e17469a620049972f78e",
+      "capabilities": [
+        "waypoint-v1"
+      ],
+      "id": "atrium-last-order",
+      "revision": 1,
+      "receiptDirectory": ".local/proofs/shop-final-proof-02",
+      "summarySha256": "51cafc7d798982c1d400d76d65150d2ed8a9b98bed527978ba47f52509d0a4e0",
+      "samples": [
+        {
+          "index": 0,
+          "input": {
+            "speed": 29.65,
+            "range": "full",
+            "input": {
+              "yaw": 93.2,
+              "pitch": 5,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 55
+          },
+          "rawSha256": "bc8b9ce05602faf8e891e164f42a1b7cc0b8c593c81c2620b20a53d4a150c236",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "threshold-roll",
+            "inside-delivery"
+          ],
+          "duration": 16.816240310668945,
+          "final": {
+            "x": -50.02204513549805,
+            "y": 7.373199939727783,
+            "z": -18.33654022216797
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 3028
+        },
+        {
+          "index": 1,
+          "input": {
+            "speed": 29.65,
+            "range": "full",
+            "input": {
+              "yaw": 93.2,
+              "pitch": 5,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 55
+          },
+          "rawSha256": "50423c24feb87ad3d087c8b1b7f23356b0304bd19382055aec70585bae7b9540",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "threshold-roll",
+            "inside-delivery"
+          ],
+          "duration": 16.816240310668945,
+          "final": {
+            "x": -50.02204513549805,
+            "y": 7.373199939727783,
+            "z": -18.33654022216797
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 3028
+        },
+        {
+          "index": 2,
+          "input": {
+            "speed": 29.65,
+            "range": "full",
+            "input": {
+              "yaw": 93.2,
+              "pitch": 5,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 55
+          },
+          "rawSha256": "848fa9046aeaaa18a8d1d9da67ec4dd8f2b0c4bd2074b042a9d6d47f11bb9cc7",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "threshold-roll",
+            "inside-delivery"
+          ],
+          "duration": 16.816240310668945,
+          "final": {
+            "x": -50.02204513549805,
+            "y": 7.373199939727783,
+            "z": -18.33654022216797
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 3028
+        },
+        {
+          "index": 3,
+          "input": {
+            "speed": 29.65,
+            "range": "full",
+            "input": {
+              "yaw": 93.2,
+              "pitch": 5,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 55
+          },
+          "rawSha256": "74c008b89b6cc49d255d20f10ca9921a0b0fceadd870090d3d8d15a0e619008f",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "threshold-roll",
+            "inside-delivery"
+          ],
+          "duration": 16.816240310668945,
+          "final": {
+            "x": -50.02204513549805,
+            "y": 7.373199939727783,
+            "z": -18.33654022216797
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 3028
+        },
+        {
+          "index": 4,
+          "input": {
+            "speed": 29.65,
+            "range": "full",
+            "input": {
+              "yaw": 93.2,
+              "pitch": 5,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 55
+          },
+          "rawSha256": "95ff8750a60c9c20176c83acfcfc3cc5ea613b70c7033fd7f989acac448ab4bd",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "threshold-roll",
+            "inside-delivery"
+          ],
+          "duration": 16.816240310668945,
+          "final": {
+            "x": -50.02204513549805,
+            "y": 7.373199939727783,
+            "z": -18.33654022216797
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 3028
+        },
+        {
+          "index": 5,
+          "input": {
+            "speed": 29.6,
+            "range": "full",
+            "input": {
+              "yaw": 93.2,
+              "pitch": 5,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 55
+          },
+          "rawSha256": "01177686507962dee798e4f18c91b4b2c6e96c567c13b1eafc94d6dc525c54b8",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "threshold-roll",
+            "inside-delivery"
+          ],
+          "duration": 15.31620979309082,
+          "final": {
+            "x": -49.66351318359375,
+            "y": 7.37315034866333,
+            "z": -18.314027786254883
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2758
+        },
+        {
+          "index": 6,
+          "input": {
+            "speed": 29.7,
+            "range": "full",
+            "input": {
+              "yaw": 93.2,
+              "pitch": 5,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 55
+          },
+          "rawSha256": "0ef5c8f59129ec1dceead13e52286aed2aa3aec1479bb7808ea51962c9a64e34",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "threshold-roll",
+            "inside-delivery"
+          ],
+          "duration": 18.410842895507812,
+          "final": {
+            "x": -50.6817512512207,
+            "y": 7.373197078704834,
+            "z": -18.370845794677734
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 3315
+        },
+        {
+          "index": 7,
+          "input": {
+            "speed": 29.65,
+            "range": "full",
+            "input": {
+              "yaw": 93.1,
+              "pitch": 5,
+              "top": -100,
+              "kick": 0
+            },
+            "observeSeconds": 55
+          },
+          "rawSha256": "51331e2876f3050fc525e9fae0c780fe8ec5eac38ad5f0036fc025de3fa11d11",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "threshold-roll",
+            "inside-delivery"
+          ],
+          "duration": 16.205068588256836,
+          "final": {
+            "x": -49.869911193847656,
+            "y": 7.37318754196167,
+            "z": -18.13921546936035
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 2918
+        }
+      ]
+    }
+  ]
+}

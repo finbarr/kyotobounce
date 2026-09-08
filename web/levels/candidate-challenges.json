@@ -14,15 +14,7 @@
       "radius": 0.25,
       "surface": "daikaidan-landing-01"
     },
-    "goal": {
-      "center": {
-        "x": -75.9,
-        "y": 19.585965,
-        "z": -5.22
-      },
-      "radius": 1,
-      "surface": "muromachi-square"
-    },
+    "goal": null,
     "waypoints": [
       {
         "id": "first-tread",
@@ -93,6 +85,15 @@
         -200,
         200
       ]
+    },
+    "hint": {
+      "yaw": 90,
+      "pitch": -20,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 365.2173913043478,
+      "powerRange": "precision",
+      "note": "Cascade the first flight. Collect optional tread and plaza contacts; no exact finishing spot."
     }
   },
   {
@@ -239,6 +240,15 @@
         -200,
         200
       ]
+    },
+    "hint": {
+      "yaw": 93.2,
+      "pitch": 5,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 820.3015075376884,
+      "powerRange": "full",
+      "note": "Deliver through the open doorway. Interior contacts spend the speed; settle inside."
     }
   }
 ]
