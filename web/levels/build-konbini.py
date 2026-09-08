@@ -18,6 +18,10 @@ def mat(name,color,metal=0,rough=.5,emission=0):
  if emission:n.inputs['Emission Color'].default_value=(*color,1);n.inputs['Emission Strength'].default_value=emission
  return m
 materials={'stone':mat('Warm ivory tile',(.58,.54,.46)), 'wall':mat('Warm interior panels',(.72,.70,.64)), 'frame':mat('Brushed metal frames',(.29,.31,.31),.8,.3), 'glass':mat('Shop window glazing',(.11,.18,.17),.3,.15), 'green':mat('Green sign band',(.015,.32,.13),emission=.35), 'orange':mat('Orange sign band',(.9,.28,.025),emission=.35), 'red':mat('Red sign band',(.62,.025,.025),emission=.35), 'mat':mat('Receiving mat adaptation',(.16,.23,.2)), 'sign':mat('Ivory signage',(.9,.86,.7),emission=.3)}
+# Windows remain visibly distinct and solid, with translucent GLB glazing.
+materials['glass'].node_tree.nodes['Principled BSDF'].inputs['Alpha'].default_value=.32
+materials['glass'].diffuse_color=(.11,.18,.17,.32)
+materials['glass'].surface_render_method='DITHERED'
 boxes=[];decor=[]
 def box(name,u,y,v,w,h,d,material,physical='stone',collision=True):
  rec=dict(id='konbini-'+name,center=position(u,y,v),size=dict(x=w,y=h,z=d),yaw=cfg['inwardYaw'],material=physical,role='shop receiving interior' if name=='floor' else 'shop boundary',collision=collision)
@@ -33,8 +37,8 @@ for side in [-1,1]:
  # Visible closed side panes frame the open center; no glass collider spans doorway.
  panel=(w-dw)/2
  box('front-pane-'+str(side),side*(dw/2+panel/2),dh/2,0,panel,dh,t,'glass','glass')
- box('door-jamb-'+str(side),side*(dw/2+.04),dh/2,-.025,.08,dh,t+.05,'frame','metal')
-box('front-header',0,(h+dh)/2,0,w,h-dh,t,'frame','metal')
+ box('door-jamb-'+str(side),side*(dw/2+.04),dh/2,-.025,.08,dh,t+.05,'frame','steel')
+box('front-header',0,(h+dh)/2,0,w,h-dh,t,'frame','steel')
 box('ceiling',0,h+t/2,d/2,w,t,d,'wall')
 # Bands lie on the visible header; they are finish, not hidden collision geometry.
 for i,color in enumerate(['red','green','orange']):box('band-'+color,0,dh+.18+i*.13,-t/2-.012,w-.2,.09,.015,color,collision=False)

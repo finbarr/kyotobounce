@@ -27,11 +27,11 @@
       {
         "id": "first-tread",
         "center": {
-          "x": -81.68,
+          "x": -81.55,
           "y": 21.164912,
           "z": -5.22
         },
-        "radius": 0.11,
+        "radius": 0.1,
         "surface": "daikaidan-flight-01",
         "normal": {
           "x": 0,
@@ -42,11 +42,11 @@
       {
         "id": "plaza-entry",
         "center": {
-          "x": -78.8,
+          "x": -78.4,
           "y": 19.585965,
           "z": -5.22
         },
-        "radius": 0.3,
+        "radius": 0.2,
         "surface": "muromachi-square",
         "normal": {
           "x": 0,

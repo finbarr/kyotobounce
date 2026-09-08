@@ -1,0 +1,13 @@
+--- a/web/public/game.js
++++ b/web/public/game.js
+@@ -204,7 +204,9 @@
+       loader.loadAsync('/assets/atrium-detail.glb'),
+       fetch('/assets/atrium-detail.json').then(r=>r.json())
+     ]);
+-    station=atrium.scene;robotAsset=robot;$('loading-message').textContent='Preparing surfaces and camera…';
++    station=atrium.scene;
++    if(data.konbiniAsset)station.add((await loader.loadAsync(data.konbiniAsset)).scene);
++    robotAsset=robot;$('loading-message').textContent='Preparing surfaces and camera…';
+     // Hardware sits on existing surfaces. Keep it out of camera collision
+     // raycasts, just as the surface decals are, to avoid little camera jolts.
+     const hardwareScene=hardware.scene;scene.add(hardwareScene);
