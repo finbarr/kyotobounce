@@ -11,11 +11,11 @@ namespace Kyoto
     {
         [Serializable] public class Command
         {
-            public string type,id,request,powerRange;
+            public string type,id,request,powerRange,scoring;
             public float x,z,yaw,pitch,top,kick,power;
             public bool fast;
             public Vector3 origin,direction;public float radius;public string slot;
-            public BrowserDisk start,goal;public BrowserChallenge challenge;
+            public BrowserDisk start,goal;public BrowserWaypoint[] waypoints;public BrowserChallenge challenge;
         }
         [Serializable] public class PlayerState
         {
@@ -80,7 +80,7 @@ namespace Kyoto
             var obj=new GameObject("Authoritative ball");obj.transform.SetParent(gameObject.transform);
             obj.AddComponent<SphereCollider>();obj.AddComponent<Rigidbody>();ball=obj.AddComponent<BallBody>();
             ball.SetProfile(BallProfile.Phase2Default);state.profile=ball.Profile.id;state.radius=ball.Profile.radius_m;
-            ball.Impact+=RecordImpact;ball.SetPose(layout.spawn+Vector3.up*1.5f,Quaternion.identity);
+            ball.Impact+=RecordImpact;ball.Contact+=RecordWaypointContact;ball.SetPose(layout.spawn+Vector3.up*1.5f,Quaternion.identity);
             Handle(new Command{type="join",id=id});
         }
         void ActivateClock()=>StationMotion.SetAnalyticTime(gameObject.scene,stationTime);
@@ -161,7 +161,7 @@ namespace Kyoto
                 bool stopped=ball.Sleeping&&ball.Velocity.sqrMagnitude<1e-10f&&ball.AngularVelocity.sqrMagnitude<1e-10f;
                 sleepDwell=stopped?sleepDwell+BallBody.Step:0;
                 if(GoalStep())Finish(true,"Target settled");
-                else if(sleepDwell>.6f)Finish(false,"Ball stopped outside the goal");
+                else if(sleepDwell>.6f)Finish(false,activeChallenge?.goal==null?"Ball stopped":"Ball stopped outside the goal");
                 else if(ball.Body.position.y < -5)
                 {Note(owner.state.id,"Ball left the station. Attempt cancelled; no score awarded.");Reset();}
             }
@@ -222,7 +222,7 @@ namespace Kyoto
             if(recording)scorePoseCursor=replayPoses.Count;
             Send(state);
         }
-        public void Dispose(){ball.Impact-=RecordImpact;UnityEngine.Object.Destroy(gameObject);}
+        public void Dispose(){ball.Impact-=RecordImpact;ball.Contact-=RecordWaypointContact;UnityEngine.Object.Destroy(gameObject);}
     }
 }
 #endif

@@ -19,6 +19,7 @@ export class PhysicsWorker extends EventEmitter {
   socket: Socket | undefined;
   child: ChildProcess | undefined;
   ready = false;
+  capabilities:string[]=[];
   status = 'starting';
   statusMessage = 'Physics is starting.';
   requests = new Map<string,{resolve:(value:any)=>void;reject:(error:Error)=>void;timer:ReturnType<typeof setTimeout>}>();
@@ -83,7 +84,7 @@ export class PhysicsWorker extends EventEmitter {
         }
         if(message.type==='ready'){
           if(this.ready)continue;
-          clearTimeout(run.startupTimer);this.ready=true;
+          clearTimeout(run.startupTimer);this.ready=true;this.capabilities=Array.isArray(message.capabilities)?message.capabilities:[];
           console.log('Native physics ready',message.profile,String(message.layout).slice(0,12));
           this.setStatus('ready','Physics is ready.');
         }
@@ -128,7 +129,7 @@ export class PhysicsWorker extends EventEmitter {
   }
   private fail(run:Run,reason:string) {
     if(this.stopping||run!==this.run||run.failed)return;
-    run.failed=true;this.ready=false;clearTimeout(run.startupTimer);
+    run.failed=true;this.ready=false;this.capabilities=[];clearTimeout(run.startupTimer);
     this.rejectRequests('Physics interrupted. The unfinished action was cancelled.');
     this.socket=undefined;for(const socket of this.sockets)socket.destroy();
     this.emit('failure',reason);

@@ -1,7 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { randomUUID } from 'node:crypto';
 import type { Challenge,Guest,NativeResult } from './types.ts';
-import { withChallengeRules,SCORING_VERSION,THROW_MODEL,CHARGE_SECONDS,RECORDED_PHYSICS } from './types.ts';
+import { withChallengeRules,SCORING_VERSION,ACTIVE_SCORING,THROW_MODEL,CHARGE_SECONDS,RECORDED_PHYSICS } from './types.ts';
 import {throwSpeed,powerForSpeed} from './public/throw-power.js';
 export class Store {
  db:DatabaseSync;
@@ -50,7 +50,7 @@ export class Store {
  }
  upgradeScoring(){
   this.db.exec('BEGIN IMMEDIATE');
-  try{for(const c of this.list())if(c.scoring!==SCORING_VERSION)this.saveChallenge({...c,revision:c.revision+1,scoring:SCORING_VERSION,allowedInputs:{...withChallengeRules(c).allowedInputs!,chargeSeconds:CHARGE_SECONDS},hint:c.hint?{...c.hint,holdMs:Math.round(c.hint.holdMs*CHARGE_SECONDS/(c.allowedInputs?.chargeSeconds||1.2))}:undefined});this.db.exec('COMMIT');}
+  try{for(const c of this.list())if(!ACTIVE_SCORING.includes(c.scoring||''))this.saveChallenge({...c,revision:c.revision+1,scoring:SCORING_VERSION,allowedInputs:{...withChallengeRules(c).allowedInputs!,chargeSeconds:CHARGE_SECONDS},hint:c.hint?{...c.hint,holdMs:Math.round(c.hint.holdMs*CHARGE_SECONDS/(c.allowedInputs?.chargeSeconds||1.2))}:undefined});this.db.exec('COMMIT');}
   catch(error){this.db.exec('ROLLBACK');throw error;}
  }
  upgradePhysics(layout:string,physics:string){

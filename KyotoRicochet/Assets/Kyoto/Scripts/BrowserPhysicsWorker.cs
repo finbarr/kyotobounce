@@ -18,7 +18,7 @@ namespace Kyoto
         [Serializable] class Ready
         {
             public string type="ready",layout,profile,physics=BrowserSession.SimulationVersion;
-            public Vector3 spawn;public float radius;
+            public Vector3 spawn;public float radius;public string[] capabilities=new[]{"waypoint-v1"};
         }
         readonly ConcurrentQueue<BrowserSession.Command> commands=new ConcurrentQueue<BrowserSession.Command>();
         readonly Dictionary<string,BrowserSession> sessions=new Dictionary<string,BrowserSession>();
@@ -55,7 +55,7 @@ namespace Kyoto
                 {
                     string line;
                     while((line=input.ReadLine())!=null)
-                    {if(line.Length>8192)break;commands.Enqueue(JsonUtility.FromJson<BrowserSession.Command>(line));}
+                    {if(line.Length>65536)break;commands.Enqueue(JsonUtility.FromJson<BrowserSession.Command>(line));}
                 }
             }
             catch(Exception){}

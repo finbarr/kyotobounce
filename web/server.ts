@@ -60,7 +60,7 @@ const server = createServer(async (request,response) => {
     if (request.method==='HEAD') response.end();else createReadStream(path).on('error',()=>response.destroy()).pipe(response);
   } catch {if(!response.headersSent)response.writeHead(400);response.end('Invalid request');}
 });
-const wss=new WebSocketServer({server,maxPayload:4096,verifyClient:(info:{origin:string})=>connections.size<32&&(allowedOrigins.has(info.origin)||(!publicOrigin&&!info.origin))});
+const wss=new WebSocketServer({server,maxPayload:65536,verifyClient:(info:{origin:string})=>connections.size<32&&(allowedOrigins.has(info.origin)||(!publicOrigin&&!info.origin))});
 function send(socket:WebSocket,value:unknown){if(socket.bufferedAmount>8_000_000){socket.close(1013,'Connection too slow. Please reconnect.');return;}if(socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify(value));}
 function broadcast(value:unknown,sessionId?:string){for(const [socket,c]of connections)if(c.guest&&(!sessionId||c.id===sessionId))send(socket,value);}
 worker.on('message', message=>{
@@ -68,11 +68,12 @@ worker.on('message', message=>{
   if(message.type==='state')competition.state(message);
   if(message.type==='notice')competition.note(message);
   if(message.type==='impact')competition.impact(message);
+  if(message.type==='waypoint-hit')competition.waypoint(message);
   if(message.type==='ready'){workerFailure='';competition.ready(message).catch(error=>broadcast({type:'error',message:error.message}));}
   if(message.type==='result'){
     try{competition.result(message);}catch(error){competition.failed(message.id);broadcast({type:'error',message:`Result could not be saved: ${error instanceof Error?error.message:error}`},message.id);}return;
   }
-  broadcast(message,['state','notice','impact'].includes(message.type)?message.id:undefined);
+  broadcast(message,['state','notice','impact','waypoint-hit'].includes(message.type)?message.id:undefined);
 });
 worker.on('failure',message=>{workerFailure=message;console.error(new Date().toISOString(),message);competition.failed();});
 worker.on('status',message=>{

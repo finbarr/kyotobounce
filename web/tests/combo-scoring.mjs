@@ -46,3 +46,5 @@ const s=new Store(':memory:');try{
  assert.equal(JSON.stringify(s.challenge(oldCombo.id,1)),oldBody);assert.equal(JSON.stringify(s.replay('old-combo')),oldReplay);assert.equal(JSON.stringify(s.leaderboard(oldCombo)),oldBoard);assert.equal(s.leaderboard(current).length,0);
 }finally{s.close();}
 console.log('PASS million-point combos, repeated surfaces, chatter, swept tags, ring accuracy, post-entry movement/spin timer, rest, legacy stability, live/final parity and rules migration');
+
+await import('./waypoint-scoring.mjs');
