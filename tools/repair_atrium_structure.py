@@ -6,7 +6,7 @@ as JSON values. New colliders and preview overlay come from the same meshes.
 import argparse,bpy,json,sys,hashlib,math
 from pathlib import Path
 from mathutils import Vector
-p=argparse.ArgumentParser();p.add_argument('--issue',choices=['gaps'],required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--layout',type=Path,default=Path('runtime/station-layout.json'))
+p=argparse.ArgumentParser();p.add_argument('--issue',choices=['gaps','escalators'],required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--layout',type=Path,default=Path('runtime/station-layout.json'))
 a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);out=a.output.resolve()
 if out.exists():raise FileExistsError('Use a fresh candidate directory')
 out.mkdir(parents=True)
@@ -48,13 +48,28 @@ if a.issue=='gaps':
    points=[c+side*x+Vector((0,h,0))+u*z for x,h,z in [(-half,y-.035,z0),(-half,y-.035,z1),(-half,y+.002,z0),(-half,y+.002,z1),(half,y-.035,z0),(half,y-.035,z1),(half,y+.002,z0),(half,y+.002,z1)]]
    faces=[tuple(reversed(f))for f in [(0,1,3,2),(4,6,7,5),(0,4,5,1),(2,3,7,6),(0,2,6,4),(1,5,7,3)]]
    mesh(lane['id']+'-'+end+'-comb-transfer',[native(p)for p in points],faces,materials['Atrium | satin gate stainless steel'],'steel')
+elif a.issue=='escalators':
+ sys.path.insert(0,str(Path(__file__).resolve().parent))
+ from repair_escalator_ends import build
+ removed,envelopes=build(layout,mesh,materials)
+ (out/'envelopes.json').write_text(json.dumps(envelopes,indent=2)+'\n')
 bpy.context.view_layer.update()
 def export_panel(obj):
- me=obj.data;me.calc_loop_triangles();verts=[];normals=[];triangles=[]
+ me=obj.data;me.calc_loop_triangles();verts=[];normals=[];triangles=[];shared={}
+ # Preserve exact evaluated corner normals, but share equal corners instead
+ # of expanding every triangle. This keeps curved-rail candidates lightweight.
+ import numpy as np
+ positions=np.empty(len(me.vertices)*3,dtype=np.float32);me.vertices.foreach_get('co',positions);positions=positions.reshape((-1,3))
+ normal_data=np.empty(len(me.corner_normals)*3,dtype=np.float32);me.corner_normals.foreach_get('vector',normal_data);normal_data=normal_data.reshape((-1,3))
+ loops=np.empty(len(me.loops),dtype=np.int32);me.loops.foreach_get('vertex_index',loops)
  for t in me.loop_triangles:
   for li in reversed(t.loops):
-   pt=obj.matrix_world@me.vertices[me.loops[li].vertex_index].co;n=me.corner_normals[li].vector
-   verts.append(dict(zip('xyz',(pt.x,pt.z,pt.y))));normals.append(dict(zip('xyz',(n.x,n.z,n.y))));triangles.append(len(triangles))
+   vi=int(loops[li]);n=normal_data[li];key=(vi,*map(float,n))
+   index=shared.get(key)
+   if index is None:
+    index=len(verts);shared[key]=index;pt=positions[vi]
+    verts.append(dict(zip('xyz',map(float,(pt[0],pt[2],pt[1])))));normals.append(dict(zip('xyz',map(float,(n[0],n[2],n[1])))))
+   triangles.append(index)
  mat=obj.data.materials[0];rec=records.get(mat.name)
  if rec is None:raise ValueError('Material not present in canonical appearance records: '+mat.name)
  return {'id':obj.name,'material':obj['kyoto_physical'],'role':obj['kyoto_role'],'vertices':verts,'normals':normals,'triangles':triangles,'uv':[{'x':v['x']/2.4,'y':v['z']/2.4}for v in verts],'collision':obj['kyoto_collision'],'appearance':rec['id'],'finishes':[],'playerOnly':False,'ballStairs':False}
