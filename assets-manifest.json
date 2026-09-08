@@ -1,10 +1,10 @@
 {
-  "version": "assets-v2",
+  "version": "assets-v3",
   "license": "MIT",
   "archive": {
-    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v2/kyoto-assets-v2.tar.gz",
-    "bytes": 209823956,
-    "sha256": "314f099eb4f836e1f744cf9f38a5edab91e112ecefed65f189a1c823e5b32ad7"
+    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v3/kyoto-assets-v3.tar.gz",
+    "bytes": 302445432,
+    "sha256": "41b8bdfb46c9d66a0d1b1f149d263c29c0f173f122cdafcea2563a3faeae4912"
   },
   "files": {
     "web/public/assets/atrium-detail.glb": {
@@ -13,11 +13,11 @@
     },
     "web/public/assets/atrium-detail.json": {
       "bytes": 27455,
-      "sha256": "e1648dc55f97c6dc995965ef005a8e295dbc2af0d771afef2243494aceeabffe"
+      "sha256": "337c11a51defedff511c2efcf9c50d571d031c86192fec95d928712737406c1e"
     },
     "web/public/assets/atrium.glb": {
-      "bytes": 166133128,
-      "sha256": "5d6c9a08c0d2d418af65fd0b186dd54df61d83fb182ea6b5f1e37314a2bfae13"
+      "bytes": 176744696,
+      "sha256": "57756f3324ec6faf911431903baacc251d155df21ccb5af8537cfee6e169f0ac"
     },
     "web/public/assets/layouts/650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2/atrium-detail.glb": {
       "bytes": 2411184,
@@ -43,17 +43,41 @@
       "bytes": 1239920,
       "sha256": "a9bfbfd5aae6e943a785dcbe52c6753f876ea68ce6c74836e95c8e1426683cdd"
     },
+    "web/public/assets/layouts/7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775/atrium-detail.glb": {
+      "bytes": 5568348,
+      "sha256": "a4825e5adcadaeffd50c04642c7673b74780a6ac3115a455b5e7f0dc42c2a1a6"
+    },
+    "web/public/assets/layouts/7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775/atrium-detail.json": {
+      "bytes": 27455,
+      "sha256": "e1648dc55f97c6dc995965ef005a8e295dbc2af0d771afef2243494aceeabffe"
+    },
+    "web/public/assets/layouts/7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775/atrium.glb": {
+      "bytes": 166133128,
+      "sha256": "5d6c9a08c0d2d418af65fd0b186dd54df61d83fb182ea6b5f1e37314a2bfae13"
+    },
+    "web/public/assets/layouts/7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775/ori.glb": {
+      "bytes": 885204,
+      "sha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4"
+    },
+    "web/public/assets/layouts/7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775/station-layout.json": {
+      "bytes": 172047941,
+      "sha256": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775"
+    },
+    "web/public/assets/layouts/7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775/station.json": {
+      "bytes": 1245576,
+      "sha256": "79cd76de34385ba6535b3b06b9edf9d79b1a206e1b01c674c4aa45f201e5ab2b"
+    },
     "web/public/assets/ori.glb": {
       "bytes": 885204,
       "sha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4"
     },
     "web/public/assets/station.json": {
-      "bytes": 1245576,
-      "sha256": "79cd76de34385ba6535b3b06b9edf9d79b1a206e1b01c674c4aa45f201e5ab2b"
+      "bytes": 1257707,
+      "sha256": "6526580bc86831f56c03a648d4a498fefd75bc1acaa13d4d2e948f7acb7c783d"
     },
     "runtime/station-layout.json": {
-      "bytes": 172047941,
-      "sha256": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775"
+      "bytes": 175175864,
+      "sha256": "485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d"
     },
     "runtime/textures/174d2dd1ba175c20fde33781.png": {
       "bytes": 234110,
@@ -91,17 +115,21 @@
       "bytes": 223370,
       "sha256": "fbfd11801789ea10c69289576dc3339b92e79ac23b1471d7cb0ef04ea81a12a5"
     },
+    "runtime/textures/k028-seasons.png": {
+      "bytes": 25842,
+      "sha256": "36c7d9b2809527c97e0334dc67691182edf8629cf8b35431b0fbb3297f585501"
+    },
     "art-source/atrium/KyotoAtrium.blend": {
-      "bytes": 36029830,
-      "sha256": "5ecd5884db55ba85199b5577f135a94ff61c1d7a076a81ed8a161425a16049e4"
+      "bytes": 52094050,
+      "sha256": "c2d7d832496f2c4df2a53640ad4e767b445190e8e40e419c88c9eb2e1c7dbb2c"
     },
     "art-source/phase3/robot/ORI.blend": {
       "bytes": 418574,
       "sha256": "cd2de40ebd5b86fbdb0c4053bcc73be32129fec8b16d7fc9719f32854b9b0c62"
     },
     "art-source/phase3/atrium-detail/AtriumHardware.blend": {
-      "bytes": 1022788,
-      "sha256": "df519c2476fde6870db11073c087ffd8778cd64fb4bf23b587b845036afd5db8"
+      "bytes": 984313,
+      "sha256": "a58f55df5c9fd4c0ab58808e0610ef5c29200ca7194db709fdcdf63742417678"
     },
     "art-source/materials/stairs/EscalatorTreadColor.png": {
       "bytes": 386640,
