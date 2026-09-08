@@ -20,9 +20,9 @@ exports run on the station lane without simultaneous Unity imports.
 | Box | Branch | Initial work | Codex configuration | State |
 | --- | --- | --- | --- | --- |
 | [kyoto-robot](https://harbor-cloud-bce90a.at.boxhaven.dev) | fleet/robot-20260907 | K001, K002 | gpt-6-astra, medium effort, standard service | online; source delivered; cleanup complete |
-| [kyoto-camera](https://opal-cloud-4468d3.at.boxhaven.dev) | fleet/levels-20260908 | K019 playable courses; camera/capacity work delivered | gpt-6-astra, medium effort, standard service | online; agent executing |
+| [kyoto-camera](https://opal-cloud-4468d3.at.boxhaven.dev) | fleet/levels-20260908 | K019 playable courses; camera/capacity work delivered | gpt-6-astra, medium effort, standard service | online; source delivered; cleanup complete |
 | [kyoto-station](https://opal-ridge-d24d72.at.boxhaven.dev) | fleet/station-20260907 | K006 | gpt-6-astra, high effort, standard service | online; source delivered; cleanup complete |
-| [kyoto-physics](https://banana-orbit-9c461b.at.boxhaven.dev) | fleet/physics-20260907 | K007 | gpt-6-astra, high effort, standard service | online; agent executing |
+| [kyoto-physics](https://banana-orbit-9c461b.at.boxhaven.dev) | fleet/physics-20260907 | K007 | gpt-6-astra, high effort, standard service | online; source delivered; cleanup complete |
 | [kyoto-audio](https://golden-orbit-acc224.at.boxhaven.dev) | fleet/audio-20260907 | K013 | gpt-6-astra, low effort, standard service | online; K013/K018/K022 audio delivered and integrated |
 
 ## Queue
@@ -31,9 +31,9 @@ exports run on the station lane without simultaneous Unity imports.
 | --- | --- | --- | --- |
 | K001 | Robot gaze follows the bouncing ball with smooth, anatomically limited head motion; returns naturally to aiming; works during replays and preserves grip/release. | robot | verified; Mac rig/gaze/gait and actual native full-game checks pass |
 | K002 | Replace unnatural walking with a coherent carrying gait: grounded stance, reduced foot sliding, sensible backward/sideways motion, smooth starts/stops and no changes to authoritative movement. Verify video and collision boundaries. | robot | verified; Mac rig/gaze/gait and actual native full-game checks pass |
-| K003 | Flight camera begins aligned with the launch trajectory, smoothly follows the ball's direction with stable world-up and collision clearance, and yields immediately to manual mouse/orbit input until the next throw. Preserve the saved throw aim and replay/recall behavior. | camera | integrated; native/browser trajectory/manual/recall checks passed on Linux and Mac |
-| K004 | Diagnose kyotobounce.com lag using actual host and service evidence; distinguish CPU/memory/worker limits from browser or network cost. Prepare and verify a concrete capacity or code fix without production load tests or deployment. | coordinator; next free dev box for benchmark | capacity benchmark passed through16sessions; native cadence fix verified30Hz at1/16; no resize justified for measured workload |
-| K005 | Make the launch-speed/power control substantially smaller and unobtrusive at desktop and mobile sizes; preserve readable speed, ranges, charge feedback, keyboard access and existing controls. | camera | integrated; desktop/mobile Mac browser bounds and keyboard checks passed |
+| K003 | Flight camera begins aligned with the launch trajectory, smoothly follows the ball's direction with stable world-up and collision clearance, and yields immediately to manual mouse/orbit input until the next throw. Preserve the saved throw aim and replay/recall behavior. | camera | verified; native/browser trajectory/manual/recall checks passed on Linux and Mac |
+| K004 | Diagnose kyotobounce.com lag using actual host and service evidence; distinguish CPU/memory/worker limits from browser or network cost. Prepare and verify a concrete capacity or code fix without production load tests or deployment. | coordinator; camera capacity lane | capacity benchmark passed through16sessions; native cadence fix verified30Hz at1/16; no resize justified for measured workload |
+| K005 | Make the launch-speed/power control substantially smaller and unobtrusive at desktop and mobile sizes; preserve readable speed, ranges, charge feedback, keyboard access and existing controls. | camera | verified; desktop/mobile Mac browser bounds and keyboard checks passed |
 | K006 | Sustained Kyoto Station fidelity lane: first compare current art against reliable station references, prioritize visible omissions, and deliver a substantial first detail pass with before/after views and render-cost measurements. Keep exact collision/visual agreement; finish this bounded detail pass. | station | verified; matched final assets and actual Mac station views pass |
 | K007 | Priority: audit and repair unintended floor/landing gaps where balls escape below the station. Record coordinates and reproducible cases; preserve intentional voids, restore correct floors below them, and verify matching visual/collision geometry plus native throws/traversal. No invisible catch planes or arbitrary shot timeouts. | physics | matched final assets integrated; native gap/transfer proofs and preservation of repaired geometry pass |
 | K008 | Restore the missing upstairs garden: reference its location, elevation, access, planting, furniture and railings; author a separate candidate and integrate its walkable floor/collision through the structural owner. | station; physics integration | verified; final native traversal/floor/guard checks and Mac garden/access views pass |
@@ -42,22 +42,22 @@ exports run on the station lane without simultaneous Unity imports.
 | K011 | Escalator lower curved rails are visibly segmented, and steps protrude through the building bottom. Repair continuous rail geometry and contained tread entry/return paths, with matched collision, traversable landings and full-cycle evidence at both ends. | physics/structural, including escalators.js | verified;20lanes/40ends pass full-cycle/native transfer checks and final Mac views |
 | K012 | Shadow edges are jagged. Improve shadow-map coverage/filtering/bias with stable edges over gameplay areas; compare matched screenshots and frame cost, without blindly escalating GPU memory/resolution. | station/rendering | integrated and Mac moving-view checked; 16.6–16.7ms medians; atrium p99 remains noisier (24.2 vs18.8ms) |
 | K013 | Music is too repetitive. Add coherent original synthesized phrases/sections, evolving melody/rhythm/orchestration and smooth transitions over minutes; preserve audible gameplay cues, mute/unlock controls and bounded audio-node use. Capture before/after audio and browser checks. | audio | e031384 integrated; 192s music comparison,125s audio endurance and native browser evidence passed remotely |
-| K014 | Space advances to the next challenge from a completed-level result without releasing pointer lock. Preserve normal Space-to-throw, ignore key repeats/editable fields, prevent accidental multiple advances, and show the shortcut on the next-challenge action. Verify completion, retry and final-level behavior. | camera/control; narrow competition.js ownership added | integrated; actual Mac pointer-lock/Space/repeat/retry checks passed |
-| K015 | Priority: timer points stop accruing while a ball is still moving toward/in the goal center. Diagnose goal-contact/prediction/time-bonus freeze; keep accruing according to the corrected movement rule until true rest, preserve final authority and immutable old replay scores, and version changed scoring behavior. | dedicated scoring worktree; coordinator review | integrated in coordination branch; native and real-browser timer/result/replay checks passed; not deployed |
-| K016 | Concrete K007/K011 reproduction: ball falls through the TOP of the escalator on Catch the Lift. Reproduce with actual stage and varied release phases, repair upper comb/landing/side support and tread turnover, then verify continuous support at both ends through full cycles. | physics | baseline top-runout sinking reproduced; candidate passes four release phases, matching rays and walking; final course proof pending |
+| K014 | Space advances to the next challenge from a completed-level result without releasing pointer lock. Preserve normal Space-to-throw, ignore key repeats/editable fields, prevent accidental multiple advances, and show the shortcut on the next-challenge action. Verify completion, retry and final-level behavior. | camera/control; narrow competition.js ownership added | verified; actual Mac pointer-lock/Space/repeat/retry checks passed |
+| K015 | Priority: timer points stop accruing while a ball is still moving toward/in the goal center. Diagnose goal-contact/prediction/time-bonus freeze; keep accruing according to the corrected movement rule until true rest, preserve final authority and immutable old replay scores, and version changed scoring behavior. | dedicated scoring worktree; coordinator review | verified in coordination branch; native and real-browser timer/result/replay checks passed; not deployed |
+| K016 | Concrete K007/K011 reproduction: ball falls through the TOP of the escalator on Catch the Lift. Reproduce with actual stage and varied release phases, repair upper comb/landing/side support and tread turnover, then verify continuous support at both ends through full cycles. | physics | baseline top-runout sinking reproduced; candidate passes four release phases, matching rays and walking; native and actual browser course/replay checks pass |
 | K017 | Give the robot a coherent Japanese arcade/mecha/toy-robot identity with expressive face, strong silhouette and intentional color/material accents. Preserve rig/release/gaze/gait, verify actual browser views, and deliver original art as a candidate asset handoff if needed. | robot | verified; all three characters pass native full-game record, replay and interruption checks |
 | K018 | Bold pachinko/game-show spectacle: HUGE bouncing multiplier numbers on actual multiplier jumps, escalating scale/pitch/LED chase and rich bank/goal/result fanfares. Milestones must feel progressively more extreme. Maintain score authority, readable flight, audio controls and bounded resources; verify a real audiovisual chain, plus reduced-motion behavior. | audio and feedback visuals | e031384 and70bdb4e integrated; actual Mac classic and waypoint jackpot chains passed; route-miss celebration corrected |
-| K019 | Design and build better challenges around meaningful station spaces. First finite design pass: top deck to authentic station konbini plus two distinct routes; verify geography, throw feasibility and readable progression, gate final coordinates on detailed matched geometry, and publish only new challenge revisions. | kyoto-camera levels worktree; station/physics handoffs | final7dcbc8 layout supplied; staircase waypoint-only, revised Lift and top-deck/shop courses undergoing actual completion/robustness checks |
+| K019 | Design and build better challenges around meaningful station spaces. First finite design pass: top deck to authentic station konbini plus two distinct routes; verify geography, throw feasibility and readable progression, gate final coordinates on detailed matched geometry, and publish only new challenge revisions. | kyoto-camera levels worktree; station/physics handoffs | verified; all24 native course samples and full-game completion/replay/retry pass; optional destination bonus misses keep waypoint points |
 | K020 | User screenshot shows striped doorway-threshold bleed and floor patches that flicker/stutter with camera movement. Identify actual overlapping geometry, depth precision, shadow or material cause; repair it and verify continuous movement at near/far views. Preserve matching structure and collision. | station/rendering; physics/camera handoffs if needed | verified; four coplanar triangles/.935947m² clipped; actual final Mac moving doorway views pass |
 | K021 | Lighting pops into existence inconsistently while moving and appears to cause stutter. Reproduce the current two-light pool's 0.4-second full-intensity reassignment, stabilize lighting with measured frame cost, and verify traversal plus clock/replay resets. | station/rendering | verified in actual native walk; 4 relocations while lit became 0; two-light count unchanged; clock rollback/fade checks pass |
 | K022 | New waypoint-v1 scoring: optional once-only surface waypoints and at most one optional destination. Preserve waypoint points when destination missed, add landing bonus, keep full native rest/authority and immutable classic replays. Author/play/replay both course forms; see WAYPOINT-SCORING.md. | local native/backend + browser worktrees; audio handoff | backend5796125 and UI63bebe5 integrated; rebuilt native suites plus actual Chrome editor/play/replay and delayed-placement checks passed; not deployed |
 | K023 | Three selectable original Japanese arcade robot characters with distinct silhouettes/personalities and high-score dances. Preserve identical physics/release/gait and replay compatibility, persist cosmetic choice, verify real record-driven celebrations and reset. | robot; browser integration | verified; actual records for all three characters, saved choice, replay suppression, reduced motion and desktop/mobile winner visibility pass |
-| K024 | Score/waypoint-driven ball heat: charged color/glow, fire/embers/trail, then extreme jackpot state. Synchronize with sound/multiplier spectacle; preserve physical core, visibility, timing and bounded render cost. | waypoint browser presentation + audio | integrated; actual native12.6m and combined169.8m stress shots, visible fire/bursts, replay resets and all tiers verified; not deployed |
+| K024 | Score/waypoint-driven ball heat: charged color/glow, fire/embers/trail, then extreme jackpot state. Synchronize with sound/multiplier spectacle; preserve physical core, visibility, timing and bounded render cost. | waypoint browser presentation + audio | verified; actual native12.6m and combined169.8m stress shots, visible fire/bursts, replay resets and all tiers verified; not deployed |
 
 ## Current findings
 
 - All five boxes have the source-compatible Linux worker and an active local game
-  service. Levels remain active; structural/station, audio and robot delivery and cleanup are complete. Final local render and changed-layout archive acceptance passed; final course startup remains.
+  service. All feature delivery and cleanup are complete. Final rendering, archive replay and existing/fresh course startup passed.
   Codex 0.153.3 uses persistent `boxhaven` tmux sessions, effort overrides and
   `service_tier=default`. Actual browser startup and throws passed on all five development previews.
 - No Unity authentication is currently blocking fleet work. The new waypoint
@@ -80,8 +80,8 @@ exports run on the station lane without simultaneous Unity imports.
   (July 2026) confirms several station 7-Eleven Heart-in shops, including the 2F
   west entrance. The West Exit2F shop is registered at the inferred model doorway(-54,7.35,-18).
   A new supported gallery connects the actual2F landing; native walk/contact checks
-  pass. A real top-deck shot enters and rests inside; final course robustness is
-  still being checked.
+  pass. A real top-deck shot enters and rests inside; all eight native samples pass. Actual browser delivery banked both waypoints;
+  its optional destination bonus was missed and its saved replay passed.
 
 - K009 Mac/Metal A/B: steady play dropped from15 backward steps/128 stalls
   to0/0; with injected120ms ordered packet delays, backward steps dropped33→0
@@ -132,12 +132,13 @@ exports run on the station lane without simultaneous Unity imports.
   ignored `.local/fleet/` directory in this coordination worktree. Future turns
   read this queue and live box status before assigning more work.
 
-- Cleanup: four completed local worktrees,67obsolete coordinator logs/setup files,
+- Cleanup: six completed local worktrees, superseded coordinator logs/setup files,
   old worker/import output and temporary benchmark services/databases removed.
   Robot removed110superseded files; audio48; station34; physics1.47GB of retired
   candidates. Required archive assets have one verified permanent copy.
   Retain reproducible source, compact final evidence and required immutable assets;
-  remove superseded candidates after their final replacements are verified.
+  superseded candidates and the completed remote levels/capacity worktrees are gone.
+  Only the current local4192review and five established public development previews remain.
 
 ## Final integration gates
 
@@ -153,7 +154,9 @@ that layout, using existing hints259ms/173ms and unchanged placements. Actual
 native rest and authoritative score/replay parity pass (41,424 /38,386 points).
 Read-only production history is6/6/8, unlike fresh local4/4/6. Catch the Lift's
 new definition must therefore use revision10; no existing revision is reused.
-Final existing/fresh startup and archived-replay checks follow the full course file.
+Production-like6/6/8, local4/4/6 and fresh startup/restart all select the exact
+five current courses. Historical raw challenge/replay/score rows remain unchanged;
+restart adds no challenge, attempt or migration rows.
 
 Final Mac station inspections passed at16.3–16.8ms median across eight views,
 with no asset/JavaScript errors. Original historical challenge/replay bytes and
@@ -167,6 +170,18 @@ The packaged dedicated Linux runtime passed an isolated1/16-session check at
 118.7ms; this does not establish production WAN or GPU performance. Test staging
 and processes were removed.
 
-Outstanding: final course definitions/browser proofs, existing/fresh startup,
-then refreshing the prepared runtime package with that course file. No production
-activation or asset release publication has been performed.
+All24 native course samples match the canonical physical definitions and proved
+numeric hints. Staircase Special completed/replayed with551,813points; Catch the
+Lift earned117,852points plus its landing bonus in the Mac browser. Last Order
+banked609,881points and both interior waypoints; its destination bonus was not
+earned. All three saved replay and retry flows passed.
+
+The prepared runtime package has238files. Only the final starter file and its
+browser build manifest changed after the Linux package run; all236other packaged
+files remain byte-identical. Asset originals, geometry and native workers are frozen.
+Current definitions have one source in web/starter-challenges.json; authoring
+helpers derive fixtures from that file and retain no duplicate catalog or seeder.
+
+Implementation and acceptance are complete. The local preview is
+http://127.0.0.1:4192. The prepared assets-v2 and Linux runtime packages remain
+local; no production deployment or asset release publication has been performed.

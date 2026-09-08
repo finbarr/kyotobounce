@@ -2,7 +2,7 @@
 
 Production definitions and hints have one source: `web/starter-challenges.json`. `proof-inputs.json` contains only the native sampling inputs for the three new/changed courses. The former candidate catalog, preview seeder, overlay loader and provisional journals have been removed.
 
-All three courses passed five identical native shots and three neighboring inputs on collision `7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775`. Normal browser completion, saved replay, scrub and retry also passed. Destinations are optional bonuses: Last Order's browser delivery collected both waypoints and banked609,881points without its destination bonus. Native samples separately proved the bonus is reachable. See [the final design](../../docs/LEVEL-DESIGN.md) and [delivery queue](../../docs/FLEET_QUEUE.md) for scope and verification limits.
+All three courses passed five identical native shots and three neighboring inputs on collision `7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775`. Normal browser completion, saved replay, scrub and retry also passed. Destinations are optional bonuses: Last Order's browser delivery collected both waypoints and banked 609,881 points without its destination bonus. Native samples separately proved the bonus is reachable. See [the final design](../../docs/LEVEL-DESIGN.md) and [delivery queue](../../docs/FLEET_QUEUE.md) for scope and verification limits.
 
 ## Native reproduction on Linux
 
@@ -29,7 +29,7 @@ Use a new output directory for each run. These are real charge/release and full 
 
 ## Browser reproduction on Linux
 
-Start a separate local game with `npm run dev -- 4284`, an explicit compatible `KYOTO_WORKER_EXECUTABLE`, and that worktree's own database/log. The helper uses Google Chrome at `/usr/bin/google-chrome` and only connects to localhost4284:
+Start a separate local game with `npm run dev -- 4284`, an explicit compatible `KYOTO_WORKER_EXECUTABLE`, and that worktree's own database/log. The helper uses Google Chrome at `/usr/bin/google-chrome` and only connects to localhost:4284:
 
 ```sh
 node web/levels/browser-proof.mjs 'Last Order' .local/browser/fresh 820.3015075376884,820.3015075376884
@@ -44,4 +44,4 @@ blender -b --python web/levels/build-konbini.py -- --output .local/konbini/fresh
 node web/levels/audit-konbini.mjs .local/konbini/fresh
 ```
 
-The builder creates an independent blend, GLB, collider records and preview. Ten solid meshes matched within2.36µm; nine doorway clearance samples passed. The canonical station includes this source and its supported gallery; no extra browser asset loader is needed. `konbini-registration.json` records source references, inferred model placement and gameplay adaptations. Geography and structural integration are documented in [LEVEL-DESIGN.md](../../docs/LEVEL-DESIGN.md) and [SHOP-INTEGRATION.md](../../tools/SHOP-INTEGRATION.md). Research images and generated binaries are excluded from Git.
+The builder creates an independent blend, GLB, collider records and preview. Ten solid meshes matched within 2.36 µm; nine doorway clearance samples passed. The canonical station includes this source and its supported gallery; no extra browser asset loader is needed. `konbini-registration.json` records source references, inferred model placement and gameplay adaptations. Geography and structural integration are documented in [LEVEL-DESIGN.md](../../docs/LEVEL-DESIGN.md) and [SHOP-INTEGRATION.md](../../tools/SHOP-INTEGRATION.md). Research images and generated binaries are excluded from Git.
