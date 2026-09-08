@@ -66,7 +66,7 @@ export function poseAvatar(a,player,phase,state,stationTime){
     }
   }
   for(let i=1;i<=3;i++)a.bones[`thumb${i}.R`].quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-.6*(1-opened)));
-  if(a.head)a.head.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-THREE.MathUtils.clamp(player.pitch*Math.PI/180,-.5,.7)*.6));
+  applyGaze(a,player,mode,state,stationTime);
   a.group.updateWorldMatrix(true,true);
   a.held.copy(grip);a.hand.localToWorld(a.held);
   if(mode==='Release'){
@@ -76,6 +76,27 @@ export function poseAvatar(a,player,phase,state,stationTime){
   }
   // Fade a robot that would otherwise fill the follow camera and hide the bounce.
   return a.held;
+}
+
+// Work in the sampled head frame, including the model, avatar heading and neck.
+// Always layer onto the restored animation pose, never last frame's correction.
+function applyGaze(a,player,mode,state,time){
+  if(!a.head)return;
+  const elapsed=a.gazeTime===undefined?0:time-a.gazeTime;
+  const reset=a.gazeTime===undefined||elapsed<0||elapsed>.5;a.gazeTime=time;
+  let yaw=0,pitch=-THREE.MathUtils.clamp(player.pitch*Math.PI/180,-.5,.7)*.6;
+  if(['Flight','Result'].includes(mode)&&state.ball&&[state.ball.x,state.ball.y,state.ball.z].every(Number.isFinite)){
+    a.group.updateWorldMatrix(true,true);
+    const direction=new THREE.Vector3(state.ball.x,state.ball.y,-state.ball.z).sub(worldPosition(a.head));
+    if(direction.lengthSq()>.01){
+      direction.applyQuaternion(a.head.getWorldQuaternion(new THREE.Quaternion()).invert());
+      yaw=THREE.MathUtils.clamp(Math.atan2(direction.x,direction.z),-1.15,1.15);
+      pitch=THREE.MathUtils.clamp(-Math.atan2(direction.y,Math.hypot(direction.x,direction.z)),-.65,.65);
+    }
+  }
+  const target=new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch,yaw,0,'YXZ'));
+  if(reset)a.gaze=target;else a.gaze.slerp(target,1-Math.exp(-10*Math.max(0,elapsed)));
+  a.head.quaternion.multiply(a.gaze);
 }
 
 // Distance-driven steps: walls and start-circle limits stop the feet as well as
