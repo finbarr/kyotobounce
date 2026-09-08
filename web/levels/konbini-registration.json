@@ -1,13 +1,13 @@
 {
   "id": "west-exit-heart-in",
-  "status": "candidate model registration; not surveyed; integration review required",
+  "status": "inferred model registration integrated with final station gallery; not surveyed",
   "evidence": {
     "operator": "https://www.dailyservice.co.jp/shop/detail/4828",
     "operatorIndex": "https://www.dailyservice.co.jp/shop/map?type=kyoto",
     "map": "https://www.jr-odekake.net/station/img/premises/0610116.pdf",
     "entrancePhoto": "https://tabelog.com/kyoto/A2601/A260101/26033019/",
     "verified": "Jan31 2026 JR flat map places shop icon immediately north/east of West Gate, by elevator E/stair8 and south/east of Kyo Navi; operator confirms 2F outside gates. Entrance photograph shows framed sliding glass/striped transom.",
-    "inferred": "Map has north downward. Shop appears on east side of north-south free passage, so candidate faces west (interior +X). Model threshold translation (-54,7.35,-18) aligns to west-2f circulation between west stair zone and east cafe mass; no doorway survey or exact map-to-model scale exists. Translation still requires structural review.",
+    "inferred": "Map has north downward. Shop appears on east side of north-south free passage, so candidate faces west (interior +X). Model threshold translation (-54,7.35,-18) aligns to west-2f circulation between west stair zone and east cafe mass; no doorway survey or exact map-to-model scale exists. Structural integration retained this transform and added a guarded gallery from the actual landing edge; geography remains model registration, not survey.",
     "adaptation": "Held-open doorway, simplified empty interior and receiving mat; no surveyed checkout or shelf claim."
   },
   "threshold": {

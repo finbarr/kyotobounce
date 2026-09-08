@@ -113,22 +113,22 @@
     },
     "goal": {
       "center": {
-        "x": 30.85,
+        "x": 29.8,
         "y": 5.5,
         "z": 6.153565
       },
-      "radius": 0.5,
+      "radius": 0.2,
       "surface": "east-ground-second-landing"
     },
     "waypoints": [
       {
         "id": "clean-dismount",
         "center": {
-          "x": 30.85,
+          "x": 29.8,
           "y": 5.5,
           "z": 6.153565
         },
-        "radius": 0.3,
+        "radius": 0.15,
         "surface": "east-ground-second-landing",
         "normal": {
           "x": 0,
@@ -160,6 +160,17 @@
         -200,
         200
       ]
+    },
+    "hint": {
+      "yaw": 90,
+      "pitch": -30,
+      "top": -50,
+      "kick": 0,
+      "holdMs": 486.95652173913044,
+      "powerRange": "precision",
+      "period": 0.7900353236922196,
+      "releasePhase": 0.2,
+      "note": "Ride the ascending lane. Stop on the clear stone before the tactile strip."
     }
   },
   {
@@ -179,11 +190,11 @@
     },
     "goal": {
       "center": {
-        "x": -50.9,
+        "x": -51.35,
         "y": 7.35,
         "z": -18
       },
-      "radius": 1.3,
+      "radius": 1.8,
       "surface": "konbini-floor"
     },
     "waypoints": [

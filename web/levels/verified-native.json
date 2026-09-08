@@ -1,5 +1,6 @@
 {
-  "status": "Native gates passed for Staircase and Shop; browser/replay acceptance tracked separately; Lift not yet proved",
+  "status": "All three native8 gates pass. Staircase and Lift browser/replay accepted; root owns final Shop browser/replay with destination optional.",
+  "browserRule": "Positive authoritative success, real waypoint/required route, full rest, persisted replay/scrub/retry; report destination bonus independently.",
   "courses": [
     {
       "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
@@ -11,6 +12,15 @@
       ],
       "id": "atrium-staircase-special",
       "revision": 1,
+      "hint": {
+        "yaw": 90,
+        "pitch": -20,
+        "top": -100,
+        "kick": 0,
+        "holdMs": 365.2173913043478,
+        "powerRange": "precision",
+        "note": "Cascade the first flight. Collect optional tread and plaza contacts; no exact finishing spot."
+      },
       "receiptDirectory": ".local/proofs/stairs-final-proof-01",
       "summarySha256": "3a7963b72e89958f770d615fc48dc84bbf86b67593d63d664aedc460e0a11d1c",
       "samples": [
@@ -36,6 +46,34 @@
             "last-roll"
           ],
           "duration": 14.294061660766602,
+          "releaseTime": 0.7222222397103906,
+          "chargeTime": 0.25555556174367666,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": -83.08000183105469,
+              "y": 21.716228485107422,
+              "z": -5
+            },
+            "release": {
+              "x": -82.66000366210938,
+              "y": 23.216228485107422,
+              "z": -5.21999979019165
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0,
+            "power": 0.1304347813129425,
+            "grounded": true
+          },
           "final": {
             "x": -75.88725280761719,
             "y": 19.60915184020996,
@@ -76,6 +114,34 @@
             "last-roll"
           ],
           "duration": 14.294061660766602,
+          "releaseTime": 15.966667053289711,
+          "chargeTime": 15.483333708252758,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": -83.08000183105469,
+              "y": 21.716228485107422,
+              "z": -5
+            },
+            "release": {
+              "x": -82.66000366210938,
+              "y": 23.216228485107422,
+              "z": -5.21999979019165
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0,
+            "power": 0.1304347813129425,
+            "grounded": true
+          },
           "final": {
             "x": -75.88725280761719,
             "y": 19.60915184020996,
@@ -116,6 +182,34 @@
             "last-roll"
           ],
           "duration": 14.294061660766602,
+          "releaseTime": 31.244445201009512,
+          "chargeTime": 30.766667411662638,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": -83.08000183105469,
+              "y": 21.716228485107422,
+              "z": -5
+            },
+            "release": {
+              "x": -82.66000366210938,
+              "y": 23.216228485107422,
+              "z": -5.21999979019165
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0,
+            "power": 0.1304347813129425,
+            "grounded": true
+          },
           "final": {
             "x": -75.88725280761719,
             "y": 19.60915184020996,
@@ -156,6 +250,34 @@
             "last-roll"
           ],
           "duration": 14.294061660766602,
+          "releaseTime": 46.56111223855987,
+          "chargeTime": 46.08889000490308,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": -83.08000183105469,
+              "y": 21.716228485107422,
+              "z": -5
+            },
+            "release": {
+              "x": -82.66000366210938,
+              "y": 23.216228485107422,
+              "z": -5.21999979019165
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0,
+            "power": 0.1304347813129425,
+            "grounded": true
+          },
           "final": {
             "x": -75.88725280761719,
             "y": 19.60915184020996,
@@ -196,6 +318,34 @@
             "last-roll"
           ],
           "duration": 14.294061660766602,
+          "releaseTime": 61.89444594318047,
+          "chargeTime": 61.40000148676336,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": -83.08000183105469,
+              "y": 21.716228485107422,
+              "z": -5
+            },
+            "release": {
+              "x": -82.66000366210938,
+              "y": 23.216228485107422,
+              "z": -5.21999979019165
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0,
+            "power": 0.1304347813129425,
+            "grounded": true
+          },
           "final": {
             "x": -75.88725280761719,
             "y": 19.60915184020996,
@@ -236,6 +386,34 @@
             "last-roll"
           ],
           "duration": 14.316282272338867,
+          "releaseTime": 77.083335199859,
+          "chargeTime": 76.61666852189228,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": -83.08000183105469,
+              "y": 21.716228485107422,
+              "z": -5
+            },
+            "release": {
+              "x": -82.66000366210938,
+              "y": 23.216228485107422,
+              "z": -5.21999979019165
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0,
+            "power": 0.12782607972621918,
+            "grounded": true
+          },
           "final": {
             "x": -75.9955825805664,
             "y": 19.609163284301758,
@@ -276,6 +454,34 @@
             "last-roll"
           ],
           "duration": 14.294061660766602,
+          "releaseTime": 92.33889112481847,
+          "chargeTime": 91.87222444685176,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": -83.08000183105469,
+              "y": 21.716228485107422,
+              "z": -5
+            },
+            "release": {
+              "x": -82.66057586669922,
+              "y": 23.216228485107422,
+              "z": -5.221098899841309
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90.14999389648438,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0,
+            "power": 0.1304347813129425,
+            "grounded": true
+          },
           "final": {
             "x": -75.88684844970703,
             "y": 19.60915184020996,
@@ -314,6 +520,34 @@
             "first-tread"
           ],
           "duration": 13.116369247436523,
+          "releaseTime": 107.53333593718708,
+          "chargeTime": 107.05000259215012,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": -83.08000183105469,
+              "y": 21.716228485107422,
+              "z": -5
+            },
+            "release": {
+              "x": -82.659423828125,
+              "y": 23.216228485107422,
+              "z": -5.218899726867676
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 89.85000610351562,
+            "pitch": -20,
+            "top": -100,
+            "kick": 0,
+            "power": 0.1304347813129425,
+            "grounded": true
+          },
           "final": {
             "x": -78.19032287597656,
             "y": 19.609161376953125,
@@ -342,10 +576,589 @@
       "capabilities": [
         "waypoint-v1"
       ],
+      "id": "atrium-moving-return",
+      "revision": 10,
+      "hint": {
+        "yaw": 90,
+        "pitch": -30,
+        "top": -50,
+        "kick": 0,
+        "holdMs": 486.95652173913044,
+        "powerRange": "precision",
+        "period": 0.7900353236922196,
+        "releasePhase": 0.2,
+        "note": "Ride the ascending lane. Stop on the clear stone before the tactile strip."
+      },
+      "receiptDirectory": ".local/proofs/lift-final-proof-01",
+      "summarySha256": "c971f05506d2bf27520b72f2aad6c238d017c17317892e11a5df23de0c512a2f",
+      "samples": [
+        {
+          "index": 0,
+          "input": {
+            "speed": 2.5,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -30,
+              "top": -50,
+              "kick": 0
+            },
+            "period": 0.7900353236922196,
+            "phase": 0.2,
+            "observeSeconds": 65
+          },
+          "rawSha256": "9780caf6e7c503c419fcf415788362abfb18cf6c1b972119528a6cb758a58979",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "clean-dismount"
+          ],
+          "duration": 28.79520606994629,
+          "releaseTime": 1.7944444878958166,
+          "chargeTime": 1.1888889176771045,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": 17.31999969482422,
+              "y": 0.024999944493174553,
+              "z": 6.373335838317871
+            },
+            "release": {
+              "x": 17.739999771118164,
+              "y": 1.524999976158142,
+              "z": 6.153336048126221
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0,
+            "power": 0.17391304671764374,
+            "grounded": true
+          },
+          "final": {
+            "x": 29.902172088623047,
+            "y": 5.52318811416626,
+            "z": 6.153340816497803
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 5184
+        },
+        {
+          "index": 1,
+          "input": {
+            "speed": 2.5,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -30,
+              "top": -50,
+              "kick": 0
+            },
+            "period": 0.7900353236922196,
+            "phase": 0.2,
+            "observeSeconds": 65
+          },
+          "rawSha256": "7c00020c78b4295b2381ca286d79683688ff59513910e07440e56c1946bcb6d9",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "clean-dismount"
+          ],
+          "duration": 28.61741065979004,
+          "releaseTime": 32.594445233698934,
+          "chargeTime": 31.994445219170302,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": 17.31999969482422,
+              "y": 0.024999944493174553,
+              "z": 6.373335838317871
+            },
+            "release": {
+              "x": 17.739999771118164,
+              "y": 1.524999976158142,
+              "z": 6.153336048126221
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0,
+            "power": 0.17391304671764374,
+            "grounded": true
+          },
+          "final": {
+            "x": 29.88374900817871,
+            "y": 5.523089408874512,
+            "z": 6.153342247009277
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 5152
+        },
+        {
+          "index": 2,
+          "input": {
+            "speed": 2.5,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -30,
+              "top": -50,
+              "kick": 0
+            },
+            "period": 0.7900353236922196,
+            "phase": 0.2,
+            "observeSeconds": 65
+          },
+          "rawSha256": "64eaf4b167c51b44b618993e8c03db0e8171fcd9b5766c7f4c1d245ba7954708",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "clean-dismount"
+          ],
+          "duration": 28.95633316040039,
+          "releaseTime": 62.65000151703134,
+          "chargeTime": 62.05000150250271,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": 17.31999969482422,
+              "y": 0.024999944493174553,
+              "z": 6.373335838317871
+            },
+            "release": {
+              "x": 17.739999771118164,
+              "y": 1.524999976158142,
+              "z": 6.153336048126221
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0,
+            "power": 0.17391304671764374,
+            "grounded": true
+          },
+          "final": {
+            "x": 29.941728591918945,
+            "y": 5.523200511932373,
+            "z": 6.153340816497803
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 5213
+        },
+        {
+          "index": 3,
+          "input": {
+            "speed": 2.5,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -30,
+              "top": -50,
+              "kick": 0
+            },
+            "period": 0.7900353236922196,
+            "phase": 0.2,
+            "observeSeconds": 65
+          },
+          "rawSha256": "ddfdc18c22266e78649fd6ba2b72d377d2e38306229766e9f142906560ae60ea",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "clean-dismount"
+          ],
+          "duration": 28.77853775024414,
+          "releaseTime": 93.4388911514543,
+          "chargeTime": 92.84444669261575,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": 17.31999969482422,
+              "y": 0.024999944493174553,
+              "z": 6.373335838317871
+            },
+            "release": {
+              "x": 17.739999771118164,
+              "y": 1.524999976158142,
+              "z": 6.153336048126221
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0,
+            "power": 0.17391304671764374,
+            "grounded": true
+          },
+          "final": {
+            "x": 29.898778915405273,
+            "y": 5.523089408874512,
+            "z": 6.153398513793945
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 5181
+        },
+        {
+          "index": 4,
+          "input": {
+            "speed": 2.5,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -30,
+              "top": -50,
+              "kick": 0
+            },
+            "period": 0.7900353236922196,
+            "phase": 0.2,
+            "observeSeconds": 65
+          },
+          "rawSha256": "b028a1aa21ce44d12d5429efb791292117c383b681e47ecf9fb211b122b40141",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "clean-dismount"
+          ],
+          "duration": 28.467395782470703,
+          "releaseTime": 124.25555856432766,
+          "chargeTime": 123.65000299410895,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": 17.31999969482422,
+              "y": 0.024999944493174553,
+              "z": 6.373335838317871
+            },
+            "release": {
+              "x": 17.739999771118164,
+              "y": 1.524999976158142,
+              "z": 6.153336048126221
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0,
+            "power": 0.17391304671764374,
+            "grounded": true
+          },
+          "final": {
+            "x": 29.865022659301758,
+            "y": 5.523200511932373,
+            "z": 6.153350830078125
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 5125
+        },
+        {
+          "index": 5,
+          "input": {
+            "speed": 2.45,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -30,
+              "top": -50,
+              "kick": 0
+            },
+            "period": 0.7900353236922196,
+            "phase": 0.2,
+            "observeSeconds": 65
+          },
+          "rawSha256": "83d8863ec8498f26858e8317298dbfe61a64189eaa0a02c9131408c57102a647",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "clean-dismount"
+          ],
+          "duration": 28.884103775024414,
+          "releaseTime": 154.2722259578295,
+          "chargeTime": 153.6888926103711,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": 17.31999969482422,
+              "y": 0.024999944493174553,
+              "z": 6.373335838317871
+            },
+            "release": {
+              "x": 17.739999771118164,
+              "y": 1.524999976158142,
+              "z": 6.153336048126221
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0,
+            "power": 0.16956521570682526,
+            "grounded": true
+          },
+          "final": {
+            "x": 29.928274154663086,
+            "y": 5.523123264312744,
+            "z": 6.1534199714660645
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 5200
+        },
+        {
+          "index": 6,
+          "input": {
+            "speed": 2.55,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -30,
+              "top": -50,
+              "kick": 0
+            },
+            "period": 0.7900353236922196,
+            "phase": 0.2,
+            "observeSeconds": 65
+          },
+          "rawSha256": "da55e0880eaddb2a8345f569069ac9e27b9db5ae95bf345ae8d45fd695fe8dfd",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "clean-dismount"
+          ],
+          "duration": 28.622966766357422,
+          "releaseTime": 185.08333781501278,
+          "chargeTime": 184.4666711334139,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": 17.31999969482422,
+              "y": 0.024999944493174553,
+              "z": 6.373335838317871
+            },
+            "release": {
+              "x": 17.739999771118164,
+              "y": 1.524999976158142,
+              "z": 6.153336048126221
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0,
+            "power": 0.17826086282730103,
+            "grounded": true
+          },
+          "final": {
+            "x": 29.87434196472168,
+            "y": 5.52315092086792,
+            "z": 6.1533403396606445
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 5153
+        },
+        {
+          "index": 7,
+          "input": {
+            "speed": 2.5,
+            "range": "precision",
+            "input": {
+              "yaw": 90,
+              "pitch": -30,
+              "top": -50,
+              "kick": 0
+            },
+            "period": 0.7900353236922196,
+            "phase": 0.25,
+            "observeSeconds": 65
+          },
+          "rawSha256": "f613c48ce609a26690ccb37a22d56d6fc85726ff0b452a82514f31b0e6cbf90c",
+          "nativeDestinationAttestation": true,
+          "destinationReached": true,
+          "waypointIds": [
+            "clean-dismount"
+          ],
+          "duration": 28.789649963378906,
+          "releaseTime": 215.1666718767956,
+          "chargeTime": 214.55000519519672,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "precision",
+            "feet": {
+              "x": 17.31999969482422,
+              "y": 0.024999944493174553,
+              "z": 6.373335838317871
+            },
+            "release": {
+              "x": 17.739999771118164,
+              "y": 1.524999976158142,
+              "z": 6.153336048126221
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 90,
+            "pitch": -30,
+            "top": -50,
+            "kick": 0,
+            "power": 0.17391304671764374,
+            "grounded": true
+          },
+          "final": {
+            "x": 29.928171157836914,
+            "y": 5.523200511932373,
+            "z": 6.153401851654053
+          },
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "spin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "supported": true,
+          "replayPoseCount": 5183
+        }
+      ]
+    },
+    {
+      "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+      "workerHash": "61c388a1cd661a6230c857fd66de0cec86a1ec497d5f6df1b7f1d585263be19f",
+      "assemblyHash": "9a8f2f06a928fb15d42b799a093c95eb7bb62fbbc3afd5f03bb1eebf34025fef",
+      "harnessHash": "653003d882931dbff429d5564cba78367bffe5566ac4e17469a620049972f78e",
+      "capabilities": [
+        "waypoint-v1"
+      ],
       "id": "atrium-last-order",
       "revision": 1,
-      "receiptDirectory": ".local/proofs/shop-final-proof-02",
-      "summarySha256": "51cafc7d798982c1d400d76d65150d2ed8a9b98bed527978ba47f52509d0a4e0",
+      "hint": {
+        "yaw": 93.2,
+        "pitch": 5,
+        "top": -100,
+        "kick": 0,
+        "holdMs": 820.3015075376884,
+        "powerRange": "full",
+        "note": "Deliver through the open doorway. Interior contacts spend the speed; settle inside."
+      },
+      "receiptDirectory": ".local/proofs/shop-final-proof-03",
+      "summarySha256": "4e5b79f27a2df9adad3f8b559c2f98841970f7ab3168c39bbad05ad4ec2f39d2",
       "samples": [
         {
           "index": 0,
@@ -360,7 +1173,7 @@
             },
             "observeSeconds": 55
           },
-          "rawSha256": "bc8b9ce05602faf8e891e164f42a1b7cc0b8c593c81c2620b20a53d4a150c236",
+          "rawSha256": "e770e617ad3bcad35e6169f5fb2af0df9a1f436fe5afafe099763d41f1ac1639",
           "nativeDestinationAttestation": true,
           "destinationReached": true,
           "waypointIds": [
@@ -368,6 +1181,34 @@
             "inside-delivery"
           ],
           "duration": 16.816240310668945,
+          "releaseTime": 1.1888889176771045,
+          "chargeTime": 0.25555556174367666,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "full",
+            "feet": {
+              "x": -158.0500030517578,
+              "y": 49.6109619140625,
+              "z": -12
+            },
+            "release": {
+              "x": -157.6429443359375,
+              "y": 51.1109619140625,
+              "z": -12.243102073669434
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 93.20001220703125,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0,
+            "power": 0.2929648160934448,
+            "grounded": true
+          },
           "final": {
             "x": -50.02204513549805,
             "y": 7.373199939727783,
@@ -399,7 +1240,7 @@
             },
             "observeSeconds": 55
           },
-          "rawSha256": "50423c24feb87ad3d087c8b1b7f23356b0304bd19382055aec70585bae7b9540",
+          "rawSha256": "7b3bf86a23acdb756b579c484495cf416303f0d9e09ad4d5e2bebb5fc5f78286",
           "nativeDestinationAttestation": true,
           "destinationReached": true,
           "waypointIds": [
@@ -407,6 +1248,34 @@
             "inside-delivery"
           ],
           "duration": 16.816240310668945,
+          "releaseTime": 19.388889358378947,
+          "chargeTime": 18.45555600244552,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "full",
+            "feet": {
+              "x": -158.0500030517578,
+              "y": 49.6109619140625,
+              "z": -12
+            },
+            "release": {
+              "x": -157.6429443359375,
+              "y": 51.1109619140625,
+              "z": -12.243102073669434
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 93.20001220703125,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0,
+            "power": 0.2929648160934448,
+            "grounded": true
+          },
           "final": {
             "x": -50.02204513549805,
             "y": 7.373199939727783,
@@ -438,7 +1307,7 @@
             },
             "observeSeconds": 55
           },
-          "rawSha256": "848fa9046aeaaa18a8d1d9da67ec4dd8f2b0c4bd2074b042a9d6d47f11bb9cc7",
+          "rawSha256": "eb117693200878ece835b98bed326ac66a931653d6de62ab97f8325047c12452",
           "nativeDestinationAttestation": true,
           "destinationReached": true,
           "waypointIds": [
@@ -446,6 +1315,34 @@
             "inside-delivery"
           ],
           "duration": 16.816240310668945,
+          "releaseTime": 37.60555646615103,
+          "chargeTime": 36.67777866590768,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "full",
+            "feet": {
+              "x": -158.0500030517578,
+              "y": 49.6109619140625,
+              "z": -12
+            },
+            "release": {
+              "x": -157.6429443359375,
+              "y": 51.1109619140625,
+              "z": -12.243102073669434
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 93.20001220703125,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0,
+            "power": 0.2929648160934448,
+            "grounded": true
+          },
           "final": {
             "x": -50.02204513549805,
             "y": 7.373199939727783,
@@ -477,7 +1374,7 @@
             },
             "observeSeconds": 55
           },
-          "rawSha256": "74c008b89b6cc49d255d20f10ca9921a0b0fceadd870090d3d8d15a0e619008f",
+          "rawSha256": "7915845fbeadd10febddb411fab13d5444c0cbb425501e324e121aa00ef8c35c",
           "nativeDestinationAttestation": true,
           "destinationReached": true,
           "waypointIds": [
@@ -485,6 +1382,34 @@
             "inside-delivery"
           ],
           "duration": 16.816240310668945,
+          "releaseTime": 55.80555690685287,
+          "chargeTime": 54.87222355091944,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "full",
+            "feet": {
+              "x": -158.0500030517578,
+              "y": 49.6109619140625,
+              "z": -12
+            },
+            "release": {
+              "x": -157.6429443359375,
+              "y": 51.1109619140625,
+              "z": -12.243102073669434
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 93.20001220703125,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0,
+            "power": 0.2929648160934448,
+            "grounded": true
+          },
           "final": {
             "x": -50.02204513549805,
             "y": 7.373199939727783,
@@ -516,7 +1441,7 @@
             },
             "observeSeconds": 55
           },
-          "rawSha256": "95ff8750a60c9c20176c83acfcfc3cc5ea613b70c7033fd7f989acac448ab4bd",
+          "rawSha256": "60a5edcbf4381a4f195dee1565001312792ba686dca8ef7cf8e43e959c6d918f",
           "nativeDestinationAttestation": true,
           "destinationReached": true,
           "waypointIds": [
@@ -524,6 +1449,34 @@
             "inside-delivery"
           ],
           "duration": 16.816240310668945,
+          "releaseTime": 74.02222401462495,
+          "chargeTime": 73.0944462143816,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "full",
+            "feet": {
+              "x": -158.0500030517578,
+              "y": 49.6109619140625,
+              "z": -12
+            },
+            "release": {
+              "x": -157.6429443359375,
+              "y": 51.1109619140625,
+              "z": -12.243102073669434
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 93.20001220703125,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0,
+            "power": 0.2929648160934448,
+            "grounded": true
+          },
           "final": {
             "x": -50.02204513549805,
             "y": 7.373199939727783,
@@ -555,7 +1508,7 @@
             },
             "observeSeconds": 55
           },
-          "rawSha256": "01177686507962dee798e4f18c91b4b2c6e96c567c13b1eafc94d6dc525c54b8",
+          "rawSha256": "d1c9281df282de8448b15c376ed49d2ac7c406b3d46fc798a736493bf936a600",
           "nativeDestinationAttestation": true,
           "destinationReached": true,
           "waypointIds": [
@@ -563,6 +1516,34 @@
             "inside-delivery"
           ],
           "duration": 15.31620979309082,
+          "releaseTime": 92.31111334636807,
+          "chargeTime": 91.3888911018148,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "full",
+            "feet": {
+              "x": -158.0500030517578,
+              "y": 49.6109619140625,
+              "z": -12
+            },
+            "release": {
+              "x": -157.6429443359375,
+              "y": 51.1109619140625,
+              "z": -12.243102073669434
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 93.20001220703125,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0,
+            "power": 0.2924623191356659,
+            "grounded": true
+          },
           "final": {
             "x": -49.66351318359375,
             "y": 7.37315034866333,
@@ -594,7 +1575,7 @@
             },
             "observeSeconds": 55
           },
-          "rawSha256": "0ef5c8f59129ec1dceead13e52286aed2aa3aec1479bb7808ea51962c9a64e34",
+          "rawSha256": "27e877783950c6f33ff895c998f90fc3e6624ee962b357a715388b92c05528fd",
           "nativeDestinationAttestation": true,
           "destinationReached": true,
           "waypointIds": [
@@ -602,6 +1583,34 @@
             "inside-delivery"
           ],
           "duration": 18.410842895507812,
+          "releaseTime": 109.03333597350866,
+          "chargeTime": 108.11111372895539,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "full",
+            "feet": {
+              "x": -158.0500030517578,
+              "y": 49.6109619140625,
+              "z": -12
+            },
+            "release": {
+              "x": -157.6429443359375,
+              "y": 51.1109619140625,
+              "z": -12.243102073669434
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 93.20001220703125,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0,
+            "power": 0.29346734285354614,
+            "grounded": true
+          },
           "final": {
             "x": -50.6817512512207,
             "y": 7.373197078704834,
@@ -633,7 +1642,7 @@
             },
             "observeSeconds": 55
           },
-          "rawSha256": "51331e2876f3050fc525e9fae0c780fe8ec5eac38ad5f0036fc025de3fa11d11",
+          "rawSha256": "bf01493c67236a317b74da17411fb8c434114b5c500db5c5f3232494794ecf06",
           "nativeDestinationAttestation": true,
           "destinationReached": true,
           "waypointIds": [
@@ -641,6 +1650,34 @@
             "inside-delivery"
           ],
           "duration": 16.205068588256836,
+          "releaseTime": 128.96111423382536,
+          "chargeTime": 128.0055586551316,
+          "thrower": {
+            "id": "k019-proof",
+            "powerRange": "full",
+            "feet": {
+              "x": -158.0500030517578,
+              "y": 49.6109619140625,
+              "z": -12
+            },
+            "release": {
+              "x": -157.64251708984375,
+              "y": 51.1109619140625,
+              "z": -12.242391586303711
+            },
+            "movement": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "walked": 0,
+            "yaw": 93.10000610351562,
+            "pitch": 5,
+            "top": -100,
+            "kick": 0,
+            "power": 0.2929648160934448,
+            "grounded": true
+          },
           "final": {
             "x": -49.869911193847656,
             "y": 7.37318754196167,
