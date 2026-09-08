@@ -20,15 +20,20 @@ try{
    const disk=(await worker.request({type:'place',id,slot:'start',radius:.25,origin:{x:s.start[0],y:s.start[1]+.1,z:s.start[2]},direction:{x:0,y:-1,z:0}})).disk;
    await worker.request({type:'select',id,challenge:{id:'structural-probe',start:disk,goal:{...disk,radius:.1},throwModel:'robot-v4',...s.challenge,layout:hash,physics:states.get(id).physics}});
    worker.send({type:'input',id,yaw:s.yaw??90,pitch:s.pitch??-65,top:s.top??0,kick:s.kick??0,x:0,z:0});await delay(150);
-   if(s.walk){
+   const checkpoints=[];
+   if(s.walk||s.walkRoute){
     await worker.request({type:'select',id,challenge:null});
-    for(let i=0;i<s.seconds*5;i++){worker.send({type:'input',id,yaw:s.yaw??90,pitch:0,x:0,z:1,fast:false});await delay(200);}
+    for(const leg of s.walkRoute??[{yaw:s.yaw??90,seconds:s.seconds}]){
+     for(let i=0;i<leg.seconds*5;i++){worker.send({type:'input',id,yaw:leg.yaw,pitch:0,x:0,z:1,fast:false});await delay(200);}
+     const feet=states.get(id).players[0].feet;checkpoints.push({feet,expected:leg.target});
+     if(leg.target&&Math.hypot(...'xyz'.split('').map((k,i)=>feet[k]-leg.target[i]))>(leg.tolerance??.45))throw Error('Walking checkpoint missed: '+JSON.stringify(checkpoints.at(-1)));
+    }
    }else{
     if(s.phase!==undefined){const period=s.period??.7900353236922196;const now=states.get(id).stationTime;const target=s.phase+Math.ceil((now+.5-s.phase)/period)*period;await delay(Math.max(0,(target-.22-now)*1000));}
     worker.send({type:'charge',id,powerRange:s.powerRange??'full'});await delay(100);worker.send({type:'release',id,power:s.power??0});await delay((s.seconds??6)*1000);
    }
    const trace=events.get(id),flight=trace.states.filter(v=>v.phase==='Flight'||v.phase==='Result');
-   const summary={id,start:disk,frames:flight.length,minBallY:flight.length?Math.min(...flight.map(v=>v.ball.y)):null,final:states.get(id),surfaces:[...new Set(trace.events.filter(e=>e.type==='impact').map(e=>e.surface))]};
+   const summary={id,start:disk,checkpoints,frames:flight.length,minBallY:flight.length?Math.min(...flight.map(v=>v.ball.y)):null,final:states.get(id),surfaces:[...new Set(trace.events.filter(e=>e.type==='impact').map(e=>e.surface))]};
    if(s.maxFeetX!==undefined&&summary.final.players[0].feet.x>s.maxFeetX)summary.failure='Walker did not traverse the repaired surface';
    if(s.minFeetY!==undefined&&summary.final.players[0].feet.y<s.minFeetY)summary.failure='Walker lost support';
    if(s.minY!==undefined&&summary.minBallY<s.minY)summary.failure='Ball crossed minimum support elevation';
