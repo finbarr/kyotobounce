@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import { mkdir,writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const out='artifacts/phase3/avatar-release';await mkdir(out,{recursive:true});
-const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']});
+const browser=await chromium.launch({executablePath:process.env.CHROME_EXECUTABLE||(process.platform==='linux'?'/usr/bin/google-chrome':'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),headless:true,args:process.platform==='linux'?['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']});
 try{
  const page=await browser.newPage();await page.goto('http://127.0.0.1:4173');
  const result=await page.evaluate(async()=>{
