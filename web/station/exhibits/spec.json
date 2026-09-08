@@ -1,0 +1,102 @@
+{
+  "task": "K029",
+  "placementStatus": "inferred boundary niches; combined transforms need coordinator review",
+  "references": {
+    "operator": "https://www.kyoto-station-building.co.jp/service/special_setting/",
+    "map": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/special_setting/img/img_aboutlegobrickarea_map.png",
+    "grand": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_eastsquare_02.jpg",
+    "upright": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/special_setting/img/img_ekipianowest.png",
+    "miniature": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/special_setting/img/img_aboutlegobrickarea_01.png",
+    "enclosure2019": "https://4travel.jp/dm_shisetsu_tips/13734319"
+  },
+  "reservedCore": {
+    "min": [
+      89,
+      33,
+      -13
+    ],
+    "max": [
+      109,
+      40,
+      6.5
+    ],
+    "note": "Conservative K029 exclusion for K027, not an assertion of K027 final bounds"
+  },
+  "exhibits": [
+    {
+      "id": "grand",
+      "origin": [
+        92.5,
+        34.62,
+        -16
+      ],
+      "bounds": [
+        [
+          -1.25,
+          0,
+          -1.35
+        ],
+        [
+          1.25,
+          1.08,
+          1.45
+        ]
+      ],
+      "area": "East Square 7F southwest boundary",
+      "floor": "east-court-garden-floor",
+      "clearance": "North approach z=-13.7; clear of escalator ends at z=-12.1/-10.5; outside proposed CORE"
+    },
+    {
+      "id": "upright",
+      "origin": [
+        -46.4,
+        7.35,
+        -19
+      ],
+      "bounds": [
+        [
+          -1.6,
+          0,
+          -0.72
+        ],
+        [
+          1.12,
+          1.95,
+          1.15
+        ]
+      ],
+      "area": "West Exit 2F south boundary in open strip between cafe and shop",
+      "floor": "west-2f-landing",
+      "clearance": "North approach z=-16.4; bounds x[-48.0,-45.28] outside shop/gallery x<=-48.25 and cafe x>=-45; no gate-facing extension"
+    },
+    {
+      "id": "miniature",
+      "origin": [
+        99,
+        34.62,
+        -16.7
+      ],
+      "bounds": [
+        [
+          -2.6,
+          0,
+          -0.67
+        ],
+        [
+          2.6,
+          1.75,
+          0.67
+        ]
+      ],
+      "area": "East Square 7F south boundary west of door frontage",
+      "floor": "east-court-garden-floor",
+      "clearance": "North viewing aisle z=-14.9; eastern edge x=101.6 stays west of curved entrance x>=102.9",
+      "modelDimensions": [
+        4.8,
+        0.72,
+        1.0
+      ]
+    }
+  ],
+  "dimensions": "Miniature 4.8 x 1.0 x 0.72m sourced. Piano, cabinet, screen and all world transforms are photo-informed estimates. Original simplified station architecture, not a copy of the LEGO model."
+}
