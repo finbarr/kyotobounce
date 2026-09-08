@@ -6,7 +6,7 @@ as JSON values. New colliders and preview overlay come from the same meshes.
 import argparse,bpy,json,sys,hashlib,math
 from pathlib import Path
 from mathutils import Vector
-p=argparse.ArgumentParser();p.add_argument('--issue',choices=['gaps','escalators','tactile','garden'],required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--garden-handoff',type=Path,default=Path('.local/fleet/garden-handoff'));p.add_argument('--metadata',type=Path,default=Path('web/public/assets/atrium-detail.json'));p.add_argument('--layout',type=Path,default=Path('runtime/station-layout.json'))
+p=argparse.ArgumentParser();p.add_argument('--issue',choices=['gaps','escalators','tactile','garden','shop'],required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--shop-handoff',type=Path,default=Path('.local/fleet/konbini-handoff'));p.add_argument('--garden-handoff',type=Path,default=Path('.local/fleet/garden-handoff'));p.add_argument('--metadata',type=Path,default=Path('web/public/assets/atrium-detail.json'));p.add_argument('--layout',type=Path,default=Path('runtime/station-layout.json'))
 a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);out=a.output.resolve()
 if out.exists():raise FileExistsError('Use a fresh candidate directory')
 out.mkdir(parents=True)
@@ -59,12 +59,18 @@ elif a.issue=='tactile':
  patches=build(layout,mesh,materials,a.metadata)
  records={m['label']:m for m in layout['authoredMaterials']}
  (out/'tactile-profile.json').write_text(json.dumps(patches,indent=2)+'\n')
-else:
+elif a.issue=='garden':
  sys.path.insert(0,str(Path(__file__).resolve().parent))
  from integrate_garden_candidate import build
  report=build(layout,mesh,box,materials,a.garden_handoff)
  records={m['label']:m for m in layout['authoredMaterials']}
  (out/'garden-integration.json').write_text(json.dumps(report,indent=2)+'\n')
+else:
+ sys.path.insert(0,str(Path(__file__).resolve().parent))
+ from integrate_konbini_candidate import build
+ report=build(layout,mesh,box,materials,a.shop_handoff)
+ records={m['label']:m for m in layout['authoredMaterials']}
+ (out/'shop-integration.json').write_text(json.dumps(report,indent=2)+'\n')
 bpy.context.view_layer.update()
 def export_panel(obj):
  me=obj.data;me.calc_loop_triangles();verts=[];normals=[];triangles=[];shared={}

@@ -2,12 +2,17 @@
 The source blend is read-only. Collision and moving-lane definitions stay in Unity.
 """
 from pathlib import Path
-import bpy,json,math,hashlib
+import bpy,json,math,hashlib,argparse,sys
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[1]
-SOURCE=ROOT/'art-source/atrium/KyotoAtrium.blend'
-LAYOUT=ROOT/'runtime/station-layout.json'
-OUT=ROOT/'web/public/assets';OUT.mkdir(parents=True,exist_ok=True)
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--source',type=Path,default=ROOT/'art-source/atrium/KyotoAtrium.blend')
+parser.add_argument('--layout',type=Path,default=ROOT/'runtime/station-layout.json')
+parser.add_argument('--output',type=Path)
+args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+SOURCE=args.source.resolve();LAYOUT=args.layout.resolve()
+OUT=(args.output or ROOT/'web/public/assets').resolve();OUT.mkdir(parents=True,exist_ok=True)
+REPORT=OUT/'atrium-export.json' if args.output else ROOT/'artifacts/phase3/art/export.json'
 bpy.ops.wm.open_mainfile(filepath=str(SOURCE));source_scene=bpy.context.scene
 layout=json.loads(LAYOUT.read_text());records={m['label']:m for m in layout['authoredMaterials']}
 def enable(layer):
@@ -15,6 +20,51 @@ def enable(layer):
  for child in layer.children:enable(child)
 enable(bpy.context.view_layer.layer_collection)
 source_scene.frame_set(1);bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
+# K020: only the two demonstrated doorway caps. Their covered portions are
+# coincident with west-south-floor-03; retain the exposed slab rim and all sides.
+# This removes duplicate visual coverage, not any real floor/contact surface.
+DOOR_CAPS={'west-south-substrate-2-2','west-south-slab-edge-3-2-2'}
+door_floor=source_scene.objects.get('west-south-floor-03')
+if door_floor is None:raise RuntimeError('K020 supporting floor is missing; review the structural candidate')
+fm=door_floor.evaluated_get(deps).to_mesh();fm.calc_loop_triangles();floor_triangles=[]
+for triangle in fm.loop_triangles:
+    pts=[door_floor.matrix_world@fm.vertices[i].co for i in triangle.vertices]
+    if (pts[1]-pts[0]).cross(pts[2]-pts[0]).z>1e-8 and max(v.z for v in pts)-min(v.z for v in pts)<1e-5:
+        floor_triangles.append(pts)
+door_floor.evaluated_get(deps).to_mesh_clear()
+cap_audit={'objects':sorted(DOOR_CAPS),'support':'west-south-floor-03','trianglesTrimmed':0,'coveredAreaM2':0}
+def planar_area(poly):
+    return abs(sum(a[0].x*b[0].y-b[0].x*a[0].y for a,b in zip(poly,poly[1:]+poly[:1])))*.5 if len(poly)>2 else 0
+
+def split_face(poly,a,b):
+    def distance(v):return (b.x-a.x)*(v[0].y-a.y)-(b.y-a.y)*(v[0].x-a.x)
+    inside=[];outside=[]
+    for v,w in zip(poly,poly[1:]+poly[:1]):
+        dv,dw=distance(v),distance(w)
+        (inside if dv>=0 else outside).append(v)
+        if (dv>=0)!=(dw>=0):
+            t=dv/(dv-dw)
+            at=(v[0].lerp(w[0],t),v[1].lerp(w[1],t),tuple(x+(y-x)*t for x,y in zip(v[2],w[2])))
+            inside.append(at);outside.append(at)
+    return inside,outside
+
+def visible_cap_fragments(name,vertices):
+    if name not in DOOR_CAPS or min(v[1].z for v in vertices)<.99:return [vertices]
+    original=planar_area(vertices);pieces=[vertices]
+    for floor_triangle in floor_triangles:
+        if max(abs(v[0].z-floor_triangle[0].z) for v in vertices)>.0001:continue
+        remaining=[]
+        for poly in pieces:
+            inside=poly
+            for a,b in zip(floor_triangle,floor_triangle[1:]+floor_triangle[:1]):
+                if len(inside)<3:break
+                inside,outside=split_face(inside,a,b)
+                if planar_area(outside)>1e-9:remaining.append(outside)
+        pieces=remaining
+    removed=original-sum(planar_area(poly) for poly in pieces)
+    if removed>1e-8:cap_audit['trianglesTrimmed']+=1;cap_audit['coveredAreaM2']+=removed
+    return pieces
+
 groups={};counts={'sourceObjects':0,'triangles':0,'skippedDynamic':0,'skippedProxies':0}
 for obj in list(source_scene.objects):
  if obj.type!='MESH':continue
@@ -34,18 +84,26 @@ for obj in list(source_scene.objects):
   label=original.name if original else 'Default stone'
   key=(label,cell)
   g=groups.setdefault(key,{'positions':[],'normals':[],'uv':[],'faces':[]})
-  base=len(g['positions']);span=float(records.get(label,{}).get('worldTextureSpan',0))
+  vertices=[];span=float(records.get(label,{}).get('worldTextureSpan',0))
   for li in (reversed(tri.loops) if flipped else tri.loops):
    pt=matrix@mesh.vertices[mesh.loops[li].vertex_index].co
    normal=(nm@mesh.corner_normals[li].vector).normalized()
-   g['positions'].append(tuple(pt));g['normals'].append(tuple(normal))
    if span>0:
     n=normal
     uv=(pt.x/span,pt.y/span) if abs(n.z)>.5 else (pt.y/span,pt.z/span) if abs(n.x)>.5 else (pt.x/span,pt.z/span)
    else:uv=tuple(uv_layer.data[li].uv) if uv_layer else (pt.x/2.4,pt.y/2.4)
-   g['uv'].append(uv)
-  g['faces'].append((base,base+1,base+2));counts['triangles']+=1
+   vertices.append((pt,normal,uv))
+  for polygon in visible_cap_fragments(obj.name,vertices):
+   for i in range(1,len(polygon)-1):
+    face=[polygon[0],polygon[i],polygon[i+1]]
+    if obj.name in DOOR_CAPS and (face[1][0]-face[0][0]).cross(face[2][0]-face[0][0]).length<1e-10:continue
+    base=len(g['positions'])
+    for pt,normal,uv in face:
+     g['positions'].append(tuple(pt));g['normals'].append(tuple(normal));g['uv'].append(uv)
+    g['faces'].append((base,base+1,base+2));counts['triangles']+=1
  e.to_mesh_clear()
+counts['doorCapDeduplication']=cap_audit
+assert cap_audit['trianglesTrimmed']>0, 'Expected K020 caps not found; review source revision'
 print('COLLECTED_BROWSER_ART',counts,'batches',len(groups),flush=True)
 scene=bpy.data.scenes.new('Browser export');bpy.context.window.scene=scene
 mats={}
@@ -79,11 +137,11 @@ for (label,cell),g in groups.items():
  mesh.normals_split_custom_set(g['normals'])
  obj=bpy.data.objects.new(name,mesh);scene.collection.objects.link(obj);mesh.materials.append(material(label))
  obj['source']='HumanScale05.blend';obj['sourceMaterial']=label
-bpy.ops.export_scene.gltf(filepath=str(OUT/'atrium.glb'),export_format='GLB',export_yup=True,export_animations=False,export_cameras=False,export_lights=False,export_extras=True,export_materials='EXPORT')
+bpy.ops.export_scene.gltf(filepath=str(OUT/'atrium.glb'),export_format='GLB',use_active_scene=True,export_yup=True,export_animations=False,export_cameras=False,export_lights=False,export_extras=True,export_materials='EXPORT')
 public={k:layout[k] for k in ['spawn','escalators','authoredLights','authoredMaterials']}
 public.update(layoutSha256=hashlib.sha256(LAYOUT.read_bytes()).hexdigest(),coordinateMapping='Unity (x,y,z) -> Three (x,y,-z)')
 (OUT/'station.json').write_text(json.dumps(public,separators=(',',':')))
 counts.update(batches=len(groups),materials=len(mats),glbBytes=(OUT/'atrium.glb').stat().st_size,sourceSha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),layoutSha256=public['layoutSha256'])
-(ROOT/'artifacts/phase3/art').mkdir(parents=True,exist_ok=True)
-(ROOT/'artifacts/phase3/art/export.json').write_text(json.dumps(counts,indent=2)+'\n')
+REPORT.parent.mkdir(parents=True,exist_ok=True)
+REPORT.write_text(json.dumps(counts,indent=2)+'\n')
 print('KYOTO_BROWSER_ART_READY',json.dumps(counts),flush=True)
