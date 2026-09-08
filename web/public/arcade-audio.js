@@ -1,7 +1,7 @@
 // Original 112 BPM arcade score: eight-bar phrases, arranged across a 32-phrase suite.
 export function arcadeAudio(){
  let ctx,master,musicBus,sfxBus,compressor,timer,next=0,step=0,charge=null,lastImpact=0,white,travel,travelGain,travelFilter;
- const cues={};
+ const cues={};let waypointRun=false;
  let prefs;try{prefs=JSON.parse(localStorage.getItem('kyoto-audio')||'null');}catch{}
  prefs={muted:false,music:true,...prefs};
  const tones=[0,3,5,7,10],root=57,beat=60/112/2;
@@ -92,7 +92,7 @@ export function arcadeAudio(){
   if(!ctx||ctx.state!=='running')return;const t=ctx.currentTime;cues[name]=(cues[name]||0)+1;
   if(name==='menu')tone(660,t,.055,.035,'square');
   if(name==='start'){[0,7,12].forEach((n,i)=>tone(notes(69+n),t+i*.055,.16,.07));}
-  if(name==='throw'){burst(t,.19,.14,2400,'highpass');tone(520,t,.21,.1,'sawtooth',sfxBus,65);tone(70,t,.14,.18,'sine',sfxBus,36);}
+  if(name==='throw'){waypointRun=false;burst(t,.19,.14,2400,'highpass');tone(520,t,.21,.1,'sawtooth',sfxBus,65);tone(70,t,.14,.18,'sine',sfxBus,36);}
   if(name==='impact'){
    if(t-lastImpact<.065)return;lastImpact=t;
    const speed=typeof value==='number'?value:value.speed,label=typeof value==='object'?`${value.surface} ${value.label}`.toLowerCase():'';
@@ -101,17 +101,19 @@ export function arcadeAudio(){
    if(metal||glass){for(const [i,ratio]of [1,1.48,2.12].entries())tone((glass?1850:680)*ratio,t,.14+i*.08,volume*.22/(i+1),'sine');}
    else tone(480,t,.035,volume*.2,'triangle',sfxBus,150);
   }
-  if(name==='bank'){
+  if(name==='bank'||name==='waypoint'){
+   if(name==='waypoint')waypointRun=true;
    duck();const mult=typeof value==='object'?value.multiplier:1+value*.75;
    const level=Math.min(6,Math.max(0,Math.floor(Math.log2(Math.max(1,mult))))),climb=Math.min(30,Math.round(9*Math.log2(Math.max(1,mult))));
-   const count=3+level,spacing=.065-level*.005;
+   const count=Math.min(9,(name==='waypoint'?5:3)+level),spacing=(name==='waypoint'?.055:.065)-level*.005;
    burst(t,.06,.065,3200);tone(92,t,.14,.12,'sine',sfxBus,45);
    for(let i=0;i<count;i++){
-    const f=notes(60+climb+[0,3,5,7,10,12,15,17,19][i]);
+    const f=notes((name==='waypoint'?65:60)+climb+[0,3,5,7,10,12,15,17,19][i]);
     tone(f,t+i*spacing,.24,.065,'triangle');tone(f*2.12,t+i*spacing,.13,.012,'sine');
    }
   }
-  if(name==='goal'){
+  if(name==='goal'||name==='destination'){
+   if(name==='destination')waypointRun=true;
    duck();burst(t,.28,.14,4800,'highpass');tone(82,t,.24,.24,'sine',sfxBus,38);
    [72,76,79,84,88,91,96].forEach((n,i)=>{tone(notes(n),t+i*.055,.42,.11,'triangle');tone(notes(n+12),t+i*.055+.02,.22,.025,'sine');});
    tone(1200,t+.22,.33,.035,'sine',sfxBus,3000);
@@ -119,6 +121,8 @@ export function arcadeAudio(){
    [0,1,2].forEach(i=>burst(t+.48+i*.12,.07,.045,4800));
   }
   if(name==='result'){
+   // A missed optional destination does not negate an earned waypoint chain.
+   if(waypointRun&&!['perfect','forfeit'].includes(value))value='tagged';waypointRun=false;
    duck();if(value==='perfect'||value==='tagged'){burst(t,.2,.1,3000);tone(90,t,.2,.18,'sine',sfxBus,38);}
    const line=value==='perfect'?[69,73,76,81,85]:value==='tagged'?[69,76,81,80]:value==='near'?[69,73,76]:[64,61,57];
    line.forEach((n,i)=>tone(notes(n),t+i*.095,i===line.length-1?.6:.18,.07,'triangle'));
