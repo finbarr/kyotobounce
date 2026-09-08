@@ -6,7 +6,7 @@ as JSON values. New colliders and preview overlay come from the same meshes.
 import argparse,bpy,json,sys,hashlib,math
 from pathlib import Path
 from mathutils import Vector
-p=argparse.ArgumentParser();p.add_argument('--issue',choices=['gaps','escalators'],required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--layout',type=Path,default=Path('runtime/station-layout.json'))
+p=argparse.ArgumentParser();p.add_argument('--issue',choices=['gaps','escalators','tactile'],required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--metadata',type=Path,default=Path('web/public/assets/atrium-detail.json'));p.add_argument('--layout',type=Path,default=Path('runtime/station-layout.json'))
 a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);out=a.output.resolve()
 if out.exists():raise FileExistsError('Use a fresh candidate directory')
 out.mkdir(parents=True)
@@ -53,6 +53,12 @@ elif a.issue=='escalators':
  from repair_escalator_ends import build
  removed,envelopes=build(layout,mesh,materials)
  (out/'envelopes.json').write_text(json.dumps(envelopes,indent=2)+'\n')
+else:
+ sys.path.insert(0,str(Path(__file__).resolve().parent))
+ from build_tactile_contact import build
+ patches=build(layout,mesh,materials,a.metadata)
+ records={m['label']:m for m in layout['authoredMaterials']}
+ (out/'tactile-profile.json').write_text(json.dumps(patches,indent=2)+'\n')
 bpy.context.view_layer.update()
 def export_panel(obj):
  me=obj.data;me.calc_loop_triangles();verts=[];normals=[];triangles=[];shared={}
