@@ -2,6 +2,8 @@ import { scoreAttempt,ComboTracker } from './scoring.ts';
 import { randomUUID } from 'node:crypto';
 import { Store } from './store.ts';
 import { PhysicsWorker } from './worker.ts';
+import type {LayoutAssets} from './layout-assets.ts';
+import {migrationInputs,migrateLayouts} from './layout-migration.ts';
 import type { Guest,Challenge,Disk,Waypoint,NativeResult } from './types.ts';
 import { SCORING_VERSION,WAYPOINT_SCORING,ACTIVE_SCORING,SUPPORTED_SCORING,THROW_MODEL,CHARGE_SECONDS,RECORDED_PHYSICS } from './types.ts';
 
@@ -10,11 +12,12 @@ export class Competition {
  store:Store;worker:PhysicsWorker;publish:(message:unknown,sessionId?:string)=>void;
  members=new Map<string,Member>();
  pending=new Map<string,{id:string;challenge:Challenge|null}>();
- layout='';physics='';animation='ori-carry-v2';
- constructor(store:Store,worker:PhysicsWorker,publish:(message:unknown,sessionId?:string)=>void){this.store=store;this.worker=worker;this.publish=publish;}
+ initializing=false;layout='';physics='';animation='ori-carry-v2';assets?:LayoutAssets;
+ constructor(store:Store,worker:PhysicsWorker,publish:(message:unknown,sessionId?:string)=>void,assets?:LayoutAssets){this.assets=assets;this.store=store;this.worker=worker;this.publish=publish;}
  session(m:Member){return {type:'session',id:m.id,busy:!!m.attempt,restoring:m.restoring,challenge:m.selected};}
  sync(m:Member){this.publish(this.session(m),m.id);}
- catalog(){return {type:'catalog',challenges:this.store.list()};}
+ playable(c:Challenge){return c.layout===this.layout&&c.physics===this.physics&&c.throwModel===THROW_MODEL&&ACTIVE_SCORING.includes(c.scoring||'')&&this.store.challenge(c.id)?.revision===c.revision;}
+ catalog(){return {type:'catalog',challenges:this.store.list().filter(c=>this.playable(c)),archived:this.store.revisions().filter(c=>!this.playable(c)).map(c=>({...c,archiveReason:this.store.layoutMigration(c.id,c.revision,this.layout,this.physics)?.reason||'Earlier station or rules revision',replayAssets:this.assets?.has(c.layout)||c.layout===this.layout}))};}
  board(m:Member){if(m.selected)this.publish({type:'leaderboard',challenge:m.selected,entries:this.store.leaderboard(m.selected)},m.id);}
  remember(m:Member){this.store.setSetting(`selected:${m.guest.id}`,m.selected?{id:m.selected.id,revision:m.selected.revision}:{id:null});}
  async add(guest:Guest,id:string){
@@ -22,7 +25,7 @@ export class Competition {
   let selected=saved?.id?this.store.challenge(saved.id,saved.revision):null;
   if(selected&&(selected.throwModel!==THROW_MODEL||!ACTIVE_SCORING.includes(selected.scoring||'')))selected=this.store.challenge(selected.id);
   const m:Member={id,guest,selected,snapshot:null,selecting:false,restoring:true};this.members.set(id,m);this.sync(m);this.board(m);
-  if(this.worker.ready)await this.restore(m);
+  if(this.worker.ready&&!this.initializing)await this.restore(m);
   return m;
  }
  remove(id:string){const m=this.members.get(id);if(!m)return;this.clearAttempt(m);this.members.delete(id);this.worker.send({type:'leave',id});}
@@ -30,10 +33,10 @@ export class Competition {
  requireWaypoints(){if(!this.worker.ready||!this.worker.capabilities?.includes(WAYPOINT_SCORING))throw new Error('This physics worker does not support waypoint courses. Rebuild and restart the worker.');}
  async restore(m:Member){
   const latest=m.selected?this.store.challenge(m.selected.id):null;
-  if(latest&&latest.layout===this.layout&&latest.physics===this.physics&&m.selected?.physics!==this.physics){m.selected=latest;this.remember(m);}
+  if(latest&&this.playable(latest)&&(!m.selected||!this.playable(m.selected))){m.selected=latest;this.remember(m);}
   m.restoring=true;this.sync(m);this.worker.send({type:'join',id:m.id});
   try{
-   if(m.selected){if(m.selected.scoring===WAYPOINT_SCORING)this.requireWaypoints();if(!SUPPORTED_SCORING.includes(m.selected.scoring||'distinct-v1'))throw new Error('Scoring version changed');await this.worker.request({type:'select',id:m.id,challenge:m.selected});}
+   if(m.selected){if(!this.playable(m.selected))throw new Error('This course is archived');if(m.selected.scoring===WAYPOINT_SCORING)this.requireWaypoints();if(!SUPPORTED_SCORING.includes(m.selected.scoring||'distinct-v1'))throw new Error('Scoring version changed');await this.worker.request({type:'select',id:m.id,challenge:m.selected});}
   }catch(error){
    if(!this.worker.ready||!this.members.has(m.id))return;
    m.selected=null;this.remember(m);this.publish({type:'notice',message:'This level could not be restored. Choose another level or explore.'},m.id);
@@ -41,7 +44,7 @@ export class Competition {
   if(!this.members.has(m.id)||!this.worker.ready)return;
   m.restoring=false;this.sync(m);this.board(m);
  }
- async ready(message:any){this.layout=message.layout;this.physics=message.physics;this.store.upgradePhysics(this.layout,this.physics);await Promise.all([...this.members.values()].map(m=>this.restore(m)));this.publish(this.catalog());}
+ async ready(message:any){this.initializing=true;try{this.layout=message.layout;this.physics=message.physics;this.store.upgradePhysics(this.layout,this.physics);if(this.assets){const input=await migrationInputs(this.layout);await migrateLayouts(this.store,this.worker,this.layout,this.physics,input.surfaces,input.proofs);}}finally{this.initializing=false;}await Promise.all([...this.members.values()].map(m=>this.restore(m)));this.publish(this.catalog());}
  state(message:any){
   const m=this.members.get(message.id);
   if(m){
@@ -114,7 +117,7 @@ export class Competition {
    if(member.attempt||member.selecting)throw new Error('Finish your throw or level change first');
    const challenge=m.challengeId?this.store.challenge(String(m.challengeId),Number(m.revision)||undefined):null;
    if(m.challengeId&&!challenge)throw new Error('Level not found');
-   if(challenge&&(!ACTIVE_SCORING.includes(challenge.scoring||'')||challenge.physics!==this.physics||challenge.throwModel!==THROW_MODEL))throw new Error('This ruleset is archived. Select the current challenge revision to throw; historical replays are still available.');
+   if(challenge&&!this.playable(challenge))throw new Error('This ruleset is archived. Select the current challenge revision to throw; historical replays are still available.');
    if(challenge?.scoring===WAYPOINT_SCORING)this.requireWaypoints();
    member.selecting=true;try{await this.worker.request({type:'select',id,challenge});}finally{member.selecting=false;}
    member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
@@ -124,7 +127,8 @@ export class Competition {
   }
   if(m.type==='replay'){
    const replay=this.store.replay(String(m.attempt));if(!replay)throw new Error('Replay not found');
-   if(replay.layout!==this.layout||(replay.physics!==this.physics&&!RECORDED_PHYSICS.includes(replay.physics))||!['ori-grip-v1',this.animation].includes(replay.animation)||!SUPPORTED_SCORING.includes(replay.scoring||'distinct-v1'))throw new Error('Replay is incompatible with the current station, animation or scoring version');
+   if((replay.physics!==this.physics&&!RECORDED_PHYSICS.includes(replay.physics))||!['ori-grip-v1',this.animation].includes(replay.animation)||!SUPPORTED_SCORING.includes(replay.scoring||'distinct-v1'))throw new Error('Replay is incompatible with the supported animation or scoring version');
+   if(replay.layout!==this.layout){if(!this.assets)throw new Error('Matching archived station assets are unavailable');await this.assets.replay(replay);}
    return {type:'replay',replay};
   }
   if(m.type==='charge'){

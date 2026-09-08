@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "layouts": {
+    "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2": {
+      "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+      "assets": {
+        "atrium": {
+          "url": "/assets/layouts/650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2/atrium.glb",
+          "bytes": 199672132,
+          "sha256": "0526fe7dbeef084d922e53028d3e2f63012fe7f7efbd3e840f3049552107a487"
+        },
+        "station": {
+          "url": "/assets/layouts/650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2/station.json",
+          "bytes": 1239920,
+          "sha256": "a9bfbfd5aae6e943a785dcbe52c6753f876ea68ce6c74836e95c8e1426683cdd"
+        },
+        "detail": {
+          "url": "/assets/layouts/650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2/atrium-detail.glb",
+          "bytes": 2411184,
+          "sha256": "f1e6533cfb927b3faa86042f45a03ee2c981fe3bfa6101c00b98388f913b9f5e"
+        },
+        "detailMeta": {
+          "url": "/assets/layouts/650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2/atrium-detail.json",
+          "bytes": 10834,
+          "sha256": "39e3468ab8fff4b1219fee520c23c927f1cecf27eb9b8742b13fee1977269e86"
+        },
+        "robot": {
+          "url": "/assets/layouts/650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2/ori.glb",
+          "bytes": 885204,
+          "sha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4"
+        },
+        "collision": {
+          "url": "/assets/layouts/650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2/station-layout.json",
+          "bytes": 66400670,
+          "sha256": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2"
+        }
+      }
+    }
+  }
+}

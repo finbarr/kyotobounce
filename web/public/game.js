@@ -14,9 +14,13 @@ import { shotDetails } from './debug.js';
 import { dressStation, contactShadow } from './station-look.js';
 import { addStationDetails } from './station-details.js';
 import {ballHeat} from './ball-heat.js';
+import {archiveBoot} from './station-bundles.js';
+const archive=await archiveBoot().catch(error=>{document.getElementById('loading-message').textContent=error.message;throw error;});
+const asset=(key,fallback)=>archive?.bundle.assets[key].url||fallback;
 THREE.BufferGeometry.prototype.computeBoundsTree=computeBoundsTree;
 THREE.Mesh.prototype.raycast=acceleratedRaycast;
 const $=id=>document.getElementById(id),canvas=$('game');
+if(archive){$('nickname').hidden=true;document.querySelectorAll('footer > span').forEach((el,i)=>{if([0,1,3].includes(i))el.hidden=true;});}
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
 const pixelRatioLimit=()=>Math.min(devicePixelRatio,1.5,Math.sqrt(1_600_000/(innerWidth*innerHeight)));
 renderer.setPixelRatio(pixelRatioLimit());renderer.setSize(innerWidth,innerHeight);
@@ -54,14 +58,14 @@ let workerStatus='starting';
 let stationLook,robotShadow,ballShadow;
 let cameraClearance=3.8;
 function notice(text,duration=4500){$('notice').textContent=text;$('notice').classList.remove('quiet');noticeUntil=performance.now()+duration;}
-function send(type,extra={}){if(socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify({type,...extra}));}
+function send(type,extra={}){if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.stringify({type,...extra}));}
 let ui,briefing;
 const sound=arcadeAudio();
 const updateShotDetails=shotDetails(()=>cancel());
-const socket=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}`);
-socket.addEventListener('open',()=>send('hello',{token:localStorage.getItem('kyoto-guest')}));
-socket.addEventListener('close',()=>{workerReady=false;workerStatus='disconnected';cancel();notice('Connection lost. Reload to rejoin.',1e8);$('connection').textContent='Disconnected';});
-socket.addEventListener('message',event=>{
+const socket=archive?null:new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}`);
+socket?.addEventListener('open',()=>send('hello',{token:localStorage.getItem('kyoto-guest')}));
+socket?.addEventListener('close',()=>{workerReady=false;workerStatus='disconnected';cancel();notice('Connection lost. Reload to rejoin.',1e8);$('connection').textContent='Disconnected';});
+socket?.addEventListener('message',event=>{
   const m=JSON.parse(event.data);ui?.message(m);
   if(m.type==='result'&&ui?.state.mode==='play'&&m.saved&&m.score>0&&(m.records?.personalBest||m.records?.courseBest))pendingRobotResult=m;
   if(m.type==='selected'||m.type==='replay')pendingRobotResult=null;
@@ -203,12 +207,12 @@ function createAvatar(id){
 
 async function load(){
   try{
-    const loader=new GLTFLoader();const data=await fetch('/assets/station.json').then(r=>r.json());
+    const loader=new GLTFLoader();const data=await fetch(asset('station','/assets/station.json')).then(r=>r.json());
     const [atrium,robot,hardware,detailData]=await Promise.all([
-      loader.loadAsync('/assets/atrium.glb',e=>{$('load-progress').style.width=`${e.total?Math.min(75,e.loaded/e.total*75):15}%`;$('loading-message').textContent=`Opening the atrium · ${Math.round(e.loaded/1024/1024)} MB`; }),
-      loader.loadAsync('/assets/ori.glb'),
-      loader.loadAsync('/assets/atrium-detail.glb'),
-      fetch('/assets/atrium-detail.json').then(r=>r.json())
+      loader.loadAsync(asset('atrium','/assets/atrium.glb'),e=>{$('load-progress').style.width=`${e.total?Math.min(75,e.loaded/e.total*75):15}%`;$('loading-message').textContent=`Opening the atrium · ${Math.round(e.loaded/1024/1024)} MB`; }),
+      loader.loadAsync(asset('robot','/assets/ori.glb')),
+      loader.loadAsync(asset('detail','/assets/atrium-detail.glb')),
+      fetch(asset('detailMeta','/assets/atrium-detail.json')).then(r=>r.json())
     ]);
     station=atrium.scene;robotAsset=robot;$('loading-message').textContent='Preparing surfaces and camera…';
     // Hardware sits on existing surfaces. Keep it out of camera collision
@@ -227,8 +231,9 @@ async function load(){
     if(guestId)createAvatar(guestId);
     await renderer.compileAsync(scene,camera);
     loaded=true;startupMs=performance.now();$('load-progress').style.width='100%';$('loading').classList.add('done');canvas.focus();
-    if(ui.state.selected)briefing.open(ui.state.selected);
-    notice('Click the game to capture the mouse and aim. Esc releases it for menus.',7000);
+    if(archive){ui.message({type:'replay',replay:archive.replay});notice('Historical replay · matching station · read only',7000);}
+    else if(ui.state.selected)briefing.open(ui.state.selected);
+    if(!archive)notice('Click the game to capture the mouse and aim. Esc releases it for menus.',7000);
   }catch(error){$('loading-message').textContent=`Could not load: ${error.message}`;console.error(error);}
 }
 // Render a short buffered timeline so the release frame precedes the first
@@ -262,7 +267,7 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   sound.cue('start');if(snapshot?.phase==='Result')recall();
   if(capture){const c=ui.state.selected;if(c){const target=c.waypoints?.[0]||c.goal||c.start;const dx=target.center.x-c.start.center.x,dz=target.center.z-c.start.center.z;yaw=Math.atan2(dx,dz)*180/Math.PI;pitch=THREE.MathUtils.clamp(12+Math.atan2(target.center.y-c.start.center.y,Math.hypot(dx,dz))*180/Math.PI,-20,55);centerOnAim();}captureMouse();}else canvas.focus();
 }});
-ui=competitionUI({overview:c=>briefing.open(c),sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>snapshot?.phase,getLiveTime:()=>snapshot?snapshot.stationTime+(performance.now()-received)/1000:0,resetView:reason=>{heat.reset();if(reason==='level'){lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;}centerOnAim();distance=3.8;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({archiveMode:!!archive,onReplayClose:()=>location.assign('/'),loadedLayout:()=>archive?.bundle.layout||snapshot?.layout,overview:c=>briefing.open(c),sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>snapshot?.phase,getLiveTime:()=>snapshot?snapshot.stationTime+(performance.now()-received)/1000:0,resetView:reason=>{heat.reset();if(reason==='level'){lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;}centerOnAim();distance=3.8;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 const characterPicker=createCharacterPicker({onChange:id=>{characterChoice=id;for(const [owner,a]of avatars)if(owner===guestId||ui.state.mode==='replay')setAvatarCharacter(a,id);}});
 $('course-view').insertBefore(characterPicker.element,$('course-list'));
 window.addEventListener('kyoto:retry',()=>{recall();captureMouse();canvas.focus();});
@@ -286,7 +291,7 @@ function animate(now){
   if(['Aim','Charging'].includes(phase))returnRequested=false;
   const inFlight=(phase==='Flight'||phase==='Result')&&!returnRequested;
   document.body.classList.toggle('is-ball-camera',inFlight);
-  $('connection').textContent=workerReady?'Solo · shared scores':workerStatus==='recovering'?'Restoring physics':workerStatus==='failed'?'Physics stopped':workerStatus==='disconnected'?'Disconnected':'Physics starting';$('connection-dot').classList.toggle('ready',workerReady);
+  $('connection').textContent=archive?'Historical replay · read only':workerReady?'Solo · shared scores':workerStatus==='recovering'?'Restoring physics':workerStatus==='failed'?'Physics stopped':workerStatus==='disconnected'?'Disconnected':'Physics starting';$('connection-dot').classList.toggle('ready',workerReady);
   ball.visible=!!snapshot;
   if(!snapshot){$('throw-panel').hidden=true;$('flight-panel').hidden=true;$('reticle').style.display='none';}
   if(snapshot){
@@ -448,7 +453,7 @@ function animate(now){
       if(now-qualityGoodSince>12000&&ratio<limit){renderer.setPixelRatio(Math.min(limit,ratio*1.1));qualityGoodSince=now;}
     }else qualityGoodSince=0;
   }
-  if(now-lastTelemetry>15){lastTelemetry=now;window.kyotoState={briefing:briefing.active,briefingTransition:briefing.blocked&&!briefing.active,audio:sound.state,result:ui.state.lastResult,mode:ui.state.mode,pointerLocked:pointerLocked(),charging:!!chargeStarted,viewerFeet:self()?.feet,challenge:ui.state.selected,busy:ui.state.session?.busy,replayTime:ui.state.replayTime,board:ui.state.board,startupMs,ready:loaded&&workerReady&&!!p,phase,diagnostics:snapshot?.diagnostics,feet:p?.feet,ball:snapshot?.ball,velocity:snapshot?.velocity,spin:snapshot?.spin,flightTime:snapshot?.flightTime,stationTime:snapshot?.stationTime,surfaces:snapshot?.surfaces,impacts:snapshot?.impacts,yaw,pitch,top,kick,rotationSampleCount:ballRotations.samples.length,renderedSpin:visibleSpin,spinMarkOpacity:ball.children[0].material.opacity,guestId,identityId,avatarCount:avatars.size,robotVisible:avatars.get(guestId)?.group.visible,robotCharacter:characterChoice,robotCelebrating:isAvatarCelebrating(avatars.get(guestId)),robotResultCamera,robotChargeQueued,cameraClearance,robotWalk:avatars.get(guestId)?.walkBlend,robotFeet:['L','R'].map(side=>avatars.get(guestId)?.bones[`foot.${side}`]?.getWorldPosition(new THREE.Vector3()).toArray()),lastImpact,held:avatars.get(guestId)?.held.toArray(),renderBall:ball.position.toArray(),escalatorStep:Array.from(scene.children.find(o=>o.children[0]?.isInstancedMesh)?.children[0].instanceMatrix.array.slice(12,15)||[]),renderFeet:avatars.get(p?.id)?.group.position.toArray(),renderAlpha:alpha,frameDt:rawDt,renderTime:timeline.time,releaseTime:snapshot?.releaseTime,releaseError:avatars.get(guestId)?.releaseError,camera:{mode:inFlight?'ball':'aim',savedAim:lastThrowAim,position:camera.position.toArray(),target:briefing.active?briefing.target.toArray():lookTarget.toArray(),up:camera.up.toArray(),manual:manualCamera,azimuth,elevation},heat:heat.state,scorePresentation:ui.scorePresentation(),render:{pixelRatio:renderer.getPixelRatio(),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frameMs:frameTimes.slice(-120)}};}
+  if(now-lastTelemetry>15){lastTelemetry=now;window.kyotoState={briefing:briefing.active,briefingTransition:briefing.blocked&&!briefing.active,audio:sound.state,result:ui.state.lastResult,mode:ui.state.mode,pointerLocked:pointerLocked(),charging:!!chargeStarted,viewerFeet:self()?.feet,challenge:ui.state.selected,busy:ui.state.session?.busy,replayTime:ui.state.replayTime,board:ui.state.board,startupMs,ready:loaded&&(workerReady||!!archive)&&!!p,archiveLayout:archive?.bundle.layout||null,phase,diagnostics:snapshot?.diagnostics,feet:p?.feet,ball:snapshot?.ball,velocity:snapshot?.velocity,spin:snapshot?.spin,flightTime:snapshot?.flightTime,stationTime:snapshot?.stationTime,surfaces:snapshot?.surfaces,impacts:snapshot?.impacts,yaw,pitch,top,kick,rotationSampleCount:ballRotations.samples.length,renderedSpin:visibleSpin,spinMarkOpacity:ball.children[0].material.opacity,guestId,identityId,avatarCount:avatars.size,robotVisible:avatars.get(guestId)?.group.visible,robotCharacter:characterChoice,robotCelebrating:isAvatarCelebrating(avatars.get(guestId)),robotResultCamera,robotChargeQueued,cameraClearance,robotWalk:avatars.get(guestId)?.walkBlend,robotFeet:['L','R'].map(side=>avatars.get(guestId)?.bones[`foot.${side}`]?.getWorldPosition(new THREE.Vector3()).toArray()),lastImpact,held:avatars.get(guestId)?.held.toArray(),renderBall:ball.position.toArray(),escalatorStep:Array.from(scene.children.find(o=>o.children[0]?.isInstancedMesh)?.children[0].instanceMatrix.array.slice(12,15)||[]),renderFeet:avatars.get(p?.id)?.group.position.toArray(),renderAlpha:alpha,frameDt:rawDt,renderTime:timeline.time,releaseTime:snapshot?.releaseTime,releaseError:avatars.get(guestId)?.releaseError,camera:{mode:inFlight?'ball':'aim',savedAim:lastThrowAim,position:camera.position.toArray(),target:briefing.active?briefing.target.toArray():lookTarget.toArray(),up:camera.up.toArray(),manual:manualCamera,azimuth,elevation},heat:heat.state,scorePresentation:ui.scorePresentation(),render:{pixelRatio:renderer.getPixelRatio(),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frameMs:frameTimes.slice(-120)}};}
   updateShotDetails({snapshot,render:window.kyotoState,lastImpact,result:ui.state.lastResult,worker:workerStatus});
 }
 window.addEventListener('resize',()=>{for(const view of [aimCamera,ballCamera]){view.aspect=innerWidth/innerHeight;view.updateProjectionMatrix();}renderer.setPixelRatio(Math.min(renderer.getPixelRatio(),pixelRatioLimit()));renderer.setSize(innerWidth,innerHeight);});

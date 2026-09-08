@@ -11,12 +11,8 @@ export class Store {
   CREATE TABLE IF NOT EXISTS challenges (id TEXT NOT NULL,revision INTEGER NOT NULL,creator TEXT NOT NULL,body TEXT NOT NULL,created INTEGER NOT NULL,PRIMARY KEY(id,revision));
   CREATE TABLE IF NOT EXISTS attempts (id TEXT PRIMARY KEY,guest TEXT NOT NULL,challenge TEXT,revision INTEGER,success INTEGER NOT NULL,score INTEGER NOT NULL,surfaces INTEGER NOT NULL,duration REAL NOT NULL,accepted INTEGER NOT NULL,replay TEXT);
   CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY,value TEXT NOT NULL);`);
-  // Add the existing global rules to legacy challenge metadata. Geometry,
-  // revisions, accepted scores and immutable replay records are unchanged.
-  const update=this.db.prepare('UPDATE challenges SET body=? WHERE id=? AND revision=?');
-  for(const row of this.db.prepare('SELECT id,revision,body FROM challenges').all()){
-   const body=JSON.stringify(withChallengeRules(JSON.parse(row.body as string)));if(body!==row.body)update.run(body,row.id,row.revision);
-  }
+  // Historical JSON stays byte-for-byte immutable. Defaults are read adapters.
+  this.db.exec('CREATE TABLE IF NOT EXISTS layout_migrations (id TEXT NOT NULL,source_revision INTEGER NOT NULL,target_layout TEXT NOT NULL,target_physics TEXT NOT NULL,status TEXT NOT NULL,reason TEXT,target_revision INTEGER,PRIMARY KEY(id,source_revision,target_layout,target_physics))');
  }
  guest(token?:string):Guest{
   let guest=token?this.db.prepare('SELECT * FROM guests WHERE token=?').get(token) as Guest|undefined:undefined;
@@ -24,10 +20,21 @@ export class Store {
   return guest;
  }
  rename(id:string,name:string){this.db.prepare('UPDATE guests SET name=? WHERE id=?').run(name,id);}
- list():Challenge[]{return this.db.prepare('SELECT body FROM challenges c WHERE revision=(SELECT max(revision) FROM challenges WHERE id=c.id) ORDER BY created,id').all().map(r=>JSON.parse(r.body as string));}
+ list():Challenge[]{return this.db.prepare('SELECT body FROM challenges c WHERE revision=(SELECT max(revision) FROM challenges WHERE id=c.id) ORDER BY created,id').all().map(r=>withChallengeRules(JSON.parse(r.body as string)));}
  challenge(id:string,revision?:number):Challenge|null{
   const r=revision?this.db.prepare('SELECT body FROM challenges WHERE id=? AND revision=?').get(id,revision):this.db.prepare('SELECT body FROM challenges WHERE id=? ORDER BY revision DESC LIMIT 1').get(id);
-  return r?JSON.parse(r.body as string):null;
+  return r?withChallengeRules(JSON.parse(r.body as string)):null;
+ }
+ revisions():Challenge[]{return this.db.prepare('SELECT body FROM challenges ORDER BY created DESC,id,revision DESC').all().map(r=>withChallengeRules(JSON.parse(r.body as string)));}
+ layoutMigration(id:string,revision:number,layout:string,physics:string){return this.db.prepare('SELECT * FROM layout_migrations WHERE id=? AND source_revision=? AND target_layout=? AND target_physics=?').get(id,revision,layout,physics);}
+ recordLayoutFailure(c:Challenge,layout:string,physics:string,reason:string){this.db.prepare("INSERT INTO layout_migrations VALUES (?,?,?,?,?,?,NULL) ON CONFLICT(id,source_revision,target_layout,target_physics) DO UPDATE SET status='archived',reason=excluded.reason WHERE status!='migrated'").run(c.id,c.revision,layout,physics,'archived',reason);}
+ appendLayoutRevision(source:Challenge,candidate:Challenge):number{
+  this.db.exec('BEGIN IMMEDIATE');try{
+   const prior=this.layoutMigration(source.id,source.revision,candidate.layout,candidate.physics);if(prior?.status==='migrated'){this.db.exec('COMMIT');return Number(prior.target_revision);}
+   const latest=this.challenge(source.id);if(!latest||latest.revision!==source.revision||latest.layout!==source.layout)throw new Error('Challenge changed during layout validation; retry migration');
+   const revision=latest.revision+1;this.saveChallenge({...candidate,id:source.id,creator:source.creator,revision});
+   this.db.prepare("INSERT INTO layout_migrations VALUES (?,?,?,?,?,'',?) ON CONFLICT(id,source_revision,target_layout,target_physics) DO UPDATE SET status='migrated',reason='',target_revision=excluded.target_revision").run(source.id,source.revision,candidate.layout,candidate.physics,'migrated',revision);this.db.exec('COMMIT');return revision;
+  }catch(error){this.db.exec('ROLLBACK');throw error;}
  }
  saveChallenge(c:Challenge){this.db.prepare('INSERT INTO challenges VALUES (?,?,?,?,?)').run(c.id,c.revision,c.creator,JSON.stringify(withChallengeRules(c)),Date.now());}
  upgradeThrowModels(){
