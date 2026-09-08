@@ -13,7 +13,7 @@ export function arcadeFeedback(sound){
  return {
   reset(){current=null;bankCount=0;tagged=false;display=10000;flash=0;trickTime=0;hud.hidden=true;hud.dataset.cue='';},
   accept(score,attempt){
-   if(!score||score.version!=='combo-v4')return;
+   if(!score||!['combo-v4','combo-v5'].includes(score.version))return;
    if(attempt!==lastAttempt){this.reset();lastAttempt=attempt;}
    current=score;
    if(score.styleBanks>bankCount){bankCount=score.styleBanks;pop(`${score.lastBank||'CLEAN BANK'}  ×${score.bankMultiplier.toFixed(2)}`);sound.cue('bank',bankCount);}
