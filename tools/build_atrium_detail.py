@@ -5,14 +5,17 @@ flush comb plates, and daytime grand-stair riser cassettes. No new furniture obs
 Run with Blender --background --python tools/build_atrium_detail.py.
 """
 from pathlib import Path
-import bpy, json, math, hashlib
+import bpy, json, math, hashlib, argparse, sys
 from mathutils import Vector
 
 ROOT=Path(__file__).resolve().parents[1]
-LAYOUT=ROOT/'runtime/station-layout.json'
-OUT=ROOT/'web/public/assets'
-SOURCE=ROOT/'art-source/phase3/atrium-detail'
-SOURCE.mkdir(parents=True,exist_ok=True)
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--layout',type=Path,default=ROOT/'runtime/station-layout.json')
+parser.add_argument('--output',type=Path,default=ROOT/'web/public/assets')
+parser.add_argument('--source-output',type=Path,default=ROOT/'art-source/phase3/atrium-detail')
+parser.add_argument('--garden-output',type=Path)
+args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+LAYOUT=args.layout.resolve();OUT=args.output.resolve();SOURCE=args.source_output.resolve()
 p=json.loads(LAYOUT.read_text())
 bpy.ops.wm.read_factory_settings(use_empty=True)
 groups={}
@@ -167,10 +170,10 @@ def build_garden_candidate(output):
         'scope':'Independently modeled photo-guided rooftop interpretation. Placement/dimensions are inferred, not surveyed. Integrate all solid surfaces with physics before gameplay.'}
     (output/'garden-candidate.json').write_text(json.dumps(meta,indent=2)+'\n');print('K008_GARDEN_CANDIDATE',garden_counts,flush=True)
 
-import sys
-if '--garden-output' in sys.argv:
-    build_garden_candidate(Path(sys.argv[sys.argv.index('--garden-output')+1]).resolve())
+if args.garden_output:
+    build_garden_candidate(args.garden_output.resolve())
     raise SystemExit(0)
+SOURCE.mkdir(parents=True,exist_ok=True);OUT.mkdir(parents=True,exist_ok=True)
 
 def comb_support(lane_id,end,origin,u,v,along,height,width):
     """Use the canonical transfer footprint when physics has supplied it.

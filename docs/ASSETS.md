@@ -44,6 +44,11 @@ blender --background --python tools/export_browser_art.py -- \
   --output artifacts/browser-candidate
 ```
 
+Build matching hardware with `tools/build_atrium_detail.py -- --layout
+artifacts/layout-candidate/station-layout.json --output artifacts/browser-candidate
+--source-output artifacts/hardware-source` on one command line after Blender's
+`--background --python` options.
+
 The exporter reads textures beside the selected layout and writes its audit receipt
 inside the selected output. With no options, the original paths remain unchanged.
 Review both candidates, then copy the layout/textures into `runtime/` and the
