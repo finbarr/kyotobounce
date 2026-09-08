@@ -1,0 +1,47 @@
+{
+  "status": "pass",
+  "frozenLayoutSha256": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+  "allSevenFinalAssetHashesUnchanged": true,
+  "coordinatorCommit": "66bd9d773438ea8c38393df24c9392f8338cd25d",
+  "exportersByteIdenticalToCoordinator": true,
+  "rendererPath": "web/public/station-details.js",
+  "rendererSha256": "7a755c05e7f3548a3e98c617d24968867dbed5bd3d822bb24df7a400ff022214",
+  "rendererTestCopy": "artifacts/k019/root-station-details.mjs",
+  "browser": {
+    "ready": true,
+    "ids": [
+      "central-hall-central-gate-sign readable face",
+      "central-hall-information-board-structure readable face",
+      "east-frontage-north-sign-recess-0 readable face",
+      "east-frontage-north-sign-recess-1 readable face",
+      "east-frontage-north-sign-recess-2 readable face",
+      "east-frontage-north-sign-recess-3 readable face"
+    ],
+    "layout": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775",
+    "fontAvailable": true,
+    "fonts": {
+      "fonts": [
+        {
+          "familyName": "Noto Sans CJK JP",
+          "postScriptName": "NotoSansCJKjp-Regular",
+          "isCustomFont": false,
+          "glyphCount": 25
+        }
+      ]
+    },
+    "errors": []
+  },
+  "sourceFindings": {
+    "missingMacFontObject": "Kyoto Theatre | Editable lettering source",
+    "objectType": "FONT",
+    "exporterSkipsNonMeshObjects": true,
+    "hardwareBlendFontDatablocks": 0,
+    "hardwareBlendTextObjects": 0,
+    "sourceChanged": false
+  },
+  "visual": "artifacts/k019/final-hardware-fonts.png",
+  "visualSha256": "c756d2f002bdec8945e0ec4cb238b3f80d953f8ddb56cdee5bc4835d85fbd673",
+  "sourceAudit": "artifacts/k019/font-source-audit.json",
+  "sourceAuditSha256": "71cf651a37af158a4dd53a4a003c2ef3ba653bda0ce3177d64b4cb3e6c1ba562",
+  "scope": "Font-only follow-up to completed full-scene acceptance; no repeated native/geometric checks, product renderer edit, asset mutation or deployment."
+}
