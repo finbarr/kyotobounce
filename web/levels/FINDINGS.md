@@ -2,7 +2,7 @@
 
 These are implementation findings, not accepted course hints. All numeric trajectories below are preliminary searches on a superseded base or local shop-composed layout. Final acceptance requires the single canonical shop/garden/K010 export, five exact and three neighboring successes, and actual browser completion.
 
-## Shop approach blocker
+## Superseded shop approach blocker
 
 The standalone source and collider parity checks pass, but its provisional translation does not prove a supported approach. On base layout `650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2`, the actual top triangles of `west-2f-landing` do not cover x = −65, −60, −58, −57, −56, −55, −54, −53 or −52 at z = −18, −17 or −15, y = 7.35. Those samples are covered at z = −12. The panel bounding box includes empty space and must not be treated as floor coverage. Physics/root owns resolving the registration and source floor/frontage; this authoring branch must not add a hidden receiving plane or extend a floor just to catch the shot.
 
@@ -15,6 +15,10 @@ Best native search receipt: `.local/proofs/konbini-door-01/shot-0.json`, compose
 - Neighbor speeds29.3,29.1 and28.9m/s miss the elevated receiving region and finish on the concourse. This is not a robust course.
 
 Keep the real doorway and roof solid. After final legitimate registration, a bounded fallback for root to consider is the design's supported 10F launch alternative with the same shop/approach bank. That route is not yet proved. Do not silently replace Last Order with a basic floor shot or publish the single interior-rest trajectory as completion.
+
+## Final handoff correction
+
+Coordinator supplied final collision SHA-256 `7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775` (172047941bytes), with the unchanged shop transform and a guarded2.4m gallery from the actual landing edge z−13.5. The prior base-layout coverage findings above describe why integration was required, not a defect asserted against this final file. The user requires top-deck delivery into the store; the provisional intermediate bank is now explicitly optional. Candidate removes that requiredSurface, retains solid doorway/roof and true rest, and adds forgiving supported destination/interior waypoints. Catch keeps its ascending-lane requirement and is revision10. Final native/browser proof remains required; earlier failed receipts are not converted into successes.
 
 ## Staircase
 

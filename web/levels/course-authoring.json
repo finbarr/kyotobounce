@@ -1,6 +1,6 @@
 {
   "status": "IMPLEMENTATION IN PROGRESS; not approved starter data",
-  "layoutBinding": "Canonical base only. Rebind all three to integrated candidate layout/physics after structural and shop integration; preserve old revisions.",
+  "layoutBinding": "Final shop/garden/K010 collision7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775; awaiting final native/browser proof. Preserve historical revisions.",
   "courses": [
     {
       "id": "atrium-staircase-special",
@@ -11,18 +11,18 @@
     },
     {
       "id": "atrium-moving-return",
-      "revision": 7,
+      "revision": 10,
       "supersedesRevision": 3,
       "mechanic": "Ride ascending moving lane and transfer onto static landing",
       "hint": "Catch the rising step. Arrive on the landing with just enough roll.",
       "proof": "Compatible worker ready. Preliminary old-layout ascending ride probes stop short or overshoot; fixed marker placement and final structural geometry proof outstanding.",
-      "revisionNote": "Proposed next revision after legacy throw/scoring/physics migrations (3 -> 4 -> 5 -> 6). Root must select a free higher revision from actual integration history; never overwrite an existing pair."
+      "revisionNote": "Coordinator production history audit: r7 historical, latest r8, potential automatic r9 reserved; changed placement is r10. Root integrates without overwriting history."
     },
     {
       "id": "atrium-last-order",
-      "mechanic": "Top-deck descent, approach bank, threshold roll and shop rest",
-      "hint": "Land shallow on the approach. Let the last roll carry it inside.",
-      "proof": "Best native shot enters shop and reaches rest but misses mat and required approach; actual base floor is absent at provisional approach. Physics/root resolving registration; see FINDINGS.md."
+      "mechanic": "Top-deck descent through solid open doorway, optional interior contact chain and supported shop rest",
+      "hint": "Clear the doorway. Let the interior contacts spend the remaining speed.",
+      "proof": "Final combined gallery/floor collision supplied; approach bank no longer required per coordinator. Native final-layout seed probes running; no approved numeric hint."
     }
   ]
 }

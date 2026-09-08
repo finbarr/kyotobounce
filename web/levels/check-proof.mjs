@@ -13,7 +13,7 @@ for(let i=0;i<8;i++){
  assert.equal(row.challenge.scoring,'waypoint-v1');assert.equal(row.result.layout,summary.layout);
  for(const field of ['velocity','spin'])assert.ok(Object.values(row.final[field]).every(x=>x===0),`Non-rest ${field}`);
  assert.equal(row.final.diagnostics.supported,true);
- assert.ok(row.events.some(e=>e.type==='impact'&&e.surface===row.challenge.requiredSurface),'Required architecture contact');
+ if(row.challenge.requiredSurface)assert.ok(row.events.some(e=>e.type==='impact'&&e.surface===row.challenge.requiredSurface),'Required architecture contact');
  assert.ok(row.result.poses.length>1,'Retain immutable native replay');
  assert.ok(row.result.waypointHits.length>0,'A route must demonstrate its optional chain');
  assert.equal(new Set(row.result.waypointHits.map(w=>w.waypointId)).size,row.result.waypointHits.length,'Once-only waypoint awards');

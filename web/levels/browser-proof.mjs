@@ -21,10 +21,10 @@ try{
   await page.keyboard.down('Space');await page.waitForTimeout(hold);await page.keyboard.up('Space');
   await page.waitForFunction(()=>window.kyotoState?.phase==='Result',null,{timeout:120000});const s=await page.evaluate(()=>window.kyotoState);shots.push(s);console.log(JSON.stringify({hold,power:s.result?.thrower?.power,score:s.result?.score,destination:s.result?.destinationReached,final:s.ball,frameMs:s.render?.frameMs}));
   await page.screenshot({scale:'css',path:resolve(out,`result-${shots.length}.png`)});
-  if(s.result?.destinationReached)break;
+  if(s.result?.success&&s.result?.destinationReached)break;
   if(shots.length<holds.length){await page.keyboard.press('r');await page.waitForFunction(()=>window.kyotoState?.phase==='Aim');await page.keyboard.press('h');await page.waitForTimeout(300);}
  }
- const final=shots.at(-1);assert.equal(final.challenge.scoring,'waypoint-v1');assert.equal(final.result.destinationReached,true);assert.ok(final.result.waypointHits.length>0);assert.ok(Object.values(final.velocity).every(v=>v===0)&&Object.values(final.spin).every(v=>v===0));
+ const final=shots.at(-1);assert.equal(final.challenge.scoring,'waypoint-v1');assert.equal(final.result.success,true);assert.equal(final.result.destinationReached,true);assert.ok(final.result.waypointHits.length>0);assert.ok(Object.values(final.velocity).every(v=>v===0)&&Object.values(final.spin).every(v=>v===0));
  // Recall/retry through actual input preserves the selected course and aiming affordance.
  await page.keyboard.press('r');await page.waitForFunction(()=>window.kyotoState?.phase==='Aim');await page.keyboard.press('h');await page.screenshot({scale:'css',path:resolve(out,'retry.png')});
  assert.deepEqual(errors,[]);status='pass';
