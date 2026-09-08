@@ -75,3 +75,24 @@ stop only this task's service, run `node web/tests/heart-in-runtime-seed.mjs`, t
 restart it and run `KYOTO_TEST_ORIGIN=http://127.0.0.1:4281 KYOTO_TEST_OUTPUT=.local/station-detail/evidence/runtime.json npm run test:runtime`.
 The seed appends a revision in `.local/4281/data/kyoto.sqlite` only; historical
 rows remain immutable. This is a private test fixture, not a published course.
+
+## Clean full-game visual acceptance
+
+`node web/tests/heart-in-clean-browser.mjs` writes `evidence/clean/` using Mesa
+llvmpipe through ANGLE Vulkan. It uses the normal browser WebSocket with no bridge,
+heartbeat substitution or service changes. It waits for multiple rendered frames
+at each camera and rejects stale native state, disconnection, visible menus or
+result cards, and frame times exceeding one second. Aiming controls are hidden
+only in the inspection harness and explicitly labeled in every image; the real
+connection, errors and performance display remain visible. Geometry, materials,
+lighting, resolution scaling and gameplay protocols are unchanged. This remains
+software-rendered evidence, not hardware performance certification.
+
+The old disconnected `evidence/after/approach.png` was WIP and is not acceptance
+evidence. The prior `evidence/gameplay/` shot/scoring receipt remains valid, but
+its aiming HUD and very slow SwiftShader frames do not establish clean visual
+acceptance. Use `evidence/clean/` for the coordinator's visual review.
+
+Regenerate `receipt.json` with `node web/station/heart-in/receipt.mjs` after this
+check. It reports `visual-acceptance-blocked` if clean capture fails; old successful
+native/scoring or bridged gameplay evidence cannot promote that status to ready.
