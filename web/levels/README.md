@@ -42,7 +42,7 @@ Early harness smoke `stairs-01` omitted trusted release.power and is invalid as 
 
 ## Current integration files and checks
 
-`compose-candidate.mjs` is a local native-authoring fixture composer only: it combines a base layout with standalone shop collider records for preliminary trajectory probes. Its optional asset metadata is not a shipping loader contract. The superseded game-loader integration patch has been deleted. Physics integrates the reviewed shop source into the final garden/K010 source, resolves actual floor/frontage clashes, and exports one canonical atrium GLB with matching colliders. Root integrates the shared challenge and proof archives. Final course hints and acceptance receipts must bind to that final shop-combined layout hash; the garden-only hash and local composed fixture are not sufficient.
+The superseded overlay composer and game-loader integration patch have been deleted. Existing combined-layout receipts are retained only as preliminary native search evidence. Physics integrates the reviewed shop source into the final garden/K010 source, resolves actual floor/frontage clashes, and exports one canonical atrium GLB with matching colliders. Root integrates the shared challenge and proof archives. Final course hints and acceptance receipts must bind to that final shop-combined layout hash; the garden-only hash and local composed fixture are not sufficient.
 
 The exact Blender source object for shared floor coordination is `west-2f-landing`, confirmed by a read-only Blender query. The current shop interior spans x[-54,-49.5], z[-21,-15] with floor top y7.35. Root/structural must resolve coincident floor support and confirm registration before integration. No current cafe or base opening was edited.
 

@@ -7,7 +7,7 @@
       "mechanic": "Cascade first flight, dissipate energy, brake on plaza",
       "hint": "Let the steps spend the speed. Backspin shortens the last roll.",
       "startConstraint": "Actual first landing is only about 0.9m deep here; native validated .25m disk, not proposed .7m disk.",
-      "proof": "preliminary stair tuning in .local/proofs/; final waypoint validation outstanding"
+      "proof": "Five exact native repeats reach the destination, but neighboring inputs and actual browser holds fail robustness. See FINDINGS.md; final layout acceptance outstanding."
     },
     {
       "id": "atrium-moving-return",
@@ -15,14 +15,14 @@
       "supersedesRevision": 3,
       "mechanic": "Ride ascending moving lane and transfer onto static landing",
       "hint": "Catch the rising step. Arrive on the landing with just enough roll.",
-      "proof": "Await repaired structural landing and final worker; legacy hint is not copied.",
+      "proof": "Compatible worker ready. Preliminary old-layout ascending ride probes stop short or overshoot; fixed marker placement and final structural geometry proof outstanding.",
       "revisionNote": "Proposed next revision after legacy throw/scoring/physics migrations (3 -> 4 -> 5 -> 6). Root must select a free higher revision from actual integration history; never overwrite an existing pair."
     },
     {
       "id": "atrium-last-order",
       "mechanic": "Top-deck descent, approach bank, threshold roll and shop rest",
       "hint": "Land shallow on the approach. Let the last roll carry it inside.",
-      "proof": "Shop transform provisional; native route search underway; do not replace with floor-only course."
+      "proof": "Best native shot enters shop and reaches rest but misses mat and required approach; actual base floor is absent at provisional approach. Physics/root resolving registration; see FINDINGS.md."
     }
   ]
 }
