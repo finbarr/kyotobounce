@@ -1,0 +1,51 @@
+{
+  "task": "K027",
+  "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_eastsquare_01.jpg",
+  "areaSource": "https://www.kyoto-station-building.co.jp/service/square/",
+  "map": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/special_setting/img/img_aboutlegobrickarea_map.png",
+  "provenance": "Original geometry; dimensions and native transforms inferred from the operator photograph and existing supported court. No photo pixels or third-party models used.",
+  "season": "Dormant / late winter appearance inferred from the mostly bare central tree in operator photograph; sparse buds, no dense summer canopy. Exact capture date and species unknown.",
+  "floor": "east-court-garden-floor",
+  "floorY": 34.62,
+  "tree": {
+    "x": 104.1,
+    "z": -8,
+    "approximateCrownHeight": 7.0,
+    "approximateCrownRadius": 2.7
+  },
+  "gazebo": {
+    "x": 101.2,
+    "z": -3,
+    "radius": 1.8,
+    "height": 3.9,
+    "ribRadius": 0.032,
+    "entranceWidth": 1.35,
+    "portal": "Continuous arched trim: 1.50m centreline width, 2.15m spring height, 2.45m crown; at least 1.35m clear at foot pads. Dimensions inferred."
+  },
+  "seats": [
+    {
+      "id": "south",
+      "x": 101.6,
+      "z": -11.8,
+      "length": 4.6,
+      "depth": 1.35,
+      "height": 0.54,
+      "rotation": 0
+    },
+    {
+      "id": "east",
+      "x": 106.7,
+      "z": -5.7,
+      "length": 4.8,
+      "depth": 1.35,
+      "height": 0.54,
+      "rotation": 90
+    }
+  ],
+  "circulation": "Retain ramp X96..98.2, north stair X102.4..104.5 Z2.326, restaurant approaches X108.4+, escalator mouths X91..94 Z-12.6..-10, south entry Z-17.87 X106.3..111.4. K029 boundary niches remain unclaimed.",
+  "budget": {
+    "triangles": 45000,
+    "batches": 24,
+    "newTextureBytes": 0
+  }
+}
