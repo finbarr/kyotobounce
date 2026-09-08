@@ -6,20 +6,25 @@ const stamp=new Date().toISOString().replace(/[:.]/g,'-');
 const output=resolve(`artifacts/online/releases/${stamp}`);
 await mkdir(output,{recursive:true});
 // Explicit runtime allowlist: no local database, guest tokens, logs, tests, or editor project.
-const files=['package.json','package-lock.json','web/public','web/server.ts','web/store.ts','web/competition.ts','web/types.ts','web/scoring.ts','web/worker.ts','web/starter-challenges.json','Builds/PhysicsWorkerLinux','deploy'];
+const files=['package.json','package-lock.json','web/public','web/server.ts','web/store.ts','web/competition.ts','web/types.ts','web/scoring.ts','web/worker.ts','web/starter-challenges.json','web/layout-assets.ts','web/layout-migration.ts','web/layout-assets.json','web/layout-proofs.json','Builds/PhysicsWorkerLinux','deploy'];
 for(const name of files)await cp(name,join(output,name),{recursive:true,filter:path=>!path.split('/').some(part=>part.endsWith('_DoNotShip'))});
 await mkdir(join(output,'runtime'),{recursive:true});
 await cp('runtime/station-layout.json',join(output,'runtime/station-layout.json'));
 await chmod(join(output,'Builds/PhysicsWorkerLinux/KyotoPhysicsWorker.x86_64'),0o755);
 await chmod(join(output,'deploy/backup.sh'),0o755);
 let original=0,compressed=0;
-for(const name of await readdir(join(output,'web/public/assets'))){
- const path=join(output,'web/public/assets',name);if(!(await stat(path)).isFile()||!name.match(/\.(glb|json)$/))continue;
- const data=await readFile(path);
- const br=brotliCompressSync(data,{params:{[constants.BROTLI_PARAM_QUALITY]:6}});
- await writeFile(path+'.br',br);await writeFile(path+'.gz',gzipSync(data,{level:6}));
- original+=data.length;compressed+=br.length;
+async function compressAssets(directory){
+ for(const entry of await readdir(directory,{withFileTypes:true})){
+  const path=join(directory,entry.name);
+  if(entry.isDirectory()){await compressAssets(path);continue;}
+  if(!entry.isFile()||!entry.name.match(/\.(glb|json)$/))continue;
+  const data=await readFile(path);
+  const br=brotliCompressSync(data,{params:{[constants.BROTLI_PARAM_QUALITY]:6}});
+  await writeFile(path+'.br',br);await writeFile(path+'.gz',gzipSync(data,{level:6}));
+  original+=data.length;compressed+=br.length;
+ }
 }
+await compressAssets(join(output,'web/public/assets'));
 const identity={release:stamp,node:'22.23.2',layoutSha256:createHash('sha256').update(await readFile(join(output,'runtime/station-layout.json'))).digest('hex'),workerSha256:createHash('sha256').update(await readFile(join(output,'Builds/PhysicsWorkerLinux/KyotoPhysicsWorker_Data/Managed/Assembly-CSharp.dll'))).digest('hex'),assetBytes:original,brotliBytes:compressed};
 await writeFile(join(output,'release.json'),JSON.stringify(identity,null,2)+'\n');
 await writeFile('artifacts/online/latest-release.txt',output+'\n');

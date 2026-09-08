@@ -398,6 +398,11 @@ function animate(now){
   const resultAvatar=avatars.get(guestId),showRobotResult=!replaying&&phase==='Result'&&avatarWantsResultView(resultAvatar);
   if(showRobotResult&&!robotResultCamera){azimuth=resultAvatar.group.rotation.y+.25;elevation=.10;distance=3.4;cameraClearance=distance;manualCamera=false;}
   robotResultCamera=showRobotResult;
+  document.body.classList.toggle('is-robot-result',showRobotResult);
+  const narrowResult=showRobotResult&&innerWidth<=800;
+  if(narrowResult&&!manualCamera)distance=4.3;
+  if(narrowResult)camera.setViewOffset(innerWidth,innerHeight,0,innerHeight*.18,innerWidth,innerHeight);
+  else if(camera.view?.enabled)camera.clearViewOffset();
   if(showRobotResult)cameraTarget.copy(resultAvatar.group.position).add(new THREE.Vector3(0,1.05,0));
   else if(inFlight)cameraTarget.copy(followTarget);
   else cameraTarget.lerp(followTarget,1-Math.exp(-dt*12));

@@ -94,3 +94,16 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
 @media(max-width:600px){#waypoint-progress{top:62px;font-size:10px;padding:7px 10px}#editor-view{max-height:calc(100dvh - 90px)}}
 #challenge-scoring{width:100%;padding:9px 6px;background:#263247;color:#f3eee2;border:1px solid #a58aff88;font:11px monospace}
 body.is-briefing #waypoint-progress{display:none}
+
+/* Leave the record winner visible beside the result breakdown. */
+.is-robot-result #result-card{left:24px;bottom:62px;transform:none;width:min(350px,calc(100vw - 48px))}
+@media(max-width:800px){
+ .is-robot-result #combo-burst,.is-robot-result #notice{display:none}
+ .is-robot-result #result-card{left:14px;bottom:54px;width:calc(100vw - 28px);max-height:36dvh;overflow:auto;padding:12px}
+ .is-robot-result #result-card .result-rank{font-size:18px;margin:6px 0}
+ .is-robot-result #result-card h2{font-size:30px;margin:5px 0 8px}
+ .is-robot-result #result-breakdown,.is-robot-result #result-tip{display:none}
+ .is-robot-result #result-math{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;padding:4px 0;margin-bottom:7px}
+ .is-robot-result #result-math>div{padding:3px 0;gap:6px}
+ .is-robot-result #result-card .actions{position:sticky;bottom:-12px;background:#142a2d;padding-top:5px}
+}
