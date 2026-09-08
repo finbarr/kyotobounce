@@ -1,5 +1,6 @@
 import type { NativeResult,Vector } from './types.ts';
-export const ARCADE_SCORING='combo-v4';
+export const ARCADE_SCORING='combo-v5';
+export const LEGACY_COMBO_SCORING='combo-v4';
 export type ScoreBreakdown={version:string;outcome:'perfect'|'tagged'|'near'|'miss'|'forfeit'|'route-missed';accuracy:number;style:number;styleBanks:number;stylePercent:number;goalVisited:boolean;distance:number;proximityRange:number;endPosition:Vector;total:number;base?:number;bankMultiplier?:number;timeMultiplier?:number;activeSeconds?:number;landingMultiplier?:number;potential?:number;firstVisit?:number|null;lastBank?:string};
 const distance=(a:Vector,b:Vector)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
 const clamp=(x:number,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -15,6 +16,15 @@ function entersGoal(a:Vector,b:Vector,g:Vector,r:number,ballRadius:number){
  return Math.hypot(a.x+dx*t-g.x,a.z+dz*t-g.z)<=Math.max(0,r-ballRadius);
 }
 type Pose=NativeResult['poses'][number];
+// Quaternion signs are interchangeable: q and -q describe the same rotation.
+function rotates(a:Pose['q'],b:Pose['q']){
+ const an=Math.hypot(a.x,a.y,a.z,a.w),bn=Math.hypot(b.x,b.y,b.z,b.w);
+ if(!Number.isFinite(an)||!Number.isFinite(bn)||!an||!bn)throw new Error('Invalid recorded rotation');
+ const direct=Math.hypot(a.x/an-b.x/bn,a.y/an-b.y/bn,a.z/an-b.z/bn,a.w/an-b.w/bn);
+ const flipped=Math.hypot(a.x/an+b.x/bn,a.y/an+b.y/bn,a.z/an+b.z/bn,a.w/an+b.w/bn);
+ // Ignore normalization roundoff far below native float precision.
+ return Math.min(direct,flipped)>1e-10;
+}
 type Contact=NativeResult['contacts'][number];
 type Challenge=NonNullable<NativeResult['challenge']>;
 export const BASE_POINTS=10000,BANK_FACTOR=1.75;
@@ -30,11 +40,15 @@ export class ComboTracker {
    if(!Number.isFinite(pose.t)||Object.values(pose.p).some(x=>!Number.isFinite(x)))throw new Error('Invalid recorded trajectory');
    const a=this.last;
    if(a&&pose.t<a.t)throw new Error('Trajectory time moved backwards');
-   if(a&&pose.t>a.t&&this.firstVisit===Infinity){
+   if(a&&pose.t>a.t){
     const dt=pose.t-a.t;
-    // Resting, spinning in place and the final slow creep cannot farm time.
-    if(distance(a.p,pose.p)/dt>=.35)this.activeSeconds+=dt;
-    if(entersGoal(a.p,pose.p,this.c.goal.center,this.c.goal.radius,.023))this.firstVisit=pose.t;
+    // Preserve archived v4 arithmetic exactly. Current time follows all native
+    // translation and rotation, including post-goal creep, until true rest.
+    const moving=this.c.scoring===LEGACY_COMBO_SCORING
+     ?this.firstVisit===Infinity&&distance(a.p,pose.p)/dt>=.35
+     :distance(a.p,pose.p)>0||rotates(a.q,pose.q);
+    if(moving)this.activeSeconds+=dt;
+    if(this.firstVisit===Infinity&&entersGoal(a.p,pose.p,this.c.goal.center,this.c.goal.radius,.023))this.firstVisit=pose.t;
    }
    if(entersGoal(pose.p,pose.p,this.c.goal.center,this.c.goal.radius,.023))this.firstVisit=Math.min(this.firstVisit,pose.t);
    this.last=pose;
@@ -57,13 +71,13 @@ export class ComboTracker {
   const routeOK=!this.c.requiredSurface||this.contacts.some(h=>h.qualifying&&h.surface===this.c.requiredSurface);
   const landingMultiplier=forfeit||!routeOK?0:options.success?1:Math.max(goalVisited?.25:0,clamp(1-gap/range));
   const total=Math.round(potential*landingMultiplier),accuracy=Math.round(BASE_POINTS*landingMultiplier);
-  return {version:ARCADE_SCORING,outcome:forfeit?'forfeit':!routeOK?'route-missed':options.success?'perfect':goalVisited?'tagged':total?'near':'miss',accuracy,style:total-accuracy,styleBanks:banks,stylePercent:bankMultiplier*timeMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,timeMultiplier,activeSeconds:this.activeSeconds,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
+  return {version:this.c.scoring===LEGACY_COMBO_SCORING?LEGACY_COMBO_SCORING:ARCADE_SCORING,outcome:forfeit?'forfeit':!routeOK?'route-missed':options.success?'perfect':goalVisited?'tagged':total?'near':'miss',accuracy,style:total-accuracy,styleBanks:banks,stylePercent:bankMultiplier*timeMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,timeMultiplier,activeSeconds:this.activeSeconds,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
  }
 }
 export function scoreAttempt(result:NativeResult):ScoreBreakdown{
- if(result.challenge?.scoring!==ARCADE_SCORING)return scoreAccuracy(result);
+ if(![ARCADE_SCORING,LEGACY_COMBO_SCORING].includes(result.challenge?.scoring||''))return scoreAccuracy(result);
  if(!result.poses.length)throw new Error('Invalid recorded trajectory');
- const tracker=new ComboTracker(result.challenge);
+ const tracker=new ComboTracker(result.challenge!);
  for(const hit of result.contacts)tracker.contact(hit);
  tracker.poses(result.poses);
  return tracker.value(result);

@@ -1,13 +1,14 @@
 import assert from 'node:assert/strict';
 import {writeFile,mkdir} from 'node:fs/promises';
 import {Client,delay} from './api-client.mjs';
+import {SCORING_VERSION} from '../types.ts';
 import {scoreAttempt} from '../scoring.ts';
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173';
 const out=process.env.KYOTO_TEST_OUTPUT||'artifacts/phase3/combo-arcade/runtime.json';
 const c=new Client(origin.replace(/^http/,'ws')),checks=[];
 try{
  await c.join();c.send('name',{name:'Arcade QA'});const course=c.messages.findLast(m=>m.type==='catalog').challenges.find(c=>c.id==='atrium-first-bank');
- assert.equal(course.scoring,'combo-v4');assert.equal(course.allowedInputs.chargeSeconds,2.8);
+ assert.equal(course.scoring,SCORING_VERSION);assert.equal(course.allowedInputs.chargeSeconds,2.8);
  await c.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');
  for(const [name,holdMs,yaw]of [['perfect',260,90],['near',260,104],['tagged',373,90]]){
   c.messages.length=0;const shot=await c.throw(holdMs,{yaw,pitch:15,powerRange:'precision'},45000),r=shot.result;
@@ -25,7 +26,17 @@ try{
   assert.ok(Math.abs(live.at(-1).potential-r.breakdown.potential)<=1,'Live multiplier exactly agrees with final replay');
   if(name==='perfect'){assert.equal(r.breakdown.landingMultiplier,1);assert.ok(live.some(m=>m.goalVisited),'The goal must light before the result');assert.ok(r.score>17500);}
   if(name==='tagged'){assert.equal(r.breakdown.goalVisited,true);assert.ok(r.breakdown.landingMultiplier>=.25);}
-  checks.push({name,score:r.score,breakdown:r.breakdown,liveFrames:live.length,poses:replay.poses.length,stopped:true});console.log(JSON.stringify({name,score:r.score,banks:r.breakdown.styleBanks,time:r.breakdown.timeMultiplier,landing:r.breakdown.landingMultiplier}));
+  let timerRegression;
+  if(name==='perfect'){
+   const entered=replay.scoreFrames.find(f=>f.score.goalVisited);
+   assert.ok(entered&&r.breakdown.activeSeconds>entered.score.activeSeconds+.05,'Native timer continues after target entry until rest');
+   const frozen=scoreAttempt({...replay,challenge:{...replay.challenge,scoring:'combo-v4'}});
+   assert.ok(r.breakdown.activeSeconds>frozen.activeSeconds+.05,'The same native trajectory reproduces the archived first-entry timer freeze');
+   const atRest=replay.poses.at(-1),extraRest={...replay,poses:[...replay.poses,{...atRest,t:atRest.t+10}]};
+   assert.deepEqual(scoreAttempt(extraRest),r.breakdown,'Rest does not keep accruing time');
+   timerRegression={entryActiveSeconds:entered.score.activeSeconds,finalActiveSeconds:r.breakdown.activeSeconds,archivedActiveSeconds:frozen.activeSeconds,extraRestSeconds:10};
+  }
+  checks.push({name,timerRegression,score:r.score,breakdown:r.breakdown,liveFrames:live.length,poses:replay.poses.length,stopped:true});console.log(JSON.stringify({name,score:r.score,banks:r.breakdown.styleBanks,time:r.breakdown.timeMultiplier,landing:r.breakdown.landingMultiplier}));
   c.send('recall');await delay(150);
  }
  const bad=c.next(m=>m.type==='error');c.send('release',{score:999999999,power:1});assert.match((await bad).message,/intent only/);

@@ -7,8 +7,8 @@ The power gauge is 590 px wide on desktop and 36 px tall. Its primary number and
 `10,000 × 1.75^banks × (1 + min(active seconds, 60) / 12) × landing accuracy`
 
 - Each qualifying, distinct surface multiplies the combo by 1.75. Contacts need at least 1 m/s impact speed, 0.18 seconds between awarded banks, and 0.6 m separation. Repeated surfaces and a run of numbered stair/escalator treads count once. There is no five-bank cap.
-- Active time counts trajectory segments moving at least 0.35 m/s. It tops out at ×6 after 60 active seconds. Slow creep, rest, and spinning in place do not add time.
-- Banks and active time freeze at the first target entry. Further bounces can change the final landing but cannot farm the combo.
+- Active time counts authoritative trajectory segments that translate or rotate, including slow rolling and spinning in place. It continues after target entry until physical rest, and tops out at ×6 after 60 active seconds. Stationary rest-dwell segments add no time.
+- Banks freeze at the first target entry. Further movement continues earning time and can change the final landing, but cannot add banks.
 - A supported rest inside the target keeps 100%. Outside, accuracy falls linearly with distance from the usable target edge, including height. The falloff range is 35% of the start-to-target distance, clamped to 3–12 m. Outer rings mark 75%, 50%, 25%, and zero.
 - Touching the target reserves at least 25% of the combo if the shot completes outside. A distant miss with no target visit earns zero. Required-route challenges still require that route. Recall and leaving the station forfeit the attempt.
 - The final score is saved only after the native ball stops translating and rotating. Live numbers are provisional; there is no shot timer or early target finish.
@@ -21,7 +21,7 @@ The live HUD shows the growing combo, bank/time multipliers, landing percentage 
 
 Sound effects are original synthesized layers: rolling/air texture, a throw whoosh, distinct stone/metal/glass impacts, ascending bank cues, target stingers and result chords. Major cues briefly lower the music. The existing sound/music switches remain independent.
 
-New replays preserve the authoritative score timeline alongside their full-rate trajectory, so the combo is visible during playback. Scoring is versioned as `combo-v4`; upgrading creates new course revisions. Earlier revisions, scores and replay records are not rewritten or mixed into the new boards.
+New replays preserve the authoritative score timeline alongside their full-rate trajectory, so the combo is visible during playback. Scoring is versioned as `combo-v5`; upgrading creates new course revisions. Earlier revisions, scores and replay records are not rewritten or mixed into the new boards. Archived `combo-v4` retains its original first-entry timer freeze and 0.35 m/s threshold when rescored.
 
 ## Verification
 
