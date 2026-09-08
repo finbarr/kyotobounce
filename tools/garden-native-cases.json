@@ -1,0 +1,154 @@
+[
+  {
+    "id": "continuous-garden-walk",
+    "start": [
+      -153.5,
+      49.58596491228072,
+      -32.3
+    ],
+    "walkRoute": [
+      {
+        "yaw": -90,
+        "seconds": 1.8,
+        "target": [
+          -156,
+          49.61096491228072,
+          -32.3
+        ]
+      },
+      {
+        "yaw": 0,
+        "seconds": 8.5,
+        "target": [
+          -156,
+          54.523245614035105,
+          -20.4
+        ],
+        "tolerance": 0.5
+      },
+      {
+        "yaw": 90,
+        "seconds": 2.5,
+        "target": [
+          -152.5,
+          54.523245614035105,
+          -20.4
+        ],
+        "tolerance": 0.6
+      }
+    ],
+    "minFeetY": 54.498245614035106
+  },
+  {
+    "id": "west-floor",
+    "start": [
+      -164,
+      54.498245614035106,
+      -23
+    ],
+    "yaw": 90,
+    "pitch": -65,
+    "power": 0.008,
+    "seconds": 6,
+    "minY": 54.468245614035105,
+    "contact": "k008-garden-deck-west"
+  },
+  {
+    "id": "east-floor",
+    "start": [
+      -145,
+      54.498245614035106,
+      -23
+    ],
+    "yaw": -90,
+    "pitch": -65,
+    "power": 0.008,
+    "seconds": 6,
+    "minY": 54.468245614035105,
+    "contact": "k008-garden-deck-east"
+  },
+  {
+    "id": "arrival-floor",
+    "start": [
+      -156,
+      54.498245614035106,
+      -20.8
+    ],
+    "yaw": 0,
+    "pitch": -65,
+    "power": 0.008,
+    "seconds": 6,
+    "minY": 54.468245614035105,
+    "contact": "k008-garden-deck-arrival"
+  },
+  {
+    "id": "west-guard",
+    "start": [
+      -166.8,
+      54.498245614035106,
+      -20
+    ],
+    "yaw": -90,
+    "pitch": -65,
+    "power": 0.035,
+    "seconds": 6,
+    "minY": 54.468245614035105,
+    "contact": "k008-perimeter-guard-glass"
+  },
+  {
+    "id": "east-guard",
+    "start": [
+      -143.2,
+      54.498245614035106,
+      -21
+    ],
+    "yaw": 90,
+    "pitch": -65,
+    "power": 0.035,
+    "seconds": 6,
+    "minY": 54.468245614035105,
+    "contact": "k008-perimeter-guard-glass"
+  },
+  {
+    "id": "north-guard",
+    "start": [
+      -155,
+      54.498245614035106,
+      -12.8
+    ],
+    "yaw": 0,
+    "pitch": -65,
+    "power": 0.035,
+    "seconds": 6,
+    "minY": 54.468245614035105,
+    "contact": "k008-perimeter-guard-glass"
+  },
+  {
+    "id": "south-guard",
+    "start": [
+      -163,
+      54.498245614035106,
+      -32.8
+    ],
+    "yaw": 180,
+    "pitch": -65,
+    "power": 0.035,
+    "seconds": 6,
+    "minY": 54.468245614035105,
+    "contact": "k008-perimeter-guard-glass"
+  },
+  {
+    "id": "south-deck-floor",
+    "start": [
+      -156,
+      54.498245614035106,
+      -32
+    ],
+    "yaw": 90,
+    "pitch": -65,
+    "power": 0.008,
+    "seconds": 6,
+    "minY": 54.47,
+    "contact": "k008-garden-deck-south"
+  }
+]
