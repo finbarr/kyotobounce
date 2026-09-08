@@ -1,0 +1,260 @@
+[
+  {
+    "id": "atrium-staircase-special",
+    "revision": 1,
+    "name": "Staircase Special",
+    "creator": "station",
+    "order": 2,
+    "start": {
+      "center": {
+        "x": -83.08,
+        "y": 21.691228,
+        "z": -5
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-01"
+    },
+    "goal": {
+      "center": {
+        "x": -75.9,
+        "y": 19.585965,
+        "z": -5.22
+      },
+      "radius": 1,
+      "surface": "muromachi-square"
+    },
+    "waypoints": [
+      {
+        "id": "first-tread",
+        "center": {
+          "x": -81.68,
+          "y": 21.164912,
+          "z": -5.22
+        },
+        "radius": 0.11,
+        "surface": "daikaidan-flight-01",
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      {
+        "id": "plaza-entry",
+        "center": {
+          "x": -78.8,
+          "y": 19.585965,
+          "z": -5.22
+        },
+        "radius": 0.3,
+        "surface": "muromachi-square",
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      {
+        "id": "last-roll",
+        "center": {
+          "x": -77.2,
+          "y": 19.585965,
+          "z": -5.22
+        },
+        "radius": 0.4,
+        "surface": "muromachi-square",
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    ],
+    "requiredSurface": "daikaidan-flight-01",
+    "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+    "physics": "kyoto-p3-1",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
+  },
+  {
+    "id": "atrium-moving-return",
+    "revision": 7,
+    "name": "Catch the Lift",
+    "creator": "station",
+    "order": 3,
+    "start": {
+      "center": {
+        "x": 17.32,
+        "y": 0,
+        "z": 6.373336
+      },
+      "radius": 0.25,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": 30.85,
+        "y": 5.5,
+        "z": 6.153565
+      },
+      "radius": 0.5,
+      "surface": "east-ground-second-landing"
+    },
+    "waypoints": [
+      {
+        "id": "entry-apron",
+        "center": {
+          "x": 18.25,
+          "y": 0,
+          "z": 6.4
+        },
+        "radius": 0.25,
+        "surface": "concourse",
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      {
+        "id": "clean-dismount",
+        "center": {
+          "x": 30.1,
+          "y": 5.5,
+          "z": 6.15
+        },
+        "radius": 0.2,
+        "surface": "east-ground-second-landing",
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    ],
+    "requiredSurface": "east-concourse-lower-escalator-1",
+    "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+    "physics": "kyoto-p3-1",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
+  },
+  {
+    "id": "atrium-last-order",
+    "revision": 1,
+    "name": "Last Order",
+    "creator": "station",
+    "order": 4,
+    "start": {
+      "center": {
+        "x": -156.4,
+        "y": 49.585965,
+        "z": -20
+      },
+      "radius": 0.35,
+      "surface": "north-circulation-landing-14"
+    },
+    "goal": {
+      "center": {
+        "x": -52,
+        "y": 7.35,
+        "z": -18
+      },
+      "radius": 0.9,
+      "surface": "konbini-floor"
+    },
+    "waypoints": [
+      {
+        "id": "approach-bank",
+        "center": {
+          "x": -57,
+          "y": 7.35,
+          "z": -18
+        },
+        "radius": 0.6,
+        "surface": "west-2f-landing",
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      {
+        "id": "threshold-roll",
+        "center": {
+          "x": -53.5,
+          "y": 7.35,
+          "z": -18
+        },
+        "radius": 0.25,
+        "surface": "konbini-floor",
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    ],
+    "requiredSurface": "west-2f-landing",
+    "layout": "650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2",
+    "physics": "kyoto-p3-1",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
+  }
+]

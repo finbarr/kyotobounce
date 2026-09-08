@@ -1,0 +1,28 @@
+{
+  "status": "IMPLEMENTATION IN PROGRESS; not approved starter data",
+  "layoutBinding": "Canonical base only. Rebind all three to integrated candidate layout/physics after structural and shop integration; preserve old revisions.",
+  "courses": [
+    {
+      "id": "atrium-staircase-special",
+      "mechanic": "Cascade first flight, dissipate energy, brake on plaza",
+      "hint": "Let the steps spend the speed. Backspin shortens the last roll.",
+      "startConstraint": "Actual first landing is only about 0.9m deep here; native validated .25m disk, not proposed .7m disk.",
+      "proof": "preliminary stair tuning in .local/proofs/; final waypoint validation outstanding"
+    },
+    {
+      "id": "atrium-moving-return",
+      "revision": 7,
+      "supersedesRevision": 3,
+      "mechanic": "Ride ascending moving lane and transfer onto static landing",
+      "hint": "Catch the rising step. Arrive on the landing with just enough roll.",
+      "proof": "Await repaired structural landing and final worker; legacy hint is not copied.",
+      "revisionNote": "Proposed next revision after legacy throw/scoring/physics migrations (3 -> 4 -> 5 -> 6). Root must select a free higher revision from actual integration history; never overwrite an existing pair."
+    },
+    {
+      "id": "atrium-last-order",
+      "mechanic": "Top-deck descent, approach bank, threshold roll and shop rest",
+      "hint": "Land shallow on the approach. Let the last roll carry it inside.",
+      "proof": "Shop transform provisional; native route search underway; do not replace with floor-only course."
+    }
+  ]
+}
