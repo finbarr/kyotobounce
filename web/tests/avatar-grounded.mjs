@@ -7,8 +7,8 @@ try{
  const page=await browser.newPage();await page.route('**/robot-test',r=>r.fulfill({contentType:'text/html',body:'<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>'}));await page.goto('http://127.0.0.1:4173/robot-test');
  const result=await page.evaluate(async()=>{
   const T=await import('three'),{GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js'),{createAvatar,poseAvatar}=await import('/avatar.js'),asset=await new GLTFLoader().loadAsync('/assets/ori.glb'),rows=[];
-  for(const [name,vx,vz,speed]of [['forward',0,1,1.1],['backward',0,-1,1.1],['strafe',1,0,1.1],['diagonal',.707,.707,1.1],['fast',0,1,4.2],['fast-strafe',1,0,4.2]])for(const fps of [15,30,60,120]){
-   const a=createAvatar(asset),p={id:'p',yaw:180,pitch:15,power:0,top:0,kick:0,grounded:true,movement:{x:vx*speed,z:-vz*speed}};let maxSlip=0,maxTargetError=0,minFoot=Infinity,maxLengthError=0,previous={},steps=0,lastSide,worst,minSeparation=Infinity;
+  for(const character of ['ori','koma','don'])for(const [name,vx,vz,speed]of [['forward',0,1,1.1],['backward',0,-1,1.1],['strafe',1,0,1.1],['diagonal',.707,.707,1.1],['fast',0,1,4.2],['fast-strafe',1,0,4.2]])for(const fps of [15,30,60,120]){
+   const a=createAvatar(asset,{character}),p={id:'p',yaw:180,pitch:15,power:0,top:0,kick:0,grounded:true,movement:{x:vx*speed,z:-vz*speed}};let maxSlip=0,maxTargetError=0,minFoot=Infinity,maxLengthError=0,previous={},steps=0,lastSide,worst,minSeparation=Infinity;
    poseAvatar(a,p,'Aim',{owner:''},0);
    for(let i=1;i<=fps*5;i++){
     a.group.position.x+=vx*speed/fps;a.group.position.z+=vz*speed/fps;poseAvatar(a,p,'Aim',{owner:''},i/fps);
@@ -27,7 +27,7 @@ try{
    const stopped=['L','R'].map(s=>a.bones[`foot.${s}`].getWorldPosition(new T.Vector3()));
    for(let i=1;i<=fps*2;i++)poseAvatar(a,p,'Aim',{owner:''},7+i/fps);
    const idleDrift=Math.max(...['L','R'].map((s,i)=>a.bones[`foot.${s}`].getWorldPosition(new T.Vector3()).distanceTo(stopped[i])));
-   rows.push({name,fps,maxSlip,maxTargetError,minFoot,maxLengthError,steps,idleDrift,minSeparation,worst,blend:a.walkBlend});
+   rows.push({character,name,fps,maxSlip,maxTargetError,minFoot,maxLengthError,steps,idleDrift,minSeparation,worst,blend:a.walkBlend});
   }
   return rows;
  });

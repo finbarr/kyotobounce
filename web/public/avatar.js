@@ -25,14 +25,22 @@ function alignGrip(a,target){
   const elbowTarget=shoulder.clone().addScaledVector(direction,along).addScaledVector(pole,Math.sqrt(Math.max(0,l1*l1-along*along)));
   pointBone(a.upper,a.forearm,elbowTarget);pointBone(a.forearm,a.hand,shoulder.clone().addScaledVector(direction,distance));setWorldRotation(a.hand,rotation);
 }
-export function createAvatar(asset){
+export const ROBOT_CHARACTERS=Object.freeze([
+  {id:'ori',name:'ORI',kana:'オリ',title:'Arcade Ace',description:'Enamel mecha · victory salute'},
+  {id:'koma',name:'KOMA',kana:'コマ',title:'Lucky Circuit',description:'Lucky-cat robot · beckoning wave'},
+  {id:'don',name:'DON',kana:'ドン',title:'Festival Beat',description:'Taiko robot · drum fanfare'},
+]);
+export function createAvatar(asset,{character='ori'}={}){
   const model=clone(asset.scene),group=new THREE.Group();group.add(model);
   const mixer=new THREE.AnimationMixer(model),actions={};
   for(const clip of asset.animations){const action=mixer.clipAction(clip);action.play();action.paused=true;actions[clip.name]=action;}
   const bones={},baseRotations=new Map(),basePositions=new Map();model.traverse(o=>{if(o.isBone){bones[o.name]=o;if(o.userData.name)bones[o.userData.name]=o;baseRotations.set(o,o.quaternion.clone());basePositions.set(o,o.position.clone());}});
   for(const name of ['upper_arm.R','forearm.R','hand.R'])if(!bones[name])throw new Error(`Robot rig missing ${name}`);
   const avatar={group,model,mixer,actions,bones,baseRotations,basePositions,walkBlend:0,lastPoseTime:null,head:bones.head,upper:bones['upper_arm.R'],forearm:bones['forearm.R'],hand:bones['hand.R'],held:new THREE.Vector3(),releaseError:0};
-  styleRobot(avatar);return avatar;
+  avatar.originalMaterials=new Map();model.traverse(o=>{if(o.isMesh)avatar.originalMaterials.set(o,o.material);});
+  group.updateWorldMatrix(true,true);avatar.bindFrames=new Map();
+  for(const bone of new Set(Object.values(bones)))avatar.bindFrames.set(bone,{inverse:bone.matrixWorld.clone().invert(),rotation:bone.getWorldQuaternion(new THREE.Quaternion()).invert()});
+  setAvatarCharacter(avatar,character);return avatar;
 }
 export function poseAvatar(a,player,phase,state,stationTime){
   const owner=player.id===state.owner,mode=owner?phase:'Aim';
@@ -70,6 +78,7 @@ export function poseAvatar(a,player,phase,state,stationTime){
   for(let i=1;i<=3;i++)a.bones[`thumb${i}.R`].quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-.6*(1-opened)));
   applyGaze(a,player,mode,state,stationTime);
   animateFace(a,mode,stationTime);
+  applyCelebration(a,player,mode,state,stationTime);
   a.group.updateWorldMatrix(true,true);
   a.held.copy(grip);a.hand.localToWorld(a.held);
   if(mode==='Release'){
@@ -200,21 +209,34 @@ function plantLeg(a,side,target,pole,footRotation){
 
 // Original arcade mascot trim, attached in the authored bind frame. The imported
 // rig, hands and collision scale remain the authority for every moving part.
+export function setAvatarCharacter(a,character){
+  if(!ROBOT_CHARACTERS.some(c=>c.id===character))throw new RangeError('Unknown robot character');
+  if(a.character===character)return;
+  for(const mesh of a.trim||[]){mesh.removeFromParent();mesh.geometry.dispose();}
+  for(const material of a.trimMaterials||[])material.dispose();
+  for(const [mesh,material]of a.originalMaterials)mesh.material=material;
+  a.trim=[];a.character=character;a.celebration=null;a.resultView??=false;a.face=null;a.drumSticks=[];
+  styleRobot(a);
+}
 function styleRobot(a){
   const enamel=(color)=>new THREE.MeshPhysicalMaterial({color,metalness:.25,roughness:.3,clearcoat:.45,clearcoatRoughness:.25});
   const cream=enamel(0xefe4cd),red=enamel(0xd94930),indigo=enamel(0x1b2b4c),gold=new THREE.MeshStandardMaterial({color:0xd6b574,metalness:.65,roughness:.32});
   const face=new THREE.MeshStandardMaterial({color:0x061722,roughness:.3}),glow=new THREE.MeshStandardMaterial({color:0xa4f4df,emissive:0x78ddc7,emissiveIntensity:1.1,roughness:.3});
+  if(a.character==='koma'){cream.color.setHex(0xffefd2);red.color.setHex(0xd6503b);indigo.color.setHex(0x234749);}
+  if(a.character==='don'){cream.color.setHex(0xe8d7b6);red.color.setHex(0xd4412f);indigo.color.setHex(0x193657);glow.color.setHex(0xffd475);glow.emissive.setHex(0xf0ab45);}
+  a.trimMaterials=[cream,red,indigo,gold,face,glow];
   const palette={'Warm porcelain':cream,'Vermilion enamel':red,'Graphite joints':indigo,'Soft cyan display':glow};
   a.model.traverse(o=>{if(o.isMesh&&palette[o.material.name])o.material=palette[o.material.name];});
   a.group.updateWorldMatrix(true,true);
   function attach(bone,geometry,material,position,rotation=new THREE.Quaternion()){
     const mesh=new THREE.Mesh(geometry,material);mesh.name='ORI arcade trim';
-    mesh.position.copy(a.bones[bone].worldToLocal(new THREE.Vector3(...position)));
-    mesh.quaternion.copy(a.bones[bone].getWorldQuaternion(new THREE.Quaternion()).invert().multiply(rotation));
-    a.bones[bone].add(mesh);return mesh;
+    mesh.position.copy(new THREE.Vector3(...position).applyMatrix4(a.bindFrames.get(a.bones[bone]).inverse));
+    mesh.quaternion.copy(a.bindFrames.get(a.bones[bone]).rotation.clone().multiply(rotation));
+    a.bones[bone].add(mesh);a.trim.push(mesh);return mesh;
   }
   const box=(bone,size,material,position,rotation)=>attach(bone,new RoundedBoxGeometry(...size,2,.008),material,position,rotation);
   const turnX=new THREE.Quaternion().setFromAxisAngle(unitZ,Math.PI/2);
+  if(a.character==='ori'){
   // Broad enamel brow and concentric ear receivers give a toy-mecha silhouette.
   box('head',[.275,.036,.048],red,[0,1.702,.083]);
   box('head',[.065,.025,.16],cream,[0,1.729,.005]);
@@ -237,12 +259,17 @@ function styleRobot(a){
   box('chest',[.04,.009,.015],gold,[0,1.248,.156]);
   box('chest',[.21,.18,.025],indigo,[0,1.287,-.126]);
   for(const y of [1.25,1.28,1.31])box('chest',[.12,.012,.011],red,[0,y,-.143]);
+  }else if(a.character==='koma'){
+    styleLuckyCat(a,{attach,box,cream,red,indigo,gold,glow});
+  }else{
+    styleFestival(a,{attach,box,cream,red,indigo,gold,glow});
+  }
   // A larger dark display covers the original two pixels. Eyes and smile are
   // geometry, so the face remains crisp without fonts, textures or asset packs.
   box('head',[.223,.108,.014],face,[0,1.606,.152]);
   const eyes=[];
   for(const sign of [-1,1]){
-    const eye=box('head',[.033,.026,.006],glow,[sign*.048,1.617,.163]);eyes.push(eye);
+    const eye=box('head',a.character==='koma'?[.036,.014,.006]:[.033,.026,.006],glow,[sign*.048,1.617,.163]);eye.userData.tilt=a.character==='koma'?-sign*.25:0;eyes.push(eye);
     box('head',[.012,.009,.006],glow,[sign*.083,1.594,.163]);
   }
   const smile=new THREE.CatmullRomCurve3([new THREE.Vector3(-.022,1.588,.163),new THREE.Vector3(0,1.581,.164),new THREE.Vector3(.022,1.588,.163)]);
@@ -256,6 +283,115 @@ function animateFace(a,mode,time){
   const opening=blink<.14?.12+.88*Math.abs(blink-.07)/.07:1;
   for(const [i,eye]of a.face.eyes.entries()){
     eye.scale.y=opening*(mode==='Charging'?.65:mode==='Result'?.65:1);
-    eye.rotation.z=(i===0?1:-1)*(mode==='Result'?.18:mode==='Charging'?-.12:0);
+    eye.rotation.z=(eye.userData.tilt||0)+(i===0?1:-1)*(mode==='Result'?.18:mode==='Charging'?-.12:0);
   }
+}
+
+function styleLuckyCat(a,{attach,box,cream,red,indigo,gold,glow}){
+  const triangle=(width,height,depth)=>{
+    const shape=new THREE.Shape();shape.moveTo(-width/2,0);shape.lineTo(0,height);shape.lineTo(width/2,0);shape.closePath();
+    return new THREE.ExtrudeGeometry(shape,{depth,bevelEnabled:true,bevelSize:.004,bevelThickness:.003,bevelSegments:2,steps:1});
+  };
+  for(const sign of [-1,1]){
+    attach('head',triangle(.108,.07,.075),cream,[sign*.084,1.678,-.04]);
+    attach('head',triangle(.057,.038,.005),red,[sign*.084,1.695,.04]);
+    attach('head',new THREE.SphereGeometry(.039,16,10),cream,[sign*.108,1.565,.08]);
+    for(const y of [1.586,1.597])box('head',[.035,.004,.006],gold,[sign*.094,y,.165],new THREE.Quaternion().setFromAxisAngle(unitZ,sign*.15));
+    const side=sign>0?'L':'R';
+    attach(`shoulder.${side}`,new THREE.SphereGeometry(.083,16,12),red,[sign*.254,1.386,0]);
+    box(`foot.${side}`,[.13,.021,.085],cream,[sign*.115,.162,.105]);
+    for(const offset of [-.036,0,.036])box(`foot.${side}`,[.008,.014,.009],gold,[sign*.115+offset,.10,.185]);
+  }
+  box('neck',[.235,.043,.17],red,[0,1.459,.005]);
+  attach('chest',new THREE.SphereGeometry(.037,16,12),gold,[0,1.415,.144]);
+  box('chest',[.007,.035,.009],indigo,[0,1.405,.18]);
+  box('chest',[.14,.13,.012],cream,[0,1.278,.149]);
+  const coin=attach('chest',new THREE.SphereGeometry(.052,20,12),gold,[0,1.271,.16]);coin.scale.set(.8,1.12,.23);
+  box('chest',[.043,.008,.014],red,[0,1.29,.178]);box('chest',[.043,.008,.014],red,[0,1.254,.178]);
+  const tail=new THREE.CatmullRomCurve3([new THREE.Vector3(0,.90,-.10),new THREE.Vector3(0,.84,-.22),new THREE.Vector3(.12,.91,-.29),new THREE.Vector3(.15,1.06,-.27),new THREE.Vector3(.06,1.08,-.24)]);
+  attach('hips',new THREE.TubeGeometry(tail,24,.027,8,false),cream,[0,0,0]);
+  attach('hips',new THREE.SphereGeometry(.029,12,8),red,[.06,1.08,-.24]);
+  box('head',[.017,.009,.008],red,[0,1.602,.168]);
+}
+
+function styleFestival(a,{attach,box,cream,red,indigo,gold,glow}){
+  const drumRotation=new THREE.Quaternion().setFromAxisAngle(unitX,Math.PI/2);
+  box('head',[.272,.035,.228],indigo,[0,1.684,.004]);
+  box('head',[.266,.009,.237],cream,[0,1.685,.005]);
+  attach('head',new THREE.SphereGeometry(.025,16,10),red,[0,1.729,-.006]);
+  box('head',[.038,.019,.012],gold,[0,1.689,.129]);
+  for(const sign of [-1,1]){
+    const side=sign>0?'L':'R';
+    box('head',[.029,.09,.045],red,[sign*.13,1.65,-.088],new THREE.Quaternion().setFromAxisAngle(unitZ,-sign*.35));
+    box(`shoulder.${side}`,[.139,.15,.185],indigo,[sign*.257,1.373,0]);
+    box(`shoulder.${side}`,[.147,.025,.193],red,[sign*.258,1.308,0]);
+    box('chest',[.026,.30,.014],cream,[sign*.077,1.28,.141],new THREE.Quaternion().setFromAxisAngle(unitZ,-sign*.20));
+    box(`foot.${side}`,[.145,.019,.10],indigo,[sign*.115,.162,.10]);
+    box(`foot.${side}`,[.145,.009,.017],red,[sign*.115,.168,.139]);
+    const stick=attach(`hand.${side}`,new THREE.CylinderGeometry(.007,.01,.22,10),gold,[sign*.365,.745,.035]);stick.visible=false;a.drumSticks.push(stick);
+  }
+  attach('chest',new THREE.CylinderGeometry(.157,.157,.15,32),red,[0,1.135,.188],drumRotation);
+  attach('chest',new THREE.CylinderGeometry(.166,.166,.019,32),indigo,[0,1.135,.27],drumRotation);
+  attach('chest',new THREE.CylinderGeometry(.143,.143,.022,32),cream,[0,1.135,.28],drumRotation);
+  for(let i=0;i<12;i++){
+    const angle=i/12*Math.PI*2;
+    attach('chest',new THREE.SphereGeometry(.008,8,6),gold,[Math.cos(angle)*.154,1.135+Math.sin(angle)*.154,.284]);
+  }
+  box('chest',[.17,.15,.021],indigo,[0,1.28,-.131]);
+  for(const sign of [-1,1])box('chest',[.025,.25,.028],gold,[sign*.028,1.27,-.151],new THREE.Quaternion().setFromAxisAngle(unitZ,sign*.4));
+}
+
+// Call only from live authoritative result handling for this attempt.
+// Cosmetic eligibility never contributes to the stored score. The pose gate
+// independently waits for native rest; Result alone is insufficient.
+export function celebrateAvatar(a,result,{reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false}={}){
+  if(!a||result?.type!=='result'||!result.saved||!(result.score>0)||!result.attempt||!(result.records?.personalBest===true||result.records?.courseBest===true)||result.breakdown?.outcome==='forfeit'||a.lastCelebratedAttempt===result.attempt)return false;
+  a.celebration={attempt:result.attempt,reducedMotion,start:null,stoppingAt:null};return true;
+}
+export function isAvatarCelebrating(a){return !!a?.celebration&&a.celebration.start!==null;}
+export function avatarWantsResultView(a){return !!a?.resultView;}
+// Delay a retry by the returned milliseconds, then retry normally. No delay is
+// requested during a shot or when there is no active celebration.
+export function cancelAvatarCelebration(a){
+  const c=a?.celebration;if(!c)return 0;
+  if(c.start===null){a.celebration=null;return 0;}
+  c.stoppingAt??=a.lastPoseTime;
+  return Math.max(0,Math.ceil((.18-(a.lastPoseTime-c.stoppingAt))*1000));
+}
+function applyCelebration(a,player,mode,state,time){
+  for(const stick of a.drumSticks||[])stick.visible=false;
+  const c=a.celebration;
+  if(mode!=='Result'){a.resultView=false;if(!(mode==='Flight'&&c?.start===null&&state.attempt===c.attempt))a.celebration=null;return;}
+  if(!c)return;
+  const still=v=>v&&[v.x,v.y,v.z].every(Number.isFinite)&&Math.hypot(v.x,v.y,v.z)<.00001;
+  if(state.attempt!==c.attempt){a.celebration=null;return;}
+  if(!state.diagnostics?.sleeping||!still(state.velocity)||!still(state.spin)){if(c.start!==null)a.celebration=null;return;}
+  if(c.start===null){c.start=time;a.lastCelebratedAttempt=c.attempt;a.resultView=true;}
+  const t=time-c.start,duration=c.reducedMotion?1.4:2.6;
+  if(t<0||t>=duration||(c.stoppingAt!==null&&time-c.stoppingAt>=.18)){a.celebration=null;return;}
+  const smooth=x=>{x=THREE.MathUtils.clamp(x,0,1);return x*x*(3-2*x);};
+  const weight=smooth(t/.28)*smooth((duration-t)/.4)*(c.stoppingAt===null?1:1-smooth((time-c.stoppingAt)/.18));
+  const beat=c.reducedMotion?0:Math.sin(t*Math.PI*4);
+  a.group.updateWorldMatrix(true,true);
+  const targets=a.character==='koma'?{L:[.35,1.63,.15+.035*beat]}:a.character==='don'?{L:[.17,1.37+.055*beat,.28],R:[-.17,1.37-.055*beat,.28]}:{R:[-.20,1.66,.12],L:[.35,1.30+.07*beat,.20]};
+  for(const [side,position]of Object.entries(targets)){
+    const hand=a.bones[`hand.${side}`],target=worldPosition(hand).lerp(a.group.localToWorld(new THREE.Vector3(...position)),weight);
+    celebrateArm(a,side,target);
+    if(a.character==='don'){
+      const rotation=hand.getWorldQuaternion(new THREE.Quaternion()).slerp(a.bindFrames.get(hand).rotation.clone().invert(),weight);setWorldRotation(hand,rotation);
+      if(side==='L'){for(const digit of ['index','middle','ring','little'])for(let i=1;i<=3;i++)a.bones[`${digit}${i}.L`].quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-weight));}
+    }
+  }
+  const nod=(a.character==='koma'?.10:a.character==='don'?.045:.07)*beat;
+  const head=a.baseRotations.get(a.head).clone().multiply(new THREE.Quaternion().setFromAxisAngle(a.character==='koma'?unitZ:unitX,nod));
+  a.head.quaternion.slerp(head,weight);
+  for(const stick of a.drumSticks||[])stick.visible=weight>.15;
+}
+function celebrateArm(a,side,target){
+  const upper=a.bones[`upper_arm.${side}`],forearm=a.bones[`forearm.${side}`],hand=a.bones[`hand.${side}`];
+  const shoulder=worldPosition(upper),elbow=worldPosition(forearm),wrist=worldPosition(hand),rotation=hand.getWorldQuaternion(new THREE.Quaternion());
+  const l1=shoulder.distanceTo(elbow),l2=elbow.distanceTo(wrist),direction=target.clone().sub(shoulder),distance=THREE.MathUtils.clamp(direction.length(),.02,l1+l2-.001);direction.normalize();
+  const pole=new THREE.Vector3(side==='L'?1:-1,0,0).applyQuaternion(a.group.getWorldQuaternion(new THREE.Quaternion()));pole.addScaledVector(direction,-pole.dot(direction)).normalize();
+  const along=(l1*l1-l2*l2+distance*distance)/(2*distance),bend=Math.sqrt(Math.max(0,l1*l1-along*along));
+  pointBone(upper,forearm,shoulder.clone().addScaledVector(direction,along).addScaledVector(pole,bend));pointBone(forearm,hand,shoulder.clone().addScaledVector(direction,distance));setWorldRotation(hand,rotation);
 }
