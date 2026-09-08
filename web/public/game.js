@@ -173,6 +173,7 @@ window.addEventListener('keydown',e=>{
   if(['INPUT','TEXTAREA','SELECT','BUTTON','SUMMARY'].includes(e.target.tagName))return;
   if(ui.state.mode==='replay'&&!e.code.startsWith('Arrow')){if(e.code==='Space'){e.preventDefault();if(!e.repeat)$('replay-play').click();}if(e.code==='Escape')$('close-replay').click();return;}
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+  if(e.code==='Space'&&!e.repeat&&ui.advanceCompleted()){e.preventDefault();return;}
   keys.add(e.code);if(e.repeat)return;
   if(e.code==='KeyH'&&ui.state.hint&&ui.state.mode==='play')$('use-hint').click();
   if(e.code==='Space'){captureMouse();startCharge();}if(e.code==='Escape')cancel();if(e.code==='KeyR')recall();
