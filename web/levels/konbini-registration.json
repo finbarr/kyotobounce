@@ -8,7 +8,11 @@
     "entrancePhoto": "https://tabelog.com/kyoto/A2601/A260101/26033019/",
     "verified": "Jan31 2026 JR flat map places shop icon immediately north/east of West Gate, by elevator E/stair8 and south/east of Kyo Navi; operator confirms 2F outside gates. Entrance photograph shows framed sliding glass/striped transom.",
     "inferred": "Map has north downward. Shop appears on east side of north-south free passage, so candidate faces west (interior +X). Model threshold translation (-54,7.35,-18) aligns to west-2f circulation between west stair zone and east cafe mass; no doorway survey or exact map-to-model scale exists. Structural integration retained this transform and added a guarded gallery from the actual landing edge; geography remains model registration, not survey.",
-    "adaptation": "Held-open doorway, simplified empty interior and receiving mat; no surveyed checkout or shelf claim."
+    "adaptation": "Held-open doorway and preserved receiving disk; perimeter shelves, cold cases and checkout are an authored approximation, not surveyed shelving.",
+    "exteriorPhotos": [
+      "https://tblg.k-img.com/restaurant/images/Rvw/315672/640x640_rect_68479f8f2baae313a3c38213a8c8b312.jpg",
+      "https://tblg.k-img.com/restaurant/images/Rvw/269911/640x640_rect_296a09a8450be46537281eed6daf9a04.jpg"
+    ]
   },
   "threshold": {
     "x": -54,
