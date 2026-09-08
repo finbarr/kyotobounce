@@ -18,7 +18,7 @@ Keep the real doorway and roof solid. After final legitimate registration, a bou
 
 ## Staircase
 
-The first-flight cascade and optional three-waypoint chain are implemented and natively selectable. Five identical 2m/s Precision shots at yaw90°, pitch−20°, top−100 reach the original plaza mat on the canonical base. Small neighboring input changes can instead run off the plaza. Full-game keyboard receipts in `.local/browser/stair-full-chain/` show waypoint awards but failed destinations after actual charge/release and one retry. Therefore exact repeats do not establish a usable hint or course acceptance. Broader input robustness remains the blocker.
+The first-flight cascade and optional three-waypoint chain are implemented and natively selectable. Five identical 2m/s Precision shots at yaw90°, pitch−20°, top−100 reach the original plaza mat on the canonical base. Small neighboring input changes can instead run off the plaza. Full-game keyboard receipts in `.local/browser/stair-full-chain/` show waypoint awards but failed destinations after actual charge/release and one retry. Therefore exact repeats do not establish a usable hint or course acceptance. Broader input robustness remains the blocker. A bounded pitch−65°/zero-spin alternative reaches the mat at1.95 and2.0m/s, but2.05m/s stops at x−69.08 instead; changing pitch alone does not solve this. A13cm shift within the same supported start landing also produced large runout changes, so that adjustment is not a demonstrated fix.
 
 ## Lift
 
