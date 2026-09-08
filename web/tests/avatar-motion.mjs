@@ -3,17 +3,17 @@
 import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-const baseline=process.argv.includes('--baseline');
-const out=`artifacts/robot/${baseline?'baseline':process.argv.includes('--gaze')?'gaze-motion':process.argv.includes('--style')?'mascot':'improved'}`;await mkdir(out,{recursive:true});
+const baseline=process.argv.includes('--baseline'),character=process.env.ROBOT_CHARACTER||'ori';
+const out=process.env.ROBOT_CHARACTER?`artifacts/robot/cast/${character}`:`artifacts/robot/${baseline?'baseline':process.argv.includes('--gaze')?'gaze-motion':process.argv.includes('--style')?'mascot':'improved'}`;await mkdir(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROME_EXECUTABLE||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const context=await browser.newContext({viewport:{width:1200,height:650},recordVideo:{dir:out,size:{width:1200,height:650}}});
 const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
  await page.route('**/robot-lab',route=>route.fulfill({contentType:'text/html',body:'<meta charset="utf-8"><style>body{margin:0;background:#202830;color:white;font:18px sans-serif}p{position:absolute;left:20px}</style><p>Robot motion: front / side / rear • W/S forward/back • A/D strafe • B ball • X wall</p><script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>'}));
  await page.goto('http://127.0.0.1:4173/robot-lab');
- await page.evaluate(async()=>{
+ await page.evaluate(async(character)=>{
   const T=await import('three'),{GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js'),{createAvatar,poseAvatar}=await import('/avatar.js');
-  const asset=await new GLTFLoader().loadAsync('/assets/ori.glb'),a=createAvatar(asset),scene=new T.Scene();scene.background=new T.Color('#303d48');scene.add(a.group,new T.HemisphereLight(0xffffff,0x4a5360,3));const light=new T.DirectionalLight(0xffffff,3);light.position.set(3,5,4);scene.add(light);
+  const asset=await new GLTFLoader().loadAsync('/assets/ori.glb'),a=createAvatar(asset,{character}),scene=new T.Scene();scene.background=new T.Color('#303d48');scene.add(a.group,new T.HemisphereLight(0xffffff,0x4a5360,3));const light=new T.DirectionalLight(0xffffff,3);light.position.set(3,5,4);scene.add(light);
   const grid=new T.GridHelper(100,200,0x8697a0,0x53636d);scene.add(grid);const floor=new T.Mesh(new T.PlaneGeometry(100,100),new T.MeshStandardMaterial({color:0x46515a}));floor.rotation.x=-Math.PI/2;floor.position.y=-.003;floor.receiveShadow=true;scene.add(floor);a.model.traverse(o=>{if(o.isMesh)o.castShadow=true;});light.castShadow=true;light.shadow.mapSize.set(512,512);light.shadow.camera.left=-3;light.shadow.camera.right=3;light.shadow.camera.top=3;light.shadow.camera.bottom=-3;scene.add(light.target);
   const ball=new T.Mesh(new T.SphereGeometry(.08),new T.MeshStandardMaterial({color:0xff6633}));scene.add(ball);
   const renderer=new T.WebGLRenderer({antialias:false});renderer.shadowMap.enabled=true;renderer.setPixelRatio(.65);renderer.setSize(1200,650);document.body.appendChild(renderer.domElement);
@@ -31,7 +31,7 @@ try{
    window.lab.rows.push({time,keys:[...keys],feet,root:a.group.position.toArray(),blend:a.walkBlend,head:a.head.getWorldQuaternion(new T.Quaternion()).toArray()});
    renderer.setScissorTest(true);cameras.forEach((c,i)=>{c.position.copy(a.group.position).add(c.userData.offset);c.lookAt(a.group.position.clone().add(new T.Vector3(0,.95,0)));renderer.setViewport(i*400,0,400,650);renderer.setScissor(i*400,0,400,650);renderer.render(scene,c);});requestAnimationFrame(frame);
   }requestAnimationFrame(frame);
- });
+ },character);
  console.log('Rig',await page.evaluate(()=>window.lab.rig));
  for(const [name,keys,duration] of [['idle',[],600],['forward',['KeyW'],2400],['wall',['KeyW','KeyX'],1000],['backward',['KeyS'],2000],['stop',[],900],['strafe',['KeyD'],2000],['diagonal',['KeyW','KeyA'],1700],['fast',['KeyW','ShiftLeft'],1700],['ball',['KeyB'],3000],['return',[],1200],['charging',['KeyC'],1000],['result',['KeyR'],1200]]){
   for(const k of keys)await page.keyboard.down(k);await page.waitForTimeout(duration);await page.screenshot({path:`${out}/${name}.png`});for(const k of keys)await page.keyboard.up(k);
