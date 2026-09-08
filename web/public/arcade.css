@@ -21,16 +21,16 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
 .legacy-points{display:none;color:var(--paper);font-size:11px;line-height:1.8}.legacy-points b{color:var(--gold)}.legacy-scoring .legacy-points{display:block}.legacy-scoring .briefing-points{display:none}
 .map-label{transform:translateY(-100%)}.map-label::after{left:var(--anchor-x,50%)}
 
-/* A broad, deliberate gauge stays in peripheral vision while aiming. */
-#power-control{position:absolute;bottom:82px;left:50%;transform:translateX(-50%);width:min(590px,calc(100vw - 40px));padding:16px 22px 15px;background:linear-gradient(120deg,#111a30f2,#1b2949eb);border:1px solid #b8ccdf55;border-top:3px solid var(--gold);box-shadow:5px 5px 0 #10172ab0;pointer-events:none}
-#power-control .power-label{font-size:11px;letter-spacing:1.3px;margin:0 0 10px;align-items:center}
-#power-number{font:900 32px/1 Impact,'Arial Narrow',sans-serif;font-variant-numeric:tabular-nums}
-#power-control .power-track{height:36px;border:1px solid #c5d5e155;border-radius:0;margin:0;background:repeating-linear-gradient(90deg,#ffffff05 0,#ffffff05 calc(10% - 1px),#ffffff2b calc(10% - 1px),#ffffff2b 10%);overflow:visible}
+/* Keep launch speed readable without covering the lower-center play view. */
+#power-control{position:absolute;bottom:82px;left:50%;transform:translateX(-50%);width:min(360px,calc(100vw - 28px));padding:10px 12px;background:linear-gradient(120deg,#111a30f2,#1b2949eb);border:1px solid #b8ccdf55;border-top:3px solid var(--gold);box-shadow:5px 5px 0 #10172ab0;pointer-events:none}
+#power-control .power-label{font-size:9px;letter-spacing:.3px;margin:0 0 6px;align-items:center}
+#power-number{font:900 23px/1 Impact,'Arial Narrow',sans-serif;font-variant-numeric:tabular-nums}
+#power-control .power-track{height:12px;border:1px solid #c5d5e155;border-radius:0;margin:0;background:repeating-linear-gradient(90deg,#ffffff05 0,#ffffff05 calc(10% - 1px),#ffffff2b calc(10% - 1px),#ffffff2b 10%);overflow:visible}
 #power-control .power-track i{background:linear-gradient(90deg,#61dbcb 0%,#f4d166 45%,#f48c64 80%,#ff625c);box-shadow:0 0 20px #f4ca6525;transition:none;max-width:100%}
 #power-control .power-track::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(5% - 1px),#11192e88 calc(5% - 1px),#11192e88 5%)}
 #power-control #hint-power-marker{width:3px;top:-6px;bottom:-6px;z-index:1;background:#fff;box-shadow:0 0 6px #fff9}
-.power-ticks{display:flex;justify-content:space-between;margin-top:7px;font-size:9px;color:#b0bfd1}
-#power-control .power-caption{margin:10px 0 0;font-size:9px;color:#b0c5d5}
+.power-ticks{display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:#b0bfd1}
+#power-control .power-caption{margin:6px 0 0;font-size:9px;letter-spacing:0;flex-wrap:wrap;gap:3px;color:#b0c5d5}
 #power-control.charging{border-color:var(--gold);box-shadow:0 0 30px #f3cc6315,5px 5px 0 #10172ab0}
 #combo-hud{position:absolute;left:50%;top:130px;transform:translateX(-50%);width:min(500px,calc(100vw - 32px));padding:15px 22px 12px;pointer-events:none;color:var(--paper);background:linear-gradient(120deg,#131d36f2,#172744d9);border-left:4px solid var(--gold);box-shadow:5px 5px 0 #0b102875;text-align:center;transition:background .2s,border-color .2s}
 .combo-heading{display:flex;justify-content:space-between;gap:10px;font:8px/1.5 ui-monospace,Menlo,monospace;letter-spacing:1px;color:#b5c4d8}.combo-heading b{color:var(--gold)}
@@ -43,9 +43,9 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
 .is-briefing #power-control,.is-briefing #combo-hud{display:none}
 #result-card[data-rank=perfect]{border-color:#79ffad;background:linear-gradient(140deg,#113c30f5,#142a2df5)}#result-card[data-rank=perfect] h2,#result-card[data-rank=perfect] .result-rank{color:#88ffb5}
 #result-card h2{font-size:clamp(30px,3.8vw,54px);overflow-wrap:anywhere}
-@media(max-width:1100px){#combo-hud{top:185px;width:min(430px,calc(100vw - 40px))}#power-control{bottom:64px;width:450px;max-width:calc(100vw - 40px)}body:not(.is-playing) #power-control{bottom:54px;left:14px;transform:none;width:calc(100vw - 28px)}body:not(.is-playing) #throw-panel{bottom:218px}body:not(.is-playing) #competition{max-height:calc(100vh - 300px)}}
-@media(max-width:800px){#combo-hud{top:186px;padding:12px 14px;width:330px;max-width:calc(100vw - 28px)}#combo-total{font-size:44px}#combo-factors{gap:10px;font-size:9px}.combo-heading{font-size:7px}#power-control{padding:12px 14px}#power-control .power-track{height:30px}.power-caption span{max-width:180px}#power-number{font-size:27px}}
-@media(max-height:680px){#combo-hud{top:106px;padding:9px 14px}#combo-total{font-size:42px;margin:7px 0}#combo-trick{margin-top:4px}.combo-landing{margin-top:7px;padding-top:7px}#power-control{bottom:53px;padding:10px 15px}#power-control .power-track{height:28px}#power-control .power-caption{margin-top:6px}.is-playing #throw-panel{bottom:210px}}
+@media(max-width:1100px){#combo-hud{top:185px;width:min(430px,calc(100vw - 40px))}#power-control{bottom:64px;width:360px;max-width:calc(100vw - 40px)}body:not(.is-playing) #power-control{bottom:54px;left:14px;transform:none;width:min(360px,calc(100vw - 28px))}body:not(.is-playing) #throw-panel{bottom:218px}body:not(.is-playing) #competition{max-height:calc(100vh - 300px)}}
+@media(max-width:800px){#combo-hud{top:186px;padding:12px 14px;width:330px;max-width:calc(100vw - 28px)}#combo-total{font-size:44px}#combo-factors{gap:10px;font-size:9px}.combo-heading{font-size:7px}#power-control{padding:10px 12px}#power-control .power-track{height:12px}#power-number{font-size:23px}}
+@media(max-height:680px){#combo-hud{top:106px;padding:9px 14px}#combo-total{font-size:42px;margin:7px 0}#combo-trick{margin-top:4px}.combo-landing{margin-top:7px;padding-top:7px}#power-control{bottom:53px;padding:10px 15px}#power-control .power-track{height:12px}#power-control .power-caption{margin-top:6px}.is-playing #throw-panel{bottom:210px}}
 
 /* Keep the flight view clear: the ball stays in the screen center. */
 #combo-hud{left:24px;top:auto;bottom:62px;transform:none;width:min(350px,calc(100vw - 48px));padding:12px 16px 10px;text-align:left}
@@ -64,11 +64,19 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
 @media(max-width:800px){#combo-hud{left:14px;bottom:65px;width:310px;max-width:calc(100vw - 28px);padding:10px 13px}#combo-total{font-size:36px}}
 @media(max-height:520px){#combo-hud{top:auto;bottom:36px;left:12px;padding:7px 12px;width:300px}.combo-heading{display:none}#combo-total{font-size:30px;line-height:1;margin:0 0 4px}#combo-factors{font-size:8px}.combo-landing{margin-top:4px;padding-top:4px}#combo-trick{height:14px;line-height:14px;margin-top:2px;font-size:8px}}
 
-.power-ranges{display:flex;gap:8px;margin-bottom:12px;pointer-events:auto}
-.power-ranges button{flex:1;padding:6px 8px;border:1px solid #8094b64d;background:#10192a;color:#aebfd4;font:10px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.3px;cursor:pointer}
+.power-ranges{display:flex;gap:6px;margin-bottom:8px;pointer-events:auto}
+.power-ranges button{flex:1;padding:7px 5px;border:1px solid #8094b64d;background:#10192a;color:#aebfd4;font:10px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.3px;cursor:pointer}
 .power-ranges button[aria-pressed="true"]{color:#10192a;background:var(--gold);border-color:var(--gold)}
 .power-ranges button:disabled{cursor:default;opacity:.65}
 #power-number{white-space:nowrap}
 .is-playing .power-ranges{pointer-events:none}
 
 .range-key{align-self:center;color:#b0c5d5;font:8px/1.5 ui-monospace,Menlo,monospace;text-align:center}
+
+/* Launch controls have no action during flight; leave the ball view clear. */
+.is-ball-camera #power-control{display:none}
+@media(max-width:800px){
+  #power-control,body:not(.is-playing) #power-control{bottom:100px}
+  #throw-panel,body:not(.is-playing) #throw-panel{bottom:280px}
+  body:not(.is-playing) #competition{max-height:calc(100vh - 390px)}
+}
