@@ -12,10 +12,11 @@ export function shotDetails(cancel){
   const number=n=>Number.isFinite(n)?n.toFixed(3):'—';
   const vector=v=>v?`${number(v.x)}, ${number(v.y)}, ${number(v.z)}`:'—';
   const speed=v=>v?number(Math.hypot(v.x,v.y,v.z)):'—';
-  return ({snapshot:s,render,lastImpact,result,worker})=>{
+  return ({snapshot:s,render,lastImpact,result,worker,performance:timing})=>{
     if(performance.now()-lastUpdate<250)return;
     lastUpdate=performance.now();
-    report={capturedAt:new Date().toISOString(),worker,snapshot:s,render,lastImpact,result};
+    report={capturedAt:new Date().toISOString(),worker,snapshot:s,render,lastImpact,result,performance:timing};
+    output.dataset.performance=JSON.stringify(timing||{});
     const d=s?.diagnostics,active=['Flight','Result'].includes(s?.phase);
     if(active)lastFlight=report;
     // Inspect through the DOM without an executable browser debugging backdoor.
@@ -23,6 +24,7 @@ export function shotDetails(cancel){
     output.textContent=s?[
       `Session: ${s.id}`,
       `View: ${render?.mode||'play'} · Worker: ${worker}`,
+      `Latest update: ${number(timing?.stateAgeMs)} ms ago · Network round trip: ${number(timing?.rttMs)} ms · Last close: ${timing?.closeCode||'none'}`,
       `Phase: ${s.phase} · ${active&&d?.sleeping?'At rest':d?.simulating?'Simulating':'Inactive'}`,
       `Camera: ${render?.camera?.mode||'—'} · Aim: ${number(render?.yaw)}°, ${number(render?.pitch)}°`,
       `Ball time: ${number(s.flightTime)} s`,

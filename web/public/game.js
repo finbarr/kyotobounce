@@ -1,4 +1,5 @@
 import {gameConnection} from './connection.js';
+import {clientPerformance} from './performance.js';
 import {THROW_MODEL,throwSpeed} from './throw-power.js';
 import {BallRotationBuffer,rotationBetween,rotationSpeed,spinMarkOpacity} from './ball-rotation.js';
 import * as THREE from 'three';
@@ -61,19 +62,22 @@ function notice(text,duration=4500){$('notice').textContent=text;$('notice').cla
 function send(type,extra={}){return connection?.send(type,extra);}
 let ui,briefing;
 const sound=arcadeAudio();
+const performanceReport=clientPerformance();
 const updateShotDetails=shotDetails(()=>cancel());
 const connection=gameConnection({
   url:`${location.protocol==='https:'?'wss':'ws'}://${location.host}`,
   hello:()=>({token:localStorage.getItem('kyoto-guest'),sessionId:guestId,lastResultAttempt}),
-  onStatus(status){
+  onStatus(status,extra){
+    performanceReport.status(status,extra);
     if(status==='latency')return;connectionStatus=status;
     if(status==='connected')return;
     workerReady=false;workerStatus=status;cancel();clearLiveMotion();
     if(status==='reconnecting')notice('Connection interrupted. Reconnecting… Your flight continues on the server.',1e8);
     if(status==='replaced')notice('This session was opened on another connection. Reload to start a new session.',1e8);
   },
-  onMessage:handleMessage
+  onMessage:handleMessage,onTraffic:performanceReport.traffic
 });
+setInterval(()=>send('client-performance',{report:performanceReport.report()}),5000);
 function clearLiveMotion(){
   snapshot=null;previous=null;history.length=0;renderClock=null;lastPhase='';lastImpact=null;
   ballRotations.samples=[];ballRotations.releaseTime=null;
@@ -473,6 +477,7 @@ function animate(now){
   const shadowsDone=performance.now();
   renderer.render(scene,camera);
   window.kyotoArt.frameCost={pose:poseDone-frameStart,camera:cameraDone-poseDone,shadows:shadowsDone-cameraDone,render:performance.now()-shadowsDone};
+  performanceReport.frame(rawDt*1000,window.kyotoArt.frameCost,replaying?'replay':phase);
   frames++;frameSum+=dt*1000;frameTimes.push(rawDt*1000);if(frameTimes.length>1000)frameTimes.shift();
   if(now-frameSample>1000){$('performance').textContent=`${Math.round(frames*1000/(now-frameSample))} FPS`;frames=0;frameSum=0;frameSample=now;}
   // Preserve input/physics speed on large displays. Only the 3D drawing buffer
@@ -488,7 +493,7 @@ function animate(now){
     }else qualityGoodSince=0;
   }
   if(now-lastTelemetry>15){lastTelemetry=now;window.kyotoState={briefing:briefing.active,briefingTransition:briefing.blocked&&!briefing.active,audio:sound.state,result:ui.state.lastResult,mode:ui.state.mode,pointerLocked:pointerLocked(),charging:!!chargeStarted,viewerFeet:self()?.feet,challenge:ui.state.selected,busy:ui.state.session?.busy,replayTime:ui.state.replayTime,board:ui.state.board,startupMs,ready:loaded&&workerReady&&!!p,phase,diagnostics:snapshot?.diagnostics,feet:p?.feet,ball:snapshot?.ball,velocity:snapshot?.velocity,spin:snapshot?.spin,flightTime:snapshot?.flightTime,stationTime:snapshot?.stationTime,surfaces:snapshot?.surfaces,impacts:snapshot?.impacts,yaw,pitch,top,kick,rotationSampleCount:ballRotations.samples.length,renderedSpin:visibleSpin,spinMarkOpacity:ball.children[0].material.opacity,guestId,identityId,avatarCount:avatars.size,robotVisible:avatars.get(guestId)?.group.visible,robotCharacter:characterChoice,robotCelebrating:isAvatarCelebrating(avatars.get(guestId)),robotResultCamera,robotChargeQueued,cameraClearance,robotWalk:avatars.get(guestId)?.walkBlend,robotFeet:['L','R'].map(side=>avatars.get(guestId)?.bones[`foot.${side}`]?.getWorldPosition(new THREE.Vector3()).toArray()),lastImpact,held:avatars.get(guestId)?.held.toArray(),renderBall:ball.position.toArray(),escalatorStep:Array.from(scene.children.find(o=>o.children[0]?.isInstancedMesh)?.children[0].instanceMatrix.array.slice(12,15)||[]),renderFeet:avatars.get(p?.id)?.group.position.toArray(),renderAlpha:alpha,frameDt:rawDt,renderTime:timeline.time,releaseTime:snapshot?.releaseTime,releaseError:avatars.get(guestId)?.releaseError,camera:{mode:inFlight?'ball':'aim',savedAim:lastThrowAim,position:camera.position.toArray(),target:briefing.active?briefing.target.toArray():lookTarget.toArray(),up:camera.up.toArray(),manual:manualCamera,azimuth,elevation},heat:heat.state,scorePresentation:ui.scorePresentation(),render:{pixelRatio:renderer.getPixelRatio(),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frameMs:frameTimes.slice(-120)}};}
-  updateShotDetails({snapshot,render:window.kyotoState,lastImpact,result:ui.state.lastResult,worker:workerStatus});
+  updateShotDetails({snapshot,render:window.kyotoState,lastImpact,result:ui.state.lastResult,worker:workerStatus,performance:performanceReport.current});
 }
 window.addEventListener('resize',()=>{for(const view of [aimCamera,ballCamera]){view.aspect=innerWidth/innerHeight;view.updateProjectionMatrix();}renderer.setPixelRatio(Math.min(renderer.getPixelRatio(),pixelRatioLimit()));renderer.setSize(innerWidth,innerHeight);});
 requestAnimationFrame(animate);load();

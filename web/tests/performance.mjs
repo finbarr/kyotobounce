@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {Samples,ConnectionMetrics,clientPerformance as sanitize} from '../performance.ts';
+import {clientPerformance} from '../public/performance.js';
+const samples=new Samples();for(let i=0;i<10000;i++)samples.add(i);samples.add(NaN);samples.add(-1);assert.deepEqual(samples.take(),{count:10000,p50:256,p95:486,max:9999});assert.equal(samples.take().count,0);
+const metrics=new ConnectionMetrics('12345678-secret');metrics.message('input',20);metrics.message('private-user-text',30);metrics.state(100,1);metrics.state(900,1.8);const report=metrics.take();assert.equal(report.snapshotGapMs.max,800);assert.equal(report.simulationStepMs.max,800);assert.equal(report.received.unknown,1);assert.equal(JSON.stringify(report).includes('private-user-text'),false);assert.equal(report.connection,'12345678');assert.equal(metrics.take().snapshotGapMs.count,0);
+let time=0;const document={hidden:false,addEventListener(){}};const client=clientPerformance({now:()=>time,document});
+client.traffic('receive','state',100,{stationTime:1},0);client.frame(16,{render:3},'Flight');time=1000;client.frame(16,{render:4},'Flight');
+let p=client.report();assert.equal(p.frameMaxMs,16);assert.equal(p.stateAgeMs,1000,'Live camera with missing snapshots is distinguishable from rendering stall');assert.equal(p.renderMaxMs,4);assert.equal(sanitize({...p,token:'secret'}).token,undefined);assert.equal(sanitize({...p,rttMs:Infinity}),null);
+client.traffic('receive','state',100,{stationTime:2},0);client.frame(900,{render:700},'Flight');time=1050;p=client.report();assert.equal(p.frameMaxMs,900);assert.equal(p.stateGapMaxMs,1000);assert.equal(p.stateAgeMs,50);assert.equal(p.simulationGapMaxMs,1000);assert.equal(client.report().frames,0);
+console.log('PASS bounded metrics, diagnostic allowlist, window reset and render/network stall separation');

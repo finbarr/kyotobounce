@@ -1,6 +1,6 @@
 // Reconnect transport only. Commands are never buffered/replayed: in particular,
 // a release from an old socket must never become a throw on a new session.
-export function gameConnection({url,hello,onMessage,onStatus,WebSocketImpl=WebSocket,
+export function gameConnection({url,hello,onMessage,onStatus,onTraffic=()=>{},WebSocketImpl=WebSocket,
   now=()=>performance.now(),later=setTimeout,cancelLater=clearTimeout,random=Math.random,
   events=globalThis.window,document=globalThis.document}){
   let socket,stopped=false,welcomed=false,attempts=0,retry,tick,probe,lastTick=now(),sequence=0;
@@ -10,7 +10,7 @@ export function gameConnection({url,hello,onMessage,onStatus,WebSocketImpl=WebSo
     if(!welcomed||socket?.readyState!==1)return false;
     // Continuous input is expendable under congestion; controls aren't queued.
     if(type==='input'&&socket.bufferedAmount>16384)return false;
-    socket.send(JSON.stringify({type,...extra}));return true;
+    const raw=JSON.stringify({type,...extra});socket.send(raw);onTraffic('send',type,raw.length,null,socket.bufferedAmount);return true;
   }
   function schedule(){
     if(stopped||retry)return;
@@ -31,8 +31,9 @@ export function gameConnection({url,hello,onMessage,onStatus,WebSocketImpl=WebSo
     ws.addEventListener('message',event=>{
       if(current!==generation||stopped)return;
       let m;try{m=JSON.parse(event.data);}catch{return;}
+      onTraffic('receive',m.type,event.data.length,m,ws.bufferedAmount);
       if(m.type==='pong'){
-        if(probe&&m.sequence===probe.sequence){publish('latency',{rttMs:Math.max(0,now()-probe.at)});probe=undefined;}
+        if(probe&&m.sequence===probe.sequence){publish('latency',{rttMs:Math.max(0,now()-probe.at),server:m.server});probe=undefined;}
         return;
       }
       if(m.type==='welcome'){welcomed=true;attempts=0;probe=undefined;publish('connected',{resumed:m.resumed===true});}
@@ -41,6 +42,7 @@ export function gameConnection({url,hello,onMessage,onStatus,WebSocketImpl=WebSo
     ws.addEventListener('close',event=>{
       if(current!==generation||stopped)return;
       welcomed=false;probe=undefined;socket=undefined;
+      publish('disconnected',{closeCode:event.code});
       if(event.code===4009){stopped=true;cancelLater(tick);publish('replaced');return;}
       schedule();
     });

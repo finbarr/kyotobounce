@@ -18,6 +18,7 @@ KYOTO_PUBLIC_ORIGIN=https://$hostname
 KYOTO_DATA_DIR=/var/lib/kyoto/data
 KYOTO_LAYOUT=/opt/kyoto/current/runtime/station-layout.json
 KYOTO_WORKER_LOG=/var/log/kyoto/player.log
+KYOTO_NATIVE_TIMING=1
 EOF
 chmod 600 /etc/kyoto.env
 ln -sfn "$release" /opt/kyoto/next

@@ -9,6 +9,8 @@ import type { Guest } from './types.ts';
 import { WebSocketServer, WebSocket } from 'ws';
 import { PhysicsWorker } from './worker.ts';
 import {ConnectionQueue} from './connection-queue.ts';
+import {monitorEventLoopDelay} from 'node:perf_hooks';
+import {ConnectionMetrics,clientPerformance} from './performance.ts';
 
 const root = resolve('web/public');
 const port = Number(process.env.KYOTO_PORT || 4173);
@@ -21,10 +23,12 @@ await mkdir(dataDir,{recursive:true});
 const store = new Store(resolve(dataDir,'kyoto.sqlite'));
 const starters=JSON.parse(await readFile(resolve('web/starter-challenges.json'),'utf8'));
 store.syncCampaign(starters);
-type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;replaced?:boolean;intentional?:boolean;opened:number;tokens:number;updated:number;alive:boolean;lastWrite:number;lastReplay:number};
+type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;metrics:ConnectionMetrics;lastClientReport:number;replaced?:boolean;intentional?:boolean;opened:number;tokens:number;updated:number;alive:boolean;lastWrite:number;lastReplay:number};
 const connections = new Map<WebSocket,Connection>();
 const detached = new Map<string,ReturnType<typeof setTimeout>>();
 const worker = new PhysicsWorker();
+const eventLoop=monitorEventLoopDelay({resolution:20});eventLoop.enable();
+let eventLoopMaxMs=0;
 const competition = new Competition(store,worker,broadcast);
 let workerFailure = '';
 const mime: Record<string,string> = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.glb':'model/gltf-binary','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon'};
@@ -62,14 +66,15 @@ const server = createServer(async (request,response) => {
 });
 const wss=new WebSocketServer({server,maxPayload:65536,verifyClient:(info:{origin:string})=>connections.size<32&&(allowedOrigins.has(info.origin)||(!publicOrigin&&!info.origin))});
 function send(socket:WebSocket,value:unknown){
+  const metrics=connections.get(socket)?.metrics;if(metrics)metrics.bufferMax=Math.max(metrics.bufferMax,socket.bufferedAmount);
   // Snapshots are superseded every tick. Never queue seconds of stale motion
   // behind a slow network or a large replay; reliable results remain ordered.
-  if((value as {type?:string})?.type==='state'&&socket.bufferedAmount>65536)return;
-  if(socket.bufferedAmount>8_000_000){socket.close(1013,'Connection too slow. Please reconnect.');return;}if(socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify(value));}
+  if((value as {type?:string})?.type==='state'&&socket.bufferedAmount>65536){if(metrics)metrics.droppedStates++;return;}
+  if(socket.bufferedAmount>8_000_000){if(metrics)metrics.closeCause='outbound-backlog';socket.close(1013,'Connection too slow. Please reconnect.');return;}if(socket.readyState===WebSocket.OPEN){const raw=JSON.stringify(value);if(metrics)metrics.bytesOut+=Buffer.byteLength(raw);socket.send(raw);}}
 function broadcast(value:unknown,sessionId?:string){for(const [socket,c]of connections)if(c.guest&&(!sessionId||c.id===sessionId))send(socket,value);}
 worker.on('message', message=>{
   if('challenge' in message&&!message.challenge?.id)message.challenge=null;
-  if(message.type==='state')competition.state(message);
+  if(message.type==='state'){const now=performance.now();for(const c of connections.values())if(c.id===message.id)c.metrics.state(now,message.stationTime);competition.state(message);}
   if(message.type==='notice')competition.note(message);
   if(message.type==='impact')competition.impact(message);
   if(message.type==='waypoint-hit')competition.waypoint(message);
@@ -89,18 +94,25 @@ worker.on('status',message=>{
   broadcast(message);
 });
 wss.on('connection',socket=>{
-  const c:Connection={id:randomUUID(),queue:new ConnectionQueue(handle),opened:performance.now(),tokens:180,updated:performance.now(),alive:true,lastWrite:0,lastReplay:0};connections.set(socket,c);
-  const authTimer=setTimeout(()=>{if(!c.guest)socket.close(1008,'Join timed out');},5000);
+  const id=randomUUID();const c:Connection={id,queue:new ConnectionQueue(handle),metrics:new ConnectionMetrics(id),lastClientReport:0,opened:performance.now(),tokens:180,updated:performance.now(),alive:true,lastWrite:0,lastReplay:0};connections.set(socket,c);
+  const authTimer=setTimeout(()=>{if(!c.guest){c.metrics.closeCause='join-timeout';socket.close(1008,'Join timed out');}},5000);
   socket.on('pong',()=>{c.alive=true;});
   socket.on('error',()=>{});
   socket.on('message',raw=>{
+    let m;const text=raw.toString();try{m=JSON.parse(text);if(!m||typeof m.type!=='string')m=null;}
+    catch{m=null;}
+    c.metrics.message(m?.type||'unknown',Buffer.byteLength(text));
     const now=performance.now();c.tokens=Math.min(180,c.tokens+(now-c.updated)*.09)-1;c.updated=now;
-    if(c.tokens<0){socket.close(1008,'Too many requests. Please reconnect.');return;}
-    let m;try{m=JSON.parse(raw.toString());if(!m||typeof m.type!=='string')throw new Error();}
-    catch{send(socket,{type:'error',message:'Invalid message'});return;}
-    if(c.guest&&m.type==='ping'){send(socket,{type:'pong',sequence:m.sequence});return;}
+    if(c.tokens<0){c.metrics.closeCause='request-rate';socket.close(1008,'Too many requests. Please reconnect.');return;}
+    if(!m){send(socket,{type:'error',message:'Invalid message'});return;}
+    if(c.guest&&m.type==='ping'){send(socket,{type:'pong',sequence:m.sequence,server:{eventLoopMaxMs,workerStateAgeMs:c.metrics.lastState?Math.round(now-c.metrics.lastState):0,pendingRequests:worker.requests.size}});return;}
+    if(c.guest&&m.type==='client-performance'){
+      if(now-c.lastClientReport<4000)return;c.lastClientReport=now;const report=clientPerformance(m.report);
+      if(report)console.info(JSON.stringify({event:'client-performance',connection:c.metrics.tag,...report}));return;
+    }
     if(c.guest&&m.type==='leave'){c.intentional=true;socket.close(1000,'Leaving');return;}
-    if(!c.queue.push(m))socket.close(1008,'Too many queued commands. Please reconnect.');
+    if(!c.queue.push(m)){c.metrics.closeCause='command-queue';socket.close(1008,'Too many queued commands. Please reconnect.');}
+    c.metrics.queueMax=Math.max(c.metrics.queueMax,c.queue.pending);
   });
   async function handle(m:any){
     try {
@@ -157,10 +169,14 @@ wss.on('connection',socket=>{
         timer.unref();detached.set(c.id,timer);
       }
     }
-    console.info(JSON.stringify({event:'connection-closed',code,authenticated:!!c.guest,resumable:!!c.guest&&!c.intentional&&!c.replaced,seconds:Math.round((performance.now()-c.opened)/1000)}));
+    console.info(JSON.stringify({event:'connection-closed',code,cause:c.metrics.closeCause,receivedTotal:c.metrics.total,...c.metrics.take(),authenticated:!!c.guest,resumable:!!c.guest&&!c.intentional&&!c.replaced,seconds:Math.round((performance.now()-c.opened)/1000)}));
   });
 });
-const heartbeat=setInterval(()=>{for(const [socket,c]of connections){if(!c.alive){socket.terminate();continue;}c.alive=false;socket.ping();}},30000);
+const telemetry=setInterval(()=>{
+  eventLoopMaxMs=Math.round(eventLoop.max/1e6);const loopP99Ms=Math.round(eventLoop.percentile(99)/1e6);eventLoop.reset();
+  if(connections.size)console.info(JSON.stringify({event:'server-performance',eventLoopMaxMs,eventLoopP99Ms:loopP99Ms,rssBytes:process.memoryUsage().rss,workerReady:worker.ready,pendingRequests:worker.requests.size,workerBufferedBytes:worker.socket?.writableLength||0,connections:[...connections.values()].map(c=>c.metrics.take())}));
+},5000);telemetry.unref();
+const heartbeat=setInterval(()=>{for(const [socket,c]of connections){if(!c.alive){c.metrics.closeCause='heartbeat-timeout';socket.terminate();continue;}c.alive=false;socket.ping();}},30000);
 heartbeat.unref();
 server.on('error',error=>{console.error(error.message);if(worker.child)worker.stop();process.exitCode=1;});
 server.listen(port,'127.0.0.1',()=>{
@@ -169,5 +185,5 @@ server.listen(port,'127.0.0.1',()=>{
 });
 let stopping=false;
 for(const signal of ['SIGINT','SIGTERM'] as const)process.on(signal,()=>{
-  if(stopping)return;stopping=true;clearInterval(heartbeat);for(const timer of detached.values())clearTimeout(timer);detached.clear();worker.stop();for(const socket of connections.keys())socket.close();wss.close();server.close();server.closeAllConnections();store.close();
+  if(stopping)return;stopping=true;clearInterval(heartbeat);clearInterval(telemetry);eventLoop.disable();for(const timer of detached.values())clearTimeout(timer);detached.clear();worker.stop();for(const socket of connections.keys())socket.close();wss.close();server.close();server.closeAllConnections();store.close();
 });
