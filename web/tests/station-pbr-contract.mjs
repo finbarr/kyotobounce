@@ -34,7 +34,7 @@ for(const name of ['Garden guard glazing','Shop window glazing','Glass - placeho
 assert.equal(stationMaterialFamily('Brushed stainless hardware'),'stainless');
 for(const name of ['Fleet tactile yellow','Atrium | wayfinding white lettering','Orange sign band','Daytime stair lens'])assert.equal(stationMaterialFamily(name),null);
 const old=execFileSync('git',['show','4ee2976:web/public/station-look.js'],{encoding:'utf8'}),candidate=await readFile('web/public/station-look.js','utf8');
-for(const [begin,end] of [['const architecturalShadow=','// Fit once'],['export function fitStationShadowCamera','// Architectural finish layer.'],['export function createStationLightPool','export function dressStation'],['export function contactShadow',null]]){
+for(const [begin,end] of [['export function fitStationShadowCamera','// Architectural finish layer.'],['export function createStationLightPool','export function dressStation'],['export function contactShadow',null]]){
  const original=old.slice(old.indexOf(begin),end?old.indexOf(end):undefined).trim();
  if(begin==='export function fitStationShadowCamera')assert(candidate.includes(original));else assert.equal(candidate.slice(candidate.indexOf(begin),end?candidate.indexOf(end):undefined).trim(),original,'accepted shadow/contact/pool implementation retained');
 }

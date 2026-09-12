@@ -2,20 +2,46 @@ import * as THREE from 'three';
 import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture } from './station-materials.js';
 import { configureStationDaylight, createStationReflections } from './station-lighting.js';
 
-// Four fixed hardware-PCF taps soften texel stair steps without the default
-// per-screen-pixel random rotation. The kernel lives in shadow-map coordinates,
-// so moving the camera does not rotate the architectural shadow pattern.
-// Keep the footprint tight: wider offsets self-shadow steep receiver planes.
-const architecturalShadow=THREE.ShaderChunk.shadowmap_pars_fragment.replace(
-  /shadow = \(\s*texture\( shadowMap, vec3\( shadowCoord\.xy \+ vogelDiskSample[\s\S]*?\) \* 0\.2;/,
-  `vec2 offset = texelSize * shadowRadius * .25;
-  shadow = (
-    texture( shadowMap, vec3( shadowCoord.xy + vec2(-offset.x,-offset.y), shadowCoord.z ) ) +
-    texture( shadowMap, vec3( shadowCoord.xy + vec2( offset.x,-offset.y), shadowCoord.z ) ) +
-    texture( shadowMap, vec3( shadowCoord.xy + vec2(-offset.x, offset.y), shadowCoord.z ) ) +
-    texture( shadowMap, vec3( shadowCoord.xy + vec2( offset.x, offset.y), shadowCoord.z ) )
-  ) * .25;`
-);
+// Filter in shadow-map space so camera motion never rotates a noisy kernel.
+// The old four taps all fell within .3 texels of the center: effectively a hard
+// edge at this building's scale. Nine weighted bilinear taps cover the neighboring
+// texels, while receiver-plane depth offsets prevent that wider footprint from
+// shadowing the receiving floor/wall itself. Keep the existing static 4096 map.
+const pcfFunction=/float getShadow\( sampler2DShadow[\s\S]*?(?=\n\s*#elif defined\( SHADOWMAP_TYPE_VSM \))/;
+const architecturalShadow=THREE.ShaderChunk.shadowmap_pars_fragment.replace(pcfFunction,`
+  float getShadow( sampler2DShadow shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+    shadowCoord.xyz /= shadowCoord.w;
+    // Evaluate derivatives before the frustum branch. The gradient converts an
+    // offset in shadow UV to the corresponding depth on this receiver plane.
+    vec3 dx = dFdx( shadowCoord.xyz ), dy = dFdy( shadowCoord.xyz );
+    float determinant = dx.x * dy.y - dx.y * dy.x;
+    vec2 depthGradient = vec2( 0.0 );
+    if ( abs( determinant ) > 1e-12 ) {
+      depthGradient = vec2( dy.y * dx.z - dx.y * dy.z, dx.x * dy.z - dy.x * dx.z ) / determinant;
+    }
+    shadowCoord.z += shadowBias;
+    bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 && shadowCoord.z <= 1.0;
+    float shadow = 1.0;
+    if ( inFrustum ) {
+      vec2 texelSize = 1.0 / shadowMapSize;
+      // A hardware lookup compares four texels at one depth. Cover their residual
+      // half-texel plane error, bounded to avoid detached shadows at grazing angles.
+      float planeBias = min( dot( abs( depthGradient ), texelSize ) * .5, .0003 );
+      shadow = 0.0;
+      for ( int y = -1; y <= 1; y ++ ) {
+        for ( int x = -1; x <= 1; x ++ ) {
+          vec2 offset = vec2( float( x ), float( y ) ) * texelSize * shadowRadius;
+          float weight = ( x == 0 ? 2.0 : 1.0 ) * ( y == 0 ? 2.0 : 1.0 );
+          float depth = shadowCoord.z + dot( depthGradient, offset ) - planeBias;
+          shadow += weight * texture( shadowMap, vec3( shadowCoord.xy + offset, depth ) );
+        }
+      }
+      shadow *= 1.0 / 16.0;
+    }
+    return mix( 1.0, shadow, shadowIntensity );
+  }
+`);
+if(architecturalShadow===THREE.ShaderChunk.shadowmap_pars_fragment)throw new Error('Station PCF shader no longer matches Three.js');
 THREE.ShaderChunk.shadowmap_pars_fragment=architecturalShadow;
 
 // Fit once to the complete retained architecture, with a margin for actors.
@@ -91,7 +117,7 @@ export function dressStation(renderer,scene,sun,station,data){
   const shadowCoverage=fitStationShadowCamera(sun,station);
   // Preserve the old world-space depth offset when fitting the near/far planes.
   // The old camera spanned 300 - 1 = 299 m; normalized bias scales with that range.
-  sun.shadow.radius=1.2;sun.shadow.bias=-.00012*299/(sun.shadow.camera.far-sun.shadow.camera.near);sun.shadow.normalBias=.04;
+  sun.shadow.radius=1.4;sun.shadow.bias=-.00012*299/(sun.shadow.camera.far-sun.shadow.camera.near);sun.shadow.normalBias=.04;
   const textures=createStationTextures(renderer);
   // Both GLTF roots and authored sign groups are already attached by load().
   // Recognize hardware by its exported material names, without a game.js hook.
@@ -131,7 +157,7 @@ export function dressStation(renderer,scene,sun,station,data){
   return {updateLights,captureEnvironment:reflections.capture,
     dispose(){textures.dispose();reflections.dispose();scene.background?.dispose();},
     stats:{finishedMaterials:done.size,families,preservedMaps,resampledMaps,generatedTextureBytes:textures.bytesWithMipmaps,
-      reflection:reflections.stats,shadowMap:4096,reflectionProbe:256,shadowCoverage,shadowFilterTaps:4,fixtureLighting:fixtureLighting.stats}};
+      reflection:reflections.stats,shadowMap:4096,reflectionProbe:256,shadowCoverage,shadowFilterTaps:9,fixtureLighting:fixtureLighting.stats}};
 }
 
 export function contactShadow(scene,station){

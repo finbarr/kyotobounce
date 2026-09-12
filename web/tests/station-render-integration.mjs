@@ -21,4 +21,5 @@ assert.equal(stationMaterialFamily('Garden guard glazing | Browser'),'guard');
 look.dispose?.();
 console.log(`PASS ${materials.length} authored material names preserve color/emission/maps; retained station families and unregistered-layout exclusion`);
 
-for(const hash of ['485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d','7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775'])assert.equal(hasStationWayfinding(hash),true);
+const detailData=JSON.parse(await readFile('web/public/assets/atrium-detail.json','utf8'));
+assert.equal(hasStationWayfinding(detailData.sourceLayoutSha256),true,'current station layout has authored wayfinding');
