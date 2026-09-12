@@ -1,6 +1,18 @@
 # Station detail pass
 
-## New research and assignments — 2026-09-08
+## Current round — 2026-09-12
+
+The September 8 batch K025–K031 is integrated, verified and deployed with
+`assets-v3`, source `3741821`. The old assignment below is retained as scope
+history; its pending handoff language no longer describes the current fleet.
+All five development VMs were retired after verified preservation on September 12.
+
+See [STATION-REFERENCE-AUDIT.md](STATION-REFERENCE-AUDIT.md) for the new
+Street View/indoor photosphere comparison, specific remaining gaps, references,
+model anchors and acceptance for K032–K036. K032 is integrated locally with static full-game and continuous shader-orbit
+checks; it is not deployed. The larger geometry jobs are queued and have no running machines.
+
+## Completed research and assignments — 2026-09-08
 
 The user rejected the first pass as visually too sparse after deployment. This
 second assignment is substantial visible scene work, with five independent jobs

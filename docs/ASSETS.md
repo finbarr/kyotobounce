@@ -56,7 +56,7 @@ matching browser exports into `web/public/assets/`. Geometry changes alter the l
 
 `art-source/phase3/robot/build_robot.py` generates the original rig; `tools/build_atrium_detail.py` generates hardware. `tools/build_stair_materials.py` generates textures using Python, NumPy and Pillow. The Blender source remains the editable authority for manually authored station geometry.
 
-For a new release, run `npm run assets:pack -- assets-v2` (increment the version), review the archive allowlist and changed manifest, attach the archive from `artifacts/open-source/` to a public GitHub release with the matching tag, and commit the manifest alongside its code changes. Publish a new version instead of replacing an existing archive. Do not add multi-hundred-megabyte binaries to Git history.
+For a new release, run `npm run assets:pack -- assets-v4` (increment the current `assets-v3` version), review the archive allowlist and changed manifest, attach the archive from `artifacts/open-source/` to a public GitHub release with the matching tag, and commit the manifest alongside its code changes. Publish a new version instead of replacing an existing archive. Do not add multi-hundred-megabyte binaries to Git history.
 
 ## Provenance and boundaries
 
