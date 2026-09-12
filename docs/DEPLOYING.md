@@ -23,7 +23,7 @@ A maintainer may keep those values in an ignored `.deploy.local.json` with `targ
 
 Activation installs the release under `/opt/kyoto/releases`, switches `/opt/kyoto/current`, configures HTTPS, restarts the service, and backs up existing SQLite data before migration. Persistent data lives outside releases under `/var/lib/kyoto/data`; the backup timer stores local backups under `/var/lib/kyoto/backups`. Arrange off-server backups separately.
 
-Verify a real shot/replay against the staged release with a separate temporary database. After activation, check the HTTPS page, `/api/health`, public asset hashes, an existing read-only archive replay, service logs and backup timer. Do not create test records in the production database by default. The upload script does not itself prove gameplay or automatically roll back a failed release. Keep the previous release and database backup available for a coordinated rollback.
+Verify a real shot/replay against the staged release with a separate temporary database. After activation, check the HTTPS page, `/api/health`, public asset hashes, service logs and backup timer. Do not create test records in the production database by default. The upload script does not itself prove gameplay or automatically roll back a failed release. Keep the previous release and database backup available for a coordinated rollback.
 
 Store protected rollback configuration and database snapshots under `/var/lib/kyoto/deployments/<release>`, outside `/var/lib/kyoto/backups`. The backup retention script runs as `kyoto` and must be able to traverse its backup directory. When staging manually, apply the release read/execute permissions from `activate.sh` before starting a temporary service as `kyoto`.
 

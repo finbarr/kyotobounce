@@ -1,4 +1,4 @@
-"""Append the ground-floor concourse layer to the reviewed assets-v3 source.
+"""Build the ground-floor concourse layer in the current editable source.
 Original geometry; dimensions and placement interpret the reference register.
 All accessible protruding fixtures have matching native boxes. Shop dressing
 behind retained solid glazing does not introduce inaccessible collision bodies.
@@ -10,11 +10,22 @@ ROOT=Path(__file__).resolve().parents[3]
 p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--baseline',type=Path)
 a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 base=a.baseline/'station-layout.json' if a.baseline else ROOT/'runtime/station-layout.json';sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
-assert sha(base)=='485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d'
-layout=json.loads(base.read_text());baseline=copy.deepcopy(layout)
+layout=json.loads(base.read_text())
 bpy.ops.wm.open_mainfile(filepath=str(a.baseline/'KyotoAtrium.blend' if a.baseline else ROOT/'art-source/atrium/KyotoAtrium.blend'))
+# Regenerate only this authored layer, using the current source as the baseline.
+previous=bpy.data.collections.get('Ground floor concourse / September 2026')
+if previous:
+ owned={o.get('kyoto_surface',o.name) for o in previous.objects}
+ material_names={'concourse-'+name for name in ['graphite','steel','ivory','wood','oak','red','blue','green','amber','glass-dark','paper','warm-light','white-light']}
+ mats={m for m in bpy.data.materials if m.name in material_names}
+ for key in ['boxes','panels','beams']:layout[key]=[r for r in layout[key] if r['id'] not in owned]
+ layout['authoredMaterials']=[r for r in layout['authoredMaterials'] if r['id'] not in {m.name for m in mats}]
+ for obj in list(previous.objects):bpy.data.objects.remove(obj,do_unlink=True)
+ bpy.data.collections.remove(previous)
+ for material in mats:bpy.data.materials.remove(material)
+baseline=copy.deepcopy(layout)
 # Original service glyphs are superseded by the registered bilingual artwork.
-# Hide only these non-colliding text meshes; retain their historical seed records.
+# Hide only these non-colliding text meshes; retain the source geometry records.
 for office in ['tickets','information']:
  for suffix in ['title','subtitle']:bpy.data.objects[f'central-hall-{office}-{suffix}'].hide_render=True
 collection=bpy.data.collections.new('Ground floor concourse / September 2026');bpy.context.scene.collection.children.link(collection)

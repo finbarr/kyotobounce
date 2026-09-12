@@ -12,17 +12,11 @@ try{
  assert.equal(s.replay('a1').score,1100,'Duplicate attempt cannot replace its score or replay');
  s.saveResult(result('a2',a.id,1200,4),'animation');s.saveResult(result('b1',b.id,1200,3),'animation');
  assert.deepEqual(s.leaderboard(c).map(r=>r.attempt),['b1','a2'],'One best per guest, duration breaks equal scores');
- s.saveChallenge({...c,revision:2,throwModel:'robot-v2',goal:{...c.goal,radius:.5}});s.saveResult(result('a3',a.id,1400,2,2),'animation');
- assert.equal(s.leaderboard(c).length,2);assert.deepEqual(s.leaderboard({...c,revision:2}).map(r=>r.attempt),['a3'],'Revisions have separate boards');
  const miss={...result('miss',b.id,0,30),success:false,surfaces:0};s.saveResult(miss,'animation');assert.equal(s.replay('miss'),null);assert.equal(s.leaderboard(c).length,2);
  assert.equal(s.guest(a.token).id,a.id,'Guest token restores identity');
- const replayBefore=JSON.stringify(s.replay('a1')),old=s.challenge(c.id,2);
- s.upgradeThrowModels();const upgraded=s.challenge(c.id);
- assert.equal(upgraded.revision,3);assert.equal(upgraded.throwModel,THROW_MODEL);
- assert.deepEqual(upgraded.goal,old.goal);assert.deepEqual(s.challenge(c.id,2),old);
- assert.equal(s.leaderboard(upgraded).length,0,'New throw rules cannot inherit old scores');
- assert.deepEqual(s.leaderboard(old).map(r=>r.attempt),['a3']);
- assert.equal(JSON.stringify(s.replay('a1')),replayBefore,'Historical replay is immutable');
- s.upgradeThrowModels();assert.equal(s.challenge(c.id).revision,3,'Restart cannot create duplicate revisions');
- console.log('PASS SQLite score/replay atomic record, duplicates, best-per-guest, ties, revisions, misses and guest identity');
+ s.saveChallenge({...c,revision:2,throwModel:THROW_MODEL,goal:{...c.goal,radius:.5}});s.saveResult(result('a3',a.id,1400,2,2),'animation');
+ assert.equal(s.challenge(c.id,1),null);assert.equal(s.replay('a1'),null);assert.equal(s.leaderboard(c).length,0);
+ assert.deepEqual(s.leaderboard({...c,revision:2}).map(r=>r.attempt),['a3']);
+ assert.equal(s.saveResult(result('late-old-shot',a.id,1500,2),'animation'),false,'A late old shot cannot resurrect retired scores');
+ console.log('PASS atomic scores/replays, duplicate protection, best-per-guest, ties, current revision replacement, misses and guest identity');
 }finally{s.close();}

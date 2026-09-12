@@ -51,7 +51,7 @@ export function arcadeFeedback(sound){
  return {
   reset(){waypointCount=0;seenWaypoints.clear();lastUpdate=performance.now();pending=null;cooldown=0;spectacleTime=0;shownMultiplier=1;clearAnimations();spectacle.hidden=true;current=null;bankCount=0;tagged=false;display=10000;flash=0;trickTime=0;hud.hidden=true;hud.dataset.cue='';},
   accept(score,attempt){
-   if(!score||!['combo-v4','combo-v5','waypoint-v1'].includes(score.version))return;
+   if(!score||!['combo-v5','waypoint-v1'].includes(score.version))return;
    if(attempt!==lastAttempt){this.reset();lastAttempt=attempt;}
    const waypoint=score.version==='waypoint-v1',rewound=waypoint&&score.waypointCount<waypointCount;
    if(waypoint&&(!current||rewound))display=score.total;

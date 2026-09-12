@@ -7,7 +7,7 @@ Ship the requested bounded change. Do not resume historical Phase 2/3 checklists
 ## Architecture and invariants
 
 - Browser: `web/public/`; authoritative service: `web/*.ts`; native physics: `KyotoRicochet/Assets/Kyoto/Scripts/`.
-- Scores are authoritative and versioned. Preserve immutable historical replays and challenge revisions. Never trust a client-supplied final score.
+- This game is pre-launch. Keep only the current station, courses and scoring rules; discard retired development data instead of maintaining archives or compatibility migrations. Current scores remain authoritative; never trust a client-supplied final score.
 - A shot finishes only when the ball stops translating AND spinning; no timer finish while it is moving. Recall forfeits.
 - Station collision and visual exports must match. The canonical layout is `runtime/station-layout.json`; art sources are supplied by `npm run assets:fetch`.
 - Current scoring behavior is documented in `docs/ARCADE-SCORING.md`.

@@ -8,7 +8,6 @@ import { Competition } from './competition.ts';
 import type { Guest } from './types.ts';
 import { WebSocketServer, WebSocket } from 'ws';
 import { PhysicsWorker } from './worker.ts';
-import {LayoutAssets} from './layout-assets.ts';
 import {ConnectionQueue} from './connection-queue.ts';
 
 const root = resolve('web/public');
@@ -22,14 +21,11 @@ await mkdir(dataDir,{recursive:true});
 const store = new Store(resolve(dataDir,'kyoto.sqlite'));
 const starters=JSON.parse(await readFile(resolve('web/starter-challenges.json'),'utf8').catch(()=>'[]'));
 for(const challenge of starters)if(!store.challenge(challenge.id,challenge.revision))store.saveChallenge(challenge);
-store.upgradeThrowModels();
-store.upgradeScoring();
 type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;replaced?:boolean;intentional?:boolean;opened:number;tokens:number;updated:number;alive:boolean;lastWrite:number;lastReplay:number};
 const connections = new Map<WebSocket,Connection>();
 const detached = new Map<string,ReturnType<typeof setTimeout>>();
 const worker = new PhysicsWorker();
-const layoutAssets=await LayoutAssets.load();
-const competition = new Competition(store,worker,broadcast,layoutAssets);
+const competition = new Competition(store,worker,broadcast);
 let workerFailure = '';
 const mime: Record<string,string> = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.glb':'model/gltf-binary','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon'};
 const vendors = [
@@ -43,15 +39,6 @@ const server = createServer(async (request,response) => {
     if (url.pathname === '/api/health') {
       response.writeHead(worker.ready?200:503,{'Content-Type':'application/json','Cache-Control':'no-store'});
       response.end(JSON.stringify({status:worker.status,scope:publicOrigin?'online':'local',worker:worker.ready,error:publicOrigin?(workerFailure?'Physics temporarily unavailable':''):workerFailure}));return;
-    }
-    // Archive reads neither create guests nor join the native physics worker.
-    if(url.pathname==='/api/archive/replay'){
-      try{const attempt=url.searchParams.get('attempt');if(!attempt||attempt.length>80)throw new Error('Replay not found');const data=await layoutAssets.replay(store.replay(attempt));response.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});response.end(JSON.stringify(data));}
-      catch(error){response.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});response.end(JSON.stringify({error:error instanceof Error?error.message:'Archive unavailable'}));}return;
-    }
-    if(url.pathname==='/api/archive/catalog'){
-      const id=url.searchParams.get('challenge'),revision=Number(url.searchParams.get('revision'));const challenge=id&&Number.isInteger(revision)?store.challenge(id,revision):null;
-      response.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});response.end(JSON.stringify(challenge?{challenge,entries:store.leaderboard(challenge)}:{challenges:competition.catalog().archived}));return;
     }
     // Local read-only game state, without guest credentials. Reject other origins.
     if (url.pathname === '/api/debug/sessions') {

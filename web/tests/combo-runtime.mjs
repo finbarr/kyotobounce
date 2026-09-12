@@ -30,11 +30,9 @@ try{
   if(name==='perfect'){
    const entered=replay.scoreFrames.find(f=>f.score.goalVisited);
    assert.ok(entered&&r.breakdown.activeSeconds>entered.score.activeSeconds+.05,'Native timer continues after target entry until rest');
-   const frozen=scoreAttempt({...replay,challenge:{...replay.challenge,scoring:'combo-v4'}});
-   assert.ok(r.breakdown.activeSeconds>frozen.activeSeconds+.05,'The same native trajectory reproduces the archived first-entry timer freeze');
    const atRest=replay.poses.at(-1),extraRest={...replay,poses:[...replay.poses,{...atRest,t:atRest.t+10}]};
    assert.deepEqual(scoreAttempt(extraRest),r.breakdown,'Rest does not keep accruing time');
-   timerRegression={entryActiveSeconds:entered.score.activeSeconds,finalActiveSeconds:r.breakdown.activeSeconds,archivedActiveSeconds:frozen.activeSeconds,extraRestSeconds:10};
+   timerRegression={entryActiveSeconds:entered.score.activeSeconds,finalActiveSeconds:r.breakdown.activeSeconds,extraRestSeconds:10};
   }
   checks.push({name,timerRegression,score:r.score,breakdown:r.breakdown,liveFrames:live.length,poses:replay.poses.length,stopped:true});console.log(JSON.stringify({name,score:r.score,banks:r.breakdown.styleBanks,time:r.breakdown.timeMultiplier,landing:r.breakdown.landingMultiplier}));
   c.send('recall');await delay(150);

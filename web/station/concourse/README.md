@@ -19,7 +19,7 @@ uses the existing solid cafe volume as backing. High posters are attached to tha
 same wall. No information desk is invented at an unidentified hotel service door.
 The existing West Exit 2F 7-Eleven/Heart-in remains in its established location.
 
-`build.py` appends to the reviewed assets-v3 Blender/layout pair. It preserves all
+`build.py` regenerates its own named layer in the current Blender/layout pair. It preserves all
 baseline boxes, beams and panels, checks the bounds of 52 new native solid
 fixtures, and embeds the exact new layout bytes in the editable blend. Appliance
 edge bevels remain within their native box hulls. Display dressing behind existing
@@ -30,11 +30,9 @@ are original. Research photographs stay outside the asset pack and Git.
 `concourseDetails` metadata travels with the exported station bundle.
 `web/public/concourse-details.js` draws 64 registered artwork faces into a single
 4096×2048 filtered atlas and one mesh. No new dynamic lights or per-frame artwork
-redraw. Old bundles lacking this metadata receive none of the additions. The
-previous production layout and its six browser/collision assets are retained in
-the archive registry before new exports are installed.
+redraw. The game ships only the current station bundle.
 
-Rebuild from the installed assets-v3 checkout, or pass `--baseline DIRECTORY`
+Rebuild from the installed current assets, or pass `--baseline DIRECTORY`
 containing its `KyotoAtrium.blend` and `station-layout.json`:
 
 ```sh
@@ -50,5 +48,4 @@ Lift uses the previously proven escalator release phase. It is a controlled
 native proof; ordinary browser timing remains a separate interaction check.
 The new Catch the Lift hint includes that timing cue. Only the new Last Order
 revision increases its destination radius from 0.9 to 1.05 m, accommodating the
-observed delivery variation while staying inside the shop floor. Historical
-course JSON, attempts and scoreboards remain unchanged.
+observed delivery variation while staying inside the shop floor. Only current course definitions ship; retired development courses and scores are discarded.

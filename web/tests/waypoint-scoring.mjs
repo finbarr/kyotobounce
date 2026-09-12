@@ -23,8 +23,8 @@ assert.equal(scoreAttempt(result({challenge:{...c,goal:{...goal,center:p(0)}},co
 const many=Array.from({length:32},(_,i)=>({...targets[0],id:`n${i}`}));const manyHits=many.map(w=>({...hits[0],waypointId:w.id}));
 const huge=scoreAttempt(result({challenge:{...c,waypoints:many},waypointHits:manyHits,contacts:Array.from({length:100},(_,i)=>({...postGoalBank,surface:`wall${i}`,time:i*.2,point:p(i)})),poses:[{t:0,p:p(0),q},{t:60,p:p(20),q}]}));assert.equal(huge.total,Number.MAX_SAFE_INTEGER);assert.ok(Number.isFinite(huge.bankMultiplier));
 const store=new Store(':memory:');try{
- store.saveChallenge(c);const before=JSON.stringify(store.challenge(c.id));store.upgradeScoring();store.upgradeScoring();assert.equal(JSON.stringify(store.challenge(c.id)),before,'Waypoint family is never migrated into classic scoring');
- const worker={ready:true,capabilities:[],request:async()=>({}),send(){}};const game=new Competition(store,worker,()=>{});const member={id:'session',guest:{id:'test'},restoring:false};
+ store.saveChallenge(c);
+ const worker={ready:true,capabilities:[],request:async()=>({}),send(){}};const game=new Competition(store,worker,()=>{});game.layout=c.layout;game.physics=c.physics;const member={id:'session',guest:{id:'test'},restoring:false};
  await assert.rejects(game.command(member,{type:'place',slot:'waypoint',origin:p(0),direction:p(0,-1),radius:.5}),/does not support/);
  await assert.rejects(game.command(member,{type:'release',waypointHits:hits}),/intent only/);
  worker.capabilities=['waypoint-v1'];
@@ -40,4 +40,4 @@ const store=new Store(':memory:');try{
   assert.deepEqual(store.replay(attempt).records,{personalBest:expected,courseBest:expected},'Only strict improvements are record events');
  }
 }finally{store.close();}
-console.log('PASS waypoint chain, destination bonus/miss, once-only contacts, anti-spoof, capability gating, migration isolation and safe integers');
+console.log('PASS waypoint chain, destination bonus/miss, once-only contacts, anti-spoof, capability gating and safe integers');

@@ -5,10 +5,10 @@ function artwork(width,height,paint){
   const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;
 }
 // Original procedural artwork and exact registrations; audit: web/station/wayfinding/README.md.
-export const wayfindingLayout='485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d';
+export const wayfindingLayout='b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515';
 // Both exports retain the audited sign faces and wall anchors. Historical650
 // predates this registration and must not receive these fixed-position overlays.
-const registeredLayouts=new Set(['b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515',wayfindingLayout,'7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775']);
+const registeredLayouts=new Set([wayfindingLayout]);
 export const hasStationWayfinding=layout=>registeredLayouts.has(layout);
 export const wayfindingFont='"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans CJK JP", "Noto Sans JP", Arial, sans-serif';
 const font=wayfindingFont;

@@ -1,11 +1,9 @@
 import {WAYPOINT_SCORING} from './types.ts';
 import type { NativeResult,Vector,WaypointHit } from './types.ts';
 export const ARCADE_SCORING='combo-v5';
-export const LEGACY_COMBO_SCORING='combo-v4';
 export type ScoreBreakdown={version:string;outcome:'perfect'|'tagged'|'near'|'miss'|'forfeit'|'route-missed';waypointCount?:number;waypointIds?:string[];waypointHits?:WaypointHit[];waypointBase?:number;waypointMultiplier?:number;destinationReached?:boolean;destinationBonus?:number;accuracy:number;style:number;styleBanks:number;stylePercent:number;goalVisited:boolean;distance:number;proximityRange:number;endPosition:Vector;total:number;base?:number;bankMultiplier?:number;timeMultiplier?:number;activeSeconds?:number;landingMultiplier?:number;potential?:number;firstVisit?:number|null;lastBank?:string};
 const distance=(a:Vector,b:Vector)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
 const clamp=(x:number,a=0,b=1)=>Math.min(b,Math.max(a,x));
-const STYLE=[0,.08,.14,.19,.23,.25];
 // A finite cylinder at floor height, swept between authoritative 180 Hz poses.
 // A fast ball cannot skip the target, and flying over another floor is not a tag.
 function entersGoal(a:Vector,b:Vector,g:Vector,r:number,ballRadius:number){
@@ -52,11 +50,8 @@ export class ComboTracker {
    if(a&&pose.t<a.t)throw new Error('Trajectory time moved backwards');
    if(a&&pose.t>a.t){
     const dt=pose.t-a.t;
-    // Preserve archived v4 arithmetic exactly. Current time follows all native
-    // translation and rotation, including post-goal creep, until true rest.
-    const moving=this.c.scoring===LEGACY_COMBO_SCORING
-     ?this.firstVisit===Infinity&&distance(a.p,pose.p)/dt>=.35
-     :distance(a.p,pose.p)>0||rotates(a.q,pose.q);
+    // Time follows every native translation and rotation until true rest.
+    const moving=distance(a.p,pose.p)>0||rotates(a.q,pose.q);
     if(moving)this.activeSeconds+=dt;
     if(this.c.goal&&this.firstVisit===Infinity&&entersGoal(a.p,pose.p,this.c.goal!.center,this.c.goal!.radius,.023))this.firstVisit=pose.t;
    }
@@ -82,7 +77,7 @@ export class ComboTracker {
   const routeOK=!this.c.requiredSurface||this.contacts.some(h=>h.qualifying&&h.surface===this.c.requiredSurface);
   const landingMultiplier=forfeit||!routeOK?0:options.success?1:Math.max(goalVisited?.25:0,clamp(1-gap/range));
   const total=Math.round(potential*landingMultiplier),accuracy=Math.round(BASE_POINTS*landingMultiplier);
-  return {version:this.c.scoring===LEGACY_COMBO_SCORING?LEGACY_COMBO_SCORING:ARCADE_SCORING,outcome:forfeit?'forfeit':!routeOK?'route-missed':options.success?'perfect':goalVisited?'tagged':total?'near':'miss',accuracy,style:total-accuracy,styleBanks:banks,stylePercent:bankMultiplier*timeMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,timeMultiplier,activeSeconds:this.activeSeconds,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
+  return {version:ARCADE_SCORING,outcome:forfeit?'forfeit':!routeOK?'route-missed':options.success?'perfect':goalVisited?'tagged':total?'near':'miss',accuracy,style:total-accuracy,styleBanks:banks,stylePercent:bankMultiplier*timeMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,timeMultiplier,activeSeconds:this.activeSeconds,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
  }
  waypointValue(options:{destinationReached?:boolean;reason?:string}):ScoreBreakdown{
   const hits=this.waypointHits.filter(h=>h.time<=(this.last?.t??0));
@@ -104,36 +99,11 @@ export class ComboTracker {
 
 }
 export function scoreAttempt(result:NativeResult):ScoreBreakdown{
- if(![ARCADE_SCORING,LEGACY_COMBO_SCORING,WAYPOINT_SCORING].includes(result.challenge?.scoring||''))return scoreAccuracy(result);
+ if(![ARCADE_SCORING,WAYPOINT_SCORING].includes(result.challenge?.scoring||''))throw new Error('Unsupported scoring rules');
  if(!result.poses.length)throw new Error('Invalid recorded trajectory');
  const tracker=new ComboTracker(result.challenge!);
  for(const hit of result.contacts)tracker.contact(hit);
  for(const hit of result.waypointHits||[])tracker.waypoint(hit);
  tracker.poses(result.poses);
  return tracker.value(result);
-}
-function scoreAccuracy(result:NativeResult):ScoreBreakdown{
- const c=result.challenge;if(!c)throw new Error('A challenge is required to score');
- const poses=result.poses,contacts=result.contacts,ballRadius=.023;
- if(!poses.length||poses.some(p=>!Number.isFinite(p.t)||['x','y','z'].some(k=>!Number.isFinite(p.p[k as keyof Vector]))))throw new Error('Invalid recorded trajectory');
- const endPosition=poses.at(-1)!.p,g=c.goal!.center;
- // Distance from the *edge* of the usable disk, including vertical separation.
- const gap=Math.hypot(Math.max(0,Math.hypot(endPosition.x-g.x,endPosition.z-g.z)-(c.goal!.radius-ballRadius)),Math.max(0,Math.abs(endPosition.y-(g.y+ballRadius))-.015));
- const proximityRange=clamp(distance(c.start.center,g)*.35,3,12);
- let firstVisit=Infinity;
- for(let i=1;i<poses.length;i++)if(entersGoal(poses[i-1].p,poses[i].p,g,c.goal!.radius,ballRadius)){firstVisit=poses[i].t;break;}
- for(const hit of contacts)if(hit.surface===c.goal!.surface&&Math.abs(hit.point.y-g.y)<.04&&Math.hypot(hit.point.x-g.x,hit.point.z-g.z)<=c.goal!.radius)firstVisit=Math.min(firstVisit,hit.time);
- const goalVisited=result.success||Number.isFinite(firstVisit);
- const forfeit=['Recalled','Player left'].includes(result.reason);
- const routeOK=!c.requiredSurface||contacts.some(h=>h.qualifying&&h.surface===c.requiredSurface);
- const accuracy=forfeit||!routeOK?0:result.success?10000:goalVisited?7500:Math.round(5999*clamp(1-gap/proximityRange)**2);
- const seen=new Set<string>();let banks=0,lastTime=-Infinity,lastPoint:Vector|null=null;
- for(const hit of contacts){
-  // One award per surface. Nearby joints/treads and rapid chatter aren't banks.
-  const family=hit.surface.replace(/-(?:step|tread)-?\d+$/,'');
-  if(!hit.qualifying||hit.speed<1||hit.time>firstVisit||seen.has(family)||hit.time-lastTime<.18||(lastPoint&&distance(hit.point,lastPoint)<.6))continue;
-  seen.add(family);banks++;lastTime=hit.time;lastPoint=hit.point;if(banks===5)break;
- }
- const stylePercent=STYLE[banks],style=Math.round(accuracy*stylePercent);
- return {version:'accuracy-v3',outcome:forfeit?'forfeit':!routeOK?'route-missed':result.success?'perfect':goalVisited?'tagged':accuracy?'near':'miss',accuracy,style,styleBanks:banks,stylePercent,goalVisited,distance:gap,proximityRange,endPosition,total:accuracy+style};
 }

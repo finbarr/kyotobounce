@@ -16,7 +16,7 @@ assert.equal(hash(generateStationGrain().albedo),hash(textures.stoneColor.image.
 assert.equal(STATION_PROBES.length,3);
 const scene=new THREE.Scene(),reflections=createStationReflections(renderer,scene,new Set());
 const audits=[];
-for(const path of ['web/public/assets/atrium.glb','web/public/assets/atrium-detail.glb',...Object.values(JSON.parse(await readFile('web/layout-assets.json')).layouts).flatMap(l=>['atrium','detail'].map(k=>'web/public'+l.assets[k].url))]){
+for(const path of ['web/public/assets/atrium.glb','web/public/assets/atrium-detail.glb']){
  const file=await open(path);const header=Buffer.alloc(20);await file.read(header,0,20,0);const bytes=Buffer.alloc(header.readUInt32LE(12));await file.read(bytes,0,bytes.length,20);await file.close();
  const data=JSON.parse(bytes.toString()),mapped=[];
  for(const original of data.materials){
@@ -41,12 +41,8 @@ for(const [begin,end] of [['const architecturalShadow=','// Fit once'],['export 
 // Existing pool must never relocate a light with nonzero intensity.
 const pool=createStationLightPool(scene,[{id:'a',position:{x:0,y:3,z:0},direction:{x:0,y:-1,z:0},range:8,intensity:20},{id:'b',position:{x:40,y:3,z:0},direction:{x:0,y:-1,z:0},range:8,intensity:20}]);
 for(let i=0;i<120;i++){const before=pool.lights.map(l=>l.position.clone());pool.update(new THREE.Vector3(i<60?0:40,0,0),i/60);pool.lights.forEach((l,j)=>{if(!l.position.equals(before[j]))assert.equal(l.intensity,0);});}
-const registry=JSON.parse(await readFile('web/layout-assets.json','utf8'));
-for(const bundle of Object.values(registry.layouts))for(const asset of Object.values(bundle.assets)){
-  const bytes=await readFile('web/public'+asset.url);assert.equal(bytes.length,asset.bytes);assert.equal(hash(bytes),asset.sha256,`${asset.url} immutable`);
-}
 assert.equal(hash(await readFile('runtime/station-layout.json')),JSON.parse(await readFile('web/public/assets/station.json','utf8')).layoutSha256,'current browser/native layout identity');
 textures.dispose();reflections.dispose();
 await mkdir('artifacts/station-detail/photorealism',{recursive:true});
-await (await import('node:fs/promises')).writeFile('artifacts/station-detail/photorealism/material-audit.json',JSON.stringify({audits,generatedTextureBytes:textures.bytesWithMipmaps,archives:'all six byte-identical'},null,2));
-console.log('PASS current/historical family mapping, original map preservation, physical data textures, fixed shadows and light pool, archived/current geometry bytes');
+await (await import('node:fs/promises')).writeFile('artifacts/station-detail/photorealism/material-audit.json',JSON.stringify({audits,generatedTextureBytes:textures.bytesWithMipmaps},null,2));
+console.log('PASS current material mapping, original map preservation, physical data textures, fixed shadows and light pool, matching geometry bytes');

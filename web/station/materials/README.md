@@ -36,10 +36,7 @@ the already attached hardware GLTF by its exported materials and leaves gameplay
 objects alone. Only architecture is captured; moving actors, practical lights and
 targets are excluded. The existing practical lights still update normally.
 
-`coordinator-build.patch` is a proposed two-module addition to the coordinator-owned
-browser-build allowlist. Apply during integration. The direct local server already
-serves both modules. No binary asset pack changes, asset release or geometry patch
-is required. Package/release files and `game.js` are unchanged in this branch.
+Both material and lighting modules are included in the browser-build allowlist.
 
 Reflection selection is spatial in the fragment shader because some exported
 batches span the hall and rooftop. Smooth fixed world-space transitions avoid

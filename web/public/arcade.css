@@ -18,7 +18,6 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
 #briefing-back{pointer-events:auto;margin-top:8px;font-size:9px;border-color:#fff5;background:#111b31d9;padding:8px 12px}
 
 #course-list{max-height:min(300px,32vh);overflow:auto;padding-right:4px;scrollbar-width:thin}#course-title{text-transform:uppercase}#score-guide{margin-top:16px;font-size:9px;color:var(--cyan)}#score-guide summary{cursor:pointer;padding:8px 0}#score-guide p{font-size:10px;line-height:1.7}#score-guide strong{color:var(--gold)}
-.legacy-points{display:none;color:var(--paper);font-size:11px;line-height:1.8}.legacy-points b{color:var(--gold)}.legacy-scoring .legacy-points{display:block}.legacy-scoring .briefing-points{display:none}
 .map-label{transform:translateY(-100%)}.map-label::after{left:var(--anchor-x,50%)}
 
 /* Keep launch speed readable without covering the lower-center play view. */
