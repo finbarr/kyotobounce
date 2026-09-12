@@ -16,5 +16,5 @@ export class Client{
   const end=await result;if(end.type!=='result')throw new Error(end.message);await delay(80);return {result:end,final:this.state.ball,contacts:this.messages.filter(m=>m.type==='impact'),state:this.state};
  }
  async place(center,radius,slot='goal'){return (await this.request('place',{slot,radius,origin:{x:center.x,y:center.y+3,z:center.z},direction:{x:0,y:-1,z:0}},'placement')).disk;}
- close(){this.socket.close();for(const w of this.waiters)clearTimeout(w.timer);this.waiters=[];}
+ close(){if(this.socket.readyState===WebSocket.OPEN)this.send('leave');this.socket.close();for(const w of this.waiters)clearTimeout(w.timer);this.waiters=[];}
 }

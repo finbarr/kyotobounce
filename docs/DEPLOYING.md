@@ -28,3 +28,16 @@ Verify a real shot/replay against the staged release with a separate temporary d
 Store protected rollback configuration and database snapshots under `/var/lib/kyoto/deployments/<release>`, outside `/var/lib/kyoto/backups`. The backup retention script runs as `kyoto` and must be able to traverse its backup directory. When staging manually, apply the release read/execute permissions from `activate.sh` before starting a temporary service as `kyoto`.
 
 CI does not deploy. Production changes are an explicit maintainer action after reviewing the integrated game.
+
+Live browser connections retry with bounded backoff and a heartbeat. A guest may
+resume its existing native session for 30 seconds using both the session ID and
+its saved guest token. In-flight simulation/scoring continues during that grace
+period; an unreleased windup is cancelled. Explicitly leaving frees the slot.
+After a service restart the client rejoins, and a changed station hash triggers
+an asset reload. Commands, especially releases, are never replayed on reconnect.
+
+Continuous inputs coalesce behind slow native requests, preserving discrete
+command order. Congested sockets skip superseded state snapshots. The service
+logs close code, duration and whether a session was resumable, without recording
+guest credentials. Use those logs and host utilization when investigating online
+lag; the client cannot repair an indefinitely unavailable network.

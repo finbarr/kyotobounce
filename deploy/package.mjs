@@ -6,7 +6,7 @@ const stamp=new Date().toISOString().replace(/[:.]/g,'-');
 const output=resolve(`artifacts/online/releases/${stamp}`);
 await mkdir(output,{recursive:true});
 // Explicit runtime allowlist: no local database, guest tokens, logs, tests, or editor project.
-const files=['package.json','package-lock.json','web/public','web/server.ts','web/store.ts','web/competition.ts','web/types.ts','web/scoring.ts','web/worker.ts','web/starter-challenges.json','web/layout-assets.ts','web/layout-migration.ts','web/layout-assets.json','web/layout-proofs.json','Builds/PhysicsWorkerLinux','deploy'];
+const files=['package.json','package-lock.json','web/public','web/server.ts','web/connection-queue.ts','web/store.ts','web/competition.ts','web/types.ts','web/scoring.ts','web/worker.ts','web/starter-challenges.json','web/layout-assets.ts','web/layout-migration.ts','web/layout-assets.json','web/layout-proofs.json','Builds/PhysicsWorkerLinux','deploy'];
 for(const name of files)await cp(name,join(output,name),{recursive:true,filter:path=>!path.split('/').some(part=>part.endsWith('_DoNotShip'))});
 await mkdir(join(output,'runtime'),{recursive:true});
 await cp('runtime/station-layout.json',join(output,'runtime/station-layout.json'));

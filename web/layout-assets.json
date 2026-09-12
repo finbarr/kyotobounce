@@ -70,6 +70,41 @@
           "sha256": "7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775"
         }
       }
+    },
+    "485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d": {
+      "layout": "485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d",
+      "assets": {
+        "atrium": {
+          "url": "/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/atrium.glb",
+          "bytes": 176744696,
+          "sha256": "57756f3324ec6faf911431903baacc251d155df21ccb5af8537cfee6e169f0ac"
+        },
+        "station": {
+          "url": "/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/station.json",
+          "bytes": 1257707,
+          "sha256": "6526580bc86831f56c03a648d4a498fefd75bc1acaa13d4d2e948f7acb7c783d"
+        },
+        "detail": {
+          "url": "/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/atrium-detail.glb",
+          "bytes": 5568348,
+          "sha256": "a4825e5adcadaeffd50c04642c7673b74780a6ac3115a455b5e7f0dc42c2a1a6"
+        },
+        "detailMeta": {
+          "url": "/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/atrium-detail.json",
+          "bytes": 27455,
+          "sha256": "337c11a51defedff511c2efcf9c50d571d031c86192fec95d928712737406c1e"
+        },
+        "robot": {
+          "url": "/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/ori.glb",
+          "bytes": 885204,
+          "sha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4"
+        },
+        "collision": {
+          "url": "/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/station-layout.json",
+          "bytes": 175175864,
+          "sha256": "485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d"
+        }
+      }
     }
   }
 }

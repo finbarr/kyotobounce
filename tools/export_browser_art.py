@@ -139,6 +139,7 @@ for (label,cell),g in groups.items():
  obj['source']='HumanScale05.blend';obj['sourceMaterial']=label
 bpy.ops.export_scene.gltf(filepath=str(OUT/'atrium.glb'),export_format='GLB',use_active_scene=True,export_yup=True,export_animations=False,export_cameras=False,export_lights=False,export_extras=True,export_materials='EXPORT')
 public={k:layout[k] for k in ['spawn','escalators','authoredLights','authoredMaterials']}
+if 'concourseDetails' in layout:public['concourseDetails']=layout['concourseDetails']
 public.update(layoutSha256=hashlib.sha256(LAYOUT.read_bytes()).hexdigest(),coordinateMapping='Unity (x,y,z) -> Three (x,y,-z)')
 (OUT/'station.json').write_text(json.dumps(public,separators=(',',':')))
 counts.update(batches=len(groups),materials=len(mats),glbBytes=(OUT/'atrium.glb').stat().st_size,sourceSha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),layoutSha256=public['layoutSha256'])

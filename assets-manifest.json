@@ -1,10 +1,10 @@
 {
-  "version": "assets-v3",
+  "version": "assets-v4",
   "license": "MIT",
   "archive": {
-    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v3/kyoto-assets-v3.tar.gz",
-    "bytes": 302445432,
-    "sha256": "41b8bdfb46c9d66a0d1b1f149d263c29c0f173f122cdafcea2563a3faeae4912"
+    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v4/kyoto-assets-v4.tar.gz",
+    "bytes": 379697618,
+    "sha256": "abaa8887889f2fb9bb4006f435addc03c98fb70d0b0b5893981c4c1b9002d86e"
   },
   "files": {
     "web/public/assets/atrium-detail.glb": {
@@ -13,11 +13,35 @@
     },
     "web/public/assets/atrium-detail.json": {
       "bytes": 27455,
-      "sha256": "337c11a51defedff511c2efcf9c50d571d031c86192fec95d928712737406c1e"
+      "sha256": "f6c9709ecd59a74516205fe5f5125636e06bbf59fbde758ba4488a1e6822341a"
     },
     "web/public/assets/atrium.glb": {
+      "bytes": 178796372,
+      "sha256": "31bd3f75f038221f519fd3475c12dcff85ef28c0168abb0261441e30a9f2f010"
+    },
+    "web/public/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/atrium-detail.glb": {
+      "bytes": 5568348,
+      "sha256": "a4825e5adcadaeffd50c04642c7673b74780a6ac3115a455b5e7f0dc42c2a1a6"
+    },
+    "web/public/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/atrium-detail.json": {
+      "bytes": 27455,
+      "sha256": "337c11a51defedff511c2efcf9c50d571d031c86192fec95d928712737406c1e"
+    },
+    "web/public/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/atrium.glb": {
       "bytes": 176744696,
       "sha256": "57756f3324ec6faf911431903baacc251d155df21ccb5af8537cfee6e169f0ac"
+    },
+    "web/public/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/ori.glb": {
+      "bytes": 885204,
+      "sha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4"
+    },
+    "web/public/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/station-layout.json": {
+      "bytes": 175175864,
+      "sha256": "485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d"
+    },
+    "web/public/assets/layouts/485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d/station.json": {
+      "bytes": 1257707,
+      "sha256": "6526580bc86831f56c03a648d4a498fefd75bc1acaa13d4d2e948f7acb7c783d"
     },
     "web/public/assets/layouts/650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2/atrium-detail.glb": {
       "bytes": 2411184,
@@ -72,12 +96,12 @@
       "sha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4"
     },
     "web/public/assets/station.json": {
-      "bytes": 1257707,
-      "sha256": "6526580bc86831f56c03a648d4a498fefd75bc1acaa13d4d2e948f7acb7c783d"
+      "bytes": 1274168,
+      "sha256": "8a1802b3b450e030236545df4767ee2a707bc81ad5484213cf71070f5f8eb684"
     },
     "runtime/station-layout.json": {
-      "bytes": 175175864,
-      "sha256": "485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d"
+      "bytes": 175202115,
+      "sha256": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515"
     },
     "runtime/textures/174d2dd1ba175c20fde33781.png": {
       "bytes": 234110,
@@ -120,16 +144,16 @@
       "sha256": "36c7d9b2809527c97e0334dc67691182edf8629cf8b35431b0fbb3297f585501"
     },
     "art-source/atrium/KyotoAtrium.blend": {
-      "bytes": 52094050,
-      "sha256": "c2d7d832496f2c4df2a53640ad4e767b445190e8e40e419c88c9eb2e1c7dbb2c"
+      "bytes": 52465143,
+      "sha256": "ac2b8ebe7954d2237de1bf257dd8fba0e49b914b17d6a006faf3b82a6dfa56d5"
     },
     "art-source/phase3/robot/ORI.blend": {
       "bytes": 418574,
       "sha256": "cd2de40ebd5b86fbdb0c4053bcc73be32129fec8b16d7fc9719f32854b9b0c62"
     },
     "art-source/phase3/atrium-detail/AtriumHardware.blend": {
-      "bytes": 984313,
-      "sha256": "a58f55df5c9fd4c0ab58808e0610ef5c29200ca7194db709fdcdf63742417678"
+      "bytes": 984299,
+      "sha256": "caceb672db0b8f33ce05e10bfb2f2bf29973ee12b648088afcc92e741b091b51"
     },
     "art-source/materials/stairs/EscalatorTreadColor.png": {
       "bytes": 386640,

@@ -9,6 +9,7 @@ import type { Guest } from './types.ts';
 import { WebSocketServer, WebSocket } from 'ws';
 import { PhysicsWorker } from './worker.ts';
 import {LayoutAssets} from './layout-assets.ts';
+import {ConnectionQueue} from './connection-queue.ts';
 
 const root = resolve('web/public');
 const port = Number(process.env.KYOTO_PORT || 4173);
@@ -23,8 +24,9 @@ const starters=JSON.parse(await readFile(resolve('web/starter-challenges.json'),
 for(const challenge of starters)if(!store.challenge(challenge.id,challenge.revision))store.saveChallenge(challenge);
 store.upgradeThrowModels();
 store.upgradeScoring();
-type Connection = {guest?:Guest;id:string;lastInput?:number;queue:Promise<void>;pending:number;tokens:number;updated:number;alive:boolean;lastWrite:number;lastReplay:number};
+type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;replaced?:boolean;intentional?:boolean;opened:number;tokens:number;updated:number;alive:boolean;lastWrite:number;lastReplay:number};
 const connections = new Map<WebSocket,Connection>();
+const detached = new Map<string,ReturnType<typeof setTimeout>>();
 const worker = new PhysicsWorker();
 const layoutAssets=await LayoutAssets.load();
 const competition = new Competition(store,worker,broadcast,layoutAssets);
@@ -72,7 +74,11 @@ const server = createServer(async (request,response) => {
   } catch {if(!response.headersSent)response.writeHead(400);response.end('Invalid request');}
 });
 const wss=new WebSocketServer({server,maxPayload:65536,verifyClient:(info:{origin:string})=>connections.size<32&&(allowedOrigins.has(info.origin)||(!publicOrigin&&!info.origin))});
-function send(socket:WebSocket,value:unknown){if(socket.bufferedAmount>8_000_000){socket.close(1013,'Connection too slow. Please reconnect.');return;}if(socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify(value));}
+function send(socket:WebSocket,value:unknown){
+  // Snapshots are superseded every tick. Never queue seconds of stale motion
+  // behind a slow network or a large replay; reliable results remain ordered.
+  if((value as {type?:string})?.type==='state'&&socket.bufferedAmount>65536)return;
+  if(socket.bufferedAmount>8_000_000){socket.close(1013,'Connection too slow. Please reconnect.');return;}if(socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify(value));}
 function broadcast(value:unknown,sessionId?:string){for(const [socket,c]of connections)if(c.guest&&(!sessionId||c.id===sessionId))send(socket,value);}
 worker.on('message', message=>{
   if('challenge' in message&&!message.challenge?.id)message.challenge=null;
@@ -96,25 +102,41 @@ worker.on('status',message=>{
   broadcast(message);
 });
 wss.on('connection',socket=>{
-  const c:Connection={id:randomUUID(),queue:Promise.resolve(),pending:0,tokens:180,updated:performance.now(),alive:true,lastWrite:0,lastReplay:0};connections.set(socket,c);
+  const c:Connection={id:randomUUID(),queue:new ConnectionQueue(handle),opened:performance.now(),tokens:180,updated:performance.now(),alive:true,lastWrite:0,lastReplay:0};connections.set(socket,c);
   const authTimer=setTimeout(()=>{if(!c.guest)socket.close(1008,'Join timed out');},5000);
   socket.on('pong',()=>{c.alive=true;});
   socket.on('error',()=>{});
   socket.on('message',raw=>{
     const now=performance.now();c.tokens=Math.min(180,c.tokens+(now-c.updated)*.09)-1;c.updated=now;
-    if(c.tokens<0||c.pending>=64){socket.close(1008,'Too many requests. Please reconnect.');return;}
-    c.pending++;
-    c.queue=c.queue.then(async()=>{
+    if(c.tokens<0){socket.close(1008,'Too many requests. Please reconnect.');return;}
+    let m;try{m=JSON.parse(raw.toString());if(!m||typeof m.type!=='string')throw new Error();}
+    catch{send(socket,{type:'error',message:'Invalid message'});return;}
+    if(c.guest&&m.type==='ping'){send(socket,{type:'pong',sequence:m.sequence});return;}
+    if(c.guest&&m.type==='leave'){c.intentional=true;socket.close(1000,'Leaving');return;}
+    if(!c.queue.push(m))socket.close(1008,'Too many queued commands. Please reconnect.');
+  });
+  async function handle(m:any){
     try {
-      if(socket.readyState!==WebSocket.OPEN)return;
-      const m=JSON.parse(raw.toString());
-      if(!m||typeof m.type!=='string')throw new Error('Invalid message');
+      if(socket.readyState!==WebSocket.OPEN||c.replaced)return;
       if(!c.guest){
         if(m.type!=='hello')throw new Error('Join first');
-        if([...connections.values()].filter(x=>x.guest).length>=16){socket.close(1013,'All 16 play slots are occupied. Please try again shortly.');return;}
-        const guest=store.guest(typeof m.token==='string'?m.token:undefined);
-        c.guest=guest;clearTimeout(authTimer);send(socket,{type:'welcome',...guest,sessionId:c.id,worker:worker.ready});
-        send(socket,worker.lifecycle());send(socket,competition.catalog());await competition.add(guest,c.id);return;
+        const candidate=typeof m.sessionId==='string'?competition.members.get(m.sessionId):undefined;
+        const resumed=candidate&&typeof m.token==='string'&&candidate.guest.token===m.token?candidate:undefined;
+        if(!resumed&&competition.members.size>=16){socket.close(1013,'All 16 play slots are occupied. Please try again shortly.');return;}
+        const guest=resumed?.guest||store.guest(typeof m.token==='string'?m.token:undefined);
+        if(resumed){
+          competition.disconnect(resumed.id);
+          c.id=resumed.id;clearTimeout(detached.get(c.id));detached.delete(c.id);
+          for(const [old,connection]of connections)if(old!==socket&&connection.id===c.id){connection.replaced=true;connection.queue.close();old.close(4009,'Session resumed on a new connection');}
+        }
+        c.guest=guest;clearTimeout(authTimer);send(socket,{type:'welcome',...guest,sessionId:c.id,worker:worker.ready,resumed:!!resumed});
+        send(socket,worker.lifecycle());send(socket,competition.catalog());
+        if(resumed){
+          competition.sync(resumed);competition.board(resumed);
+          if(resumed.snapshot)send(socket,resumed.snapshot);
+          if(resumed.snapshot?.phase==='Result'&&resumed.lastResult?.attempt!==m.lastResultAttempt&&resumed.lastResult)send(socket,resumed.lastResult);
+        }else await competition.add(guest,c.id);
+        return;
       }
       const id=c.id;
       if(['name','save-challenge'].includes(m.type)){
@@ -129,7 +151,6 @@ wss.on('connection',socket=>{
       }
       if(!worker.ready)throw new Error(workerFailure||'The physics worker is starting');
       if(m.type==='input'){
-        const now=performance.now();if(c.lastInput&&now-c.lastInput<15)return;c.lastInput=now;
         for(const key of ['x','z','yaw','pitch','top','kick'])if(typeof m[key]!=='number'||!Number.isFinite(m[key]))throw new Error('Invalid input');
         if(Math.abs(m.x)>1||Math.abs(m.z)>1||Math.abs(m.yaw)>10000||m.pitch < -65||m.pitch>80||Math.abs(m.top)>200||Math.abs(m.kick)>200)throw new Error('Input out of range');
         worker.send({type:'input',id,x:m.x,z:m.z,yaw:m.yaw,pitch:m.pitch,top:m.top,kick:m.kick,fast:m.fast===true});
@@ -137,10 +158,20 @@ wss.on('connection',socket=>{
         const member=competition.members.get(id);if(!member)throw new Error('Rejoin the session');
         const result=await competition.command(member,m);if(result)send(socket,result);
       }
-    }catch(error){send(socket,{type:'error',message:error instanceof Error?error.message:'Invalid message'});}finally{c.pending--;}
-    });
+    }catch(error){send(socket,{type:'error',message:error instanceof Error?error.message:'Invalid message'});}
+  }
+  socket.on('close',code=>{
+    clearTimeout(authTimer);c.queue.close();connections.delete(socket);
+    if(c.guest&&!c.replaced){
+      if(c.intentional||stopping)competition.remove(c.id);
+      else{
+        competition.disconnect(c.id);
+        const timer=setTimeout(()=>{detached.delete(c.id);competition.remove(c.id);},30000);
+        timer.unref();detached.set(c.id,timer);
+      }
+    }
+    console.info(JSON.stringify({event:'connection-closed',code,authenticated:!!c.guest,resumable:!!c.guest&&!c.intentional&&!c.replaced,seconds:Math.round((performance.now()-c.opened)/1000)}));
   });
-  socket.on('close',()=>{clearTimeout(authTimer);connections.delete(socket);if(c.guest)competition.remove(c.id);});
 });
 const heartbeat=setInterval(()=>{for(const [socket,c]of connections){if(!c.alive){socket.terminate();continue;}c.alive=false;socket.ping();}},30000);
 heartbeat.unref();
@@ -151,5 +182,5 @@ server.listen(port,'127.0.0.1',()=>{
 });
 let stopping=false;
 for(const signal of ['SIGINT','SIGTERM'] as const)process.on(signal,()=>{
-  if(stopping)return;stopping=true;clearInterval(heartbeat);worker.stop();for(const socket of connections.keys())socket.close();wss.close();server.close();server.closeAllConnections();store.close();
+  if(stopping)return;stopping=true;clearInterval(heartbeat);for(const timer of detached.values())clearTimeout(timer);detached.clear();worker.stop();for(const socket of connections.keys())socket.close();wss.close();server.close();server.closeAllConnections();store.close();
 });

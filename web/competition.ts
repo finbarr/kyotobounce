@@ -7,7 +7,7 @@ import {migrationInputs,migrateLayouts} from './layout-migration.ts';
 import type { Guest,Challenge,Disk,Waypoint,NativeResult } from './types.ts';
 import { SCORING_VERSION,WAYPOINT_SCORING,ACTIVE_SCORING,SUPPORTED_SCORING,THROW_MODEL,CHARGE_SECONDS,RECORDED_PHYSICS } from './types.ts';
 
-export type Member={id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>};
+export type Member={id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>;lastResult?:any};
 export class Competition {
  store:Store;worker:PhysicsWorker;publish:(message:unknown,sessionId?:string)=>void;
  members=new Map<string,Member>();
@@ -29,6 +29,12 @@ export class Competition {
   return m;
  }
  remove(id:string){const m=this.members.get(id);if(!m)return;this.clearAttempt(m);this.members.delete(id);this.worker.send({type:'leave',id});}
+ disconnect(id:string){
+  const m=this.members.get(id);if(!m)return;
+  // Movement already expires after 300 ms in the native worker. Cancel an
+  // unreleased wind-up, but let an authoritative ball in flight finish normally.
+  if(m.chargeAt!==undefined){this.clearAttempt(m);this.worker.send({type:'cancel',id});this.sync(m);}
+ }
  clearAttempt(m:Member){if(m.attempt)this.pending.delete(m.attempt);m.attempt=undefined;m.chargeAt=undefined;m.combo=undefined;m.scoreFrames=undefined;}
  requireWaypoints(){if(!this.worker.ready||!this.worker.capabilities?.includes(WAYPOINT_SCORING))throw new Error('This physics worker does not support waypoint courses. Rebuild and restart the worker.');}
  async restore(m:Member){
@@ -84,7 +90,7 @@ export class Competition {
    result.records={personalBest:result.score>previous.reduce((best,row)=>row.guest===member.guest.id?Math.max(best,Number(row.score)):best,0),courseBest:result.score>previous.reduce((best,row)=>Math.max(best,Number(row.score)),0)};
    this.store.saveResult({...result,id:member.guest.id},this.animation);
   }
-  const {poses,contacts,scoreFrames:recordedFrames,...summary}=result;this.publish({...summary,type:'result',saved:!!c&&result.score>0},member.id);
+  const {poses,contacts,scoreFrames:recordedFrames,...summary}=result;member.lastResult={...summary,type:'result',saved:!!c&&result.score>0};this.publish(member.lastResult,member.id);
   if(c)this.publish({type:'leaderboard',challenge:c,entries:this.store.leaderboard(c)});
   this.sync(member);
  }
@@ -120,7 +126,7 @@ export class Competition {
    if(challenge&&!this.playable(challenge))throw new Error('This ruleset is archived. Select the current challenge revision to throw; historical replays are still available.');
    if(challenge?.scoring===WAYPOINT_SCORING)this.requireWaypoints();
    member.selecting=true;try{await this.worker.request({type:'select',id,challenge});}finally{member.selecting=false;}
-   member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
+   member.lastResult=undefined;member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
   }
   if(m.type==='leaderboard'){
    const c=this.store.challenge(String(m.challengeId),Number(m.revision));if(!c)throw new Error('Level not found');return {type:'leaderboard',challenge:c,entries:this.store.leaderboard(c)};
@@ -136,7 +142,7 @@ export class Competition {
    if(member.attempt||member.selecting)throw new Error('Your attempt or level change is already active');
    if(member.selected?.scoring===WAYPOINT_SCORING)this.requireWaypoints();
    if((m.challengeId||null)!==(member.selected?.id||null)||(m.revision||null)!==(member.selected?.revision||null)||m.layout!==this.layout||m.physics!==this.physics)throw new Error('Refresh the current level: its version changed');
-   member.combo=member.selected?new ComboTracker(member.selected):undefined;member.scoreFrames=[];
+   member.lastResult=undefined;member.combo=member.selected?new ComboTracker(member.selected):undefined;member.scoreFrames=[];
    member.chargeAt=performance.now();member.attempt=randomUUID();this.pending.set(member.attempt,{id,challenge:member.selected});
    this.worker.send({type:'charge',id,request:member.attempt,powerRange:m.powerRange||'full'});this.sync(member);return;
   }

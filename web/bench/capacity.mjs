@@ -57,7 +57,7 @@ class Player{
   if(this.releaseAt){if(now>=this.releaseAt){this.send({type:'release'});this.releases++;this.pendingRelease=now;this.releaseAt=0;this.nextThrow=now+2000;}return;}
   if(['Aim','Result'].includes(this.state.phase)&&now>=this.nextThrow&&!this.pendingCharge){this.send({type:'charge',challengeId:this.selected.id,revision:this.selected.revision,layout:this.state.layout,physics:this.state.physics,powerRange:'full'});this.charges++;this.pendingCharge=now;this.releaseAt=now+1200;this.nextThrow=Infinity;}
  }
- close(){this.cleaning=true;this.socket.close();}
+ close(){this.cleaning=true;if(this.socket.readyState===WebSocket.OPEN)this.socket.send(JSON.stringify({type:'leave'}));this.socket.close();}
 }
 let players=[],inputTimer;
 try{
