@@ -92,6 +92,13 @@ export function prepareGraniteMaps(material){
 const roughness={floor:.32,wall:.56,stone:.4,paving:.65,stair:.6,stainless:.28,paint:.43,guard:.09,facade:.14};
 export function applyStationMaterial(material,family,textures,reflections){
   const m=material; m.userData.stationFamily=family;
+  // K032: only the bare exported stone cladding needs new slab courses.
+  // The 9.6m floor atlas already contains its 1.2 x .6m tile joints; stairs,
+  // polished frontage maps, relief/coffers and authored fixtures retain theirs.
+  const slabCourses=!m.map&&(/Granite - plain draft|Pale cladding/i.test(m.name));
+  if(family==='floor')for(const key of ['map','normalMap'])if(m[key]){
+    m[key].anisotropy=textures.stoneColor.anisotropy;m[key].needsUpdate=true;
+  }
   m.metalness=family==='stainless'?1:0;m.roughness=roughness[family];m.envMapIntensity=family==='stainless'?1:.85;
   // Preserve the original color/normal maps, especially the UV-authored nosing.
   if(family==='floor')m.color.set(m.map?0xc8cbc7:0x747b78);
@@ -119,6 +126,19 @@ varying vec3 vStationPosition;
 varying vec3 vStationNormal;
 uniform sampler2D stationGrain;
 uniform sampler2D stationSurface;
+// Integral of a periodic unit-height stripe, giving its true pixel coverage.
+// Unlike widening a smoothstep, this retains a 4mm physical joint and its
+// correct distant mean, including footprints spanning several complete slabs.
+vec2 stationJointIntegral(vec2 x,vec2 duty){
+  return floor(x)*duty+min(fract(x),duty);
+}
+float stationSlabJoint(vec2 metric){
+  vec2 period=vec2(1.44,.72),duty=vec2(.004)/period;
+  vec2 p=metric/period+duty*.5;
+  vec2 footprint=max(fwidth(metric)/period,vec2(.00001));
+  vec2 coverage=clamp((stationJointIntegral(p+footprint*.5,duty)-stationJointIntegral(p-footprint*.5,duty))/footprint,0.0,1.0);
+  return coverage.x+coverage.y-coverage.x*coverage.y;
+}
 mat3 stationFrame(vec3 p,vec3 n,vec2 uv){
   vec3 a=dFdx(p),b=dFdy(p);vec2 u=dFdx(uv),v=dFdy(uv);
   vec3 bp=cross(b,n),ap=cross(n,a),t=bp*u.x+ap*v.x,s=bp*u.y+ap*v.y;
@@ -135,7 +155,12 @@ vec4 micro=texture2D(stationSurface,guv);
 // Two nonmatching periods suppress recognizable stamping; filtering supplies
 // stable distant means instead of per-pixel noise or artificial grain fading.
 diffuseColor.rgb*=mix(vec3(1.0),mix(grainA,grainB,.3),${family==='stair'?'.22':'.66'});
-${family==='wall'?`
+${slabCourses?`
+// Photosphere/Street View: fine pale joints in honed stone slab courses.
+// Restrict to vertical cladding; broad horizontal soffits are not tile floors.
+float slabJoint=stationSlabJoint(metric)*(1.0-smoothstep(.10,.25,sn.y));
+diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*1.28,slabJoint);
+`:family==='wall'?`
 vec2 edge=abs(fract(metric/vec2(1.44,.72)+.5)-.5)*vec2(1.44,.72);
 vec2 aa=max(fwidth(metric),vec2(.001));
 vec2 seam=(1.0-smoothstep(vec2(.002),vec2(.002)+aa,edge))*min(vec2(1.0),vec2(.002)/aa);
@@ -162,5 +187,5 @@ outgoingLight=(totalDiffuse*${family==='guard'?'.045':'.17'}+totalSpecular)/max(
 diffuseColor.a=coverage;
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey=()=>`K026-pbr-1-${family}`;m.needsUpdate=true;
+  m.customProgramCacheKey=()=>`K032-pbr-2-${family}-${slabCourses}`;m.needsUpdate=true;
 }
