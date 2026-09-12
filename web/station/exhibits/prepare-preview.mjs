@@ -15,6 +15,6 @@ let game=await readFile('web/public/game.js','utf8');game=game.replace('    stat
 const gamePath=join(app,'web/public/game.js');await rm(gamePath);await writeFile(gamePath,game);
 // Local QA starter only; cloned rules/geometry, new candidate layout, private DB.
 const starter=JSON.parse(await readFile('web/starter-challenges.json'));
-for(const c of starter){c.layout=manifest.layoutSha256;c.physics='kyoto-p3-2';}
+for(const c of starter){c.layout=manifest.layoutSha256;c.physics='kyoto-p3-3';}
 const starterPath=join(app,'web/starter-challenges.json');await rm(starterPath);await writeFile(starterPath,JSON.stringify(starter));
 console.log(`Prepared ${app}; candidate ${manifest.layoutSha256}`);

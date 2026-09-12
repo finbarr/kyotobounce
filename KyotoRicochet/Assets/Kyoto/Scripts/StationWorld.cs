@@ -18,7 +18,10 @@ namespace Kyoto
             var physical=new Dictionary<string,PhysicsMaterial>
             {
                 {"stone",Surface.Material("Stone · provisional",.70f,.43f)},
-                {"granite",Surface.Material("Granite · provisional",.76f,.24f)},
+                // Preserve the ball's lively vertical rebound, with the same
+                // moderate tangential grip as the other hard station surfaces.
+                // The laboratory Superball/granite fit is not a station material.
+                {"granite",Surface.Material("Granite · provisional",BallProfile.Phase2Default.response.normal_restitution,.24f)},
                 {"granite-cladding",Surface.Material("Granite cladding · provisional",.76f,.24f)},
                 {"facade",Surface.Material("Cladding · provisional",.70f,.32f)},
                 {"steel",Surface.Material("Steel · provisional",.64f,.20f)},
@@ -51,13 +54,6 @@ namespace Kyoto
             };
             Material Visual(string key)=>appearance!=null&&appearance.TryGetValue(key,out var m)?m:null;
             PhysicsMaterial Physical(string key)=>physical.TryGetValue(key,out var m)?m:physical["stone"];
-            void AssociateResponse(GameObject obj,string key)
-            {
-                var surface=obj.GetComponent<Surface>();
-                // Appearance chooses an explicit pair; it does not turn every
-                // stone, stair or cladding contact into polished laboratory granite.
-                if(surface)surface.useBallReferenceResponse=key=="granite";
-            }
             var batches=new Dictionary<string,List<CombineInstance>>();int batchIndex=0;
             void Flush(string key)
             {
@@ -81,7 +77,6 @@ namespace Kyoto
                 if(collision&&b.collision)obj=StationGeometry.Box(parent,b.id,b.center,b.size,Physical(b.material),b.id,b.role.ToUpperInvariant());
                 else obj=Child(parent,b.id,b.center);
                 obj.transform.localRotation=Quaternion.Euler(0,b.yaw,0);
-                AssociateResponse(obj,b.material);
                 if(b.role=="step-edge")obj.layer=CollisionLayers.BallStairs;
                 string appearanceKey=string.IsNullOrEmpty(b.appearance)?b.material:b.appearance;
                 if(Visual(appearanceKey))
@@ -109,7 +104,6 @@ namespace Kyoto
                     bool stoneLanding=material=="stone"&&f.role=="landing";
                     var flight=StairGeometry.Create(parent,f.id,f.Rows(),f.baseElevation,f.rise,Physical(material),
                         Visual(string.IsNullOrEmpty(f.appearance)?(stoneStair||stoneLanding?"stair-stone":material):f.appearance),walking,collision,.3f,stoneStair?Visual(string.IsNullOrEmpty(f.treadAppearance)?"stair-tread":f.treadAppearance):null);
-                    AssociateResponse(flight,material);
                 }
                 if(f.foundationDepth>0)
                     StairGeometry.Create(parent,f.id+" foundation",new[]{f.contours[0].points,f.contours[f.contours.Length-1].points},
@@ -173,7 +167,6 @@ namespace Kyoto
                     var surface=obj.AddComponent<Surface>();surface.surfaceId=p.id;
                     surface.displayName=p.id.Contains("balustrade")?"GLASS BALUSTRADE":p.id.StartsWith("canopy")?"CANOPY GLASS":p.id.StartsWith("east-end-screen-")?"GLAZED END WALL":"GLAZED BRIDGE ROOF";surface.tone=1600;
                     if(!string.IsNullOrEmpty(p.role)){surface.displayName=p.role.ToUpperInvariant();surface.tone=420;}
-                    AssociateResponse(obj,p.material);
                     }
                 }
                 if(!p.playerOnly&&p.finishes!=null&&p.finishes.Length>0&&appearance!=null)
@@ -218,7 +211,6 @@ namespace Kyoto
                         if(turn)sign=Vector3.Dot((b.a+b.b)*.5f-lane.lowerCenter,lane.uphill)>lane.run*.5f?1:-1;
                         s.contactVelocity=delta.normalized*lane.speed*sign;break;
                     }
-                    AssociateResponse(obj,b.material);
                 }
                 string appearanceKey=string.IsNullOrEmpty(b.appearance)?b.material:b.appearance;
                 if(Visual(appearanceKey))

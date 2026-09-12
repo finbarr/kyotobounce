@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {throwSpeed} from '../public/throw-power.js';
+import {PHYSICS_VERSION} from '../types.ts';
 const courses=JSON.parse(await readFile(new URL('../starter-challenges.json',import.meta.url)));
 const proofs=JSON.parse(await readFile(new URL('../levels/proof-inputs.json',import.meta.url)));
 assert.equal(courses.length,30,'The campaign has thirty authored stages');
@@ -9,6 +10,7 @@ assert.equal(new Set(courses.map(c=>c.name)).size,30);
 const heights=new Set(),signatures=new Set();
 for(const [i,c] of courses.entries()){
  assert.equal(c.order,i);assert.equal(c.creator,'station');assert.equal(c.layout,proofs.layout);
+ assert.equal(c.physics,PHYSICS_VERSION,'The campaign uses the current native response');
  assert.equal(c.campaign.chapter,Math.floor(i/5)+1);assert.ok(c.campaign.brief.length>30);
  assert.ok(c.campaign.distance>0);if(i)assert.ok(c.campaign.distance>=courses[i-1].campaign.distance,'Suggested route length ascends');
  const proof=proofs.courses.find(p=>p.id===c.id&&p.revision===c.revision);assert.ok(proof,'Every stage has a reproducible native shot');

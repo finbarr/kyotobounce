@@ -5,7 +5,7 @@ import {Competition} from '../competition.ts';
 const p=(x,y=0,z=0)=>({x,y,z}),q={x:0,y:0,z:0,w:1};
 const start={center:p(0),radius:.75,surface:'floor'},goal={center:p(20),radius:1,surface:'floor'};
 const targets=Array.from({length:3},(_,i)=>({id:`w${i}`,center:p(i),normal:p(0,1),radius:.5,surface:'floor'}));
-const c={id:'waypoint-test',revision:1,name:'Targets',creator:'test',layout:'test',physics:'kyoto-p3-2',throwModel:'robot-v4',scoring:'waypoint-v1',start,goal:null,waypoints:targets};
+const c={id:'waypoint-test',revision:1,name:'Targets',creator:'test',layout:'test',physics:'kyoto-p3-3',throwModel:'robot-v4',scoring:'waypoint-v1',start,goal:null,waypoints:targets};
 const hits=targets.map((w,i)=>({waypointId:w.id,time:i+1,point:w.center,normal:w.normal,surface:w.surface}));
 const result=(extra={})=>({challenge:c,success:false,destinationReached:false,reason:'Ball stopped',score:0,surfaces:0,contacts:[],poses:[{t:0,p:p(0,1),q},{t:12,p:p(20,.023),q}],waypointHits:hits,...extra});
 const earned=scoreAttempt(result());assert.equal(earned.waypointBase,70000);assert.equal(earned.total,140000);assert.equal(earned.waypointMultiplier,8,'Label means NEXT waypoint award multiplier');

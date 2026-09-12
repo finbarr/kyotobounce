@@ -1,6 +1,6 @@
 # Kyoto campaign
 
-The campaign contains 30 stages in six chapters, with five stages per chapter. Suggested route length rises from 6.9 m to 274 m. Routes range from a short convenience-store delivery to garden ricochets, stair cascades, an enclosed Skyway run and throws across the station.
+The campaign contains 30 stages in six chapters, with five stages per chapter. Suggested route length rises from 6.9 m to 270.7 m. Routes range from a short convenience-store delivery to garden ricochets, stair cascades, an enclosed Skyway run and throws across the station.
 
 `web/starter-challenges.json` is the complete current station campaign. The service replaces retired station-authored definitions and their scores at startup. Unchanged campaign scores and player-created courses survive. There are no archived development campaigns or compatibility catalogs.
 
@@ -13,35 +13,35 @@ The distance label is the measured length of the suggested native trajectory, in
 | Stage | Chapter | Course | Suggested route | Waypoints |
 | --- | --- | --- | ---: | ---: |
 | 01 | First Departures | Snack Run | 6.9 m | 2 |
-| 02 | First Departures | Exact Change | 15.8 m | 2 |
-| 03 | First Departures | Ticket Trick | 16.3 m | 2 |
-| 04 | First Departures | First Bank | 18.3 m | 0 |
-| 05 | First Departures | Terrace Turnaround | 18.3 m | 2 |
-| 06 | Local Connections | Platform Drift | 20.8 m | 3 |
-| 07 | Local Connections | Lost and Found | 21.1 m | 3 |
-| 08 | Local Connections | Information Exchange | 25.8 m | 3 |
-| 09 | Local Connections | Garden Party | 26.2 m | 3 |
-| 10 | Local Connections | Window Shopping | 30.4 m | 3 |
-| 11 | Banking on Kyoto | Double Step | 30.6 m | 4 |
-| 12 | Banking on Kyoto | Locker Loop | 36.1 m | 4 |
-| 13 | Banking on Kyoto | Under the Café | 36.4 m | 4 |
-| 14 | Banking on Kyoto | Sky Garden Shuffle | 37.3 m | 4 |
-| 15 | Banking on Kyoto | Concourse Cruiser | 49.6 m | 4 |
-| 16 | The Grand Climb | East Square Encore | 59 m | 5 |
-| 17 | The Grand Climb | Café Delivery | 64.7 m | 5 |
-| 18 | The Grand Climb | Three Flights Down | 81.6 m | 6 |
-| 19 | The Grand Climb | Balcony Express | 108.7 m | 5 |
+| 02 | First Departures | Ticket Trick | 15.3 m | 2 |
+| 03 | First Departures | Terrace Turnaround | 18.3 m | 2 |
+| 04 | First Departures | First Bank | 24.4 m | 0 |
+| 05 | First Departures | Garden Party | 26.2 m | 3 |
+| 06 | Local Connections | Window Shopping | 30.5 m | 3 |
+| 07 | Local Connections | Double Step | 30.6 m | 4 |
+| 08 | Local Connections | Platform Drift | 30.9 m | 3 |
+| 09 | Local Connections | Lost and Found | 36.4 m | 3 |
+| 10 | Local Connections | Sky Garden Shuffle | 37.3 m | 4 |
+| 11 | Banking on Kyoto | Exact Change | 43.4 m | 2 |
+| 12 | Banking on Kyoto | Information Exchange | 45.4 m | 3 |
+| 13 | Banking on Kyoto | Locker Loop | 50.4 m | 4 |
+| 14 | Banking on Kyoto | East Square Encore | 59 m | 5 |
+| 15 | Banking on Kyoto | Café Delivery | 64.7 m | 5 |
+| 16 | The Grand Climb | Under the Café | 65.2 m | 4 |
+| 17 | The Grand Climb | Three Flights Down | 81.6 m | 6 |
+| 18 | The Grand Climb | Concourse Cruiser | 93.8 m | 4 |
+| 19 | The Grand Climb | Balcony Express | 111.3 m | 5 |
 | 20 | The Grand Climb | Grand Stair Fever | 114.2 m | 5 |
 | 21 | Cross-Station Express | Skyway Speedway | 122.4 m | 6 |
 | 22 | Cross-Station Express | Staircase Jackpot | 124.4 m | 5 |
 | 23 | Cross-Station Express | Upper Deck Tumble | 146.3 m | 4 |
 | 24 | Cross-Station Express | Last Order | 149.6 m | 2 |
-| 25 | Cross-Station Express | Escalator Relay | 156.1 m | 7 |
+| 25 | Cross-Station Express | Escalator Relay | 157 m | 7 |
 | 26 | Jackpot Finale | Thirteen and Counting | 167.4 m | 4 |
-| 27 | Jackpot Finale | Sculpture Square Slingshot | 180.7 m | 6 |
-| 28 | Jackpot Finale | Roof-to-Terrace Special | 190.6 m | 3 |
-| 29 | Jackpot Finale | East-to-West Ricochet | 195.8 m | 8 |
-| 30 | Jackpot Finale | The Kyoto Grand Slam | 274 m | 8 |
+| 27 | Jackpot Finale | East-to-West Ricochet | 179.8 m | 8 |
+| 28 | Jackpot Finale | Sculpture Square Slingshot | 182.3 m | 6 |
+| 29 | Jackpot Finale | Roof-to-Terrace Special | 190.6 m | 3 |
+| 30 | Jackpot Finale | The Kyoto Grand Slam | 270.7 m | 8 |
 
 ## Targets and physics
 
@@ -55,10 +55,10 @@ The overview cuts above the highest target by 1.8 m so low shop ceilings do not 
 
 ## Verification
 
-The campaign uses collision `b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515`, physics `kyoto-p3-2`, throw model `robot-v4` and capability `waypoint-v1`. Scene assets and native collision were not changed in this campaign.
+The campaign uses collision `b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515`, physics `kyoto-p3-3`, throw model `robot-v4` and capability `waypoint-v1`. Station geometry is unchanged; floor contact uses the moderate grip described in [FLIGHT-CONTACT-FIXES.md](FLIGHT-CONTACT-FIXES.md). Targets, route lengths and stage ordering have been recalibrated for that response.
 
 `web/levels/proof-inputs.json` pairs every current course with two repeated suggested shots and one nearby aim. The native proof requires all suggested waypoints, positive completion for neighboring shots, and full physical rest. Optional destination results are reported separately. A timeout or a ball leaving the station fails the proof.
 
 `npm test` checks campaign completeness, progression, hints, target data and replacement of the previous catalog. `npm run test:runtime` checks authoritative scores and saved replay parity on an isolated local service, including shop, garden, Skyway and finale routes. Browser verification covers the real chapter selector, stage overviews, visible hints and custom-course access. See `web/levels/README.md` for reproduction.
 
-The final local acceptance covered 90 passing native shots: 60 suggested shots and 30 nearby positive completions. The ticket-machine patch and two cascade checkpoints were adjusted and rechecked. The isolated service also passed classic scoring regressions plus shop, garden, Skyway and finale score/replay checks. Browser checks covered all six chapters, custom-course access, hints and short/long overviews. In-app mouse capture was unavailable, so these results do not claim a manual browser playthrough of every stage. The campaign has not been deployed.
+Local acceptance requires 90 passing native shots: 60 suggested shots collecting every waypoint and 30 nearby positive completions. Optional destinations are checked separately; a hint can collect its full chain without earning the destination bonus. The isolated service checks classic scoring plus shop, garden, Skyway and finale score/replay parity. In-app mouse capture is unavailable, so browser checks do not establish a manual playthrough of every stage. The campaign has not been deployed.

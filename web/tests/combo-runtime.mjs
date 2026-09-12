@@ -10,7 +10,7 @@ try{
  await c.join();c.send('name',{name:'Arcade QA'});const course=c.messages.findLast(m=>m.type==='catalog').challenges.find(c=>c.id==='atrium-first-bank');
  assert.equal(course.scoring,SCORING_VERSION);assert.equal(course.allowedInputs.chargeSeconds,2.8);
  await c.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');
- for(const [name,holdMs,yaw]of [['perfect',260,90],['near',260,104],['tagged',373,90]]){
+ for(const [name,holdMs,yaw]of [['perfect',260,90],['near',260,100],['tagged',373,90]]){
   c.messages.length=0;const shot=await c.throw(holdMs,{yaw,pitch:15,powerRange:'precision'},45000),r=shot.result;
   const live=c.messages.filter(m=>m.type==='state'&&m.liveScore).map(m=>m.liveScore);
   assert.ok(live.length>10);assert.ok(live.some(m=>m.potential>10000));assert.ok(live.some(m=>m.styleBanks>0));

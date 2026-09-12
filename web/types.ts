@@ -7,7 +7,7 @@ export const ACTIVE_SCORING=['combo-v5',WAYPOINT_SCORING];
 export type Hint = {yaw:number;pitch:number;top:number;kick:number;holdMs:number;powerRange?:'precision'|'full';note:string;period?:number;releasePhase?:number};
 export type CampaignStage = {chapter:number;chapterTitle:string;difficulty:string;distance:number;brief:string};
 export type Challenge = {id:string;revision:number;name:string;creator:string;layout:string;physics:string;throwModel?:string;scoring?:string;allowedInputs?:{chargeSeconds:number;power:[number,number];pitch:[number,number];top:[number,number];kick:[number,number]};start:Disk;goal:Disk|null;waypoints?:Waypoint[];hint?:Hint;order?:number;requiredSurface?:string;campaign?:CampaignStage};
-export const PHYSICS_VERSION='kyoto-p3-2';
+export const PHYSICS_VERSION='kyoto-p3-3';
 import { THROW_MODEL } from './public/throw-power.js';
 export { THROW_MODEL };
 export const SCORING_VERSION='combo-v5';
