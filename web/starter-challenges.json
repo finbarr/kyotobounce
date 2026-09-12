@@ -1,10 +1,315 @@
 [
   {
+    "id": "kyoto-konbinidirect",
+    "revision": 1,
+    "name": "Snack Run",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -56,
+        "y": 7.34999942779541,
+        "z": -18
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "k019-west-2f-gallery"
+    },
+    "goal": {
+      "center": {
+        "x": -51.60438537597656,
+        "y": 7.349999904632568,
+        "z": -18.219999313354492
+      },
+      "normal": {
+        "x": 0,
+        "y": 1.000000238418579,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "konbini-floor"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -53.775543212890625,
+          "y": 7.349999904632568,
+          "z": -18.219999313354492
+        },
+        "normal": {
+          "x": 0,
+          "y": 1.000000238418579,
+          "z": 0
+        },
+        "radius": 0.15000000596046448,
+        "surface": "konbini-floor"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -51.75627899169922,
+          "y": 7.349999904632568,
+          "z": -18.219999313354492
+        },
+        "normal": {
+          "x": 0,
+          "y": 1.000000238418579,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "konbini-floor"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": -10,
+      "top": -70,
+      "kick": 0,
+      "holdMs": 243.47826086956522,
+      "powerRange": "precision",
+      "note": "1.50 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 0,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "Rookie",
+      "distance": 6.9,
+      "brief": "Roll through the open convenience-store entrance. Collect the purple patches, then park beside the shelves."
+    }
+  },
+  {
+    "id": "kyoto-vending",
+    "revision": 1,
+    "name": "Exact Change",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -42,
+        "y": 0,
+        "z": -8
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": -44.70355224609375,
+        "y": 0,
+        "z": -11.067882537841797
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1.5,
+      "surface": "concourse"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -42.66282653808594,
+          "y": 0,
+          "z": -13.052205085754395
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -44.33584976196289,
+          "y": 0,
+          "z": -11.94542407989502
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": 185,
+      "pitch": 10,
+      "top": -60,
+      "kick": 0,
+      "holdMs": 1582.6086956521738,
+      "powerRange": "precision",
+      "note": "7.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 1,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "Rookie",
+      "distance": 15.8,
+      "brief": "Bank off the drink machines and catch the return. A light touch is enough to start the chain."
+    }
+  },
+  {
+    "id": "kyoto-ticket",
+    "revision": 1,
+    "name": "Ticket Trick",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": 20,
+        "y": 0,
+        "z": -20
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "concourse"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": 20.074819564819336,
+          "y": 0,
+          "z": -23.379383087158203
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": 20.68,
+          "y": 0.37,
+          "z": -27.779998779296875
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        "radius": 0.17,
+        "surface": "concourse-ticket-machine-1"
+      }
+    ],
+    "hint": {
+      "yaw": 175,
+      "pitch": 5,
+      "top": -40,
+      "kick": 0,
+      "holdMs": 1095.6521739130435,
+      "powerRange": "precision",
+      "note": "5.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 2,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "Rookie",
+      "distance": 16.3,
+      "brief": "Skip across the ticket hall, then catch the back of a ticket machine for the harder bonus patch."
+    }
+  },
+  {
     "id": "atrium-first-bank",
     "revision": 10,
     "name": "First Bank",
     "creator": "station",
-    "order": 0,
+    "order": 3,
     "start": {
       "center": {
         "x": 0,
@@ -31,7 +336,7 @@
       "top": 0,
       "kick": 0,
       "holdMs": 259,
-      "note": "A gentle floor bank. Set the suggested aim and release at the suggested speed.",
+      "note": "1.56 m/s · H sets the suggested aim. Charge to the marker and watch the final rolls into the gold circle.",
       "powerRange": "precision"
     },
     "scoring": "combo-v5",
@@ -54,44 +359,735 @@
         200
       ]
     },
-    "throwModel": "robot-v4"
+    "throwModel": "robot-v4",
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "Rookie",
+      "distance": 18.3,
+      "brief": "Learn the bounce: keep the ball on a straight line and let the last few rolls carry it into the gold circle."
+    }
   },
   {
-    "id": "atrium-return-ticket",
-    "revision": 10,
-    "name": "Return Ticket",
+    "id": "kyoto-terrace",
+    "revision": 1,
+    "name": "Terrace Turnaround",
     "creator": "station",
-    "order": 1,
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -36,
+        "y": 7.350000381469727,
+        "z": -5
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "west-2f-landing"
+    },
+    "goal": {
+      "center": {
+        "x": -33.968658447265625,
+        "y": 7.34999942779541,
+        "z": 1.8038419485092163
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1.5,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -35.89179611206055,
+          "y": 7.350000381469727,
+          "z": -8.760974884033203
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -34.11557388305664,
+          "y": 7.350000381469727,
+          "z": 0.8807566165924072
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 175,
+      "pitch": 15,
+      "top": -50,
+      "kick": 0,
+      "holdMs": 1095.6521739130435,
+      "powerRange": "precision",
+      "note": "5.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 4,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "Rookie",
+      "distance": 18.3,
+      "brief": "Use the seating partition to turn the ball back across the terrace. Bank first, collect on the way home."
+    }
+  },
+  {
+    "id": "kyoto-platform",
+    "revision": 1,
+    "name": "Platform Drift",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
     "start": {
       "center": {
         "x": 0,
         "y": 0,
-        "z": 20
+        "z": 22
       },
-      "radius": 0.75,
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
       "surface": "concourse"
     },
     "goal": {
       "center": {
-        "x": -5.037579536437988,
+        "x": 12.102253913879395,
         "y": 0,
-        "z": 19.780000686645508
+        "z": 25.014812469482422
       },
-      "radius": 0.6499999761581421,
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1.5,
       "surface": "concourse"
     },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": 2.5485119819641113,
+          "y": 0,
+          "z": 22.45510482788086
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": 6.658604621887207,
+          "y": 0,
+          "z": 23.55636978149414
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": 10.60590934753418,
+          "y": 0,
+          "z": 24.613990783691406
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": 75,
+      "pitch": 10,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 389.5652173913044,
+      "powerRange": "precision",
+      "note": "2.10 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 5,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Local Connections",
+      "difficulty": "Tricky",
+      "distance": 20.8,
+      "brief": "Send a gentle diagonal shot across the open concourse. Pick up the chain before the final landing."
+    }
+  },
+  {
+    "id": "kyoto-locker",
+    "revision": 1,
+    "name": "Lost and Found",
+    "creator": "station",
     "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
     "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -30,
+        "y": 0,
+        "z": -8
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": -36.37855529785156,
+        "y": 0,
+        "z": -14.728452682495117
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "concourse"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -32.94148254394531,
+          "y": 0,
+          "z": -11.163257598876953
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -34.26044845581055,
+          "y": 0,
+          "z": -12.735130310058594
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -36.70649719238281,
+          "y": 0,
+          "z": -15.650211334228516
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": 220,
+      "pitch": 10,
+      "top": -50,
+      "kick": 0,
+      "holdMs": 1339.1304347826087,
+      "powerRange": "precision",
+      "note": "6.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 6,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Local Connections",
+      "difficulty": "Tricky",
+      "distance": 21.1,
+      "brief": "Thread the locker and recycling area. The return off the shop boundary keeps the chain alive."
+    }
+  },
+  {
+    "id": "kyoto-information",
+    "revision": 1,
+    "name": "Information Exchange",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -12,
+        "y": 0,
+        "z": -21
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": -3.90159273147583,
+        "y": 0,
+        "z": -4.9689154624938965
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1.5,
+      "surface": "concourse"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -10.671693801879883,
+          "y": 0,
+          "z": -18.248151779174805
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -7.6131391525268555,
+          "y": 0,
+          "z": -12.249420166015625
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -4.804964065551758,
+          "y": 0,
+          "z": -6.7409467697143555
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": 150,
+      "pitch": 10,
+      "top": -80,
+      "kick": 0,
+      "holdMs": 1144.3478260869565,
+      "powerRange": "precision",
+      "note": "5.20 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 7,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Local Connections",
+      "difficulty": "Tricky",
+      "distance": 25.8,
+      "brief": "Bounce off the southern frontage and bring the ball back into the hall. Follow the floor patches through the turn."
+    }
+  },
+  {
+    "id": "kyoto-eastgarden",
+    "revision": 1,
+    "name": "Garden Party",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": 96,
+        "y": 34.619998931884766,
+        "z": -12
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "east-court-garden-floor"
+    },
+    "goal": {
+      "center": {
+        "x": 100.50675964355469,
+        "y": 34.619998931884766,
+        "z": -10.482536315917969
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.5,
+      "surface": "east-court-garden-floor"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": 103.16007995605469,
+          "y": 34.6199951171875,
+          "z": -9.62806510925293
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "east-court-garden-floor"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": 106.96085357666016,
+          "y": 34.619998931884766,
+          "z": -9.545300483703613
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "east-court-garden-floor"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": 101.26614379882812,
+          "y": 34.62000274658203,
+          "z": -10.345006942749023
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "east-court-garden-floor"
+      }
+    ],
+    "hint": {
+      "yaw": 70,
+      "pitch": 10,
+      "top": -70,
+      "kick": 0,
+      "holdMs": 2313.0434782608695,
+      "powerRange": "precision",
+      "note": "10.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 8,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Local Connections",
+      "difficulty": "Tricky",
+      "distance": 26.2,
+      "brief": "Ricochet among the East Square garden seats and planters. Every new patch turns the score up another notch."
+    }
+  },
+  {
+    "id": "kyoto-terracecross",
+    "revision": 1,
+    "name": "Window Shopping",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -42.999996185302734,
+        "y": 7.34999942779541,
+        "z": -8
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "west-2f-landing"
+    },
+    "goal": {
+      "center": {
+        "x": -39.96364974975586,
+        "y": 7.349999904632568,
+        "z": -6.800454139709473
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1.5,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -36.54539108276367,
+          "y": 7.349999904632568,
+          "z": -8.220001220703125
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -30.494783401489258,
+          "y": 7.34999942779541,
+          "z": -8.21953010559082
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -38.39460754394531,
+          "y": 7.349999904632568,
+          "z": -7.279701232910156
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "west-2f-landing"
+      }
+    ],
     "hint": {
       "yaw": 90,
       "pitch": 15,
-      "top": -200,
+      "top": -70,
       "kick": 0,
-      "holdMs": 173,
-      "note": "Strong backspin brings the ball back. release at the suggested speed.",
-      "powerRange": "precision"
+      "holdMs": 1826.0869565217392,
+      "powerRange": "precision",
+      "note": "8.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
     },
-    "scoring": "combo-v5",
+    "order": 9,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Local Connections",
+      "difficulty": "Tricky",
+      "distance": 30.4,
+      "brief": "Cross the café terrace, bank off its glass edge, and come back over the shallow seating steps."
+    }
+  },
+  {
+    "id": "kyoto-cascade2",
+    "revision": 1,
+    "name": "Double Step",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
     "allowedInputs": {
       "chargeSeconds": 2.8,
       "power": [
@@ -111,50 +1107,391 @@
         200
       ]
     },
-    "throwModel": "robot-v4"
-  },
-  {
-    "id": "atrium-moving-return",
-    "revision": 12,
-    "name": "Catch the Lift",
-    "creator": "station",
-    "order": 3,
     "start": {
       "center": {
-        "x": 17.32,
+        "x": -88.80000305175781,
+        "y": 23.971927642822266,
+        "z": -4.849999904632568
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-02"
+    },
+    "goal": {
+      "center": {
+        "x": -67.98958587646484,
+        "y": 19.58596420288086,
+        "z": -0.08777475357055664
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "muromachi-square"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -78.9188461303711,
+          "y": 19.58596420288086,
+          "z": -2.704050064086914
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
+        },
+        "radius": 0.15000000596046448,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -74.52946472167969,
+          "y": 19.58596420288086,
+          "z": -1.6514058113098145
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -72.36247253417969,
+          "y": 19.58596420288086,
+          "z": -1.131698489189148
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -68.03327941894531,
+          "y": 19.58596420288086,
+          "z": -0.09812557697296143
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "muromachi-square"
+      }
+    ],
+    "hint": {
+      "yaw": 76.5,
+      "pitch": 0,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 608.695652173913,
+      "powerRange": "precision",
+      "note": "3.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 10,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Banking on Kyoto",
+      "difficulty": "Skilled",
+      "distance": 30.6,
+      "brief": "Start above the Grand Staircase. Bounce through two flights and collect the trail across Muromachi Square."
+    }
+  },
+  {
+    "id": "kyoto-cafe",
+    "revision": 1,
+    "name": "Locker Loop",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -40,
         "y": 0,
-        "z": 6.373336
+        "z": 2
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "concourse"
+    },
+    "goal": {
+      "center": {
+        "x": -26.057279586791992,
+        "y": 0,
+        "z": -10.253406524658203
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "concourse"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -37.42351531982422,
+          "y": 0,
+          "z": -5.722088813781738
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -34.33472442626953,
+          "y": 0,
+          "z": -14.208542823791504
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -29.96905517578125,
+          "y": 0,
+          "z": -12.814906120300293
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -26.562259674072266,
+          "y": 0,
+          "z": -10.582382202148438
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": 160,
+      "pitch": 20,
+      "top": -70,
+      "kick": 0,
+      "holdMs": 2069.565217391304,
+      "powerRange": "precision",
+      "note": "9.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 11,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Banking on Kyoto",
+      "difficulty": "Skilled",
+      "distance": 36.1,
+      "brief": "Drive a longer line into the lockers, then let the rebound sweep across the floor under the café."
+    }
+  },
+  {
+    "id": "kyoto-undercroft",
+    "revision": 1,
+    "name": "Under the Café",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -55,
+        "y": 0,
+        "z": -10
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
       },
       "radius": 0.25,
       "surface": "concourse"
     },
     "goal": {
       "center": {
-        "x": 29.8,
-        "y": 5.5,
-        "z": 6.153565
+        "x": -24.487201690673828,
+        "y": 0,
+        "z": -12.890941619873047
       },
-      "radius": 0.2,
-      "surface": "east-ground-second-landing"
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "concourse"
     },
     "waypoints": [
       {
-        "id": "clean-dismount",
+        "id": "patch-1",
         "center": {
-          "x": 29.8,
-          "y": 5.5,
-          "z": 6.153565
+          "x": -45.53273010253906,
+          "y": 0,
+          "z": -11.049010276794434
         },
-        "radius": 0.15,
-        "surface": "east-ground-second-landing",
         "normal": {
           "x": 0,
           "y": 1,
           "z": 0
-        }
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -38.79918670654297,
+          "y": 0,
+          "z": -11.638193130493164
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -32.6661491394043,
+          "y": 0,
+          "z": -12.174996376037598
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -26.317440032958984,
+          "y": 0,
+          "z": -12.730757713317871
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
       }
     ],
-    "requiredSurface": "east-concourse-lower-escalator-1",
+    "hint": {
+      "yaw": 95,
+      "pitch": 15,
+      "top": -70,
+      "kick": 0,
+      "holdMs": 1266.0869565217392,
+      "powerRange": "precision",
+      "note": "5.70 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 12,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Banking on Kyoto",
+      "difficulty": "Skilled",
+      "distance": 36.4,
+      "brief": "Keep a low diagonal line through the space below the terrace. Save enough speed for the far patches."
+    }
+  },
+  {
+    "id": "kyoto-garden",
+    "revision": 1,
+    "name": "Sky Garden Shuffle",
+    "creator": "station",
     "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
     "physics": "kyoto-p3-2",
     "throwModel": "robot-v4",
@@ -178,82 +1515,255 @@
         200
       ]
     },
+    "start": {
+      "center": {
+        "x": -150,
+        "y": 54.49824523925781,
+        "z": -25
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "k008-garden-deck-east"
+    },
+    "goal": {
+      "center": {
+        "x": -142.4335479736328,
+        "y": 54.49824523925781,
+        "z": -30.331483840942383
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.30000001192092896,
+      "surface": "k008-garden-deck-east"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -149.77999877929688,
+          "y": 54.49824523925781,
+          "z": -18.545372009277344
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "k008-garden-deck-east"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -147.70860290527344,
+          "y": 54.49824523925781,
+          "z": -15.179999351501465
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.30000001192092896,
+        "surface": "k008-garden-deck-east"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -144.26168823242188,
+          "y": 54.49824523925781,
+          "z": -22.896581649780273
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "k008-garden-deck-east"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -142.18487548828125,
+          "y": 54.49824523925781,
+          "z": -28.807357788085938
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.15000000596046448,
+        "surface": "k008-garden-deck-east"
+      }
+    ],
     "hint": {
-      "yaw": 90,
-      "pitch": -30,
-      "top": -50,
+      "yaw": 0,
+      "pitch": 15,
+      "top": -70,
       "kick": 0,
+      "holdMs": 1826.0869565217392,
       "powerRange": "precision",
-      "holdMs": 486.95652173913044,
-      "note": "Catch the rising step. Roll onto the stone landing.",
-      "period": 0.7900353236922196,
-      "releasePhase": 0.2
+      "note": "8.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 13,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Banking on Kyoto",
+      "difficulty": "Skilled",
+      "distance": 37.3,
+      "brief": "Work the rooftop glass for a long return through the garden. Avoid clipping the planted beds."
     }
   },
   {
-    "id": "atrium-staircase-special",
-    "revision": 3,
-    "name": "Staircase Special",
+    "id": "kyoto-longconcourse",
+    "revision": 1,
+    "name": "Concourse Cruiser",
     "creator": "station",
-    "order": 2,
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
     "start": {
       "center": {
-        "x": -83.08,
-        "y": 21.691228,
-        "z": -5
+        "x": -30,
+        "y": 0,
+        "z": 20
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
       },
       "radius": 0.25,
-      "surface": "daikaidan-landing-01"
+      "surface": "concourse"
     },
-    "goal": null,
+    "goal": {
+      "center": {
+        "x": 13.797282218933105,
+        "y": 0,
+        "z": 19.780000686645508
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "concourse"
+    },
     "waypoints": [
       {
-        "id": "first-tread",
+        "id": "patch-1",
         "center": {
-          "x": -81.55,
-          "y": 21.164912,
-          "z": -5.22
+          "x": -23.04407501220703,
+          "y": 0,
+          "z": 19.779998779296875
         },
-        "radius": 0.1,
-        "surface": "daikaidan-flight-01",
         "normal": {
           "x": 0,
           "y": 1,
           "z": 0
-        }
+        },
+        "radius": 0.75,
+        "surface": "concourse"
       },
       {
-        "id": "plaza-entry",
+        "id": "patch-2",
         "center": {
-          "x": -78.4,
-          "y": 19.585965,
-          "z": -5.22
+          "x": -10.729944229125977,
+          "y": 0,
+          "z": 19.78000259399414
         },
-        "radius": 0.2,
-        "surface": "muromachi-square",
         "normal": {
           "x": 0,
           "y": 1,
           "z": 0
-        }
+        },
+        "radius": 0.75,
+        "surface": "concourse"
       },
       {
-        "id": "last-roll",
+        "id": "patch-3",
         "center": {
-          "x": -77.2,
-          "y": 19.585965,
-          "z": -5.22
+          "x": 4.13962984085083,
+          "y": 0,
+          "z": 19.780000686645508
         },
-        "radius": 0.4,
-        "surface": "muromachi-square",
         "normal": {
           "x": 0,
           "y": 1,
           "z": 0
-        }
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": 13.129735946655273,
+          "y": 0,
+          "z": 19.779998779296875
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
       }
     ],
-    "requiredSurface": "daikaidan-flight-01",
+    "hint": {
+      "yaw": 90,
+      "pitch": 20,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 1826.0869565217392,
+      "powerRange": "precision",
+      "note": "8.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 14,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Banking on Kyoto",
+      "difficulty": "Skilled",
+      "distance": 49.6,
+      "brief": "Stretch a single throw across the concourse. Build the full chain as the ball slows toward the destination."
+    }
+  },
+  {
+    "id": "kyoto-gardenlong",
+    "revision": 1,
+    "name": "East Square Encore",
+    "creator": "station",
     "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
     "physics": "kyoto-p3-2",
     "throwModel": "robot-v4",
@@ -277,95 +1787,1289 @@
         200
       ]
     },
+    "start": {
+      "center": {
+        "x": 96,
+        "y": 34.619998931884766,
+        "z": -12
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "east-court-garden-floor"
+    },
+    "goal": {
+      "center": {
+        "x": 96.2640609741211,
+        "y": 33.5,
+        "z": 8.950775146484375
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "east-square"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": 96.22000122070312,
+          "y": 33.5,
+          "z": 9.33212661743164
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "east-square"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": 96.21998596191406,
+          "y": 33.5,
+          "z": 3.3897368907928467
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "east-square"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": 96.23362731933594,
+          "y": 33.62417984008789,
+          "z": -1.6087571382522583
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9937863349914551,
+          "z": 0.11130397021770477
+        },
+        "radius": 0.15000000596046448,
+        "surface": "east-court-garden-ramp"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": 96.25965881347656,
+          "y": 33.5,
+          "z": 0.947640597820282
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "east-square"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": 96.26222229003906,
+          "y": 33.5,
+          "z": 5.95970344543457
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "east-square"
+      }
+    ],
     "hint": {
-      "yaw": 90,
-      "pitch": -20,
+      "yaw": 0,
+      "pitch": 15,
       "top": -100,
       "kick": 0,
-      "holdMs": 365.2173913043478,
-      "powerRange": "precision",
-      "note": "Cascade the first flight. Collect optional tread and plaza contacts; no exact finishing spot."
+      "holdMs": 492.46231155778895,
+      "powerRange": "full",
+      "note": "18.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 15,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "The Grand Climb",
+      "difficulty": "Expert",
+      "distance": 59,
+      "brief": "Launch through the upper garden and out onto East Square. Follow the rebound into the lower arrival area."
     }
   },
   {
-    "id": "atrium-last-order",
-    "revision": 3,
-    "name": "Last Order",
+    "id": "kyoto-plaza",
+    "revision": 1,
+    "name": "Café Delivery",
     "creator": "station",
-    "order": 4,
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
     "start": {
       "center": {
-        "x": -158.05,
-        "y": 49.585965,
-        "z": -12
+        "x": -72,
+        "y": 19.58596420288086,
+        "z": -3
       },
-      "radius": 0.35,
+      "normal": {
+        "x": 0,
+        "y": 0.9999999403953552,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "muromachi-square"
+    },
+    "goal": {
+      "center": {
+        "x": -34.67967224121094,
+        "y": 7.349999904632568,
+        "z": -9.476369857788086
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.30000001192092896,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -53.01980972290039,
+          "y": 7.34999942779541,
+          "z": -4.879732131958008
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -48.200679779052734,
+          "y": 7.349999904632568,
+          "z": -5.304224014282227
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -43.078857421875,
+          "y": 7.34999942779541,
+          "z": -5.755278587341309
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -38.871002197265625,
+          "y": 7.34999942779541,
+          "z": -6.126543998718262
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": -34.52587127685547,
+          "y": 7.349999904632568,
+          "z": -6.509975910186768
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 95,
+      "pitch": 10,
+      "top": -80,
+      "kick": 0,
+      "holdMs": 1193.0434782608697,
+      "powerRange": "precision",
+      "note": "5.40 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 16,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "The Grand Climb",
+      "difficulty": "Expert",
+      "distance": 64.7,
+      "brief": "Drop from Muromachi Square to the café level. Keep the ball moving through the steps and onto the terrace."
+    }
+  },
+  {
+    "id": "kyoto-cascade3",
+    "revision": 1,
+    "name": "Three Flights Down",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -94.2699966430664,
+        "y": 26.077192306518555,
+        "z": -6.4599995613098145
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-03"
+    },
+    "goal": {
+      "center": {
+        "x": -51.434261322021484,
+        "y": 7.349999904632568,
+        "z": -2.9881644248962402
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "center": {
+          "x": -88.6853256225586,
+          "y": 23.9719295501709,
+          "z": -5.345485687255859
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "daikaidan-landing-02",
+        "id": "patch-1"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -73.88995361328125,
+          "y": 19.58596420288086,
+          "z": -3.717127561569214
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -68.84809112548828,
+          "y": 19.58596420288086,
+          "z": -3.3769426345825195
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -59.31141662597656,
+          "y": 19.585966110229492,
+          "z": -3.1492514610290527
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": -56.294464111328125,
+          "y": 7.349999904632568,
+          "z": -3.083220958709717
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-6",
+        "center": {
+          "x": -51.59735107421875,
+          "y": 7.349999904632568,
+          "z": -2.9907913208007812
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 76.5,
+      "pitch": 0,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 852.1739130434784,
+      "powerRange": "precision",
+      "note": "4.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 17,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "The Grand Climb",
+      "difficulty": "Expert",
+      "distance": 81.6,
+      "brief": "Tag the first landing, then ride the Grand Staircase into the lower balconies. The long chain rewards a clean passage through the remaining flights."
+    }
+  },
+  {
+    "id": "kyoto-balcony",
+    "revision": 1,
+    "name": "Balcony Express",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -58,
+        "y": 7.34999942779541,
+        "z": 1.9999996423721313
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "west-2f-landing"
+    },
+    "goal": {
+      "center": {
+        "x": 27.777816772460938,
+        "y": 0,
+        "z": 1.7697036266326904
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "concourse"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -11.540727615356445,
+          "y": 0,
+          "z": 1.7763218879699707
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -4.035914421081543,
+          "y": 0,
+          "z": 1.7755274772644043
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -1.0240075588226318,
+          "y": 0,
+          "z": 1.7751514911651611
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": 3.7475361824035645,
+          "y": 0,
+          "z": 1.7745592594146729
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": 5.817905902862549,
+          "y": 0,
+          "z": 1.7742784023284912
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": 0,
+      "top": -50,
+      "kick": 0,
+      "holdMs": 1826.0869565217392,
+      "powerRange": "precision",
+      "note": "8.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 18,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "The Grand Climb",
+      "difficulty": "Expert",
+      "distance": 108.7,
+      "brief": "Leave the west balcony, bounce down the escalator, and carry the chain across the ground-floor hall."
+    }
+  },
+  {
+    "id": "kyoto-cascade6",
+    "revision": 1,
+    "name": "Grand Stair Fever",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -111.22000122070312,
+        "y": 32.392982482910156,
+        "z": -10.649999618530273
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-06"
+    },
+    "goal": {
+      "center": {
+        "x": -42.019989013671875,
+        "y": 7.34999942779541,
+        "z": 4.787539005279541
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -78.66781616210938,
+          "y": 19.585966110229492,
+          "z": -3.0611681938171387
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.30000001192092896,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -71.15005493164062,
+          "y": 19.58596420288086,
+          "z": -1.2567756175994873
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -63.66124725341797,
+          "y": 19.585966110229492,
+          "z": 0.47893571853637695
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -55.23912811279297,
+          "y": 7.350000381469727,
+          "z": 2.163524866104126
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": -47.721683502197266,
+          "y": 7.349999904632568,
+          "z": 3.6581015586853027
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 76.5,
+      "pitch": 0,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 1339.1304347826087,
+      "powerRange": "precision",
+      "note": "6.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 19,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "The Grand Climb",
+      "difficulty": "Expert",
+      "distance": 114.2,
+      "brief": "Launch down the long stair axis. Follow the cascade onto the café balcony and finish the return."
+    }
+  },
+  {
+    "id": "kyoto-skyway",
+    "revision": 1,
+    "name": "Skyway Speedway",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -50,
+        "y": 45.20000457763672,
+        "z": 2.3261070251464844
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "skyway-circulation-floor"
+    },
+    "goal": {
+      "center": {
+        "x": 63.24444580078125,
+        "y": 45.20000076293945,
+        "z": 2.0986199378967285
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.75,
+      "surface": "skyway-circulation-floor"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -3.7612009048461914,
+          "y": 45.20000076293945,
+          "z": 2.106106996536255
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "skyway-circulation-floor"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": 0.8628457188606262,
+          "y": 45.20000076293945,
+          "z": 2.106106996536255
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "skyway-circulation-floor"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": 5.3177571296691895,
+          "y": 45.20000076293945,
+          "z": 2.10591459274292
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "skyway-circulation-floor"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": 11.706014633178711,
+          "y": 45.20000076293945,
+          "z": 2.1054558753967285
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "skyway-circulation-floor"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": 24.73348045349121,
+          "y": 45.20000076293945,
+          "z": 2.1045114994049072
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "skyway-circulation-floor"
+      },
+      {
+        "id": "patch-6",
+        "center": {
+          "x": 57.71237564086914,
+          "y": 45.20000076293945,
+          "z": 2.101638078689575
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "skyway-circulation-floor"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": 0,
+      "top": -70,
+      "kick": 0,
+      "holdMs": 548.7437185929648,
+      "powerRange": "full",
+      "note": "20.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 20,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Cross-Station Express",
+      "difficulty": "Master",
+      "distance": 122.4,
+      "brief": "Send the ball along the enclosed bridge, collect the long rolling chain, then bank off the eastern end."
+    }
+  },
+  {
+    "id": "kyoto-cascade7",
+    "revision": 1,
+    "name": "Staircase Jackpot",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -116.8699951171875,
+        "y": 34.49824523925781,
+        "z": -12.020000457763672
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-07"
+    },
+    "goal": {
+      "center": {
+        "x": -38.36423110961914,
+        "y": 7.350000381469727,
+        "z": 5.837945461273193
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.15000000596046448,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -83.28445434570312,
+          "y": 21.69122886657715,
+          "z": -4.1830878257751465
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.30000001192092896,
+        "surface": "daikaidan-landing-01"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -74.077880859375,
+          "y": 19.58596420288086,
+          "z": -1.9723037481307983
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -65.73190307617188,
+          "y": 19.58596420288086,
+          "z": 0.01787710189819336
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -54.515380859375,
+          "y": 7.34999942779541,
+          "z": 2.446972608566284
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": -46.10540008544922,
+          "y": 7.349999904632568,
+          "z": 4.252213478088379
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 76.5,
+      "pitch": 0,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 1582.6086956521738,
+      "powerRange": "precision",
+      "note": "7.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 21,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Cross-Station Express",
+      "difficulty": "Master",
+      "distance": 124.4,
+      "brief": "Let the upper flights build momentum, then keep the bounce train running across the lower terrace."
+    }
+  },
+  {
+    "id": "kyoto-cascade10",
+    "revision": 1,
+    "name": "Upper Deck Tumble",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -134.1199951171875,
+        "y": 40.98947525024414,
+        "z": -16.209999084472656
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-10"
+    },
+    "goal": {
+      "center": {
+        "x": -38.75294876098633,
+        "y": 7.349999904632568,
+        "z": 6.43496036529541
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.5,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -74.82640838623047,
+          "y": 19.58596420288086,
+          "z": -2.202514171600342
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -64.50975036621094,
+          "y": 19.58596420288086,
+          "z": 0.26485657691955566
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -53.27565002441406,
+          "y": 7.34999942779541,
+          "z": 2.8271539211273193
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -42.61124801635742,
+          "y": 7.349999904632568,
+          "z": 5.254519462585449
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 76.5,
+      "pitch": 0,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 2313.0434782608695,
+      "powerRange": "precision",
+      "note": "10.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 22,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Cross-Station Express",
+      "difficulty": "Master",
+      "distance": 146.3,
+      "brief": "Drop from the high staircase into a distant balcony finish. The early landings only set up the real chain below."
+    }
+  },
+  {
+    "id": "kyoto-lastorder",
+    "revision": 1,
+    "name": "Last Order",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -158.04998779296875,
+        "y": 49.58596420288086,
+        "z": -12.000000953674316
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
       "surface": "north-circulation-landing-14"
     },
     "goal": {
       "center": {
-        "x": -51.35,
-        "y": 7.35,
-        "z": -18
+        "x": -50.466636657714844,
+        "y": 7.349999904632568,
+        "z": -18.30768585205078
       },
-      "radius": 1.05,
+      "normal": {
+        "x": 0,
+        "y": 1.000000238418579,
+        "z": 0
+      },
+      "radius": 0.15000000596046448,
       "surface": "konbini-floor"
     },
     "waypoints": [
       {
-        "id": "threshold-roll",
+        "id": "patch-1",
         "center": {
-          "x": -53.5,
-          "y": 7.35,
-          "z": -18
+          "x": -53.54608917236328,
+          "y": 7.349999904632568,
+          "z": -18.0631046295166
         },
-        "radius": 0.25,
-        "surface": "konbini-floor",
         "normal": {
           "x": 0,
-          "y": 1,
+          "y": 1.000000238418579,
           "z": 0
-        }
+        },
+        "radius": 0.30000001192092896,
+        "surface": "konbini-floor"
       },
       {
-        "id": "inside-delivery",
+        "id": "patch-2",
         "center": {
-          "x": -51.2,
-          "y": 7.35,
-          "z": -18
+          "x": -50.81239318847656,
+          "y": 7.349999904632568,
+          "z": -18.215944290161133
         },
-        "radius": 0.7,
-        "surface": "konbini-floor",
         "normal": {
           "x": 0,
-          "y": 1,
+          "y": 1.000000238418579,
           "z": 0
-        }
+        },
+        "radius": 0.5,
+        "surface": "konbini-floor"
       }
     ],
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
-    "physics": "kyoto-p3-2",
-    "throwModel": "robot-v4",
-    "scoring": "waypoint-v1",
-    "allowedInputs": {
-      "chargeSeconds": 2.8,
-      "power": [
-        0,
-        1
-      ],
-      "pitch": [
-        -65,
-        80
-      ],
-      "top": [
-        -200,
-        200
-      ],
-      "kick": [
-        -200,
-        200
-      ]
-    },
     "hint": {
       "yaw": 93.2,
       "pitch": 5,
@@ -373,7 +3077,985 @@
       "kick": 0,
       "holdMs": 820.3015075376884,
       "powerRange": "full",
-      "note": "Deliver through the open doorway. Interior contacts spend the speed; settle inside."
+      "note": "29.65 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 23,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Cross-Station Express",
+      "difficulty": "Master",
+      "distance": 149.6,
+      "brief": "Throw from the upper deck into the convenience store. Skim the stairs, find the doorway, and deliver between the shelves."
+    }
+  },
+  {
+    "id": "kyoto-cascade5",
+    "revision": 1,
+    "name": "Escalator Relay",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -105.56999969482422,
+        "y": 30.287717819213867,
+        "z": -9.279999732971191
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-05"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -101.00732421875,
+          "y": 28.18245506286621,
+          "z": -8.410858154296875
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.30000001192092896,
+        "surface": "north-escalator-upper-landing",
+        "id": "patch-1"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -63.85002517700195,
+          "y": 19.58596420288086,
+          "z": -2.649746894836426
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -52.70360565185547,
+          "y": 7.349999904632568,
+          "z": -1.0740350484848022
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -40.532493591308594,
+          "y": 7.34999942779541,
+          "z": 0.6429204940795898
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": -29.425138473510742,
+          "y": 7.349999904632568,
+          "z": 2.2080397605895996
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-6",
+        "center": {
+          "x": -15.411529541015625,
+          "y": 0,
+          "z": 4.182368278503418
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-7",
+        "center": {
+          "x": -4.372477054595947,
+          "y": 0,
+          "z": 5.7386474609375
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": 76.5,
+      "pitch": 0,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 1095.6521739130435,
+      "powerRange": "precision",
+      "note": "5.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 24,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Cross-Station Express",
+      "difficulty": "Master",
+      "distance": 156.1,
+      "brief": "Tag the upper landing, then relay the ball down the stairs and escalators into the concourse. The distant patches turn a small opening into a huge chain."
+    }
+  },
+  {
+    "id": "kyoto-cascade13",
+    "revision": 1,
+    "name": "Thirteen and Counting",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -151.07000732421875,
+        "y": 47.30526351928711,
+        "z": -20.31999969482422
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-13"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -78.63929748535156,
+          "y": 19.58596420288086,
+          "z": -3.1571807861328125
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.30000001192092896,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -65.2814712524414,
+          "y": 19.58596420288086,
+          "z": 0.06939756870269775
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -52.016319274902344,
+          "y": 7.34999942779541,
+          "z": 3.332512140274048
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -39.836769104003906,
+          "y": 7.349999904632568,
+          "z": 6.328141689300537
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 76.5,
+      "pitch": 0,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 379.8994974874372,
+      "powerRange": "full",
+      "note": "14.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 25,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Jackpot Finale",
+      "difficulty": "Legend",
+      "distance": 167.4,
+      "brief": "Start near the top of the great stair cascade. Keep a precise diagonal line into the far balcony patches."
+    }
+  },
+  {
+    "id": "kyoto-terracedrop",
+    "revision": 1,
+    "name": "Sculpture Square Slingshot",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": 67,
+        "y": 20.5,
+        "z": -13.000000953674316
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "east-4f-terrace"
+    },
+    "goal": {
+      "center": {
+        "x": -55.93052673339844,
+        "y": 0,
+        "z": 21.027589797973633
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.75,
+      "surface": "concourse"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": 20.662757873535156,
+          "y": 0,
+          "z": -0.3564929962158203
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": 2.651522159576416,
+          "y": 0,
+          "z": 4.469285011291504
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.30000001192092896,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -12.385835647583008,
+          "y": 0,
+          "z": 8.498189926147461
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -25.278244018554688,
+          "y": 0,
+          "z": 11.952247619628906
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": -38.1606559753418,
+          "y": 0,
+          "z": 15.402621269226074
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-6",
+        "center": {
+          "x": -50.82550048828125,
+          "y": 0,
+          "z": 18.79545021057129
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": -75,
+      "pitch": 25,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 379.8994974874372,
+      "powerRange": "full",
+      "note": "14.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 26,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Jackpot Finale",
+      "difficulty": "Legend",
+      "distance": 180.7,
+      "brief": "Launch from the eastern sculpture terrace, cross the central void, and land deep in the opposite concourse."
+    }
+  },
+  {
+    "id": "kyoto-roofdrop",
+    "revision": 1,
+    "name": "Roof-to-Terrace Special",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -150,
+        "y": 54.49824523925781,
+        "z": -25
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "k008-garden-deck-east"
+    },
+    "goal": {
+      "center": {
+        "x": -38.32681655883789,
+        "y": 7.349999904632568,
+        "z": -5.872175216674805
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.75,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -71.56947326660156,
+          "y": 19.58596420288086,
+          "z": -11.39395809173584
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "muromachi-square"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -48.21197509765625,
+          "y": 7.349999904632568,
+          "z": -7.27636194229126
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -34.084285736083984,
+          "y": 7.34999942779541,
+          "z": -4.787252426147461
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 80,
+      "pitch": 20,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 689.4472361809046,
+      "powerRange": "full",
+      "note": "25.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 27,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Jackpot Finale",
+      "difficulty": "Legend",
+      "distance": 190.6,
+      "brief": "Clear the Sky Garden edge and drop through the station to the café terrace. A small change of angle changes the entire landing."
+    }
+  },
+  {
+    "id": "kyoto-eastdrop",
+    "revision": 1,
+    "name": "East-to-West Ricochet",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": 90,
+        "y": 33.500003814697266,
+        "z": 5.000000476837158
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "east-square"
+    },
+    "goal": {
+      "center": {
+        "x": 15.246200561523438,
+        "y": 0,
+        "z": 5.220000267028809
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.75,
+      "surface": "concourse"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": 7.565945625305176,
+          "y": 0,
+          "z": 5.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -12.333126068115234,
+          "y": 0,
+          "z": 5.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": -9.920899391174316,
+          "y": 0,
+          "z": 5.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": -0.5427818298339844,
+          "y": 0,
+          "z": 5.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.30000001192092896,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": 1.9137494564056396,
+          "y": 0,
+          "z": 5.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-6",
+        "center": {
+          "x": 9.706599235534668,
+          "y": 0,
+          "z": 5.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-7",
+        "center": {
+          "x": 14.518691062927246,
+          "y": 0,
+          "z": 5.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-8",
+        "center": {
+          "x": 18.765201568603516,
+          "y": 0,
+          "z": 5.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": -90,
+      "pitch": 10,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 605.0251256281407,
+      "powerRange": "full",
+      "note": "22.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 28,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Jackpot Finale",
+      "difficulty": "Legend",
+      "distance": 195.8,
+      "brief": "Throw from East Square through the lower escalator banks. Sweep the concourse, rebound, and collect the returning line."
+    }
+  },
+  {
+    "id": "kyoto-crossstation",
+    "revision": 1,
+    "name": "The Kyoto Grand Slam",
+    "creator": "station",
+    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "physics": "kyoto-p3-2",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v1",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -158.04998779296875,
+        "y": 49.58596420288086,
+        "z": -12.000000953674316
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "north-circulation-landing-14"
+    },
+    "goal": {
+      "center": {
+        "x": 14.345287322998047,
+        "y": 0,
+        "z": -12.219891548156738
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.75,
+      "surface": "concourse"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -49.829368591308594,
+          "y": 7.350000381469727,
+          "z": -12.220001220703125
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -8.36338996887207,
+          "y": 0,
+          "z": -12.220001220703125
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-3",
+        "center": {
+          "x": 0.6463239192962646,
+          "y": 0,
+          "z": -12.220000267028809
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-4",
+        "center": {
+          "x": 13.770405769348145,
+          "y": 0,
+          "z": -12.220001220703125
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-5",
+        "center": {
+          "x": 18.747940063476562,
+          "y": 0,
+          "z": -12.220001220703125
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-6",
+        "center": {
+          "x": 26.257381439208984,
+          "y": 0,
+          "z": -12.220001220703125
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-7",
+        "center": {
+          "x": 29.206035614013672,
+          "y": 0,
+          "z": -12.220001220703125
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-8",
+        "center": {
+          "x": 16.680816650390625,
+          "y": 0,
+          "z": -12.219891548156738
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.65,
+        "surface": "concourse"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": 8,
+      "top": -100,
+      "kick": 0,
+      "holdMs": 1055.2763819095478,
+      "powerRange": "full",
+      "note": "38.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 29,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Jackpot Finale",
+      "difficulty": "Legend",
+      "distance": 274,
+      "brief": "Launch from the uppermost stair landing, skip the terrace furniture, cross to the eastern frontage, and bank the ball back home."
     }
   }
 ]

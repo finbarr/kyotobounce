@@ -33,6 +33,28 @@ export class Store {
    this.db.exec('COMMIT');
   }catch(error){this.db.exec('ROLLBACK');throw error;}
  }
+ // The checked-in campaign is the complete set of station-authored courses.
+ // Replace changed development courses and remove their scores atomically;
+ // player-created courses and unchanged campaign scores remain available.
+ syncCampaign(courses:Challenge[]){
+  if(!courses.length||new Set(courses.map(c=>c.id)).size!==courses.length||courses.some(c=>c.creator!=='station'))throw new Error('Invalid station campaign');
+  this.db.exec('BEGIN IMMEDIATE');try{
+   const desired=new Map(courses.map(c=>[c.id,withChallengeRules(c)]));
+   for(const row of this.db.prepare('SELECT id,revision,body FROM challenges WHERE creator=?').all('station')){
+    const c=desired.get(String(row.id));
+    if(!c||JSON.stringify(c)!==String(row.body)){
+     this.db.prepare('DELETE FROM attempts WHERE challenge=? AND revision=?').run(String(row.id),Number(row.revision));
+     this.db.prepare('DELETE FROM challenges WHERE id=? AND revision=?').run(String(row.id),Number(row.revision));
+    }
+   }
+   for(const c of desired.values()){
+    const existing=this.challenge(c.id);
+    if(existing&&existing.creator!=='station')throw new Error('Campaign ID belongs to a player');
+    if(!this.challenge(c.id,c.revision))this.db.prepare('INSERT INTO challenges VALUES (?,?,?,?,?)').run(c.id,c.revision,c.creator,JSON.stringify(c),Date.now());
+   }
+   this.db.exec('COMMIT');
+  }catch(error){this.db.exec('ROLLBACK');throw error;}
+ }
  discardRetired(layout:string,physics:string){
   if(physics!==PHYSICS_VERSION)throw new Error('Unsupported physics worker');
   this.db.exec('BEGIN IMMEDIATE');try{

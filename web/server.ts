@@ -19,8 +19,8 @@ const allowedOrigins=new Set(publicOrigin?[publicOrigin]:[`http://127.0.0.1:${po
 const dataDir=resolve(process.env.KYOTO_DATA_DIR||'web/data');
 await mkdir(dataDir,{recursive:true});
 const store = new Store(resolve(dataDir,'kyoto.sqlite'));
-const starters=JSON.parse(await readFile(resolve('web/starter-challenges.json'),'utf8').catch(()=>'[]'));
-for(const challenge of starters)if(!store.challenge(challenge.id,challenge.revision))store.saveChallenge(challenge);
+const starters=JSON.parse(await readFile(resolve('web/starter-challenges.json'),'utf8'));
+store.syncCampaign(starters);
 type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;replaced?:boolean;intentional?:boolean;opened:number;tokens:number;updated:number;alive:boolean;lastWrite:number;lastReplay:number};
 const connections = new Map<WebSocket,Connection>();
 const detached = new Map<string,ReturnType<typeof setTimeout>>();

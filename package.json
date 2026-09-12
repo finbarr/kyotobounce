@@ -22,8 +22,9 @@
     "assets:verify": "node tools/assets.mjs verify",
     "assets:pack": "node tools/pack-assets.mjs",
     "dev": "node tools/dev.mjs",
-    "test": "node web/tests/store.mjs && node web/tests/combo-scoring.mjs && node web/tests/current-game.mjs && node web/tests/ball-rotation.mjs && node web/tests/throw-power.mjs && node web/tests/connection.mjs",
-    "test:runtime": "node web/tests/combo-runtime.mjs"
+    "test": "node web/tests/store.mjs && node web/tests/combo-scoring.mjs && node web/tests/current-game.mjs && node web/tests/ball-rotation.mjs && node web/tests/throw-power.mjs && node web/tests/connection.mjs && node web/tests/campaign.mjs",
+    "test:runtime": "node web/tests/combo-runtime.mjs && node web/tests/campaign-runtime.mjs",
+    "test:campaign": "node web/levels/campaign-proof.mjs"
   },
   "dependencies": {
     "three": "0.185.1",

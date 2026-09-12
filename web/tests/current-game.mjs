@@ -31,5 +31,22 @@ try{
  await assert.rejects(game.command(member,{type:'select-challenge',challengeId:current.id,revision:1}),/not found/);
  assert.throws(()=>store.discardRetired('station','unknown-worker'),/Unsupported/);
  assert.equal(store.replay('current-shot').score,10000,'An invalid worker cannot clear the current game');
+ // Replacing the campaign removes old station courses even on the same layout.
+ const station={...current,id:'retained-stage',creator:'station',revision:1};
+ const removed={...station,id:'removed-stage'},changed={...station,id:'changed-stage'};
+ for(const c of [station,removed,changed]){store.saveChallenge(c);store.saveResult(result(c,c.id),'ori-carry-v2');}
+ const replacement={...changed,revision:2,name:'New route'},added={...station,id:'added-stage'};
+ store.syncCampaign([station,replacement,added]);
+ assert.equal(store.challenge(removed.id),null);assert.equal(store.replay(removed.id),null);
+ assert.equal(store.replay(changed.id),null);assert.equal(store.challenge(changed.id).revision,2);
+ assert.equal(store.replay(station.id).score,10000);
+ assert.equal(store.replay('current-shot').score,10000,'Player-created courses survive campaign replacement');
+ store.syncCampaign([station,replacement,added]);
+ assert.equal(store.replay(station.id).score,10000,'Restart preserves unchanged campaign scores');
+ assert.throws(()=>store.syncCampaign([]),/Invalid/);
+ assert.equal(store.challenge(station.id).name,station.name,'Invalid campaign fails without deleting data');
+ const collision={...added,id:current.id,revision:current.revision};
+ assert.throws(()=>store.syncCampaign([collision]),/belongs to a player/);
+ assert.equal(store.challenge(station.id).name,station.name,'A failed replacement rolls back removals');
  console.log('PASS retired layout/rules/revision cleanup, current score retention, replay, guest selection and restart');
 }finally{store.close();}

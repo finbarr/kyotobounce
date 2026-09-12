@@ -1,37 +1,64 @@
-# Station courses
+# Kyoto campaign
 
-This delivery contains three routes on the repaired station. Current course definitions and numerical hints belong in `web/starter-challenges.json`; historical entries remain immutable. Authoring tools and proof instructions are in `web/levels/README.md`.
+The campaign contains 30 stages in six chapters, with five stages per chapter. Suggested route length rises from 6.9 m to 274 m. Routes range from a short convenience-store delivery to garden ricochets, stair cascades, an enclosed Skyway run and throws across the station.
 
-| Course | Route | Scoring and completion |
-| --- | --- | --- |
-| Staircase Special | First Great Staircase flight into Muromachi plaza | Three optional surface waypoints, required staircase contact, no destination. Points are banked when translation and spin stop. |
-| Catch the Lift, revision 10 | Lower east ascending escalator to its static upper landing | Required ascending-lane contact, optional dismount waypoint and one landing destination. |
-| Last Order | Upper west landing through the station into the West Exit shop | Optional interior waypoints and one supported interior destination. The intermediate approach bank is optional. |
+`web/starter-challenges.json` is the complete current station campaign. The service replaces retired station-authored definitions and their scores at startup. Unchanged campaign scores and player-created courses survive. There are no archived development campaigns or compatibility catalogs.
 
-First Bank and Return Ticket remain the introductory courses, with native-proved revision 8 definitions on the repaired layout. Catch the Lift's revision 10 preserves production's existing revisions through 8 and avoids reusing a possible rule-migration revision 9. The two new course IDs start at revision 1.
+## Progression
 
-## Station registration
+All stages are available immediately. The chapter selector shows five numbered stages at a time; player-created courses have their own entry. Completing a stage keeps the existing Space-to-advance behavior, including chapter boundaries. Every stage has a brief, an overview and an H-key aim/charge hint.
 
-The operator's [July 2026 Kyoto shop index](https://www.dailyservice.co.jp/shop/map?type=kyoto) and [West Exit shop entry](https://www.dailyservice.co.jp/shop/detail/4828) identify Seven-Eleven Heart-in JR Kyoto Station West Exit on 2F outside the gates. This is separate from the Central Gate 1F shop. The [JR station map](https://www.jr-odekake.net/station/img/premises/0610116.pdf), revised January 31, 2026, locates the West Exit store beside the West Gate passage. The [station squares guide](https://www.kyoto-station-building.co.jp/service/square/) identifies Muromachi Square and the Great Staircase.
+The distance label is the measured length of the suggested native trajectory, including vertical travel, banks and returns. It is not the straight-line distance to the destination, which the overview reports separately. Difficulty labels describe the authored progression, not a measured human success rate.
 
-The game's West Exit threshold is registered at (-54, 7.35, -18), facing west with its interior extending east. This is an inference from schematic references, not a surveyed coordinate. The simplified interior, held-open doorway and scoring markers are gameplay adaptations. The original cafe has not been relabeled as the shop.
+| Stage | Chapter | Course | Suggested route | Waypoints |
+| --- | --- | --- | ---: | ---: |
+| 01 | First Departures | Snack Run | 6.9 m | 2 |
+| 02 | First Departures | Exact Change | 15.8 m | 2 |
+| 03 | First Departures | Ticket Trick | 16.3 m | 2 |
+| 04 | First Departures | First Bank | 18.3 m | 0 |
+| 05 | First Departures | Terrace Turnaround | 18.3 m | 2 |
+| 06 | Local Connections | Platform Drift | 20.8 m | 3 |
+| 07 | Local Connections | Lost and Found | 21.1 m | 3 |
+| 08 | Local Connections | Information Exchange | 25.8 m | 3 |
+| 09 | Local Connections | Garden Party | 26.2 m | 3 |
+| 10 | Local Connections | Window Shopping | 30.4 m | 3 |
+| 11 | Banking on Kyoto | Double Step | 30.6 m | 4 |
+| 12 | Banking on Kyoto | Locker Loop | 36.1 m | 4 |
+| 13 | Banking on Kyoto | Under the Café | 36.4 m | 4 |
+| 14 | Banking on Kyoto | Sky Garden Shuffle | 37.3 m | 4 |
+| 15 | Banking on Kyoto | Concourse Cruiser | 49.6 m | 4 |
+| 16 | The Grand Climb | East Square Encore | 59 m | 5 |
+| 17 | The Grand Climb | Café Delivery | 64.7 m | 5 |
+| 18 | The Grand Climb | Three Flights Down | 81.6 m | 6 |
+| 19 | The Grand Climb | Balcony Express | 108.7 m | 5 |
+| 20 | The Grand Climb | Grand Stair Fever | 114.2 m | 5 |
+| 21 | Cross-Station Express | Skyway Speedway | 122.4 m | 6 |
+| 22 | Cross-Station Express | Staircase Jackpot | 124.4 m | 5 |
+| 23 | Cross-Station Express | Upper Deck Tumble | 146.3 m | 4 |
+| 24 | Cross-Station Express | Last Order | 149.6 m | 2 |
+| 25 | Cross-Station Express | Escalator Relay | 156.1 m | 7 |
+| 26 | Jackpot Finale | Thirteen and Counting | 167.4 m | 4 |
+| 27 | Jackpot Finale | Sculpture Square Slingshot | 180.7 m | 6 |
+| 28 | Jackpot Finale | Roof-to-Terrace Special | 190.6 m | 3 |
+| 29 | Jackpot Finale | East-to-West Ricochet | 195.8 m | 8 |
+| 30 | Jackpot Finale | The Kyoto Grand Slam | 274 m | 8 |
 
-The final source adds a guarded gallery from the actual west 2F landing edge to that threshold. Its floor, solid roof/walls, doorway and guards match the canonical collision export. Native traversal and ball-entry checks confirm continuous support. See `tools/SHOP-INTEGRATION.md` for source and geometry verification.
+## Targets and physics
 
-## Physical constraints
+Twenty-nine stages use optional waypoint chains. Each waypoint scores once, in any order. Destinations are optional bonuses; a destination miss keeps earned waypoint points. First Bank retains the classic landing-accuracy introduction. The later stages reward longer chains, narrower surfaces, multi-level routes and precise delivery through the shop doorway. Two stair cascades retain an early landing checkpoint so a small aiming error can still bank a partial score.
 
-The first staircase landing supports a 0.25 m start disk; the earlier proposed 0.7 m disk did not fit. Staircase Special deliberately has no exact finishing target: collecting the optional tread/plaza chain is its purpose.
+All starts and targets are checked against the native collision model. A level changes only the start, targets and suggested input. It does not add catch planes, magnetic targets, special friction, forced stops or level-specific physics. A shot must stop translating and spinning before its score locks; recall forfeits.
 
-The escalator's upper comb ends near x29.52; raised tactile paving begins near x30.009. The clear static stone patch between them supports a 0.2 m-radius destination centered near x29.8. This is smaller than the original design sketch because a target disk must fit its actual fixed surface. The route retains the existing ascending lane and moving geometry.
+The store delivery uses the existing modeled 2F convenience store at the west gallery, not a new storefront. Its doorway, shelves, ceiling and collision stay intact. Station source registration remains in `web/levels/konbini-registration.json` and the canonical layout.
 
-Last Order starts on the existing upper west landing. The ball must pass through the real modeled opening; the doorway frame and roof remain solid. Its forgiving destination is contained by the actual shop floor. There is no hidden catch plane, target magnet, special friction or forced stop.
+The overview cuts above the highest target by 1.8 m so low shop ceilings do not cover indoor targets. Numbered purple guides keep distant patches legible through station geometry. Connecting dashes indicate the target sequence, not a predicted flight path; waypoints remain optional and unordered.
 
-## Acceptance
+## Verification
 
-All final proofs bind to collision SHA256 `7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775`, the matching browser assets, `kyoto-p3-2`, `robot-v4` and `waypoint-v1`.
+The campaign uses collision `b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515`, physics `kyoto-p3-2`, throw model `robot-v4` and capability `waypoint-v1`. Scene assets and native collision were not changed in this campaign.
 
-Each authored hint is checked with five identical native shots and three small neighboring inputs. The records must show actual waypoint contacts, required architecture when specified, complete replays and supported rest with zero translation and spin. Destination attestation is required only when the course has a destination. These samples establish bounded repeatability, not human playtesting or a broad success rate.
+`web/levels/proof-inputs.json` pairs every current course with two repeated suggested shots and one nearby aim. The native proof requires all suggested waypoints, positive completion for neighboring shots, and full physical rest. Optional destination results are reported separately. A timeout or a ball leaving the station fails the proof.
 
-Normal browser input must complete the course from its briefing, verify the saved replay and its scrub controls, and return to aiming through retry. No teleports, fabricated results or client-supplied scores count. General native suites separately verify recall forfeiture, once-only awards, retained waypoint points on a destination miss, route rejection and classic replay parity.
+`npm test` checks campaign completeness, progression, hints, target data and replacement of the previous catalog. `npm run test:runtime` checks authoritative scores and saved replay parity on an isolated local service, including shop, garden, Skyway and finale routes. Browser verification covers the real chapter selector, stage overviews, visible hints and custom-course access. See `web/levels/README.md` for reproduction.
 
-Before release, fresh and existing database startup must select the exact current revisions while preserving historical challenge/replay bytes. Completion status and outstanding checks are maintained once, in `docs/FLEET_QUEUE.md`. This pass does not add a campaign, alternate difficulty variants or further station phases.
+The final local acceptance covered 90 passing native shots: 60 suggested shots and 30 nearby positive completions. The ticket-machine patch and two cascade checkpoints were adjusted and rechecked. The isolated service also passed classic scoring regressions plus shop, garden, Skyway and finale score/replay checks. Browser checks covered all six chapters, custom-course access, hints and short/long overviews. In-app mouse capture was unavailable, so these results do not claim a manual browser playthrough of every stage. The campaign has not been deployed.

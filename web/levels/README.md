@@ -1,47 +1,38 @@
-# Course authoring tools
+# Campaign authoring and verification
 
-Production definitions and hints have one source: `web/starter-challenges.json`. `proof-inputs.json` contains only the native sampling inputs for the three new/changed courses. The former candidate catalog, preview seeder, overlay loader and provisional journals have been removed.
+The current 30-stage campaign lives in `web/starter-challenges.json`. Its exact native sampling inputs live in `proof-inputs.json`; chapter design and route descriptions are in [LEVEL-DESIGN.md](../../docs/LEVEL-DESIGN.md). Do not maintain a second candidate or historical catalog.
 
-All three courses passed five identical native shots and three neighboring inputs on collision `7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775`. Normal browser completion, saved replay, scrub and retry also passed. Destinations are optional bonuses: Last Order's browser delivery collected both waypoints and banked 609,881 points without its destination bonus. Native samples separately proved the bonus is reachable. See [the final design](../../docs/LEVEL-DESIGN.md) and [delivery queue](../../docs/FLEET_QUEUE.md) for scope and verification limits.
+## Native route proof
 
-## Native reproduction on Linux
-
-Use a compatible dedicated Linux worker. The verified Assembly-CSharp SHA256 is `9a8f2f06a928fb15d42b799a093c95eb7bb62fbbc3afd5f03bb1eebf34025fef`. Generate a fixture from the canonical course and retained sampling inputs:
+Select a compatible worker explicitly. A Mac worker or a dedicated Linux worker can run the same campaign. Every run gets a separate worker process and log; it does not connect to a running game or production database.
 
 ```sh
-node --input-type=module - atrium-last-order <<'JS'
-import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
-import assert from 'node:assert/strict';
-const proof=JSON.parse(readFileSync('web/levels/proof-inputs.json'));
-const sample=proof.courses.find(c=>c.id===process.argv[2]);
-assert.ok(sample,'Choose a course listed in proof-inputs.json');
-const challenge=JSON.parse(readFileSync('web/starter-challenges.json')).find(c=>c.id===sample.id&&c.revision===sample.revision);
-assert.equal(challenge.layout,proof.layout);
-mkdirSync('.local/proofs',{recursive:true});
-writeFileSync('.local/course-fixture.json',JSON.stringify({preliminary:false,challenge,shots:[...Array.from({length:sample.repeat},()=>structuredClone(sample.shot)),...sample.neighbors]},null,2));
-JS
-KYOTO_WORKER_EXECUTABLE=/absolute/dedicated/Linux/worker \
-node web/levels/native-proof.mjs .local/course-fixture.json .local/proofs/fresh
-node web/levels/check-proof.mjs .local/proofs/fresh
+KYOTO_WORKER_EXECUTABLE=/absolute/path/to/compatible/worker \
+  npm run test:campaign -- .local/campaign-proof-fresh
 ```
 
-Use a new output directory for each run. These are real charge/release and full native stepping probes; a timeout is inconclusive and recalls the shot. They cannot substitute for browser-input checks. The harness records the actual worker, layout, input, contacts, full rest and replay; it does not connect to a running service.
+The runner uses four isolated native sessions, two repeated hints and one neighboring aim per stage. It requires every hint target to be collected, a positive neighboring completion, and zero movement/spin at full rest. Optional destination outcomes are recorded separately. A timeout or cancellation fails. The output includes the exact tested catalog, its hash and per-shot results.
 
-## Browser reproduction on Linux
-
-Start a separate local game with `npm run dev -- 4284`, an explicit compatible `KYOTO_WORKER_EXECUTABLE`, and that worktree's own database/log. The helper uses Google Chrome at `/usr/bin/google-chrome` and only connects to localhost:4284:
+To recheck only a changed route, provide a comma-separated list of current IDs:
 
 ```sh
-node web/levels/browser-proof.mjs 'Last Order' .local/browser/fresh 820.3015075376884,820.3015075376884
+KYOTO_WORKER_EXECUTABLE=/absolute/path/to/compatible/worker \
+  npm run test:campaign -- .local/ticket-recheck kyoto-ticket
 ```
 
-It uses the briefing, hint key, normal charge/release, saved replay controls and retry, with at most one retry. Positive authoritative waypoint completion is required; an optional destination miss is reported honestly. Linux software rendering can delay input events, so inspect the recorded authoritative power before drawing conclusions about hint timing. These measurements do not establish Mac GPU or WAN performance.
+Use a new output directory for every run. Keep logs and exploratory trajectories under `.local/`; do not commit them. Native charge duration and launch speed are real service-to-worker inputs. They are not client-authorized scores or browser power overrides.
 
-## Shop source
+## Service and browser checks
 
 ```sh
-blender -b --python web/levels/build-konbini.py -- --output .local/konbini/fresh
-node web/levels/audit-konbini.mjs .local/konbini/fresh
+KYOTO_WORKER_EXECUTABLE=/absolute/path/to/compatible/worker npm run dev -- 4302
+KYOTO_TEST_ORIGIN=http://127.0.0.1:4302 npm run test:runtime
 ```
 
-The builder creates an independent blend, GLB, collider records and preview. Ten solid meshes matched within 2.36 µm; nine doorway clearance samples passed. The canonical station includes this source and its supported gallery; no extra browser asset loader is needed. `konbini-registration.json` records source references, inferred model placement and gameplay adaptations. Geography and structural integration are documented in [LEVEL-DESIGN.md](../../docs/LEVEL-DESIGN.md) and [SHOP-INTEGRATION.md](../../tools/SHOP-INTEGRATION.md). Research images and generated binaries are excluded from Git.
+The runtime suite creates records only in this isolated development database. It checks authoritative scoring, once-only waypoint awards, full rest, saved replay parity and progression. The campaign runtime test rejects non-local hosts.
+
+In the real browser, inspect every chapter, select short and long routes, open their overviews, apply the H-key hint, and check that returning from an overview retains the selected chapter. Player-created courses must remain reachable. Normal game completion still uses Space to advance to the next stage. Native proof does not establish a broad human success rate or remote-network performance.
+
+## Existing shop source
+
+`build-konbini.py`, `audit-konbini.mjs` and `konbini-registration.json` describe the modeled convenience store included in the station asset pack. The campaign uses its supported floor and real doorway. Research images and generated binaries stay outside Git; campaign development does not require rebuilding the shop or Unity worker.
