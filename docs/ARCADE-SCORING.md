@@ -23,7 +23,7 @@ The first waypoint adds 10,000 base points, the second 20,000, the third 40,000,
 
 A supported rest in the optional destination adds a bonus equal to the multiplied waypoint score, or the multiplied 10,000 base when no waypoint was hit. Missing the destination preserves every earned waypoint point. A positive target score completes the course; destination completion is recorded separately. Recall, leaving the station and a missed required route still forfeit. Completion always waits for translation and spin to stop. Scores saturate only at JavaScript's safe-integer storage limit.
 
-This family coexists with classic courses; it never rewrites their revisions, boards or archived replay bytes. New results include authoritative `personalBest` and `courseBest` flags for strict improvements on the exact course revision; ties and zero scores do not trigger a record. See [the waypoint specification](WAYPOINT-SCORING.md) for editor and presentation acceptance.
+This family coexists with current classic courses. Pre-launch builds discard retired layouts and rule versions. New results include authoritative `personalBest` and `courseBest` flags for strict improvements on the exact course revision; ties and zero scores do not trigger a record. See [the waypoint specification](WAYPOINT-SCORING.md) for editor and presentation acceptance.
 
 ## Presentation
 
@@ -37,9 +37,10 @@ New replays preserve the authoritative score timeline alongside their full-rate 
 
 ## Verification
 
-- `node web/tests/scoring.mjs`: archived accuracy-v3 behavior and historical replay preservation.
-- `node web/tests/combo-scoring.mjs`: million-point lines, rings, swept targets, anti-farming rules, live/final parity, and idempotent revision/hint migration.
+- `node web/tests/combo-scoring.mjs`: million-point lines, rings, swept targets, anti-farming rules, live/final parity, and movement/spin scoring through full rest.
 - `node web/tests/combo-runtime.mjs`: actual native perfect/near/tag shots, full-rest completion, authoritative power timing, score timelines, replay parity and score-spoof rejection. Set `KYOTO_TEST_ORIGIN` to an isolated local server and `KYOTO_TEST_OUTPUT` for a separate receipt.
 
 - `node web/tests/waypoint-scoring.mjs`: waypoint arithmetic, destination retention/bonus, once-only awards, capability gating, strict records and version isolation.
 - `node web/tests/waypoint-runtime.mjs` and `node web/tests/waypoint-oriented-runtime.mjs`: rebuilt native floor/wall/ceiling, slow contacts, misses, full rest, recall and replay parity on an isolated server.
+
+- `node web/tests/current-game.mjs`: retired development data removal and current score/replay retention across restart.

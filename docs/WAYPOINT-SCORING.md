@@ -18,8 +18,8 @@ points.** This is a new scoring family alongside existing destination courses.
   is credited by native ball contact, including slow rolling, on its actual face;
   flying nearby or touching the opposite side of a wall does not count.
 - First slice includes authoring, saving, playing and replaying a waypoint-only
-  course and a mixed course. Existing classic challenges and historical replays
-  remain available under their own rules; no existing route is silently replaced.
+  course and a mixed course. Current classic and waypoint courses remain playable. Retired development
+  layouts and rule versions are discarded.
 
 ## Initial tuning
 
@@ -95,7 +95,7 @@ reviews results, and integrates. The five-VM cap stays unchanged.
 
 Verify floor/wall/ceiling and slow contact; reject backside/near-miss/forged hits;
 verify once-only awards, destination miss preserving waypoint points, destination
-bonus, all targets optional, full rest, recall forfeiture and immutable old replays.
+bonus, all targets optional, full rest, recall forfeiture and current saved replay parity.
 Prove both new course forms through an isolated rebuilt native worker and real
 browser create/play/replay controls. Test score/FX reset on recall, retry, stage
 change and replay scrub. Capture actual escalation and character dance evidence,

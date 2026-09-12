@@ -19,7 +19,7 @@ if previous:
  material_names={'concourse-'+name for name in ['graphite','steel','ivory','wood','oak','red','blue','green','amber','glass-dark','paper','warm-light','white-light']}
  mats={m for m in bpy.data.materials if m.name in material_names}
  for key in ['boxes','panels','beams']:layout[key]=[r for r in layout[key] if r['id'] not in owned]
- layout['authoredMaterials']=[r for r in layout['authoredMaterials'] if r['id'] not in {m.name for m in mats}]
+ layout['authoredMaterials']=[r for r in layout['authoredMaterials'] if r['id'] not in material_names]
  for obj in list(previous.objects):bpy.data.objects.remove(obj,do_unlink=True)
  bpy.data.collections.remove(previous)
  for material in mats:bpy.data.materials.remove(material)

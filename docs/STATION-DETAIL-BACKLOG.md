@@ -9,8 +9,7 @@ All five development VMs were retired after verified preservation on September 1
 
 See [STATION-REFERENCE-AUDIT.md](STATION-REFERENCE-AUDIT.md) for the new
 Street View/indoor photosphere comparison, specific remaining gaps, references,
-model anchors and acceptance for K032–K036. K032 is integrated locally with static full-game and continuous shader-orbit
-checks; it is not deployed. The larger geometry jobs are queued and have no running machines.
+model anchors and acceptance for K032–K036. K032 and the expanded K034 ground-floor pass are now deployed with assets-v4. K033, K035 and K036 remain queued with no running machines. Retired development assets and course history are no longer retained in the game.
 
 ## Completed research and assignments — 2026-09-08
 

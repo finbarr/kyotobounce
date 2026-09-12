@@ -75,8 +75,7 @@ many objects by material and region.
 
 ## Bounded jobs
 
-The queue uses these IDs. Geometry jobs remain queued; K032 is integrated locally
-in this round. Each geometry owner must work in a separate branch/worktree and
+The queue uses these IDs. K032 and the expanded K034 ground-floor pass are deployed; K033, K035 and K036 remain queued. Each geometry owner must work in a separate branch/worktree and
 submit a standalone editable layer with a matching collision proposal.
 
 **K032 — Stone courses and floor-map readability.** Own `station-materials.js`.
@@ -87,7 +86,7 @@ revision. Acceptance: full-game near/far inspection and moving camera review,
 stable resources, browser build and no shader errors. This is a finish improvement,
 not completion of the facade geometry jobs below.
 
-Result: integrated as `8a3438d`. Syntax and browser build checks passed. Real
+Result: integrated as `8a3438d` and deployed in the September 12 pass. Syntax and browser build checks passed. Real
 Chrome loaded the full game/native worker without console errors; the floor
 pattern, tactile path and facade remained intact. A separate actual-shader
 inspection compared baseline/candidate at 4 m and ran continuous orbit at 4 m
@@ -105,15 +104,12 @@ its shape. Acceptance: a reference-matched wide view and close view; no floating
 skin or coplanar overlap; matching substantial collision; retain all stair routes.
 Extend to adjacent bays only after the first bay is registered and reviewed.
 
-**K034 — One concourse vending/service alcove.** Use the 1F interior panorama,
-linked walking coverage and current operator route plan to locate it relative
-to the central hall and 2F access. The exact game anchor is still unresolved.
-Model the recessed bay, original machine cabinet/product-window detail, fire
-equipment recess and framed notices. Avoid copying old advertisements or assuming
-2017 machine brands are current. Acceptance: recognizable station service alcove,
-verified supported approach, no collision outside visible cabinets and clear
-tactile/circulation paths. Stop if registration places it outside modeled space;
-do not insert a generic vending wall into an unrelated bay.
+**K034 — Ground-floor concourse detail.** Deployed. Current operator retail
+references and the 1F panorama informed the east shopfronts, vending/ticket
+machines, locker/service edge, notices and bilingual artwork. Exact shop-to-model
+transforms and service fixture positions are inferred within supported existing
+geometry. The result does not claim a measured replica of the old photosphere.
+See `web/station/concourse/README.md` for the reference register and native checks.
 
 **K035 — One covered concourse column/soffit module.** Use the 1F panorama and
 manual printed page 14. Refine the existing column's dark/pale stone bands,
@@ -141,7 +137,6 @@ matched asset revision and preserved historical bundles before publication.
 - Detailed panorama observations: `.local/round-two-20260912/panorama-research.md`.
 - Prior accepted game captures: sibling `kyoto-render-integration/.local/render-integration/`.
 - Fleet preservation and deletion: `.local/fleet-retained-20260912/cleanup-receipt.json`.
-- Latest completed deployment: `.local/station-detail/deployment/production-check.json`.
+- Latest completed deployment: `.local/ground-floor-20260912/deployment/production-check.json`.
 
-Production remains the September 8 release. New local finish work is not deployed
-by this research pass.
+The September 12 ground-floor and connection build is deployed. The game is pre-launch; historical bundles and compatibility migrations have been removed.

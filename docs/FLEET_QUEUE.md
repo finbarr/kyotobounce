@@ -10,10 +10,14 @@ deploy to production.
 
 ## Current state — 2026-09-12
 
-K025–K031 are integrated and deployed from `3741821` with `assets-v3`.
-The release is `2026-09-08T19-11-30-919Z`; final Mac rendering, native
-contacts/course/replay checks, archived layouts, Linux capacity checks and the
-read-only production check passed. See the delivery receipt below.
+The current ground-floor and connection pass is deployed with `assets-v4`, release
+`2026-09-12T20-13-14-794Z`. K032 and K034 are included; K037 covers connection
+recovery. The current station has furnished east shopfronts, bilingual artwork,
+ticket/vending machines, lockers, directory/clock, notices and safety fixtures.
+
+The game is pre-launch. Retired station bundles, course revisions, scoring rules
+and the archive browser were removed at the user's request. Only current game
+assets and courses ship. Current high scores and replays remain supported.
 
 All five idle development VMs were deleted on 2026-09-12 after preserving
 unique editable layers, source commits and final evidence. `bh list` returned
@@ -36,8 +40,7 @@ not an active fleet charge.
 
 The next bounded pass uses local worktrees. Its Street View, photosphere,
 operator photographs and plan audit is [STATION-REFERENCE-AUDIT.md](STATION-REFERENCE-AUDIT.md).
-K032 is integrated locally with reviewed stone finishes; K033–K036 are concrete queued geometry
-jobs, not running sessions. No Unity login is currently required.
+K032 and K034 are delivered. K033, K035 and K036 remain queued architectural jobs. No Unity login is currently required.
 
 ## Queue
 
@@ -74,36 +77,23 @@ jobs, not running sessions. No Unity login is currently required.
 | K029 | Add East Square grand piano, West Exit upright piano and East Square miniature-station exhibit with appropriate display furniture. Inspect current references, preserve circulation and distinct silhouettes, and prove substantial fixture contacts. Musical interaction is outside this job. | kyoto-audio; fleet/station-exhibits-20260908; port4285 | verified and deployed; distinct pianos and miniature station, combined contacts and Mac close views pass |
 | K030 | Audit registered station signs and retail frontage identities against current floor plans; replace generic/wrong-side label fallbacks and add readable direction cues for modeled destinations. | kyoto-audio; fleet/wayfinding-20260908; port4286 | verified and deployed; source-backed labels, final glyph preservation and Mac approach/readability checks pass |
 | K031 | Priority regression: user reports frequent one-sided robot lean at fresh start and janky walking. Reproduce initial/retry/character-change poses and directional movement; fix the demonstrated pose/reset or gait cause, keep upright balanced idle and stable feet without changing authoritative motion, and preserve gaze/grip/celebrations/replays. Require before/after normal-game evidence across all three robots. Reopens K002/K009 acceptance for this symptom. | kyoto-camera; fleet/robot-movement-20260908; port4287 | verified and deployed; 90 rig cases and all-character native full-game reload/turn/retry/replay checks pass |
-| K032 | Refine visible granite slab courses and retain the floor atlas at grazing views. Inspect source UVs first, filter joints under minification and preserve authored fixtures/tactile/stair finishes. | local codex/station-stone-joints-20260912 | integrated locally as 8a3438d; build/static full-game and continuous shader-orbit checks pass; full-game walking unverified; not deployed |
+| K032 | Refine visible granite slab courses and retain the floor atlas at grazing views. Inspect source UVs first, filter joints under minification and preserve authored fixtures/tactile/stair finishes. | local codex/station-stone-joints-20260912 | deployed; stone finishes and final station browser views pass; sustained hardware walking was unavailable in the test browser |
 | K033 | Restore reference-backed south facade and Grand Staircase wall detail: rose stone fields, recessed square arrays, red service panels and projecting/recessed bays. Audit existing geometry and register one bounded bay before extending it. | queued geometry owner | queued; see reference audit and acceptance |
-| K034 | Model a registered concourse vending/service alcove: machine fronts, product windows, recessed fire equipment and framed notices. Confirm location from linked interior coverage and current plan before authoring. | queued geometry owner | queued; reference observed, game anchor unresolved |
+| K034 | Model a registered concourse vending/service alcove: machine fronts, product windows, recessed fire equipment and framed notices. Confirm location from linked interior coverage and current plan before authoring. | local coordinator | deployed as the broader current ground-floor pass; registered service fixtures and east shopfronts, original artwork, matched collision and browser/native checks pass; exact real-world fixture coordinates are inferred |
 | K035 | Refine covered concourse columns/soffits: contrasting stone bands, linear ceiling grilles, recessed lights and service panels, retaining existing coffers and bounded light pool. | queued geometry owner | queued; reference observed, current simplified fixtures inventoried |
 | K036 | Correct the roof-garden edge and upper landing detail after registration: diagonal metal guards, paving courses/drainage and yellow circular shelters. Preserve supported garden access and prove substantial visible/collision agreement. | queued geometry owner | queued; rooftop Street View visibly differs from present generic glass guards |
 
+| K037 | Fix online lag/disconnections: reproduce input backlog, coalesce continuous input, bound stale snapshots, heartbeat and reconnect with same-session recovery; never replay stale throws. | local coordinator | deployed; stalled-worker A/B, browser reconnection, native flight/result/replay checks and staged Linux shot/resume pass |
+
 ## Latest delivery and findings
 
-- Source `3741821` and `assets-v3` shipped on September 8. [CI passed](https://github.com/finbarr/kyotobounce/actions/runs/34268137246).
-  The 258-file package and public asset bytes were checked after activation;
-  the service was ready with no restarts and SQLite integrity passed.
-- Current layout: `485daa6d8189436f526f6f89e7b82818ff3171de92f45ac40bf65da5e2419b2d`.
-  Both prior layouts remain immutable archives. The combined station has
-  1,430,086 triangles, 638 batches and 115 materials. All 625 new substantial
-  solids match the native layout; earlier non-shop geometry was preserved.
-- Mac rendering at 1280×800 and pixel ratio 1 measured 16.7 ms median and
-  16.8 ms p99 in the final fixed-view run; 34 textures and three reflection
-  zones remained stable. These measurements do not establish every device's performance.
-- Thirty controlled native course samples and exact saved-replay parity passed.
-  Eight of ten ordinary execution samples scored; Catch the Lift and Last Order
-  remain sensitive to release phase/charge. Last Order's destination radius was
-  reduced to 0.9 m in a new revision to fit its furnished receiving space.
-- Historical guests, courses and attempts were preserved. Production received
-  no QA attempts. Detailed local receipts are in `.local/station-detail/deployment/`.
-- K031 fixed foot-settling starvation after large heading changes. The baseline
-  failed 78 of 90 rig cases; the final version passed all 90 and the full Mac
-  movement/reload/replay flow for every character.
-- The subsequent September 12 reference audit found specific remaining
-  architectural omissions. Existing roof lattice, balcony forms, stair cassettes,
-  garden, shop and plaza landmarks must be refined or retained, not duplicated.
+- `2026-09-12T20-13-14-794Z` is active and healthy. The 220-file package and public hashes passed verification. Production tests created no records.
+- Current layout: `b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515`. The main station has 1,450,246 triangles, 647 batches and 126 materials; 52 new substantial fixtures match native collision.
+- One 4096×2048 atlas supplies 64 artwork faces in one draw call. Local 1280×720 review settled near 60 FPS; this is not a universal hardware guarantee.
+- All five current courses passed controlled native proofs, including three Last Order deliveries. The final Linux release passed a real shot, full rest, saved replay parity and session resume.
+- A production-copy restart test removed 35 development revisions and 18 old attempts, leaving five current courses. Current identities and current-version scores survive restart. No historical migration or old-geometry replay service remains.
+- The former 1.16 GB browser asset set is now 187 MB; the editable current asset pack is 163 MB. Receipts: `.local/ground-floor-20260912/`.
+- K033, K035 and K036 are still queued. This delivery covers the requested ground-floor/shop/service detail and connection faults.
 
 - K015: native perfect-shot timer now continues from first goal entry at 10.78 s
   through 16.41 active seconds; identical stationary tail poses add nothing.
