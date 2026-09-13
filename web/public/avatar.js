@@ -39,6 +39,7 @@ export function createAvatar(asset,{character='ori'}={}){
   const bones={},baseRotations=new Map(),basePositions=new Map();model.traverse(o=>{if(o.isBone){bones[o.name]=o;if(o.userData.name)bones[o.userData.name]=o;baseRotations.set(o,o.quaternion.clone());basePositions.set(o,o.position.clone());}});
   for(const name of ['upper_arm.R','forearm.R','hand.R'])if(!bones[name])throw new Error(`Robot rig missing ${name}`);
   const avatar={group,model,mixer,actions,bones,baseRotations,basePositions,walkBlend:0,lastPoseTime:null,head:bones.head,upper:bones['upper_arm.R'],forearm:bones['forearm.R'],hand:bones['hand.R'],held:new THREE.Vector3(),releaseError:0};
+  avatar.restWrists=Object.fromEntries(['L','R'].map(side=>[side,bones[`hand.${side}`].quaternion.clone()]));
   avatar.originalMaterials=new Map();model.traverse(o=>{if(o.isMesh)avatar.originalMaterials.set(o,o.material);});
   group.updateWorldMatrix(true,true);avatar.bindFrames=new Map();
   for(const bone of new Set(Object.values(bones)))avatar.bindFrames.set(bone,{inverse:bone.matrixWorld.clone().invert(),rotation:bone.getWorldQuaternion(new THREE.Quaternion()).invert()});
@@ -77,11 +78,13 @@ export function poseAvatar(a,player,phase,state,stationTime){
   a.throwGrip=null;a.throwGripWeight=1;
   applyWalk(a,player,mode,stationTime);
   applyThrowStyle(a,player,mode,state,stationTime,releaseProgress);
-  const top=player.top/200,kick=player.kick/200,pronation=THREE.MathUtils.clamp(top*Math.PI*.52+kick*Math.PI*.30,-1.55,1.55);
+  // Once the shot has finished, neither the fingers nor the wrist should still
+  // carry its ball grip and spin settings into the celebration.
+  const top=mode==='Result'?0:player.top/200,kick=mode==='Result'?0:player.kick/200,pronation=THREE.MathUtils.clamp(top*Math.PI*.52+kick*Math.PI*.30,-1.55,1.55);
   a.forearm.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitY,pronation*.65));
   a.hand.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitY,pronation*.35));
   a.hand.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,top*.23));
-  const opened=mode==='Flight'?Math.min(1,Math.max(0,stationTime-state.releaseTime)*12):0;
+  const opened=mode==='Result'?1:mode==='Flight'?Math.min(1,Math.max(0,stationTime-state.releaseTime)*12):0;
   for(const digit of ['index','middle','ring','little']){
     for(let i=1;i<=3;i++){
       const angle=[0,-1.00,-1.28,-.67][i]*(1-opened);
@@ -465,12 +468,21 @@ function applyCelebration(a,player,mode,state,time){
    if(tier>=5&&t>duration*.35&&t<duration*.58)targets={L:[.48,1.46,.15],R:[-.48,1.46,.15]};
   }
   if(a.face)for(const [i,eye]of a.face.eyes.entries()){eye.scale.y=1-weight*.7;eye.scale.x=1+weight*.25;eye.rotation.z=(i?1:-1)*weight*.38;}
+  // A one-handed salute/wave still releases the other arm from the carry pose.
+  targets={L:[.365,.745,.035],R:[-.365,.745,.035],...targets};
   for(const [side,position]of Object.entries(targets)){
     const hand=a.bones[`hand.${side}`],target=worldPosition(hand).lerp(a.group.localToWorld(new THREE.Vector3(...position)),weight);
     celebrateArm(a,side,target);
-    if(a.character==='don'){
-      const rotation=hand.getWorldQuaternion(new THREE.Quaternion()).slerp(a.bindFrames.get(hand).rotation.clone().invert(),weight);setWorldRotation(hand,rotation);
-      if(side==='L'){for(const digit of ['index','middle','ring','little'])for(let i=1;i<=3;i++)a.bones[`${digit}${i}.L`].quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-weight));}
+    // Keep the wrist aligned with its forearm instead of preserving the old
+    // world-space carry angle as the arm rises. Cat paws beckon; taiko hands
+    // close equally around their sticks. Everything blends out with the dance.
+    const wrist=a.restWrists[side].clone();
+    if(a.character==='koma')wrist.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-.20+.25*beat*(side==='L'?1:-1)));
+    hand.quaternion.slerp(wrist,weight);
+    for(const digit of ['index','middle','ring','little','thumb'])for(let i=1;i<=3;i++){
+      const bone=a.bones[`${digit}${i}.${side}`],curl=a.character==='don'?(digit==='thumb'?-.5:[0,-.85,-1.10,-.65][i]):0;
+      const rotation=a.baseRotations.get(bone).clone().multiply(new THREE.Quaternion().setFromAxisAngle(unitX,curl));
+      bone.quaternion.slerp(rotation,weight);
     }
   }
   const nod=(tier>=3?.17:a.character==='koma'?.10:a.character==='don'?.045:.07)*beat;

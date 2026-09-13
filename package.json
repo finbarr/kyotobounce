@@ -16,7 +16,7 @@
     "build:unity-web:legacy": "node web/build.mjs",
     "test:traversal": "node web/tests/browser-traversal.mjs",
     "test:spin": "node web/tests/browser-spin.mjs",
-    "test:avatar": "node web/tests/avatar-release.mjs",
+    "test:avatar": "node web/tests/avatar-release.mjs && node web/tests/avatar-celebrations.mjs",
     "setup": "npm ci && npm run assets:fetch && npm run build:worker && npm run build:web",
     "assets:fetch": "node tools/assets.mjs fetch",
     "assets:verify": "node tools/assets.mjs verify",

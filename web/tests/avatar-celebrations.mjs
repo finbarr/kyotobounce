@@ -1,54 +1,71 @@
-import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {readFile} from 'node:fs/promises';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import * as T from 'three';
 import assert from 'node:assert/strict';
-import {createAvatar,poseAvatar,setAvatarCharacter,celebrateAvatar,cancelAvatarCelebration,isAvatarCelebrating} from '../public/avatar.js';
-const trigger=JSON.parse(await readFile('artifacts/robot/cast-menu/authoritative-trigger.json','utf8'));
-const bytes=await readFile('web/public/assets/ori.glb'),asset=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
-// Use an unmodified saved native record for the successful celebration.
-// Variants below exercise rejection and alternate record flags.
-const recordResult=trigger.result;
-assert.ok(recordResult.saved&&(recordResult.records?.personalBest||recordResult.records?.courseBest));
-const state=trigger.snapshot,p=state.players.find(p=>p.id===state.owner),results=[];
-function make(character){const a=createAvatar(asset,{character});a.group.position.set(p.feet.x,p.feet.y,-p.feet.z);a.group.rotation.y=Math.PI-p.yaw*Math.PI/180;return a;}
-const pos=(a,name)=>a.bones[name].getWorldPosition(new T.Vector3());
-for(const character of ['ori','koma','don'])for(const reducedMotion of [false,true]){
- const courseOnly=make(character);poseAvatar(courseOnly,p,'Result',state,0);assert.equal(celebrateAvatar(courseOnly,{...recordResult,records:{personalBest:false,courseBest:true}}),true);poseAvatar(courseOnly,p,'Result',state,.1);assert.equal(isAvatarCelebrating(courseOnly),true);
- const a=make(character),unchanged=JSON.stringify(p);poseAvatar(a,p,'Result',state,0);const feet=['L','R'].map(s=>pos(a,`foot.${s}`));
- assert.equal(celebrateAvatar(a,{...recordResult,saved:false}),false);
- assert.equal(celebrateAvatar(a,{...recordResult,records:undefined}),false,'Old results have no record event');
- assert.equal(celebrateAvatar(a,{...recordResult,type:'replay'}),false,'Replay is not a live result');
- assert.equal(celebrateAvatar(a,{...recordResult,records:{personalBest:false,courseBest:false}}),false,'Ties and non-records do not celebrate');
- assert.equal(celebrateAvatar(a,{...recordResult,score:0}),false);
- assert.equal(celebrateAvatar(a,{...recordResult,breakdown:{outcome:'forfeit'}}),false);
- assert.equal(celebrateAvatar(a,recordResult,{reducedMotion}),true);
- poseAvatar(a,p,'Flight',{...state,velocity:{x:1,y:0,z:0}},.01);assert.equal(isAvatarCelebrating(a),false,'Never dance in Flight');
- poseAvatar(a,p,'Result',{...state,diagnostics:{sleeping:false}},.02);assert.equal(isAvatarCelebrating(a),false);
- poseAvatar(a,p,'Result',{...state,velocity:{x:.1,y:0,z:0}},.03);assert.equal(isAvatarCelebrating(a),false,'Translation must stop');
- poseAvatar(a,p,'Result',{...state,spin:{x:0,y:.1,z:0}},.04);assert.equal(isAvatarCelebrating(a),false,'Spin must also stop');
- let maxFootDrift=0,maxLengthError=0;const handRows=[];
- for(let i=0;i<200;i++){
-  poseAvatar(a,p,'Result',state,.1+i/60);
-  for(const [index,side]of ['L','R'].entries()){
-   maxFootDrift=Math.max(maxFootDrift,pos(a,`foot.${side}`).distanceTo(feet[index]));
-   const upper=pos(a,`upper_arm.${side}`),elbow=pos(a,`forearm.${side}`),hand=pos(a,`hand.${side}`);
-   maxLengthError=Math.max(maxLengthError,Math.abs(upper.distanceTo(elbow)-Math.hypot(.12,.02,.275)),Math.abs(elbow.distanceTo(hand)-Math.hypot(.015,.26)));
-  }
-  if(i>=24&&i<=54)handRows.push(pos(a,'hand.L'));
+import {createAvatar,poseAvatar,celebrateAvatar,cancelAvatarCelebration,isAvatarCelebrating} from '../public/avatar.js';
+const bytes=await readFile(new URL('../public/assets/ori.glb',import.meta.url));
+const asset=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+// Cosmetic rig fixtures only: no service, score submission or generated records.
+const zero={x:0,y:0,z:0},state={owner:'p',attempt:'hands',releaseTime:-5,ball:{x:2,y:.023,z:1},velocity:zero,spin:zero,diagnostics:{sleeping:true}};
+const player={id:'p',feet:zero,release:{x:-.22,y:1.5,z:-.42},yaw:0,pitch:0,top:0,kick:0,power:1,powerRange:'full',grounded:true};
+const digits=['index','middle','ring','little','thumb'];
+const close=(a,b,label)=>assert.ok(a.clone().normalize().angleTo(b.clone().normalize())<1e-5,label);
+const position=(a,name)=>a.bones[name].getWorldPosition(new T.Vector3());
+const make=(character,yaw=0)=>{const a=createAvatar(asset,{character});a.group.position.set(4,2,-5);a.group.rotation.y=yaw;return a;};
+let cases=0;
+for(const character of ['ori','koma','don'])for(const score of [100,100000,1000000,5000000,20000000])for(const yaw of [0,1.7])for(const reducedMotion of [false,true]){
+ const result={type:'result',saved:true,score,attempt:state.attempt},plain=make(character,yaw),spun=make(character,yaw);
+ const spunPlayer={...player,top:200,kick:-200};
+ for(const a of [plain,spun]){
+  assert.equal(celebrateAvatar(a,result,{reducedMotion}),true);
+  poseAvatar(a,player,'Result',state,0);
  }
- const variation=Math.max(...handRows.map(v=>v.distanceTo(handRows[0]))),reference=make(character);for(let i=0;i<=240;i++)poseAvatar(reference,p,'Result',state,i/60);
- assert.ok(maxFootDrift<.00001&&maxLengthError<.00001,'Feet and rigid limbs preserved through celebration');
- assert.equal(isAvatarCelebrating(a),false);assert.ok(pos(a,'hand.L').distanceTo(pos(reference,'hand.L'))<.00001&&pos(a,'hand.R').distanceTo(pos(reference,'hand.R'))<.00001,'Returns exactly to sampled pose');
- assert.ok(reducedMotion?variation<.00001:variation>.01,'Reduced-motion holds a static pose; normal characters have distinct rhythmic motion');
- assert.equal(celebrateAvatar(a,recordResult),false,'Duplicate record results do not restart');assert.equal(JSON.stringify(p),unchanged);
- const cancel=make(character);poseAvatar(cancel,p,'Result',state,0);celebrateAvatar(cancel,recordResult);for(let i=1;i<=42;i++)poseAvatar(cancel,p,'Result',state,i/60);
- assert.equal(cancelAvatarCelebration(cancel),180);for(let i=43;i<=55;i++)poseAvatar(cancel,p,'Result',state,i/60);assert.equal(isAvatarCelebrating(cancel),false);assert.ok(pos(cancel,'hand.L').distanceTo(pos(reference,'hand.L'))<.00001);
- results.push({character,reducedMotion,maxFootDrift,maxLengthError,variation});
+ const duration=reducedMotion?1.8:plain.celebration.duration;
+ for(const t of [.08,.35,.6,duration*.45,duration*.65,duration-.1]){
+  poseAvatar(plain,player,'Result',state,t);poseAvatar(spun,spunPlayer,'Result',state,t);
+  for(const side of ['L','R']){
+   const hand=`hand.${side}`,forearm=`forearm.${side}`;
+   close(plain.bones[hand].quaternion,spun.bones[hand].quaternion,'The shot spin cannot twist a celebrating wrist');
+   assert.ok(position(plain,hand).distanceTo(position(spun,hand))<1e-5,'Shot spin cannot change the dance hand position');
+   assert.ok(Math.abs(position(spun,forearm).distanceTo(position(spun,hand))-.26)<.001,'Wrist pose preserves the rigid forearm');
+   for(const digit of digits)for(let i=1;i<=3;i++){
+    const name=`${digit}${i}.${side}`;close(plain.bones[name].quaternion,spun.bones[name].quaternion,'No residual ball curl in either hand');
+   }
+   if(t>=.35&&t<=duration-.4){
+    assert.ok(spun.bones[hand].quaternion.angleTo(spun.restWrists[side])<.46,'Hands follow the forearms rather than the world-space carry angle');
+    for(const digit of digits)for(let i=1;i<=3;i++){
+     const bone=spun.bones[`${digit}${i}.${side}`],curl=bone.quaternion.clone().normalize().angleTo(spun.baseRotations.get(bone).clone().normalize());
+     assert.ok(character==='don'?curl>.45:curl<1e-5,'Open celebration palms; both taiko hands grip their sticks');
+    }
+   }
+  }
+  for(const digit of digits)for(let i=1;i<=3;i++){
+   const left=spun.bones[`${digit}${i}.L`],right=spun.bones[`${digit}${i}.R`];
+   const leftCurl=spun.baseRotations.get(left).clone().invert().multiply(left.quaternion);
+   const rightCurl=spun.baseRotations.get(right).clone().invert().multiply(right.quaternion);
+   close(leftCurl,rightCurl,'Both hands use the same gesture, including the thumbs');
+  }
+ }
+ for(const a of [plain,spun])poseAvatar(a,player,'Result',state,duration+.1);
+ assert.equal(isAvatarCelebrating(spun),false);
+ assert.equal(celebrateAvatar(spun,result),false,'Duplicate result cannot restart the celebration');
+ for(const digit of digits)for(let i=1;i<=3;i++){
+  const bone=spun.bones[`${digit}${i}.R`];close(bone.quaternion,spun.baseRotations.get(bone),'The hand stays empty after the dance');
+ }
+ const reference=make(character,yaw);
+ for(const mode of ['Aim','Charging','Release']){
+  const next={...state,releaseTime:10};poseAvatar(spun,spunPlayer,mode,next,10);poseAvatar(reference,spunPlayer,mode,next,10);
+  close(spun.hand.quaternion,reference.hand.quaternion,'Retry restores the normal throwing wrist');
+  assert.ok(spun.held.distanceTo(reference.held)<1e-5,'Retry restores the exact ball grip');
+ }
+ cases++;
 }
-const switcher=make('ori');poseAvatar(switcher,p,'Charging',state,10);const before=[...switcher.baseRotations.keys()].map(b=>b.getWorldPosition(new T.Vector3()));let meshCount=0;
-for(let round=0;round<4;round++)for(const character of ['koma','don','ori']){
- setAvatarCharacter(switcher,character);poseAvatar(switcher,p,'Charging',state,10);
- [...switcher.baseRotations.keys()].forEach((b,i)=>assert.ok(b.getWorldPosition(new T.Vector3()).distanceTo(before[i])<.00001,'Switching preserves the recorded pose'));
- if(character==='ori'){let count=0;switcher.group.traverse(o=>{if(o.isMesh)count++;});if(meshCount)assert.equal(count,meshCount,'Old trim is removed on switch');meshCount=count;}
-}
-await mkdir('artifacts/robot/celebrations',{recursive:true});await writeFile('artifacts/robot/celebrations/result.json',JSON.stringify({status:'pass',results,switchMeshCount:meshCount},null,2));console.log('PASS authoritative rest gates, three celebrations, reduced-motion, neutral/cancel, fixed feet/limbs and repeated transformed character switches');
+const wave=make('koma'),result={type:'result',saved:true,score:100000,attempt:state.attempt};
+celebrateAvatar(wave,result);poseAvatar(wave,player,'Result',state,0);poseAvatar(wave,player,'Result',state,.5);
+assert.ok(wave.group.worldToLocal(position(wave,'hand.R')).y<.85,'The non-waving hand drops from the ball-carrying position');
+assert.equal(cancelAvatarCelebration(wave),180);poseAvatar(wave,player,'Result',state,.7);assert.equal(isAvatarCelebrating(wave),false);
+const gated=make('ori');celebrateAvatar(gated,result);
+for(const blocked of [{...state,diagnostics:{sleeping:false}},{...state,velocity:{x:.1,y:0,z:0}},{...state,spin:{x:0,y:.1,z:0}}]){poseAvatar(gated,player,'Result',blocked,0);assert.equal(isAvatarCelebrating(gated),false,'Native rest still gates the dance');}
+assert.equal(celebrateAvatar(make('ori'),{...result,saved:false}),false);
+assert.equal(celebrateAvatar(make('ori'),{...result,breakdown:{outcome:'forfeit'}}),false);
+console.log(`PASS ${cases} actual-rig celebrations: all characters/tiers/headings/reduced-motion, empty hands, wrist alignment, spin isolation, matching stick grips, rest gates, cancel and retry`);
