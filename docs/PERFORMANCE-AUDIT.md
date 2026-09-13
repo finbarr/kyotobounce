@@ -38,3 +38,37 @@ A bounded implementation follow-up is opt-in aggregate worker/server timing inst
 - `readlink /opt/kyoto/current`, SHA-256 comparison of the two service source files, and local source review of `web/server.ts`, `web/worker.ts`, `web/public/game.js`, `web/public/station-look.js`, `BrowserPhysicsWorker.cs`, `BrowserSession.cs` and `BallBody.cs`.
 
 This audit cannot establish active capacity, reproduce the reported lag, characterize peak traffic, or prove production browser frame rate. No production player credentials or game data were inspected.
+
+## Production follow-up — 2026-09-13
+
+Read-only inspection of release `2026-09-13T07-26-52-219Z`, through
+19:51 UTC: zero service restarts, about 656 MiB service memory, 2.7 GiB host
+memory available. The native worker kept publishing at 30 Hz. The largest
+active-period worker update gap in the inspected timing records was 103 ms;
+the largest service event-loop gap was 190 ms. Seventy-five completed shots
+were computed in at most 2.304 seconds (57.4 seconds of playback for that shot).
+
+Three connections ended in heartbeat timeouts, with outbound state drops while
+the worker continued normally. Those incidents occurred with the tab hidden;
+they do not prove the cause of every visible pause. Foreground telemetry showed
+no shot-buffer underruns. One 2.567-second frame gap straddled a visibility
+change; the final minute also dropped from roughly 60 to 36–43 FPS with browser
+long tasks up to 91 ms. That is separate from server capacity.
+
+The client polled its 12-second unanswered-ping timeout only every five seconds,
+allowing roughly 15–20 seconds of dead-socket delay. It now probes silence at
+one-second intervals and reconnects after at least three seconds of silence plus
+a two-second unanswered probe. Recent state traffic proves liveness, quiet
+buffered shots respond to pings, and background/wake grace prevents false
+reconnects. A local real-WebSocket blackout test resumed the same authenticated
+session in 4.285 seconds, kept the buffered trajectory moving without underruns,
+and saved the original shot's score. No production test shots were made.
+
+Additional `client-performance` fields distinguish animation-clock stalls,
+release-to-first-chunk waits, gaps between consecutive live snapshots, and
+silent-socket recovery. `clockSource` identifies live, shot, or replay playback;
+paused replays and hidden tabs are excluded from stall duration. Server samples
+include the phase and shot-stream status. Long gaps between a precomputed shot
+and the next live snapshot are expected, so `stateGapMaxMs` alone is not evidence
+of a freeze. All added fields are bounded numeric values or allowlisted enums;
+no player names, credentials, or positions are logged.

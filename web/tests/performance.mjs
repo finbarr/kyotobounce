@@ -8,3 +8,14 @@ client.traffic('receive','state',100,{stationTime:1},0);client.frame(16,{render:
 let p=client.report();assert.equal(p.frameMaxMs,16);assert.equal(p.stateAgeMs,1000,'Live camera with missing snapshots is distinguishable from rendering stall');assert.equal(p.renderMaxMs,4);assert.equal(sanitize({...p,token:'secret'}).token,undefined);assert.equal(sanitize({...p,rttMs:Infinity}),null);
 client.traffic('receive','state',100,{stationTime:2},0);client.frame(900,{render:700},'Flight');time=1050;p=client.report();assert.equal(p.frameMaxMs,900);assert.equal(p.stateGapMaxMs,1000);assert.equal(p.stateAgeMs,50);assert.equal(p.simulationGapMaxMs,1000);assert.equal(client.report().frames,0);
 console.log('PASS bounded metrics, diagnostic allowlist, window reset and render/network stall separation');
+
+client.timeline(10,'shot',16);for(let i=0;i<180;i++)client.timeline(10,'shot',1000/60);
+p=client.report();assert.ok(p.clockStallMaxMs>2900,'Frozen animation is measured even when the browser renders normally');assert.equal(p.clockSource,'shot');assert.equal(sanitize(p).clockSource,'shot');
+client.timeline(11,'shot',16);assert.equal(client.report().clockStallMaxMs,0,'Advancing playback clears the current stall');
+client.timeline(11,'replay',16);for(let i=0;i<180;i++)client.timeline(11,'replay',16);assert.equal(client.report().clockStallMaxMs,0,'Paused replays are not animation stalls');
+client.timeline(0,'live',16,true);client.timeline(.02,'live',16,true);assert.equal(client.report().releaseWaitMaxMs,32);
+client.status('interrupted',{silenceMs:3000});p=client.report();assert.equal(p.reconnects,1);assert.equal(p.reconnectSilenceMs,3000);assert.equal(sanitize({...p,clockSource:'secret'}).clockSource,undefined);
+time=2000;client.traffic('receive','state',100,{phase:'Aim',stationTime:3});time=2033;client.traffic('receive','state',100,{phase:'Aim',stationTime:3.03});
+time=2066;client.traffic('receive','shot-chunk',100,{frames:[{stationTime:20}]});time=20000;client.traffic('receive','state',100,{phase:'Aim',stationTime:21});
+assert.equal(client.report().liveStateGapMaxMs,33,'Precomputed shots do not look like long live-state delivery gaps');
+console.log('PASS animation freeze, release wait, replay pause and network recovery diagnostics');

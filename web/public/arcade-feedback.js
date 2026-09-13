@@ -1,11 +1,14 @@
 import {currentScore,scoreEvents,pendingScoreEvent,heatTier,HEAT_STAGES,allWaypointsCollected} from './waypoint-score.js';
 import {arcadeParticles} from './arcade-particles.js';
+import {waypointCard} from './waypoint-card.js';
 const $=id=>document.getElementById(id),format=n=>Math.round(n).toLocaleString();
 export function arcadeFeedback(sound){
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
  const hud=document.createElement('section');hud.id='combo-hud';hud.hidden=true;hud.setAttribute('aria-label','Live shot score');
  hud.innerHTML=`<div class="combo-heading"><span>LIVE COMBO / コンボ</span><b id="combo-status">BUILD YOUR LINE</b></div><div class="special-label"><b id="special-name">SPECIAL</b><span id="special-next">25,000 PTS</span></div><div id="special-track"><i id="special-fill"></i></div><div id="combo-total">0</div><div id="combo-factors"><b id="combo-banks">×1.00 COMBO</b><b id="combo-targets">HIT A TARGET</b></div><div class="combo-landing"><span id="combo-accuracy"></span><strong id="combo-cash"></strong></div><div id="combo-motion"></div><div id="combo-trick" aria-live="polite"></div>`;
  document.body.append(hud);
+ const card=document.createElement('div');card.id='waypoint-card';card.hidden=true;$('combo-factors').after(card);
+ const punches=waypointCard(card);
  const spectacle=document.createElement('div');spectacle.id='combo-spectacle';spectacle.hidden=true;spectacle.setAttribute('aria-hidden','true');
  spectacle.innerHTML='<div id="combo-burst"><small id="combo-call"></small><strong id="combo-mult"></strong><small id="combo-sub"></small></div><div id="combo-line"></div>';
  const leds=Array.from({length:20},(_,i)=>{const led=document.createElement('i');led.className='combo-led';led.style.cssText=`${i<10?'left':'right'}:5px;top:${9+(i%10)*8}%`;spectacle.append(led);return led;});document.body.append(spectacle);
@@ -51,12 +54,12 @@ export function arcadeFeedback(sound){
   if(audible)sound.cue(event.kind,{multiplier:event.multiplier,tier});
  }
  const api={
-  reset(){current=null;currentCourse=null;lastAttempt='';display=0;bankCount=0;waypointCount=0;tagged=false;flash=0;trickTime=0;burstTime=0;cooldown=0;pending=null;tricks=[];highestTier=0;lastUpdate=performance.now();cancelAnimations();resetClear();particles.reset();hud.hidden=true;spectacle.hidden=true;hud.dataset.cue='';$('combo-line').textContent='';},
+  reset(){punches.reset();current=null;currentCourse=null;lastAttempt='';display=0;bankCount=0;waypointCount=0;tagged=false;flash=0;trickTime=0;burstTime=0;cooldown=0;pending=null;tricks=[];highestTier=0;lastUpdate=performance.now();cancelAnimations();resetClear();particles.reset();hud.hidden=true;spectacle.hidden=true;hud.dataset.cue='';$('combo-line').textContent='';},
   accept(score,attempt,challenge,silent=false){
    if(!currentScore(score))return;
    const rewind=current&&(score.styleBanks<bankCount||(score.waypointCount||0)<waypointCount);
    if(attempt!==lastAttempt||rewind){api.reset();lastAttempt=attempt;}
-   currentCourse=challenge;
+   currentCourse=challenge;punches.update(score,challenge,silent||!!rewind);
    const events=rewind||silent?[]:scoreEvents(current,score,challenge);if(rewind)display=score.version==='waypoint-v3'?score.total:score.potential;current=score;bankCount=score.styleBanks;waypointCount=score.waypointCount||0;tagged=score.version==='waypoint-v3'?score.destinationReached:score.goalVisited;
    for(const event of events){
     if(event.kind==='clear'){if(!clearFired)clearPending=event;continue;}

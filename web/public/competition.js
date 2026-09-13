@@ -29,7 +29,6 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
  // A canceled request still owns its reply slot until the server responds.
  function cancelPendingPlacement(){if(pendingPlacement)pendingPlacement.cancelled=true;}
  const targetMarkers=waypointTargets(scene);
- const waypointHud=document.createElement('div');waypointHud.id='waypoint-progress';waypointHud.hidden=true;waypointHud.setAttribute('aria-label','Waypoint progress and earned score');document.body.append(waypointHud);
  const markers=new THREE.Group();scene.add(markers);
  function drawDisks(challenge){
   while(markers.children.length){const o=markers.children[0];markers.remove(o);o.geometry?.dispose();o.material?.map?.dispose();o.material?.dispose();}
@@ -252,9 +251,6 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
   },
   update(dt,rate=1){
    const score=state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore;targetMarkers.update(collectedIds(score));
-   const course=state.mode==='replay'?state.replay?.challenge:state.selected;waypointHud.hidden=course?.scoring!=='waypoint-v3'||state.mode==='editor';
-   const allClear=allWaypointsCollected(score,course);waypointHud.classList.toggle('all-clear',allClear);
-   if(!waypointHud.hidden)waypointHud.textContent=`${Math.round(score?.total||0).toLocaleString()} PTS · ${score?.waypointCount||0} / ${course.waypoints?.length||0} WAYPOINTS${allClear?' · 100% COMPLETE':''} · ${score?.destinationReached?'DESTINATION BONUS':course.goal?'GOLD = OPTIONAL BONUS':'NO DESTINATION NEEDED'}${score?' · ×'+(score.comboMultiplier??1).toLocaleString()+' COMBO':''}`;
    if(state.mode==='replay'&&state.replay?.scoreFrames){
     if(state.replayTime<replayFeedbackTime)feedback.reset();
     const frames=state.replay.scoreFrames;let lo=0,hi=frames.length-1;

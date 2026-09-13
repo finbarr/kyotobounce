@@ -202,7 +202,7 @@ let lastReplayCacheStats='';
 const telemetry=setInterval(()=>{
   eventLoopMaxMs=Math.round(eventLoop.max/1e6);const loopP99Ms=Math.round(eventLoop.percentile(99)/1e6);eventLoop.reset();
   const replayCache=store.replayCache.stats(),cacheStats=JSON.stringify(replayCache);
-  if(connections.size||cacheStats!==lastReplayCacheStats)console.info(JSON.stringify({event:'server-performance',replayCache,eventLoopMaxMs,eventLoopP99Ms:loopP99Ms,rssBytes:process.memoryUsage().rss,workerReady:worker.ready,pendingRequests:worker.requests.size,workerBufferedBytes:worker.socket?.writableLength||0,connections:[...connections.values()].map(c=>c.metrics.take())}));
+  if(connections.size||cacheStats!==lastReplayCacheStats)console.info(JSON.stringify({event:'server-performance',replayCache,eventLoopMaxMs,eventLoopP99Ms:loopP99Ms,rssBytes:process.memoryUsage().rss,workerReady:worker.ready,pendingRequests:worker.requests.size,workerBufferedBytes:worker.socket?.writableLength||0,connections:[...connections.values()].map(c=>{const shot=shots.get(c.id),snapshot=competition.members.get(c.id)?.snapshot;return {...c.metrics.take(),phase:snapshot?.phase||'none',shotActive:!!shot,shotComplete:shot?.chunks.at(-1)?.complete===true,shotChunks:shot?.sequence||0};})}));
   lastReplayCacheStats=cacheStats;
 },5000);telemetry.unref();
 const heartbeat=setInterval(()=>{for(const [socket,c]of connections){if(!c.alive){c.metrics.closeCause='heartbeat-timeout';socket.terminate();continue;}c.alive=false;socket.ping();}},30000);

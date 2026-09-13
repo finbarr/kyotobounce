@@ -2,17 +2,27 @@
 export function clientPerformance({now=()=>performance.now(),document=globalThis.document}={}){
   let started=now(),frames=[],frameCount=0,frameMax=0,states=0,lastState=null,lastSimulation=null,stateGapMax=0,simulationGapMax=0,rtt=0,buffered=0,closeCode=0,phase='loading';
   let maxima={},longTasks=0,longTaskMax=0,visibilityChanges=0,server=null;
+  let clock=null,clockSource='none',clockStall=0,clockStallMax=0,releaseWait=0,releaseWaitMax=0,liveStateGapMax=0,lastLive=null;
+  let reconnects=0,reconnectSilence=0;
   const observer=globalThis.PerformanceObserver?.supportedEntryTypes?.includes('longtask')?new PerformanceObserver(list=>{for(const e of list.getEntries()){longTasks++;longTaskMax=Math.max(longTaskMax,e.duration);}}):null;
   observer?.observe({type:'longtask',buffered:false});
-  document?.addEventListener('visibilitychange',()=>{visibilityChanges++;lastState=null;lastSimulation=null;});
+  document?.addEventListener('visibilitychange',()=>{visibilityChanges++;lastState=null;lastSimulation=null;lastLive=null;clock=null;clockStall=releaseWait=0;});
   return {
     frame(dt,costs,currentPhase){phase=currentPhase||'loading';if(document?.hidden)return;frameCount++;frameMax=Math.max(frameMax,dt);if(frames.length<512)frames.push(dt);for(const [key,value]of Object.entries(costs))maxima[key]=Math.max(maxima[key]||0,value);},
-    traffic(direction,type,bytes,message,queueBytes){buffered=Math.max(buffered,queueBytes||0);if(direction!=='receive'||!['state','shot-chunk'].includes(type))return;if(type==='shot-chunk')message=message.frames.at(-1);const time=now();if(lastState!==null)stateGapMax=Math.max(stateGapMax,time-lastState);if(lastSimulation!==null&&message.stationTime>=lastSimulation)simulationGapMax=Math.max(simulationGapMax,(message.stationTime-lastSimulation)*1000);lastState=time;lastSimulation=message.stationTime;states++;},
-    status(status,extra={}){if(status==='latency'){rtt=extra.rttMs;server=extra.server||null;}if(extra.closeCode)closeCode=extra.closeCode;},
+    timeline(time,source,dt,waiting=false){
+      if(document?.hidden||source==='replay'){clock=null;clockStall=releaseWait=0;clockSource=source;return;}
+      const elapsed=Math.max(0,Math.min(250,dt));
+      clockStall=clock!==null&&source===clockSource&&time===clock?clockStall+elapsed:0;
+      clockStallMax=Math.max(clockStallMax,clockStall);clock=time;clockSource=source;
+      releaseWait=waiting?releaseWait+elapsed:0;releaseWaitMax=Math.max(releaseWaitMax,releaseWait);
+    },
+    traffic(direction,type,bytes,message,queueBytes){buffered=Math.max(buffered,queueBytes||0);if(direction!=='receive'||!['state','shot-chunk'].includes(type))return;const live=type==='state'&&['Aim','Charging','Release'].includes(message.phase);const time=now();if(live&&lastLive!==null)liveStateGapMax=Math.max(liveStateGapMax,time-lastLive);lastLive=live?time:null;if(type==='shot-chunk')message=message.frames.at(-1);if(lastState!==null)stateGapMax=Math.max(stateGapMax,time-lastState);if(lastSimulation!==null&&message.stationTime>=lastSimulation)simulationGapMax=Math.max(simulationGapMax,(message.stationTime-lastSimulation)*1000);lastState=time;lastSimulation=message.stationTime;states++;},
+    status(status,extra={}){if(status==='latency'){rtt=extra.rttMs;server=extra.server||null;}if(status==='interrupted'){reconnects++;reconnectSilence=Math.max(reconnectSilence,extra.silenceMs||0);}if(extra.closeCode)closeCode=extra.closeCode;},
     get current(){return {stateAgeMs:lastState===null?0:Math.max(0,now()-lastState),rttMs:rtt,closeCode,server};},
     report(shot={}){const time=now(),sorted=frames.sort((a,b)=>a-b),n=sorted.length;
       const result={shotUnderrunMs:shot.shotUnderrunMs||0,shotBufferMs:Math.max(0,(shot.shotBufferedSeconds||0)*1000),shotComplete:shot.shotComplete?1:0,windowMs:time-started,frames:frameCount,frameP50Ms:sorted[Math.floor(n*.5)]||0,frameP95Ms:sorted[Math.min(n-1,Math.floor(n*.95))]||0,frameMaxMs:frameMax,renderMaxMs:maxima.render||0,poseMaxMs:maxima.pose||0,cameraMaxMs:maxima.camera||0,shadowMaxMs:maxima.shadows||0,states,stateGapMaxMs:stateGapMax,stateAgeMs:lastState===null?0:Math.max(0,time-lastState),simulationGapMaxMs:simulationGapMax,rttMs:rtt,outgoingBufferedBytes:buffered,longTasks,longTaskMaxMs:longTaskMax,visibilityChanges,closeCode,phase,hidden:document?.hidden===true};
-      started=time;frames=[];frameCount=frameMax=states=stateGapMax=simulationGapMax=buffered=longTasks=longTaskMax=visibilityChanges=0;maxima={};return result;
+      Object.assign(result,{clockSource,clockStallMaxMs:clockStallMax,releaseWaitMaxMs:releaseWaitMax,liveStateGapMaxMs:liveStateGapMax,reconnects,reconnectSilenceMs:reconnectSilence});
+      started=time;frames=[];frameCount=frameMax=states=stateGapMax=simulationGapMax=buffered=longTasks=longTaskMax=visibilityChanges=clockStallMax=releaseWaitMax=liveStateGapMax=reconnects=reconnectSilence=0;maxima={};return result;
     }
   };
 }

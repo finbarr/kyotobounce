@@ -4,7 +4,7 @@ export function gameConnection({url,hello,onMessage,onStatus,onTraffic=()=>{},We
   now=()=>performance.now(),later=setTimeout,cancelLater=clearTimeout,random=Math.random,
   events=globalThis.window,document=globalThis.document}){
   let socket,stopped=false,welcomed=false,attempts=0,retry,tick,probe,lastTick=now(),sequence=0;
-  let generation=0;
+  let generation=0,lastReceived=now(),lastProbe=now();
   const publish=(status,extra={})=>onStatus(status,extra);
   function send(type,extra={}){
     if(!welcomed||socket?.readyState!==1)return false;
@@ -17,20 +17,22 @@ export function gameConnection({url,hello,onMessage,onStatus,onTraffic=()=>{},We
     const delay=Math.min(8000,500*2**Math.min(attempts++,4))*(.8+random()*.4);
     publish('reconnecting',{retryMs:delay});retry=later(()=>{retry=undefined;connect();},delay);
   }
-  function reconnect(){
+  function reconnect(reason){
     if(stopped)return;
     welcomed=false;probe=undefined;generation++;
+    publish('interrupted',{reason,silenceMs:Math.max(0,now()-lastReceived)});
     const old=socket;socket=undefined;old?.close();schedule();
   }
   function connect(){
     if(stopped)return;
     const current=++generation;welcomed=false;probe=undefined;
-    const ws=socket=new WebSocketImpl(url);let openedAt=now();
+    const ws=socket=new WebSocketImpl(url);let openedAt=now();lastReceived=lastProbe=openedAt;
     publish(attempts?'reconnecting':'connecting');
     ws.addEventListener('open',()=>{if(current!==generation)return;openedAt=now();ws.send(JSON.stringify({type:'hello',...hello()}));});
     ws.addEventListener('message',event=>{
       if(current!==generation||stopped)return;
       let m;try{m=JSON.parse(event.data);}catch{return;}
+      lastReceived=now();
       onTraffic('receive',m.type,event.data.length,m,ws.bufferedAmount);
       if(m.type==='pong'){
         if(probe&&m.sequence===probe.sequence){publish('latency',{rttMs:Math.max(0,now()-probe.at),server:m.server});probe=undefined;}
@@ -52,20 +54,24 @@ export function gameConnection({url,hello,onMessage,onStatus,onTraffic=()=>{},We
       const time=now(),woke=time-lastTick>7000;lastTick=time;
       // Sleep/background throttling isn't proof of a broken network. Give the
       // newly awakened page a fresh probe before evaluating a timeout.
-      if(woke){probe=undefined;openedAt=time;}
-      if(!welcomed&&time-openedAt>12000){reconnect();return;}
+      if(woke){probe=undefined;openedAt=lastReceived=lastProbe=time;}
+      if(!welcomed&&time-openedAt>12000){reconnect('join-timeout');return;}
       if(welcomed){
-        if(probe&&time-probe.at>12000){reconnect();return;}
-        if(!probe){probe={sequence:++sequence,at:time};send('ping',{sequence:probe.sequence});}
+        // Missing snapshots alone are normal during buffered shot playback.
+        // Confirm a silent socket with an unanswered ping, then resume promptly.
+        const silence=time-lastReceived;
+        if(probe&&silence>=3000&&time-probe.at>=2000&&document?.hidden!==true){reconnect('receive-timeout');return;}
+        if(probe&&time-probe.at>=5000&&silence<3000)probe=undefined;
+        if(!probe&&(time-lastProbe>=5000||silence>=1000)){lastProbe=time;probe={sequence:++sequence,at:time};send('ping',{sequence:probe.sequence});}
       }
-      tick=later(poll,5000);
+      tick=later(poll,1000);
     }
-    cancelLater(tick);lastTick=now();tick=later(poll,5000);
+    cancelLater(tick);lastTick=now();tick=later(poll,1000);
   }
   function wake(){
     if(stopped||document?.visibilityState==='hidden')return;
     if(!socket){cancelLater(retry);retry=undefined;connect();}
-    else{probe=undefined;lastTick=now();}
+    else{probe=undefined;lastTick=lastReceived=now();lastProbe=now()-5000;}
   }
   function stop(){
     if(stopped)return;stopped=true;cancelLater(retry);cancelLater(tick);

@@ -19,5 +19,7 @@ export function clientPerformance(value:any){
   const result:Record<string,number|string|boolean>={};
   for(const key of fields){const n=value[key];if(typeof n!=='number'||!Number.isFinite(n)||n<0||n>100_000_000)return null;result[key]=Math.round(n);}
   if(!['loading','Aim','Charging','Release','Flight','Result','replay'].includes(value.phase)||typeof value.hidden!=='boolean')return null;
+  for(const key of ['clockStallMaxMs','releaseWaitMaxMs','liveStateGapMaxMs','reconnects','reconnectSilenceMs']){const n=value[key];if(n!==undefined){if(typeof n!=='number'||!Number.isFinite(n)||n<0||n>100_000_000)return null;result[key]=Math.round(n);}}
+  if(['none','live','shot','replay'].includes(value.clockSource))result.clockSource=value.clockSource;
   result.phase=value.phase;result.hidden=value.hidden;return result;
 }

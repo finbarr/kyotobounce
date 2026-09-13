@@ -81,7 +81,6 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
 }
 
 /* Optional waypoint authoring and collection. */
-#waypoint-progress{position:fixed;left:50%;top:82px;transform:translateX(-50%);max-width:calc(100vw - 28px);padding:9px 14px;border:1px solid #af94ff;background:#17172de8;color:#d9d1ff;font:700 12px monospace;text-align:center;z-index:8;pointer-events:none;border-radius:4px}
 #destination-toggle{display:flex;align-items:center;gap:8px;margin:16px 0;color:#ffe3a2}
 #waypoint-editor{margin:14px 0;padding-top:12px;border-top:1px solid #ffffff25}
 #waypoint-list{max-height:170px;overflow-y:auto;margin:9px 0}
@@ -90,9 +89,8 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
 #waypoint-editor p{font-size:12px;color:#c5badf}
 #editor-view{max-height:calc(100dvh - 120px);overflow-y:auto}
 #result-card[data-rank=chain] .result-rank{color:#b59aff}
-@media(max-width:600px){#waypoint-progress{top:62px;font-size:10px;padding:7px 10px}#editor-view{max-height:calc(100dvh - 90px)}}
+@media(max-width:600px){#editor-view{max-height:calc(100dvh - 90px)}}
 #challenge-scoring{width:100%;padding:9px 6px;background:#263247;color:#f3eee2;border:1px solid #a58aff88;font:11px monospace}
-body.is-briefing #waypoint-progress{display:none}
 
 /* Leave the record winner visible beside the result breakdown. */
 .is-robot-result #result-card{left:24px;bottom:62px;transform:none;width:min(350px,calc(100vw - 48px))}
@@ -156,10 +154,23 @@ body.is-briefing #waypoint-progress{display:none}
 .clear-ribbon{display:block;margin:auto;width:fit-content;max-width:100%;padding:5px 28px;background:linear-gradient(100deg,#f6b641,#fff0a1 50%,#ffc24a);color:#192239;box-shadow:0 3px 0 #d47739;font:1000 italic clamp(17px,2.7vw,34px)/1.1 Impact,'Arial Black',sans-serif;letter-spacing:.075em;clip-path:polygon(0 0,100% 0,97% 50%,100% 100%,0 100%,3% 50%)}
 #clear-count{display:block;margin-top:12px;font:800 10px/1.4 system-ui;letter-spacing:.2em;color:#fff4c9}
 .clear-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-#waypoint-progress.all-clear{border-color:#ffe38a;color:#fff0b0;box-shadow:0 0 18px #ffd26030}
 #result-card[data-clear=true]{border-color:#ffe38a;background:linear-gradient(135deg,#453319f5,#18233df8);box-shadow:5px 5px 0 #171426,0 0 28px #ffc54333}
 #result-card[data-clear=true] .result-rank,#result-card[data-clear=true] .eyebrow{color:#ffe38a}
 #result-card[data-clear=true]::after{content:'★';color:#ffe38a;position:absolute;right:20px;top:15px;font-size:26px}
 @media(max-width:600px){#waypoint-clear{top:11%;width:calc(100vw - 18px)}.clear-medal{padding-inline:8px}.clear-crown{font-size:20px;letter-spacing:13px}.clear-kicker{letter-spacing:.13em}.clear-medal>strong{-webkit-text-stroke:1px #885229}#clear-count{font-size:8px}.clear-ribbon{padding-inline:22px}}
 @media(max-height:550px){#waypoint-clear{top:4%;width:min(500px,70vw)}.clear-crown{font-size:14px}.clear-medal>strong{font-size:76px;margin-block:2px 7px}.clear-ribbon{font-size:21px}.clear-kicker{font-size:10px}#clear-count{margin-top:8px}}
 @media(prefers-reduced-motion:reduce){#waypoint-clear{transform:translateX(-50%);filter:none}.clear-rays{display:none}.clear-medal>strong{text-shadow:2px 3px #111a32}}
+
+/* Collected targets leave dark, inset holes in the scorecard. */
+#waypoint-card{margin:9px 0 7px;padding:8px 0;border-block:1px dashed #ffffff32}
+.waypoint-card-heading{display:flex;justify-content:space-between;color:#aca8be;font:700 10px monospace;letter-spacing:.1em;margin-bottom:7px}
+.waypoint-card-heading b{color:#eee8ff;letter-spacing:0}
+.waypoint-punches{display:grid;grid-template-columns:repeat(8,26px);gap:7px 10px;list-style:none;padding:0;margin:0}
+.waypoint-punch{position:relative;width:26px;height:26px;border:1px dashed #c4acf1;border-radius:50%;background:#7e609c24}
+.waypoint-punch span{display:grid;place-items:center;position:absolute;inset:2px;border-radius:50%;background:#d9c6fa;color:#30203f;font:800 10px monospace}
+.waypoint-punch.punched{border:1px solid #887398;background:#080d19;box-shadow:inset 0 2px 5px #000d,0 1px 0 #ffffff30}
+.waypoint-punch.punched span{opacity:0}
+#waypoint-card.complete .waypoint-card-heading b{color:#ffe38a}
+#waypoint-card.complete .waypoint-punch.punched{border-color:#b79d64}
+@media(max-width:800px){.waypoint-punches{grid-template-columns:repeat(8,23px);gap:6px 8px}.waypoint-punch{width:23px;height:23px}}
+@media(max-height:520px){#waypoint-card{padding:5px 0;margin:5px 0}.waypoint-punches{grid-template-columns:repeat(8,20px);gap:4px 8px}.waypoint-punch{width:20px;height:20px}}

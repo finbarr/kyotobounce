@@ -113,7 +113,7 @@ const connection=sharedReplayId?null:gameConnection({
   },
   onMessage:handleMessage,onTraffic:performanceReport.traffic
 });
-setInterval(()=>send('client-performance',{report:performanceReport.report(shotPlayback.stats())}),5000);
+setInterval(()=>{if(connectionStatus==='connected')send('client-performance',{report:performanceReport.report(shotPlayback.stats())});},5000);
 function clearLiveMotion(){
   snapshot=null;previous=null;history.length=0;renderClock=null;lastPhase='';lastImpact=null;
   ballRotations.samples=[];ballRotations.releaseTime=null;
@@ -563,6 +563,7 @@ function animate(now){
   const shadowsDone=performance.now();
   blur.render(scene,camera,{velocity:snapshot?.velocity,phase:briefing.blocked||fly.active?'Aim':phase,ball:ball.position,playbackRate:replaying?ui.playbackRate():livePlaybackRate,reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches});
   window.kyotoArt.frameCost={pose:poseDone-frameStart,camera:cameraDone-poseDone,shadows:shadowsDone-cameraDone,render:performance.now()-shadowsDone};
+  performanceReport.timeline(timeline.time,replaying?'replay':shotTimeline?'shot':'live',rawDt*1000,flightPending);
   performanceReport.frame(rawDt*1000,window.kyotoArt.frameCost,replaying?'replay':phase);
   frames++;frameSum+=dt*1000;frameTimes.push(rawDt*1000);if(frameTimes.length>1000)frameTimes.shift();
   if(now-frameSample>1000){$('performance').textContent=`${Math.round(frames*1000/(now-frameSample))} FPS`;frames=0;frameSum=0;frameSample=now;}

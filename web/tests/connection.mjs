@@ -37,9 +37,21 @@ sockets[1].receive({type:'welcome',resumed:true});
 assert.equal(sockets[1].sent.some(m=>m.type==='release'),false,'Never replay a stale release');
 const count=messages.length;sockets[0].receive({type:'result'});assert.equal(messages.length,count,'Old socket ignored');
 sockets[1].bufferedAmount=20000;assert.equal(transport.send('input'),false);sockets[1].bufferedAmount=0;
-advance(5000);const probe=sockets[1].sent.at(-1);assert.equal(probe.type,'ping');
+advance(1000);const probe=sockets[1].sent.at(-1);assert.equal(probe.type,'ping');
 advance(20);sockets[1].receive({type:'pong',sequence:probe.sequence});assert.equal(statuses.at(-1),'latency');
-advance(20000);assert.equal(sockets[1].readyState,3,'Silent connection closes after missed heartbeat');
+advance(2980);assert.equal(sockets[1].readyState,1,'A brief packet gap gets a probe and grace period');
+advance(1000);assert.equal(sockets[1].readyState,3,'Silent connection recovers within four seconds, instead of waiting twenty');
 advance(500);sockets[2].open();sockets[2].receive({type:'welcome'});
 transport.stop();assert.equal(sockets[2].sent.at(-1).type,'leave');advance(60000);assert.equal(sockets.length,3);
 assert.ok(statuses.includes('reconnecting'));console.log('PASS coalesced input, control order, bounded queue, authenticated resume handshake, heartbeat and no stale command replay');
+
+// Ordinary state traffic proves liveness even if a pong is delayed. Buffered
+// shots have no live snapshots, so their pongs must keep the socket healthy.
+const visible={hidden:false,visibilityState:'visible',addEventListener(type,fn){this.wake=fn;},removeEventListener(){}};
+const healthy=gameConnection({url:'ws://test',hello:()=>({}),onMessage(){},onStatus(){},WebSocketImpl:Socket,now:()=>time,later,cancelLater:id=>timers.delete(id),random:()=>.5,events:null,document:visible});
+advance(0);const live=sockets.at(-1);live.open();live.receive({type:'welcome'});
+for(let i=0;i<40;i++){advance(500);live.receive({type:'state'});}assert.equal(live.readyState,1,'State traffic prevents a false timeout');
+for(let i=0;i<20;i++){advance(1000);const ping=live.sent.findLast(m=>m.type==='ping');if(ping)live.receive({type:'pong',sequence:ping.sequence});}assert.equal(live.readyState,1,'Quiet precomputed playback stays connected');
+visible.hidden=true;visible.visibilityState='hidden';advance(10000);assert.equal(live.readyState,1,'Hidden tabs do not churn connections');
+visible.hidden=false;visible.visibilityState='visible';visible.wake();advance(2000);assert.equal(live.readyState,1,'Foreground wake gets a fresh probe and grace');healthy.stop();
+console.log('PASS live-state liveness, quiet buffered shots and background/wake grace');
