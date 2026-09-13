@@ -1,15 +1,15 @@
 {
-  "version": "assets-v4",
+  "version": "assets-v5",
   "license": "MIT",
   "archive": {
-    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v4/kyoto-assets-v4.tar.gz",
-    "bytes": 163340837,
-    "sha256": "490b18d79e540b9662181517969946ceac34e60bc2e7b2ce6561f6a1e58e9a7c"
+    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v5/kyoto-assets-v5.tar.gz",
+    "bytes": 163417699,
+    "sha256": "6fb7e353115364c49aa2cc81ecd23adc17426a926d4d3741f5338e21d4812488"
   },
   "files": {
     "web/public/assets/atrium.glb": {
-      "bytes": 178796372,
-      "sha256": "31bd3f75f038221f519fd3475c12dcff85ef28c0168abb0261441e30a9f2f010"
+      "bytes": 178936588,
+      "sha256": "7b306288c2b220dd9ebb71d3d20ed16da40e128f4d3e9cac429f65596ae2ccd6"
     },
     "web/public/assets/station.json": {
       "bytes": 1274168,
