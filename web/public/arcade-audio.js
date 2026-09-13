@@ -157,6 +157,16 @@ export function arcadeAudio(){
    for(let i=0;i<8+tier*2;i++){const at=t+.22+i*.038; tone(notes(78+[0,7,3,10][i%4]),at,.07,.018,'sine');if(i%3===0)burst(at,.022,.025,3600);}
    [48,55,60,63].forEach(n=>tone(notes(n),t+.6,.7,.04,'triangle'));
   }
+  if(name==='clear'){
+   waypointRun=true;duck();
+   // A complete route gets a full taiko roll, octave fanfare and medal payout.
+   // It is a single earned cue, and uses the same bounded mix and playback clock.
+   [0,.12,.24,.42].forEach((offset,i)=>{tone(i===3?66:95,t+offset,.28,i===3?.19:.10,'sine',sfxBus,34);burst(t+offset,.09,.045,2500);});
+   [60,67,72,76,79,84,79,88].forEach((n,i)=>{tone(notes(n),t+.12+i*.105,.38,.065,'triangle');tone(notes(n-12),t+.12+i*.105,.28,.035,'square');});
+   [48,55,60,64,72].forEach(n=>tone(notes(n),t+1,.95,.045,'triangle'));
+   for(let i=0;i<24;i++)tone(notes(84+[0,7,12,4,9,16][i%6]),t+.55+i*.045,.13,.018,'sine');
+   burst(t+1,.18,.07,4500,'highpass');
+  }
   if(name==='goal'||name==='destination'){
    if(name==='destination')waypointRun=true;
    duck();burst(t,.28,.14,4800,'highpass');tone(82,t,.24,.24,'sine',sfxBus,38);

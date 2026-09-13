@@ -21,8 +21,13 @@ export function heatTier(score){
  return HEAT_STAGES.findLastIndex(stage=>earned>=stage.at);
 }
 export function collectedIds(score){return new Set(score?.version==='waypoint-v3'?(score.waypointIds||[]):[]);}
+export function allWaypointsCollected(score,challenge){
+ if(score?.version!=='waypoint-v3'||challenge?.scoring!=='waypoint-v3'||!challenge.waypoints?.length||['forfeit','route-missed'].includes(score.outcome))return false;
+ const ids=collectedIds(score);
+ return challenge.waypoints.every(waypoint=>ids.has(waypoint.id));
+}
 export const actionCount=score=>(score?.styleBanks||0)+(score?.waypointCount||0)+(score?.destinationReached?1:0);
-export function scoreEvents(previous,score){
+export function scoreEvents(previous,score,challenge){
  if(!currentScore(score))return [];
  if(previous&&(score.styleBanks<previous.styleBanks||(score.waypointCount||0)<(previous.waypointCount||0)))return [];
  const events=[],banks=score.styleBanks-(previous?.styleBanks||0),waypoints=(score.waypointCount||0)-(previous?.waypointCount||0);
@@ -32,12 +37,14 @@ export function scoreEvents(previous,score){
  // Changes in position, spin, time or landing accuracy cannot ring the machine.
  const tier=heatTier(score);
  if(events.length&&tier>heatTier(previous))events.push({kind:'special',label:HEAT_STAGES[tier].name,tier,multiplier:score.bankMultiplier,count:1});
+ if(allWaypointsCollected(score,challenge)&&!allWaypointsCollected(previous,challenge))events.push({kind:'clear',label:'ALL WAYPOINTS',tier:6,count:challenge.waypoints.length});
  return events;
 }
 
 // A tier promotion must not hide a simultaneous target collection. Its color
 // and ball effect still advance, while the popup explains the earned targets.
 export function pendingScoreEvent(pending,event){
+ if(pending?.kind==='clear')return pending;
  if(pending?.kind==='waypoint'&&pending.count>1&&event.kind==='special')return {...pending,tier:event.tier};
  return !pending||event.kind!=='bank'?event:pending;
 }

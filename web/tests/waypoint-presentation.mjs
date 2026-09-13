@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import {scoreAt,heatTier,collectedIds,scoreEvents,pendingScoreEvent,HEAT_STAGES} from '../public/waypoint-score.js';
+import {scoreAt,heatTier,collectedIds,scoreEvents,pendingScoreEvent,HEAT_STAGES,allWaypointsCollected} from '../public/waypoint-score.js';
+import {celebrationProfile} from '../public/celebration.js';
 import {routeBounds,waypointGeometry} from '../public/waypoint-targets.js';
 import {ballHeat} from '../public/ball-heat.js';
 import * as THREE from 'three';
@@ -47,3 +48,31 @@ for(const radius of [.1,.85,2]){
  }
 }
 console.log('PASS visible waypoint borders match native scoring bounds');
+
+const course={scoring:'waypoint-v3',waypoints:[{id:'patch-1'},{id:'patch-2'}],goal:{center:{x:10,y:0,z:0},radius:1}};
+const partial={...simultaneous,waypointCount:1,waypointIds:['patch-1'],total:10000};
+const complete={...simultaneous,total:30000,destinationReached:false,outcome:'chain'};
+assert.equal(allWaypointsCollected(partial,course),false);
+assert.equal(allWaypointsCollected(complete,course),true,'The optional destination is not needed for 100% waypoints');
+for(const invalid of [{...complete,waypointIds:['patch-1','patch-1']},{...complete,waypointIds:['old-patch-1','old-patch-2']},{...complete,outcome:'forfeit'},{...complete,outcome:'route-missed'},{...complete,version:'combo-v7'}])assert.equal(allWaypointsCollected(invalid,course),false,'Actual collected IDs and valid outcome are required');
+assert.equal(allWaypointsCollected(complete,{...course,waypoints:[]}),false,'An empty course is not a perfect route');
+assert.equal(allWaypointsCollected(complete,null),false);
+const clearEvents=scoreEvents(null,complete,course);
+assert.deepEqual(clearEvents.map(e=>e.kind),['bank','waypoint','special','clear']);
+const clearPopup=clearEvents.reduce(pendingScoreEvent,null);
+assert.equal(clearPopup.kind,'clear');assert.equal(clearPopup.count,2);assert.equal(clearPopup.tier,6);
+assert.equal(pendingScoreEvent(clearPopup,{kind:'special',tier:2}),clearPopup,'A later promotion cannot hide the all-clear');
+assert.equal(scoreEvents(partial,complete,course).filter(e=>e.kind==='clear').length,1);
+for(let i=0;i<100;i++)assert.deepEqual(scoreEvents(complete,{...complete,total:complete.total+i*100},course),[],'Repeated frames and movement points never repeat the all-clear');
+assert.deepEqual(scoreEvents(complete,partial,course),[],'Rewinding does not celebrate');
+assert.equal(celebrationProfile({saved:true,score:30000,breakdown:complete,challenge:course}).tier,5,'Even a low-score perfect route earns the biggest dance');
+assert.equal(celebrationProfile({saved:true,score:30000,breakdown:complete,challenge:course}).duration,7.2);
+assert.equal(celebrationProfile({saved:true,score:10000,breakdown:partial,challenge:course}).tier,1);
+assert.equal(celebrationProfile({saved:true,score:30000,breakdown:{...complete,outcome:'forfeit'},challenge:course}).tier,0);
+const clearHeat=ballHeat({scene,ball,trail});
+clearHeat.update({score:partial,challenge:course,attempt:'clear',mode:'play',time:1},1/60,'Flight');assert.equal(clearHeat.state.tier,0);
+clearHeat.update({score:complete,challenge:course,attempt:'clear',mode:'play',time:2},1/60,'Flight');assert.equal(clearHeat.state.tier,6,'Every waypoint unlocks the maximum ball effect');
+assert.ok(clearHeat.state.activeParticles<=128);assert.ok(ball.scale.equals(scale));assert.equal(scene.children.filter(o=>o.isLight).length,0);
+clearHeat.update({score:complete,challenge:course,attempt:'clear',mode:'play',time:3},1/60,'Flight',true);assert.equal(clearHeat.state.tier,6);assert.equal(clearHeat.state.activeParticles,0);
+clearHeat.update({score:null,challenge:course,attempt:'clear',mode:'play',time:4},1/60,'Aim');assert.equal(clearHeat.state.tier,0);clearHeat.dispose();
+console.log('PASS all-waypoint ID validation, one-shot priority, optional destination, maximum dance and bounded ball effects');

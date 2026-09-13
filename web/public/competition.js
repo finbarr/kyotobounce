@@ -4,7 +4,7 @@ import {resultBoard} from './result-board.js';
 import {fetchReplay,copyReplay,replayURL} from './replay-links.js';
 import {arcadeFeedback} from './arcade-feedback.js';
 import {waypointTargets} from './waypoint-targets.js';
-import {scoreAt,collectedIds} from './waypoint-score.js';
+import {scoreAt,collectedIds,allWaypointsCollected} from './waypoint-score.js';
 const $=id=>document.getElementById(id),v=p=>new THREE.Vector3(p.x,p.y,-p.z);
 export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
  const feedback=arcadeFeedback(sound);
@@ -187,11 +187,11 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
  return {
   state,advanceCompleted,openReplay,
   playbackRate(){return state.mode==='replay'?(state.replayPlaying?Number($('replay-speed').value):0):1;},
-  scorePresentation(){return {score:state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore,attempt:state.mode==='replay'?state.replay?.attempt:scoreAttempt,time:state.mode==='replay'?state.replayTime:getLiveTime(),mode:state.mode,epoch:scoreEpoch};},
+  scorePresentation(){return {score:state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore,challenge:state.mode==='replay'?state.replay?.challenge:state.selected,attempt:state.mode==='replay'?state.replay?.attempt:scoreAttempt,time:state.mode==='replay'?state.replayTime:getLiveTime(),mode:state.mode,epoch:scoreEpoch};},
   dismissResult(){$('result-card').hidden=true;ranking.clear();feedback.reset();liveScore=null;scoreEpoch++;},
   message(m){
    if(m.type==='selected'||m.type==='error')nextRequested=false;
-   if(m.type==='state'&&state.mode!=='replay'){if(m.liveScore){liveScore=m.liveScore;scoreAttempt=m.attempt;feedback.accept(m.liveScore,m.attempt);}if(['Aim','Charging'].includes(m.phase)){feedback.reset();liveScore=null;}}
+   if(m.type==='state'&&state.mode!=='replay'){if(m.liveScore){liveScore=m.liveScore;scoreAttempt=m.attempt;feedback.accept(m.liveScore,m.attempt,state.selected);}if(['Aim','Charging'].includes(m.phase)){feedback.reset();liveScore=null;}}
    if(m.type==='worker-status'&&m.status!=='ready'){feedback.reset();liveScore=null;scoreEpoch++;if(state.mode==='design'){setMode('editor');$('placement-status').textContent='Recording interrupted. Start another design ball when physics reconnects.';}}
    if(m.type==='session'){state.session=m;if(m.designing&&state.mode==='play')setMode('design');updateSession();}
    if(m.type==='catalog'){state.challenges=m.challenges;renderCatalog();}
@@ -223,9 +223,10 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
     if(state.mode==='replay')return;
     feedback.result(m);liveScore=m.breakdown||null;scoreAttempt=m.attempt;state.lastResult=m;$('result-card').hidden=state.mode!=='play';
     const b=m.breakdown,waypoint=b?.version==='waypoint-v3',rank=waypoint?(['forfeit','route-missed'].includes(b.outcome)?b.outcome:b.destinationReached?'perfect':m.success?'chain':'miss'):b?.outcome||(m.success?'perfect':'miss');
+    const allClear=allWaypointsCollected(b,m.challenge);$('result-card').dataset.clear=String(allClear);
     $('result-card').dataset.rank=rank;
-    $('result-label').textContent=m.success?'CHALLENGE COMPLETE':'SHOT FINISHED';
-    $('result-rank').textContent=({chain:'WAYPOINTS BANKED',perfect:'PERFECT LANDING',tagged:'TAGGED IT!',near:'SO CLOSE',miss:'FIND YOUR LINE',forfeit:'SHOT RECALLED','route-missed':'ROUTE MISSED'})[rank];
+    $('result-label').textContent=allClear?'100% WAYPOINT CLEAR':m.success?'CHALLENGE COMPLETE':'SHOT FINISHED';
+    $('result-rank').textContent=allClear?'ALL WAYPOINTS!':({chain:'WAYPOINTS BANKED',perfect:'PERFECT LANDING',tagged:'TAGGED IT!',near:'SO CLOSE',miss:'FIND YOUR LINE',forfeit:'SHOT RECALLED','route-missed':'ROUTE MISSED'})[rank];
     $('result-title').textContent=`${m.score.toLocaleString()} PTS`;
     $('result-breakdown').textContent=waypoint?(b.outcome==='forfeit'?'Recalling a live shot forfeits its points.':b.outcome==='route-missed'?'The required route contact was missed; this shot earns no points.':`${b.waypointCount} waypoints collected. ${b.destinationReached?'Destination bonus earned.':'No destination bonus; waypoint points stay yours.'}`):b?b.outcome==='perfect'?'Settled inside the target.':b.outcome==='tagged'?'Entered the target, then bounced out.':b.outcome==='forfeit'?'Recalling a live shot forfeits its points.':b.outcome==='route-missed'?'This stage requires an escalator contact.':`${b.distance.toFixed(2)} m from the target when the ball stopped.`:m.success?`1000 target + ${m.surfaces} surfaces × 100`:m.challenge?'Try another angle.':'Choose a stage to save your score.';
     $('result-math').replaceChildren();
@@ -235,7 +236,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
     if(b){const row=document.createElement('div'),name=document.createElement('span'),points=document.createElement('b');name.textContent=`MOVEMENT · ${(b.movingSeconds||0).toFixed(1)} s × 100`;points.textContent=(b.total>0?b.movementPoints||0:0).toLocaleString();row.append(name,points);$('result-math').append(row);}
     $('result-tip').textContent=waypoint?'Every waypoint is optional. Collect in any order. R · TRY AGAIN':b?.outcome==='miss'?`Finish within ${b.proximityRange.toFixed(1)} m to earn proximity points.`:'R · TRY AGAIN     ESC · REPLAY & MENUS';
     $('watch-result').hidden=!m.saved;$('share-result').hidden=!m.saved;ranking.show(m);$('next-challenge').hidden=!m.success||!state.challenges.some(c=>c.order===(state.selected?.order??-2)+1);
-    sound.cue('result',rank);
+    if(!feedback.clearing)sound.cue('result',rank);
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches){const began=performance.now(),attempt=m.attempt;function count(now){if(state.lastResult?.attempt!==attempt)return;const t=Math.min(1,(now-began)/800);$('result-title').textContent=`${Math.round(m.score*(1-(1-t)**3)).toLocaleString()} PTS`;if(t<1)requestAnimationFrame(count);}requestAnimationFrame(count);}
 
    }
@@ -252,12 +253,13 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
   update(dt,rate=1){
    const score=state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore;targetMarkers.update(collectedIds(score));
    const course=state.mode==='replay'?state.replay?.challenge:state.selected;waypointHud.hidden=course?.scoring!=='waypoint-v3'||state.mode==='editor';
-   if(!waypointHud.hidden)waypointHud.textContent=`${Math.round(score?.total||0).toLocaleString()} PTS · ${score?.waypointCount||0} / ${course.waypoints?.length||0} WAYPOINTS · ${score?.destinationReached?'DESTINATION BONUS':course.goal?'GOLD = OPTIONAL BONUS':'NO DESTINATION NEEDED'}${score?' · NEXT ×'+(score.waypointMultiplier||1).toLocaleString():''}`;
+   const allClear=allWaypointsCollected(score,course);waypointHud.classList.toggle('all-clear',allClear);
+   if(!waypointHud.hidden)waypointHud.textContent=`${Math.round(score?.total||0).toLocaleString()} PTS · ${score?.waypointCount||0} / ${course.waypoints?.length||0} WAYPOINTS${allClear?' · 100% COMPLETE':''} · ${score?.destinationReached?'DESTINATION BONUS':course.goal?'GOLD = OPTIONAL BONUS':'NO DESTINATION NEEDED'}${score&&!allClear?' · NEXT ×'+(score.waypointMultiplier||1).toLocaleString():''}`;
    if(state.mode==='replay'&&state.replay?.scoreFrames){
     if(state.replayTime<replayFeedbackTime)feedback.reset();
     const frames=state.replay.scoreFrames;let lo=0,hi=frames.length-1;
     while(lo<hi){const mid=Math.ceil((lo+hi)/2);if(frames[mid].t<=state.replayTime)lo=mid;else hi=mid-1;}
-    if(frames[lo]?.t<=state.replayTime)feedback.accept(frames[lo].score,state.replay.attempt+'-replay');
+    if(frames[lo]?.t<=state.replayTime)feedback.accept(frames[lo].score,state.replay.attempt+'-replay',state.replay.challenge,!state.replayPlaying);
     replayFeedbackTime=state.replayTime;
    }
    feedback.update(dt*rate,state.mode==='replay'?(state.replayTime>=0?'Flight':'Charging'):getPhase(),state.mode,rate);

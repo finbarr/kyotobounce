@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {heatTier,HEAT_STAGES,actionCount} from './waypoint-score.js';
+import {heatTier,HEAT_STAGES,actionCount,allWaypointsCollected} from './waypoint-score.js';
 export function ballHeat({scene,ball,trail}){
  const capacity=128,positions=new Float32Array(capacity*3),ages=new Float32Array(capacity),lifetimes=new Float32Array(capacity),velocities=new Float32Array(capacity*3);
  const rendered=new Float32Array(capacity*3),colors=new Float32Array(capacity*3),geometry=new THREE.BufferGeometry();
@@ -34,12 +34,12 @@ export function ballHeat({scene,ball,trail}){
  reset();
  return {
   reset(){reset();key='';lastTime=null;},
-  update({score,attempt,time,mode,epoch=0},dt,phase,reduced=false,frameMs=16){
+  update({score,attempt,time,mode,challenge,epoch=0},dt,phase,reduced=false,frameMs=16){
    const nextKey=`${mode}:${attempt||''}:${epoch}`;
    if(nextKey!==key||(lastTime!==null&&time<lastTime-.0001)){reset();key=nextKey;}
    lastTime=time;dt=Math.min(.05,Math.max(0,dt));
    if(!ball.visible||!['Flight','Result'].includes(phase)||mode==='editor'){reset();return;}
-   const nextTier=heatTier(score),nextActions=actionCount(score),fresh=nextActions>actions;
+   const nextTier=allWaypointsCollected(score,challenge)?6:heatTier(score),nextActions=actionCount(score),fresh=nextActions>actions;
    const animate=!reduced&&frameMs<34&&phase==='Flight';
    if(fresh){quiet=0;pulse=1;}else{quiet+=dt;pulse=Math.max(0,pulse-dt*1.8);}
    actions=nextActions;tier=Math.max(0,nextTier);

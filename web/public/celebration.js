@@ -1,6 +1,8 @@
+import {allWaypointsCollected} from './waypoint-score.js';
 // Achievement tiers are cosmetic. Only the authoritative result chooses them.
 export function celebrationProfile(result){
  if(!result?.saved||!(result.score>0)||['forfeit','route-missed'].includes(result.breakdown?.outcome))return {tier:0,label:'',duration:0};
+ if(allWaypointsCollected(result.breakdown,result.challenge))return {tier:5,label:'ALL WAYPOINTS!',duration:7.2};
  const rank=result.standings?.rank,contenders=result.standings?.before?.length||0;
  let tier=result.score>=20_000_000?5:result.score>=5_000_000?4:result.score>=1_000_000?3:result.score>=100_000?2:1;
  if(result.records?.personalBest)tier=Math.max(tier,2);

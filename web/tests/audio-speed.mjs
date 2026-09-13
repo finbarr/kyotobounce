@@ -18,6 +18,12 @@ try{
  sound.motion(10,true,true);source=context.sources.at(-1);assert.equal(source.playbackRate.value,2,'Rolling audio speeds up too');
  sound.setPlaybackRate(1);assert.equal(sound.state.bpm,112);assert.equal(source.playbackRate.value,1);
  sound.cue('menu');assert.equal(context.sources.at(-1).frequency.value,660);assert.equal(sound.state.cues.menu,2,'Rate switches do not retrigger scoring cues');
+ const beforeClear=context.sources.length;sound.cue('clear');const payout=context.sources.slice(beforeClear);
+ assert.equal(sound.state.cues.clear,1);assert.ok(payout.length>=40&&payout.length<=60,'Fanfare has a bounded, layered payout');
+ assert.ok(payout.every(n=>Number.isFinite(n.startTime)&&Number.isFinite(n.endTime)&&n.endTime>n.startTime));
+ const tail=Math.max(...payout.map(n=>n.endTime))-context.currentTime;assert.ok(tail>1.9&&tail<2.2,'A resolving two-second fanfare');
+ sound.setPlaybackRate(2);assert.equal(sound.state.cues.clear,1,'Fast-forward retimes the fanfare without retriggering it');
+ assert.ok(Math.max(...context.sources.filter(n=>n.onended).map(n=>n.endTime))-context.currentTime<1.2,'The active fanfare follows 2x playback');
  controls.get('sound-toggle').onclick();sound.setPlaybackRate(2);assert.equal(sound.state.muted,true,'Fast-forward preserves mute preference');
  console.log('PASS 112/224 BPM music, retimed voices, doubled SFX pitch/envelopes, rolling playback and mute preservation');
 }finally{Object.assign(globalThis,original);}

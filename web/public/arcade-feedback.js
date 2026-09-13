@@ -1,4 +1,4 @@
-import {currentScore,scoreEvents,pendingScoreEvent,heatTier,HEAT_STAGES} from './waypoint-score.js';
+import {currentScore,scoreEvents,pendingScoreEvent,heatTier,HEAT_STAGES,allWaypointsCollected} from './waypoint-score.js';
 import {arcadeParticles} from './arcade-particles.js';
 const $=id=>document.getElementById(id),format=n=>Math.round(n).toLocaleString();
 export function arcadeFeedback(sound){
@@ -10,8 +10,26 @@ export function arcadeFeedback(sound){
  spectacle.innerHTML='<div id="combo-burst"><small id="combo-call"></small><strong id="combo-mult"></strong><small id="combo-sub"></small></div><div id="combo-line"></div>';
  const leds=Array.from({length:20},(_,i)=>{const led=document.createElement('i');led.className='combo-led';led.style.cssText=`${i<10?'left':'right'}:5px;top:${9+(i%10)*8}%`;spectacle.append(led);return led;});document.body.append(spectacle);
  const particles=arcadeParticles(spectacle);
+ const clearBanner=document.createElement('div');clearBanner.id='waypoint-clear';clearBanner.hidden=true;
+ clearBanner.innerHTML='<div class="clear-rays"></div><div class="clear-medal"><span class="clear-crown">★ ★ ★</span><span class="clear-kicker">ALL WAYPOINTS / 全制覇</span><strong>100<span>%</span></strong><span class="clear-ribbon">PERFECT ROUTE!</span><small id="clear-count"></small></div>';
+ spectacle.append(clearBanner);
+ const clearStatus=document.createElement('div');clearStatus.className='clear-status';clearStatus.setAttribute('role','status');document.body.append(clearStatus);
+ let clearTime=0,clearPending=null,clearFired=false,clearVolley=0,clearAnimations=[],currentCourse=null;
  let current=null,lastAttempt='',display=0,bankCount=0,waypointCount=0,tagged=false,flash=0,trickTime=0,burstTime=0,cooldown=0,pending=null,animations=[],tricks=[],highestTier=0,lastUpdate=performance.now();
  function cancelAnimations(){animations.forEach(a=>a.cancel());animations=[];}
+ function resetClear(){clearTime=0;clearPending=null;clearFired=false;clearVolley=0;clearAnimations.forEach(a=>a.cancel());clearAnimations=[];clearBanner.hidden=true;clearBanner.dataset.fired='0';clearStatus.textContent='';}
+ function clearWaypoints(){
+  if(!clearPending||clearFired)return;
+  const event=clearPending;clearPending=null;clearFired=true;clearTime=3.2;clearVolley=0;pending=null;burstTime=0;cancelAnimations();
+  clearBanner.hidden=false;spectacle.hidden=false;spectacle.style.setProperty('--combo-tint','#ffe38a');clearBanner.dataset.fired='1';$('clear-count').textContent=`${event.count} / ${event.count} TARGETS COLLECTED`;
+  clearStatus.textContent=`100 percent! All ${event.count} waypoints collected.`;pop('100% · ALL WAYPOINTS','clear');
+  if(!reduced()){
+   clearAnimations.push(clearBanner.animate([{transform:'translateX(-50%) scale(.45) rotate(-12deg)',opacity:0},{transform:'translateX(-50%) scale(1.12) rotate(3deg)',opacity:1,offset:.13},{transform:'translateX(-50%) scale(1) rotate(-2deg)',opacity:1,offset:.24},{transform:'translateX(-50%) scale(1) rotate(-2deg)',opacity:1,offset:.82},{transform:'translateX(-50%) translateY(-35px) scale(.85)',opacity:0}],{duration:3200,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'}));
+   clearAnimations.push(clearBanner.querySelector('.clear-rays').animate([{transform:'rotate(-12deg) scale(.75)',opacity:0},{opacity:1,offset:.15},{transform:'rotate(18deg) scale(1.08)',opacity:0}],{duration:3200,easing:'ease-out',fill:'both'}));
+   leds.forEach((led,i)=>clearAnimations.push(led.animate([{opacity:0},{opacity:1},{opacity:0}],{duration:950,delay:(i%10)*45,iterations:3})));
+  }
+  sound.cue('clear');
+ }
  function pop(text,kind){
   $('combo-trick').textContent=text;hud.dataset.cue=kind;flash=.5;trickTime=2.4;
   if(!reduced()){$('combo-total').getAnimations().forEach(a=>a.cancel());$('combo-total').animate([{transform:'scale(1.14) rotate(-3deg)'},{transform:'scale(1) rotate(-2deg)'}],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'});}
@@ -33,13 +51,15 @@ export function arcadeFeedback(sound){
   if(audible)sound.cue(event.kind,{multiplier:event.multiplier,tier});
  }
  const api={
-  reset(){current=null;lastAttempt='';display=0;bankCount=0;waypointCount=0;tagged=false;flash=0;trickTime=0;burstTime=0;cooldown=0;pending=null;tricks=[];highestTier=0;lastUpdate=performance.now();cancelAnimations();particles.reset();hud.hidden=true;spectacle.hidden=true;hud.dataset.cue='';$('combo-line').textContent='';},
-  accept(score,attempt){
+  reset(){current=null;currentCourse=null;lastAttempt='';display=0;bankCount=0;waypointCount=0;tagged=false;flash=0;trickTime=0;burstTime=0;cooldown=0;pending=null;tricks=[];highestTier=0;lastUpdate=performance.now();cancelAnimations();resetClear();particles.reset();hud.hidden=true;spectacle.hidden=true;hud.dataset.cue='';$('combo-line').textContent='';},
+  accept(score,attempt,challenge,silent=false){
    if(!currentScore(score))return;
    const rewind=current&&(score.styleBanks<bankCount||(score.waypointCount||0)<waypointCount);
    if(attempt!==lastAttempt||rewind){api.reset();lastAttempt=attempt;}
-   const events=rewind?[]:scoreEvents(current,score);if(rewind)display=score.version==='waypoint-v3'?score.total:score.potential;current=score;bankCount=score.styleBanks;waypointCount=score.waypointCount||0;tagged=score.version==='waypoint-v3'?score.destinationReached:score.goalVisited;
+   currentCourse=challenge;
+   const events=rewind||silent?[]:scoreEvents(current,score,challenge);if(rewind)display=score.version==='waypoint-v3'?score.total:score.potential;current=score;bankCount=score.styleBanks;waypointCount=score.waypointCount||0;tagged=score.version==='waypoint-v3'?score.destinationReached:score.goalVisited;
    for(const event of events){
+    if(event.kind==='clear'){if(!clearFired)clearPending=event;continue;}
     if(event.kind==='special'){if(event.tier<=highestTier)continue;highestTier=event.tier;}
     else {
      const label=event.label.toUpperCase();
@@ -50,37 +70,43 @@ export function arcadeFeedback(sound){
    }
   },
   result(result){
-   if(result.breakdown)api.accept(result.breakdown,result.attempt);pending=null;
-   if(!current||!(current.total>0)||['forfeit','route-missed'].includes(current.outcome)){burstTime=0;cancelAnimations();particles.reset();spectacle.hidden=true;return;}
+   if(result.breakdown)api.accept(result.breakdown,result.attempt,result.challenge);pending=null;
+   if(!current||!(current.total>0)||['forfeit','route-missed'].includes(current.outcome)){burstTime=0;cancelAnimations();resetClear();particles.reset();spectacle.hidden=true;return;}
+   if(clearPending)clearWaypoints();
+   if(clearTime)return;
    celebrate({kind:'result',multiplier:current.bankMultiplier},false);
   },
   update(dt,phase,mode,rate=1){
    const now=performance.now(),elapsed=Math.max(0,(now-lastUpdate)/1000)*rate;lastUpdate=now;
-   for(const animation of [...animations,...$('combo-total').getAnimations()])if(animation.playbackRate!==rate)animation.updatePlaybackRate(rate);
+   for(const animation of [...animations,...clearAnimations,...$('combo-total').getAnimations()])if(animation.playbackRate!==rate)animation.updatePlaybackRate(rate);
    const visible=['play','replay'].includes(mode)&&!!current;
-   hud.hidden=!visible||phase!=='Flight';cooldown=Math.max(0,cooldown-elapsed);burstTime=Math.max(0,burstTime-elapsed);
-   if(pending&&!cooldown&&visible&&phase==='Flight'){const event=pending;pending=null;celebrate(event);}
-   particles.update(elapsed,visible&&!reduced());spectacle.hidden=!visible||(!burstTime&&!particles.active);
+   hud.hidden=!visible||phase!=='Flight';cooldown=Math.max(0,cooldown-elapsed);burstTime=Math.max(0,burstTime-elapsed);clearTime=Math.max(0,clearTime-elapsed);
+   if(clearPending&&visible&&['Flight','Result'].includes(phase)&&rate>0)clearWaypoints();
+   if(clearTime&&visible&&!reduced())while(clearVolley<3&&3.2-clearTime>=clearVolley*.28){particles.burst(6,true);clearVolley++;}
+   clearBanner.hidden=!visible||!clearTime;
+   if(!clearTime&&clearAnimations.length){clearAnimations.forEach(a=>a.cancel());clearAnimations=[];}
+   if(pending&&!cooldown&&!clearTime&&visible&&phase==='Flight'&&rate>0){const event=pending;pending=null;celebrate(event);}
+   particles.update(elapsed,visible&&!reduced());spectacle.hidden=!visible||(!burstTime&&!clearTime&&!particles.active);
    $('combo-burst').hidden=!burstTime;$('combo-line').hidden=phase!=='Flight'||!burstTime;
    if(!burstTime&&animations.length)cancelAnimations();
    if(!current)return;
-   const waypoint=current.version==='waypoint-v3',value=waypoint?current.total:current.potential,tier=heatTier(current),next=HEAT_STAGES[tier+1];
+   const waypoint=current.version==='waypoint-v3',allClear=allWaypointsCollected(current,currentCourse),value=waypoint?current.total:current.potential,tier=allClear?6:heatTier(current),next=HEAT_STAGES[tier+1];
    display=reduced()?value:display+(value-display)*(1-Math.exp(-dt*18));$('combo-total').textContent=format(display);
    hud.style.setProperty('--combo-tint','#'+HEAT_STAGES[tier].color.toString(16).padStart(6,'0'));hud.dataset.tier=tier;
    $('special-name').textContent=tier?HEAT_STAGES[tier].name:'SPECIAL';$('special-next').textContent=next?`${format(next.at)} PTS`:'MAXIMUM OVERDRIVE';
    const progress=next?Math.max(0,Math.min(1,((current.total||0)-HEAT_STAGES[tier].at)/(next.at-HEAT_STAGES[tier].at))):1;
    $('special-fill').style.transform=`scaleX(${progress})`;
    $('combo-banks').textContent=`×${current.bankMultiplier.toFixed(2)} BANKS · ${current.styleBanks}`;
-   $('combo-targets').textContent=waypoint?`${waypointCount} TARGETS · NEXT ×${format(current.waypointMultiplier)}`:'DISTINCT SURFACES';
+   $('combo-targets').textContent=waypoint?`${waypointCount} TARGETS · ${allClear?'100% COMPLETE':'NEXT ×'+format(current.waypointMultiplier)}`:'DISTINCT SURFACES';
    $('combo-accuracy').textContent=waypoint?(tagged?'DESTINATION BONUS':'DESTINATION OPTIONAL'):`${Math.round((current.landingMultiplier||0)*100)}% LANDING`;
    $('combo-motion').textContent=`+${format(current.movementPoints||0)} MOVEMENT · 100 PTS / SEC${current.total>0?'':' · HIT A TARGET TO BANK'}`;
    $('combo-cash').textContent=`${format(current.total)} ${waypoint?'PTS BANKED':'PTS IF IT STOPS HERE'}`;
-   $('combo-status').textContent=tagged?'LAND THE FINISH':waypointCount?'CHAIN EARNED':bankCount>=3?'KEEP LINKING':'FIND YOUR LINE';
+   $('combo-status').textContent=allClear?'100% · ALL WAYPOINTS':tagged?'LAND THE FINISH':waypointCount?'CHAIN EARNED':bankCount>=3?'KEEP LINKING':'FIND YOUR LINE';
    hud.classList.toggle('on-target',!!tagged);flash=Math.max(0,flash-elapsed);trickTime=Math.max(0,trickTime-elapsed);if(!flash)hud.dataset.cue='';$('combo-trick').style.opacity=trickTime?1:0;
    // DOM diagnostics make cue/particle behavior inspectable without private state.
    hud.dataset.events=String(bankCount+waypointCount);hud.dataset.particles=String(particles.active);
   },
-  get score(){return current;},get goalFlash(){return tagged?flash:0;}
+  get score(){return current;},get goalFlash(){return tagged?flash:0;},get clearing(){return clearTime>0;}
  };
  return api;
 }
