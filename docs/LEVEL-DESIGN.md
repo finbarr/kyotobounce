@@ -62,3 +62,52 @@ The campaign uses collision `b304c84aa1292e9e401c4abde9d305f754548d3b815fba81378
 `npm test` checks campaign completeness, progression, hints, target data and replacement of the previous catalog. `npm run test:runtime` checks authoritative scores and saved replay parity on an isolated local service, including shop, garden, Skyway and finale routes. Browser verification covers the real chapter selector, stage overviews, visible hints and custom-course access. See `web/levels/README.md` for reproduction.
 
 The ten changed routes are verified with repeated suggested shots and nearby positive completions. The isolated service checks classic scoring plus shop, garden, Skyway and finale score/replay parity. Browser checks cover course selection, overviews and the live movement counter; they do not establish a manual playthrough of every stage.
+
+## Scouting and creating courses
+
+Press **F** before throwing to enter or leave the free camera. **WASD** flies in
+view direction, the mouse looks around, **E/Q** (or Space/Ctrl) moves vertically,
+**Shift** boosts from 18 to 60 m/s, and **Alt** slows to 4 m/s for placement.
+The robot stays where it was, with its aim and spin unchanged. Escape releases
+the mouse and stops movement; right-drag also looks around with a free cursor.
+Scouting labels show target numbers and distances through station geometry.
+
+**Create** opens the designer with this camera. Choose a placement tool, then
+click a surface (the centre of the view while the mouse is captured). Starts
+and destinations need fixed, horizontal, clear floors. Waypoints can use fixed
+walls, ceilings or floors. Select a waypoint to fly to it, resize, move or remove
+it. Separate buttons fly to the start and finish.
+
+The designer has two modes:
+
+- **Place by hand:** arrange the start, optional waypoint chain and destination.
+- **Design ball:** use a placed start or walk to a launch position, then throw
+  the cyan ball. It plays the normal authoritative physics and earns no ranked
+  score. Hold Space during flight for 2×. At full physical rest, its real surface
+  contacts become up to eight waypoints, preferring sharp banks and vertical faces.
+  Rolling contacts are skipped. Targets stay at least 0.45 seconds and 3–8 metres
+  apart, with wider spacing on longer routes.
+  A clear landing becomes an optional destination. Every proposed patch passes the same native
+  geometry checks as manual placement. Cramped or uneven landings produce a
+  waypoint-only course when useful banks exist, with an explanation.
+
+A cyan line previews the captured trajectory. Untouched generated targets carry
+an explicit recorded-route indication; saving also preserves the real aim, spin
+and charge power as the course hint. Changing target geometry clears that
+indication. Save edited targets as a manual course or record another shot.
+The recorded route proves that all generated targets were
+reachable together; it does not establish an absolute maximum score. Moving
+escalator interactions can depend on release timing.
+
+The browser cannot submit a trajectory as proof. The service accepts only an
+unmodified capture token belonging to that session; the native worker creates
+it after actual full-rest recording. Neither scouting nor authoring changes
+scoring rules, existing courses or the physical solver.
+
+Validation: `npm test` covers independent fly-camera movement and geometry
+identity. `npm run test:runtime` includes `designer-runtime.mjs`, which records a
+native wall-bank route, saves it, and repeats the captured authoritative power
+in a separate native worker to check every waypoint and the destination without
+WebSocket release-timing jitter. It also rejects forged or edited capture proofs
+and checks cramped landings that omit the destination. Runtime tests
+require an isolated local server and a rebuilt `design-ball-v1` worker.

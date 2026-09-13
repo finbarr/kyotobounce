@@ -27,6 +27,7 @@ namespace Kyoto
             public Vector3 launchPosition,velocity,spin;
             public ReplayPose[] poses;
             public ImpactEvent[] contacts;
+            public DesignCapture design;
         }
         [Serializable] public class WaypointHit
         {
@@ -48,6 +49,15 @@ namespace Kyoto
 
         bool CompetitionCommand(Command c)
         {
+            if(c.type=="design-start")
+            {
+                string message="";bool ok=(owner==null||state.phase=="Result")&&players.ContainsKey(c.id);
+                if(!ok)message="Finish or recall your shot before recording another route.";
+                if(c.start!=null&&string.IsNullOrEmpty(c.start.surface))c.start=null;
+                if(ok&&c.start!=null)ok=ValidateDisk(c.start,true,out message);
+                if(ok){Reset();activeChallenge=null;designArmed=true;if(c.start!=null)players[c.id].walker.Place(c.start.center+Vector3.up*.03f);}
+                Send(new RpcReply{request=c.request,ok=ok,message=message});return true;
+            }
             if(c.type=="place")
             {
                 var reply=new RpcReply{request=c.request};
@@ -80,7 +90,7 @@ namespace Kyoto
                 }
                 if(ok)
                 {
-                    Reset();activeChallenge=c.challenge;
+                    Reset();designArmed=false;activeChallenge=c.challenge;
                     foreach(var p in players.Values)
                     {
                         if(activeChallenge!=null)p.walker.Place(activeChallenge.start.center+Vector3.up*.03f);
@@ -152,6 +162,7 @@ namespace Kyoto
         }
         void RecordWaypointContact(ContactSample contact)
         {
+            RecordDesignContact(contact);
             if(state.phase!="Flight"||activeChallenge?.scoring!="waypoint-v3")return;
             foreach(var target in activeChallenge.waypoints??Array.Empty<BrowserWaypoint>())
             {
@@ -185,7 +196,7 @@ namespace Kyoto
         void BeginRecording()
         {
             distinct.Clear();impactTimes.Clear();waypointHits.Clear();visitedWaypoints.Clear();impactCount=0;goalDwell=sleepDwell=0;replayPoses.Clear();replayContacts.Clear();
-            scorePoseCursor=0;
+            scorePoseCursor=0;designContacts.Clear();
             thrower=JsonUtility.FromJson<PlayerState>(JsonUtility.ToJson(owner.state));thrower.feet=owner.walker.transform.position;
             launchVelocity=ball.Velocity;launchSpin=ball.AngularVelocity;
             replayPoses.Add(new ReplayPose{t=0,p=ball.Body.position,q=ball.Body.rotation});
@@ -211,7 +222,7 @@ namespace Kyoto
             pendingResult=new ThrowResult{attempt=attempt,id=owner.state.id,reason=reason,layout=state.layout,profile=state.profile,challenge=activeChallenge,
                 success=success,destinationReached=success,waypointHits=waypointHits.ToArray(),score=success?1000+100*distinct.Count:0,surfaces=distinct.Count,impacts=impactCount,duration=ball.Clock,
                 releaseTime=state.releaseTime,chargeTime=state.chargeTime,thrower=thrower,launchPosition=state.launchPosition,velocity=launchVelocity,spin=launchSpin,
-                poses=replayPoses.ToArray(),contacts=replayContacts.ToArray()};
+                poses=replayPoses.ToArray(),contacts=replayContacts.ToArray(),design=designArmed?CaptureDesign():null};
         }
         void ConstrainWalker(Player p,Vector3 previousFeet)
         {

@@ -1,18 +1,19 @@
+import {designGeometry} from './public/design-geometry.js';
 import { scoreAttempt,ComboTracker } from './scoring.ts';
 import { randomUUID } from 'node:crypto';
 import { Store } from './store.ts';
 import { PhysicsWorker } from './worker.ts';
-import type { Guest,Challenge,Disk,Waypoint,NativeResult } from './types.ts';
+import type { Guest,Challenge,Disk,Waypoint,NativeResult,Hint } from './types.ts';
 import { SCORING_VERSION,WAYPOINT_SCORING,ACTIVE_SCORING,SUPPORTED_SCORING,THROW_MODEL,CHARGE_SECONDS } from './types.ts';
 
-export type Member={id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>;lastResult?:any;attemptPresentation?:{playerName:string;character:NonNullable<NativeResult['character']>}};
+export type Member={designing?:boolean;designProof?:{token:string;geometry:string;hint:Hint};id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>;lastResult?:any;attemptPresentation?:{playerName:string;character:NonNullable<NativeResult['character']>}};
 export class Competition {
  store:Store;worker:PhysicsWorker;publish:(message:unknown,sessionId?:string)=>void;
  members=new Map<string,Member>();
  pending=new Map<string,{id:string;challenge:Challenge|null}>();
  initializing=false;layout='';physics='';animation='ori-carry-v2';
  constructor(store:Store,worker:PhysicsWorker,publish:(message:unknown,sessionId?:string)=>void){this.store=store;this.worker=worker;this.publish=publish;}
- session(m:Member){return {type:'session',id:m.id,busy:!!m.attempt,restoring:m.restoring,challenge:m.selected};}
+ session(m:Member){return {type:'session',id:m.id,busy:!!m.attempt,designing:!!m.designing,restoring:m.restoring,challenge:m.selected};}
  sync(m:Member){this.publish(this.session(m),m.id);}
  playable(c:Challenge){return c.layout===this.layout&&c.physics===this.physics&&c.throwModel===THROW_MODEL&&ACTIVE_SCORING.includes(c.scoring||'')&&this.store.challenge(c.id)?.revision===c.revision;}
  catalog(){return {type:'catalog',challenges:this.store.list().filter(c=>this.playable(c))};}
@@ -68,13 +69,23 @@ export class Competition {
  waypoint(message:any){const m=this.members.get(message.id);if(m&&m.attempt===message.attempt)m.combo?.waypoint(message);}
  impact(message:any){this.members.get(message.id)?.combo?.contact(message);}
  note(message:any){const m=this.members.get(message.id);if(m){this.clearAttempt(m);this.sync(m);}}
- failed(id?:string){for(const m of this.members.values()){if(id&&m.id!==id)continue;m.snapshot=null;this.clearAttempt(m);this.sync(m);}}
+ failed(id?:string){for(const m of this.members.values()){if(id&&m.id!==id)continue;m.snapshot=null;m.designing=false;m.designProof=undefined;this.clearAttempt(m);this.sync(m);}}
  nameChanged(guest:Guest){for(const m of this.members.values()){if(m.guest.id===guest.id)m.guest.name=guest.name;this.board(m);}}
  result(result:NativeResult){
   const expected=this.pending.get(result.attempt),member=this.members.get(result.id);
   if(!expected||expected.id!==result.id||!member)return;
   const scoreFrames=member.scoreFrames;this.clearAttempt(member);
   const c=expected.challenge;
+  if(member.designing){
+   member.designing=false;
+   const capture=result.design;if(capture&&!capture.goal?.surface)capture.goal=null;
+   if(capture&&!capture.error){
+    const thrower=result.thrower as {yaw:number;pitch:number;top:number;kick:number;power:number;powerRange:'precision'|'full'};
+    const geometry={...capture,scoring:WAYPOINT_SCORING};
+    member.designProof={token:randomUUID(),geometry:designGeometry(geometry),hint:{yaw:thrower.yaw,pitch:thrower.pitch,top:thrower.top,kick:thrower.kick,holdMs:thrower.power*CHARGE_SECONDS*1000,powerRange:thrower.powerRange,note:`Recorded design shot: every waypoint was reached${capture.goal?' and the ball landed in the finish zone':''}. Moving escalators can require matching the original timing.`}};
+    Object.assign(capture,{proof:member.designProof.token});
+   }
+  }else delete result.design;
   if(c&&(!this.playable(c)||!result.challenge||c.id!==result.challenge.id||c.revision!==result.challenge.revision||result.layout!==c.layout||result.physics!==c.physics)){
    this.publish({type:'error',message:'The attempt used an incompatible level version. No score was saved.'},member.id);this.sync(member);return;
   }
@@ -108,6 +119,15 @@ export class Competition {
    const allowed=m.type==='charge'?['type','challengeId','revision','layout','physics','powerRange','character']:['type'];
    if(Object.keys(m).some(key=>!allowed.includes(key)))throw new Error('Send throw intent only. Launch position, power, timing and results are authoritative.');
   }
+  if(m.type==='design-start'){
+   if(Object.keys(m).some(k=>!['type','start'].includes(k)))throw new Error('Send a start zone only; the route is recorded by physics');
+   if(member.attempt||member.selecting)throw new Error('Finish or recall your shot before recording a route');
+   if(!this.worker.capabilities.includes('design-ball-v1'))throw new Error('The physics worker needs an update for the design ball');
+   const start=m.start?disk(m.start):null;
+   member.selecting=true;try{await this.worker.request({type:'design-start',id,start});}finally{member.selecting=false;}
+   member.selected=null;member.lastResult=undefined;member.designProof=undefined;member.designing=true;this.remember(member);this.sync(member);
+   return {type:'design-ready'};
+  }
   if(m.type==='place'){
    if(!['start','goal','waypoint'].includes(m.slot))throw new Error('Choose start, destination or waypoint');if(m.slot==='waypoint')this.requireWaypoints();validateVector(m.origin);validateVector(m.direction);
    if(typeof m.radius!=='number'||!Number.isFinite(m.radius))throw new Error('Invalid radius');
@@ -124,6 +144,11 @@ export class Competition {
    const old=m.editId?this.store.challenge(String(m.editId)):null;
    if(m.editId&&(!old||old.creator!==member.guest.id))throw new Error('Only the creator can revise a level');
    const challenge:Challenge={id:old?.id||randomUUID(),revision:(old?.revision||0)+1,name:m.name.trim(),creator:member.guest.id,start,goal,...(old?.requiredSurface?{requiredSurface:old.requiredSurface}:{}),...(waypoints?{waypoints}:{}),layout:this.layout,physics:this.physics,throwModel:THROW_MODEL,scoring};
+   if(m.designProof!==undefined){
+    const proof=member.designProof;
+    if(!proof||m.designProof!==proof.token||designGeometry(challenge)!==proof.geometry)throw new Error('The recorded route changed. Save it as a manual course or record a new design shot.');
+    challenge.hint=proof.hint;
+   }
    this.store.saveChallenge(challenge);this.publish(this.catalog());return {type:'saved-challenge',challenge};
   }
   if(m.type==='select-challenge'){
@@ -133,7 +158,7 @@ export class Competition {
    if(challenge&&!this.playable(challenge))throw new Error('This level has changed. Select its current version.');
    if(challenge?.scoring===WAYPOINT_SCORING)this.requireWaypoints();
    member.selecting=true;try{await this.worker.request({type:'select',id,challenge});}finally{member.selecting=false;}
-   member.lastResult=undefined;member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
+   member.designing=false;member.lastResult=undefined;member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
   }
   if(m.type==='leaderboard'){
    const c=this.store.challenge(String(m.challengeId),Number(m.revision));if(!c)throw new Error('Level not found');return {type:'leaderboard',challenge:c,entries:this.store.leaderboard(c)};
