@@ -13,7 +13,7 @@ export class ConnectionMetrics {
   state(time:number,simulation:number){if(this.lastState)this.snapshotGaps.add(time-this.lastState);if(this.lastSimulation!==undefined&&simulation>=this.lastSimulation)this.simulationGaps.add((simulation-this.lastSimulation)*1000);this.lastState=time;this.lastSimulation=simulation;}
   take(){const result={connection:this.tag,received:this.received,bytesIn:this.bytesIn,bytesOut:this.bytesOut,droppedStates:this.droppedStates,queueMax:this.queueMax,bufferMax:this.bufferMax,snapshotGapMs:this.snapshotGaps.take(),simulationStepMs:this.simulationGaps.take()};this.received={};this.bytesIn=this.bytesOut=this.droppedStates=this.queueMax=this.bufferMax=0;return result;}
 }
-const fields=['windowMs','frames','frameP50Ms','frameP95Ms','frameMaxMs','renderMaxMs','poseMaxMs','cameraMaxMs','shadowMaxMs','states','stateGapMaxMs','stateAgeMs','simulationGapMaxMs','rttMs','outgoingBufferedBytes','longTasks','longTaskMaxMs','visibilityChanges','closeCode'];
+const fields=['shotUnderrunMs','shotBufferMs','shotComplete','windowMs','frames','frameP50Ms','frameP95Ms','frameMaxMs','renderMaxMs','poseMaxMs','cameraMaxMs','shadowMaxMs','states','stateGapMaxMs','stateAgeMs','simulationGapMaxMs','rttMs','outgoingBufferedBytes','longTasks','longTaskMaxMs','visibilityChanges','closeCode'];
 export function clientPerformance(value:any){
   if(!value||typeof value!=='object')return null;
   const result:Record<string,number|string|boolean>={};

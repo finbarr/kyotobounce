@@ -25,6 +25,7 @@ export function shotDetails(cancel){
       `Session: ${s.id}`,
       `View: ${render?.mode||'play'} · Worker: ${worker}`,
       `Latest update: ${number(timing?.stateAgeMs)} ms ago · Network round trip: ${number(timing?.rttMs)} ms · Last close: ${timing?.closeCode||'none'}`,
+      `Shot buffer: ${number(timing?.shotBufferedSeconds)} s${timing?.shotComplete?' · Entire shot received':''}`,
       `Phase: ${s.phase} · ${active&&d?.sleeping?'At rest':d?.simulating?'Simulating':'Inactive'}`,
       `Camera: ${render?.camera?.mode||'—'} · Aim: ${number(render?.yaw)}°, ${number(render?.pitch)}°`,
       `Ball time: ${number(s.flightTime)} s`,

@@ -40,6 +40,7 @@ docs/*
 !docs/FLIGHT-CONTACT-FIXES.md
 !docs/FLEET_QUEUE.md
 !docs/PERFORMANCE-AUDIT.md
+!docs/SHOT-PLAYBACK.md
 !docs/STATION-DETAIL-BACKLOG.md
 !docs/STATION-REFERENCE-AUDIT.md
 tools/*

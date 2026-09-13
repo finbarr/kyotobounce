@@ -1,3 +1,4 @@
+import {ShotPlayback} from '../public/shot-playback.js';
 // Local-only actual native/service load. Does not alter game completion rules.
 import WebSocket from 'ws';
 import {spawn,execFileSync} from 'node:child_process';
@@ -31,7 +32,7 @@ async function cgroup(){try{const path=(await readFile('/proc/self/cgroup','utf8
 async function proc(pid){try{const [stat,status]=await Promise.all([readFile(`/proc/${pid}/stat`,'utf8'),readFile(`/proc/${pid}/status`,'utf8')]);const fields=stat.slice(stat.lastIndexOf(')')+2).trim().split(/\s+/);return {ticks:Number(fields[11])+Number(fields[12]),rssMb:Number(status.match(/VmRSS:\s+(\d+)/)?.[1]||0)/1024,threads:Number(status.match(/Threads:\s+(\d+)/)?.[1]||0)};}catch{return null;}}
 const summary={created:new Date().toISOString(),commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),host:{cpus:cpus().length,model:cpus()[0]?.model,memoryMb:totalmem()/1024**2,kernel:release(),node:process.version,cgroup:await cgroup()},worker:{path:worker,sha256:beforeHash},parameters:{levels,reps,duration,warmup,port:4283,inputHz:30,profile:'First Bank, real charge 1.2s full range, 25-degree launch, alternating spin; auto-rethrow only on natural result/Aim cancellation'},runs:[]};
 class Player{
- constructor(index){this.index=index;this.state=null;this.id=null;this.selected=null;this.lastStateAt=0;this.nextThrow=0;this.phase='joining';this.errors=[];this.notices=[];this.recoveries=[];this.states=[];this.inputs=[];this.commands=[];this.latencies=[];this.results=0;this.charges=0;this.releases=0;this.closed=false;this.pendingInput=null;this.pendingCharge=null;this.pendingRelease=null;this.yaw=90;this.releaseAt=0;this.observing=false;this.joinAt=performance.now();this.socket=new WebSocket(origin.replace('http','ws'),{origin});this.socket.on('open',()=>this.send({type:'hello'}));this.socket.on('error',e=>this.errors.push({at:performance.now(),message:e.message}));this.socket.on('close',(code,reason)=>{this.closed=true;if(!this.cleaning)this.errors.push({at:performance.now(),message:`closed ${code}: ${reason}`});});this.socket.on('message',raw=>this.message(JSON.parse(raw.toString())));}
+ constructor(index){this.playback=new ShotPlayback();this.index=index;this.state=null;this.id=null;this.selected=null;this.lastStateAt=0;this.nextThrow=0;this.phase='joining';this.errors=[];this.notices=[];this.recoveries=[];this.states=[];this.inputs=[];this.commands=[];this.latencies=[];this.results=0;this.charges=0;this.releases=0;this.closed=false;this.pendingInput=null;this.pendingCharge=null;this.pendingRelease=null;this.yaw=90;this.releaseAt=0;this.observing=false;this.joinAt=performance.now();this.socket=new WebSocket(origin.replace('http','ws'),{origin});this.socket.on('open',()=>this.send({type:'hello',protocol:'shot-stream-v1'}));this.socket.on('error',e=>this.errors.push({at:performance.now(),message:e.message}));this.socket.on('close',(code,reason)=>{this.closed=true;if(!this.cleaning)this.errors.push({at:performance.now(),message:`closed ${code}: ${reason}`});});this.socket.on('message',raw=>{const m=JSON.parse(raw.toString());if(m.type==='shot-chunk'){this.playback.accept(m,performance.now());return;}if(m.type==='result'&&this.playback.result(m))return;if(m.type==='state'){if(['Aim','Charging'].includes(m.phase))this.playback.clear(true);else if(this.playback.active)return;}this.message(m);});}
  send(m){if(this.socket.readyState!==WebSocket.OPEN)return;this.socket.send(JSON.stringify(m));if(m.type!=='input')this.commands.push({at:performance.now(),type:m.type});}
  message(m){const now=performance.now();if(m.type==='welcome')this.id=m.sessionId;
   if(m.type==='catalog'&&!this.selected){this.selected=m.challenges.find(c=>c.id==='atrium-first-bank');}
@@ -49,13 +50,13 @@ class Player{
   if(this.pendingCharge&&m.phase==='Charging'){this.latencies.push({type:'charge-to-state',ms:now-this.pendingCharge,observing:this.observing});this.pendingCharge=null;}
   if(this.pendingRelease&&m.phase==='Flight'){this.latencies.push({type:'release-to-flight',ms:now-this.pendingRelease,observing:this.observing});this.pendingRelease=null;}
  }
- tick(now){if(this.phase!=='ready'||!this.state)return;
+ tick(now){const playback=this.playback.sample(now);if(playback)for(const message of playback.messages)this.message(message);if(this.phase!=='ready'||!this.state)return;
   // Flight/Release/Result intentionally freeze aim; do not label that wait as input latency.
   const canAim=this.state.phase==='Aim'&&!this.releaseAt&&!this.pendingRelease;
   if(canAim&&!this.pendingInput&&now-(this.lastProbe||0)>250){this.yaw=this.yaw===90?91:90;this.lastProbe=now;this.pendingInput={yaw:this.yaw,at:now};}
-  this.send({type:'input',x:0,z:0,yaw:this.yaw,pitch:25,top:this.index%2?150:-150,kick:this.index%2?75:-75,fast:false});if(this.observing)this.inputs.push(now);
-  if(this.releaseAt){if(now>=this.releaseAt){this.send({type:'release'});this.releases++;this.pendingRelease=now;this.releaseAt=0;this.nextThrow=now+2000;}return;}
-  if(['Aim','Result'].includes(this.state.phase)&&now>=this.nextThrow&&!this.pendingCharge){this.send({type:'charge',challengeId:this.selected.id,revision:this.selected.revision,layout:this.state.layout,physics:this.state.physics,powerRange:'full'});this.charges++;this.pendingCharge=now;this.releaseAt=now+1200;this.nextThrow=Infinity;}
+  if(!this.playback.active)this.send({type:'input',x:0,z:0,yaw:this.yaw,pitch:25,top:this.index%2?150:-150,kick:this.index%2?75:-75,fast:false});if(this.observing)this.inputs.push(now);
+  if(this.releaseAt){if(now>=this.releaseAt){this.send({type:'release'});this.releases++;this.pendingRelease=now;this.releaseAt=0;this.nextThrow=Infinity;}return;}
+  if(['Aim','Result'].includes(this.state.phase)&&now>=this.nextThrow&&!this.pendingCharge){this.playback.clear(true);this.send({type:'charge',challengeId:this.selected.id,revision:this.selected.revision,layout:this.state.layout,physics:this.state.physics,powerRange:'full'});this.charges++;this.pendingCharge=now;this.releaseAt=now+1200;this.nextThrow=Infinity;}
  }
  close(){this.cleaning=true;if(this.socket.readyState===WebSocket.OPEN)this.socket.send(JSON.stringify({type:'leave'}));this.socket.close();}
 }

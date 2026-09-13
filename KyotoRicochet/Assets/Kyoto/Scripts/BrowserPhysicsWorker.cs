@@ -18,7 +18,7 @@ namespace Kyoto
         [Serializable] class Ready
         {
             public string type="ready",layout,profile,physics=BrowserSession.SimulationVersion;
-            public Vector3 spawn;public float radius;public string[] capabilities=new[]{"waypoint-v1"};
+            public Vector3 spawn;public float radius;public string[] capabilities=new[]{"waypoint-v1","shot-stream-v1"};
         }
         readonly ConcurrentQueue<BrowserSession.Command> commands=new ConcurrentQueue<BrowserSession.Command>();
         readonly Dictionary<string,BrowserSession> sessions=new Dictionary<string,BrowserSession>();
@@ -112,6 +112,21 @@ namespace Kyoto
                 if(command.type=="leave"){session.Dispose();sessions.Remove(command.id);continue;}
                 session.Handle(command);
             }
+            // Yield between batches and rotate priority so future flight never
+            // monopolizes the worker while other players walk and aim.
+            var active=new List<BrowserSession>(sessions.Values);
+            double deadline=Milliseconds()+8;
+            if(active.Count>0){
+                aheadCursor%=active.Count;
+                bool worked=true;
+                while(worked&&Milliseconds()<deadline){worked=false;
+                    for(int i=0;i<active.Count&&Milliseconds()<deadline;i++){
+                        var session=active[(aheadCursor+i)%active.Count];
+                        if(session.CanAdvanceAhead){session.AdvanceAhead();worked=true;}
+                    }
+                }
+                aheadCursor=(aheadCursor+1)%active.Count;
+            }
             double now=Time.realtimeSinceStartupAsDouble;
             if(now>=nextSend)
             {
@@ -130,7 +145,8 @@ namespace Kyoto
             }
             if(timing)ReportTiming(Time.realtimeSinceStartupAsDouble);
         }
-        void FixedUpdate(){if(!disconnected)foreach(var session in sessions.Values)session.Step();}
+        int aheadCursor;
+        void FixedUpdate(){if(!disconnected)foreach(var session in sessions.Values)session.StepLive();}
         void OnDestroy(){disconnected=true;socket?.Close();}
     }
 }

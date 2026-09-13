@@ -1,5 +1,6 @@
 import {gameConnection} from './connection.js';
 import {clientPerformance} from './performance.js';
+import {ShotPlayback} from './shot-playback.js';
 import {THROW_MODEL,throwSpeed} from './throw-power.js';
 import {BallRotationBuffer,rotationBetween,rotationSpeed,spinMarkOpacity} from './ball-rotation.js';
 import * as THREE from 'three';
@@ -43,6 +44,8 @@ const heat=ballHeat({scene,ball,trail});
 let heatPresentationKey='',heatPresentationTime=null;
 let station,robotAsset,motion,loaded=false,guestId='',identityId='',snapshot=null,previous=null,received=0,workerReady=false;
 const history=[],ballRotations=new BallRotationBuffer();
+const shotPlayback=new ShotPlayback();
+let shotTimeline=null;
 let renderClock=null;
 let spinExposure=1/60;
 let yaw=180,pitch=12,top=0,kick=0,azimuth=-Math.PI,elevation=.006,distance=3.8,manualCamera=false,chargeStarted=0;
@@ -66,18 +69,18 @@ const performanceReport=clientPerformance();
 const updateShotDetails=shotDetails(()=>cancel());
 const connection=gameConnection({
   url:`${location.protocol==='https:'?'wss':'ws'}://${location.host}`,
-  hello:()=>({token:localStorage.getItem('kyoto-guest'),sessionId:guestId,lastResultAttempt}),
+  hello:()=>({protocol:'shot-stream-v1',token:localStorage.getItem('kyoto-guest'),sessionId:guestId,lastResultAttempt}),
   onStatus(status,extra){
     performanceReport.status(status,extra);
     if(status==='latency')return;connectionStatus=status;
     if(status==='connected')return;
-    workerReady=false;workerStatus=status;cancel();clearLiveMotion();
-    if(status==='reconnecting')notice('Connection interrupted. Reconnecting… Your flight continues on the server.',1e8);
+    workerReady=false;workerStatus=status;cancel();if(!shotPlayback.active)clearLiveMotion();
+    if(status==='reconnecting')notice(shotPlayback.active?'Reconnecting… Playing the buffered shot.':'Connection interrupted. Reconnecting…',1e8);
     if(status==='replaced')notice('This session was opened on another connection. Reload to start a new session.',1e8);
   },
   onMessage:handleMessage,onTraffic:performanceReport.traffic
 });
-setInterval(()=>send('client-performance',{report:performanceReport.report()}),5000);
+setInterval(()=>send('client-performance',{report:performanceReport.report(shotPlayback.stats())}),5000);
 function clearLiveMotion(){
   snapshot=null;previous=null;history.length=0;renderClock=null;lastPhase='';lastImpact=null;
   ballRotations.samples=[];ballRotations.releaseTime=null;
@@ -90,7 +93,14 @@ function checkStationVersion(layout){
   notice('A new station version is ready. Updating the game…',1e8);
   location.reload();return true;
 }
-function handleMessage(m){
+function handleMessage(m,playback=false){
+  if(m.type==='shot-resume'){shotPlayback.resume(m);return;}
+  if(m.type==='shot-chunk'){if(checkStationVersion(m.base.layout))return;shotPlayback.accept(m,performance.now());flightPending=false;workerReady=true;return;}
+  if(!playback&&m.type==='result'&&shotPlayback.result(m))return;
+  if(!playback&&m.type==='state'){
+    if(['Aim','Charging'].includes(m.phase)){shotPlayback.clear(true);shotTimeline=null;}
+    else if(shotPlayback.active)return;
+  }
   if(m.type==='state'&&checkStationVersion(m.layout))return;
   ui?.message(m);
   if(m.type==='result')lastResultAttempt=m.attempt;
@@ -102,7 +112,7 @@ function handleMessage(m){
     // Input stays disabled until a fresh authoritative state arrives.
     workerReady=false;
     if(returning){
-      if(!m.resumed){pendingRobotResult=null;ui?.dismissResult();}
+      if(!m.resumed){shotPlayback.clear(true);shotTimeline=null;pendingRobotResult=null;ui?.dismissResult();}
       notice(m.resumed?'Connection restored. Your session is ready.':'Reconnected. The previous session ended; your saved scores are safe.',6500);
     }
   }
@@ -111,12 +121,12 @@ function handleMessage(m){
     if(m.status==='ready'){if(recovering)notice('Session restored. Your unfinished shot was cancelled; you can throw again.',6500);}
     else{
       workerReady=false;cancel();
-      clearLiveMotion();
+      shotPlayback.clear(true);shotTimeline=null;clearLiveMotion();
       if(m.status==='recovering'||m.status==='failed')notice(m.message,1e8);
     }
   }
   if(m.type==='ready')checkStationVersion(m.layout);
-  if(m.type==='state'){if(snapshot&&m.stationTime<snapshot.stationTime){history.length=0;renderClock=null;}ballRotations.add(m);if(m.phase==='Flight')flightPending=false;previous=snapshot;snapshot=m;received=performance.now();history.push(m);if(history.length>30)history.shift();workerReady=true;}
+  if(m.type==='state'){if(snapshot&&m.stationTime<snapshot.stationTime){history.length=0;renderClock=null;}ballRotations.add(m);if(m.phase==='Flight')flightPending=false;previous=snapshot;snapshot=m;received=performance.now();history.push(m);if(history.length>30)history.shift();if(!playback||connectionStatus==='connected')workerReady=true;}
   if(m.type==='error'||m.type==='notice'){if(!m.id||m.id===guestId){if(m.type==='error')flightPending=false;notice(m.message);stopChargeSound();chargeStarted=0;}}
   if(m.type==='impact'){lastImpact=m;$('last-impact').textContent=m.label;if(m.qualifying)sound.cue('impact',m);}
 }
@@ -133,6 +143,7 @@ function startCharge(){
   const settle=cancelAvatarCelebration(avatars.get(guestId));
   if(settle){robotChargeQueued=true;clearTimeout(robotChargeTimer);robotChargeTimer=setTimeout(()=>{if(robotChargeQueued){robotChargeQueued=false;startCharge();}},settle);return;}
   if(snapshot.phase==='Result'){returnRequested=true;restoreThrowAim();}
+  shotPlayback.clear(true);shotTimeline=null;
   sound.unlock();sound.startCharge(ui.state.selected?.allowedInputs?.chargeSeconds||2.8);ui.dismissResult();sendInput();send('charge',{challengeId:ui.state.selected?.id||null,revision:ui.state.selected?.revision||null,layout:snapshot.layout,physics:snapshot.physics,powerRange});chargeStarted=performance.now();canvas.focus();
 }
 function setPowerRange(range,force=false){
@@ -169,7 +180,7 @@ document.addEventListener('pointerlockchange',()=>{
     cancel();
   }
 });
-function recall(){const settle=cancelAvatarCelebration(avatars.get(guestId));if(settle){clearTimeout(robotRetryTimer);robotRetryTimer=setTimeout(recall,settle);return;}pendingRobotResult=null;if(ui?.state.mode==='replay'){$('close-replay').click();return;}stopChargeSound();ui.dismissResult();send('recall');chargeStarted=0;flightPending=false;returnRequested=true;restoreThrowAim();trailCount=0;}
+function recall(){const settle=cancelAvatarCelebration(avatars.get(guestId));if(settle){clearTimeout(robotRetryTimer);robotRetryTimer=setTimeout(recall,settle);return;}pendingRobotResult=null;if(ui?.state.mode==='replay'){$('close-replay').click();return;}if(!send('recall')){notice('Reconnect before recalling this shot.');return;}shotPlayback.clear(true);shotTimeline=null;stopChargeSound();ui.dismissResult();chargeStarted=0;flightPending=false;returnRequested=true;restoreThrowAim();trailCount=0;}
 function syncSpin(){top=Number($('top').value);kick=Number($('kick').value);$('top-value').textContent=top;$('kick-value').textContent=kick;}
 for(const id of ['top','kick'])$(id).addEventListener('input',syncSpin);
 $('clear-spin').onclick=()=>{$('top').value=0;$('kick').value=0;syncSpin();canvas.focus();};
@@ -231,7 +242,7 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='Space'&&!(e.target instanceof HTMLInputElement)){e.preventDefault();release();}});
 function self(){return snapshot?.players.find(p=>p.id===guestId);}
-function sendInput(){if(briefing?.blocked||!workerReady||!loaded||ui.state.mode==='replay')return;send('input',{x:flightControls()?0:Number(keys.has('KeyD'))-Number(keys.has('KeyA')),z:flightControls()?0:Number(keys.has('KeyW'))-Number(keys.has('KeyS')),fast:keys.has('ShiftLeft')||keys.has('ShiftRight'),yaw,pitch,top,kick});}
+function sendInput(){if(briefing?.blocked||!workerReady||!loaded||ui.state.mode==='replay'||shotPlayback.active)return;send('input',{x:flightControls()?0:Number(keys.has('KeyD'))-Number(keys.has('KeyA')),z:flightControls()?0:Number(keys.has('KeyW'))-Number(keys.has('KeyS')),fast:keys.has('ShiftLeft')||keys.has('ShiftRight'),yaw,pitch,top,kick});}
 setInterval(sendInput,1000/30);
 
 function createAvatar(id){
@@ -272,6 +283,7 @@ async function load(){
 // Render a short buffered timeline so the release frame precedes the first
 // airborne pose even when those snapshots arrive in the same network packet.
 function renderTimeline(now){
+  if(shotTimeline)return shotTimeline;
   if(!snapshot)return {before:null,after:null,alpha:1,time:0,phase:'Aim'};
   const oldest=history[0].stationTime;
   const target=Math.max(oldest,snapshot.stationTime+Math.min(.04,(now-received)/1000)-.08);
@@ -300,7 +312,7 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   sound.cue('start');if(snapshot?.phase==='Result')recall();
   if(capture){const c=ui.state.selected;if(c){const target=c.waypoints?.[0]||c.goal||c.start;const dx=target.center.x-c.start.center.x,dz=target.center.z-c.start.center.z;yaw=Math.atan2(dx,dz)*180/Math.PI;pitch=THREE.MathUtils.clamp(12+Math.atan2(target.center.y-c.start.center.y,Math.hypot(dx,dz))*180/Math.PI,-20,55);centerOnAim();}captureMouse();}else canvas.focus();
 }});
-ui=competitionUI({overview:c=>briefing.open(c),sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>snapshot?.phase,getLiveTime:()=>snapshot?snapshot.stationTime+(performance.now()-received)/1000:0,resetView:reason=>{heat.reset();if(reason==='level'){lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;}centerOnAim();distance=3.8;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({overview:c=>briefing.open(c),sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;}centerOnAim();distance=3.8;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 const characterPicker=createCharacterPicker({onChange:id=>{characterChoice=id;for(const [owner,a]of avatars)if(owner===guestId||ui.state.mode==='replay')setAvatarCharacter(a,id);}});
 $('course-view').insertBefore(characterPicker.element,$('course-list'));
 window.addEventListener('kyoto:retry',()=>{recall();captureMouse();canvas.focus();});
@@ -311,6 +323,8 @@ let qualityCheck=0,qualityGoodSince=0;
 function animate(now){
   const frameStart=performance.now();requestAnimationFrame(animate);const rawDt=(now-lastFrame)/1000,dt=Math.min(.1,rawDt);lastFrame=now;
   if(!loaded){renderer.render(scene,camera);return;}
+  shotTimeline=shotPlayback.sample(now);
+  if(shotTimeline){for(const message of shotTimeline.messages)handleMessage(message,true);ballRotations.add(shotTimeline.after);}
   if(!rightDrag){
     const turn=Number(keys.has('ArrowRight'))-Number(keys.has('ArrowLeft')),tilt=Number(keys.has('ArrowUp'))-Number(keys.has('ArrowDown'));
     if(turn||tilt){takeCameraControl();azimuth-=turn*1.3*dt;elevation=THREE.MathUtils.clamp(elevation+tilt*.9*dt,-.95,1.25);}
@@ -493,7 +507,7 @@ function animate(now){
     }else qualityGoodSince=0;
   }
   if(now-lastTelemetry>15){lastTelemetry=now;window.kyotoState={briefing:briefing.active,briefingTransition:briefing.blocked&&!briefing.active,audio:sound.state,result:ui.state.lastResult,mode:ui.state.mode,pointerLocked:pointerLocked(),charging:!!chargeStarted,viewerFeet:self()?.feet,challenge:ui.state.selected,busy:ui.state.session?.busy,replayTime:ui.state.replayTime,board:ui.state.board,startupMs,ready:loaded&&workerReady&&!!p,phase,diagnostics:snapshot?.diagnostics,feet:p?.feet,ball:snapshot?.ball,velocity:snapshot?.velocity,spin:snapshot?.spin,flightTime:snapshot?.flightTime,stationTime:snapshot?.stationTime,surfaces:snapshot?.surfaces,impacts:snapshot?.impacts,yaw,pitch,top,kick,rotationSampleCount:ballRotations.samples.length,renderedSpin:visibleSpin,spinMarkOpacity:ball.children[0].material.opacity,guestId,identityId,avatarCount:avatars.size,robotVisible:avatars.get(guestId)?.group.visible,robotCharacter:characterChoice,robotCelebrating:isAvatarCelebrating(avatars.get(guestId)),robotResultCamera,robotChargeQueued,cameraClearance,robotWalk:avatars.get(guestId)?.walkBlend,robotFeet:['L','R'].map(side=>avatars.get(guestId)?.bones[`foot.${side}`]?.getWorldPosition(new THREE.Vector3()).toArray()),lastImpact,held:avatars.get(guestId)?.held.toArray(),renderBall:ball.position.toArray(),escalatorStep:Array.from(scene.children.find(o=>o.children[0]?.isInstancedMesh)?.children[0].instanceMatrix.array.slice(12,15)||[]),renderFeet:avatars.get(p?.id)?.group.position.toArray(),renderAlpha:alpha,frameDt:rawDt,renderTime:timeline.time,releaseTime:snapshot?.releaseTime,releaseError:avatars.get(guestId)?.releaseError,camera:{mode:inFlight?'ball':'aim',savedAim:lastThrowAim,position:camera.position.toArray(),target:briefing.active?briefing.target.toArray():lookTarget.toArray(),up:camera.up.toArray(),manual:manualCamera,azimuth,elevation},heat:heat.state,scorePresentation:ui.scorePresentation(),render:{pixelRatio:renderer.getPixelRatio(),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frameMs:frameTimes.slice(-120)}};}
-  updateShotDetails({snapshot,render:window.kyotoState,lastImpact,result:ui.state.lastResult,worker:workerStatus,performance:performanceReport.current});
+  updateShotDetails({snapshot,render:window.kyotoState,lastImpact,result:ui.state.lastResult,worker:workerStatus,performance:{...performanceReport.current,...shotPlayback.stats()}});
 }
 window.addEventListener('resize',()=>{for(const view of [aimCamera,ballCamera]){view.aspect=innerWidth/innerHeight;view.updateProjectionMatrix();}renderer.setPixelRatio(Math.min(renderer.getPixelRatio(),pixelRatioLimit()));renderer.setSize(innerWidth,innerHeight);});
 requestAnimationFrame(animate);load();

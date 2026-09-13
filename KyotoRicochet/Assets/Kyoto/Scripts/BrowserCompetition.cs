@@ -178,7 +178,7 @@ namespace Kyoto
             string id=surface?surface.surfaceId:"unknown";
             if(qualifying&&impactTimes.TryGetValue(id,out float last)&&ball.Clock-last<.08f)qualifying=false;
             if(qualifying){impactTimes[id]=ball.Clock;impactCount++;distinct.Add(id);}
-            var impact=new ImpactEvent{id=state.id,surface=id,label=surface?surface.displayName:"Surface",point=point,speed=speed,time=ball.Clock,
+            var impact=new ImpactEvent{id=state.id,attempt=attempt,surface=id,label=surface?surface.displayName:"Surface",point=point,speed=speed,time=ball.Clock,
                 stationTime=StationMotion.Time(gameObject.scene),qualifying=qualifying};
             replayContacts.Add(impact);Send(impact);
         }
@@ -208,10 +208,10 @@ namespace Kyoto
             if(state.phase!="Flight"||!ball.Sleeping||ball.Velocity.sqrMagnitude>=1e-10f||ball.AngularVelocity.sqrMagnitude>=1e-10f)return;
             state.phase="Result";
             state.diagnostics.endReason=reason;state.diagnostics.endedAt=ball.Clock;
-            Send(new ThrowResult{attempt=attempt,id=owner.state.id,reason=reason,layout=state.layout,profile=state.profile,challenge=activeChallenge,
+            pendingResult=new ThrowResult{attempt=attempt,id=owner.state.id,reason=reason,layout=state.layout,profile=state.profile,challenge=activeChallenge,
                 success=success,destinationReached=success,waypointHits=waypointHits.ToArray(),score=success?1000+100*distinct.Count:0,surfaces=distinct.Count,impacts=impactCount,duration=ball.Clock,
                 releaseTime=state.releaseTime,chargeTime=state.chargeTime,thrower=thrower,launchPosition=state.launchPosition,velocity=launchVelocity,spin=launchSpin,
-                poses=replayPoses.ToArray(),contacts=replayContacts.ToArray()});
+                poses=replayPoses.ToArray(),contacts=replayContacts.ToArray()};
         }
         void ConstrainWalker(Player p,Vector3 previousFeet)
         {

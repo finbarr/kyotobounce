@@ -42,6 +42,7 @@ namespace Kyoto
             public Vector3 ball,velocity,spin,launchPosition;
             public Quaternion rotation;
             public int impacts,surfaces;public float goalDwell;
+            public bool trajectoryEnd;
             public PlayerState[] players;
             public ReplayPose[] scorePoses;
             public BallDiagnostics diagnostics=new BallDiagnostics();
@@ -57,7 +58,7 @@ namespace Kyoto
         [Serializable] class Notice {public string type="notice",id,message;}
         [Serializable] class ImpactEvent
         {
-            public string type="impact",id,surface,label;
+            public string type="impact",id,attempt,surface,label;
             public Vector3 point;
             public float speed,time;
             public double stationTime;
@@ -72,6 +73,31 @@ namespace Kyoto
         double releaseAt,chargeAt,stationTime;
         float pendingPower;
         Player owner;
+        // Compute a minute of runway in small batches while presentation and
+        // other players keep their own clocks. A perpetual roll stays bounded.
+        bool ahead;
+        double shotWallTime,shotStationTime;
+        int aheadSteps;
+        ThrowResult pendingResult;
+        Notice pendingNotice;
+        readonly List<ReplayPose> walkerPoses=new List<ReplayPose>();
+        public bool CanAdvanceAhead => ahead&&pendingNotice==null&&state.phase=="Flight"&&stationTime-shotStationTime<Time.realtimeSinceStartupAsDouble-shotWallTime+60;
+        public void StepLive()
+        {
+            if(!ahead){Step();return;}
+            if(pendingNotice!=null&&Time.realtimeSinceStartupAsDouble>=shotWallTime+ball.Clock+.2)
+            {Send(pendingNotice);Reset();return;}
+            if(pendingResult!=null&&Time.realtimeSinceStartupAsDouble>=shotWallTime+pendingResult.duration+.2)
+            {var result=pendingResult;pendingResult=null;ahead=false;Send(result);}
+        }
+        public void AdvanceAhead()
+        {
+            for(int i=0;i<12&&CanAdvanceAhead;i++)
+            {
+                Step();aheadSteps++;
+                if(aheadSteps%6==0||state.phase!="Flight"||pendingNotice!=null)Publish(true);
+            }
+        }
 
         public BrowserSession(StationLayout station,string hash,string id,Action<object> send)
         {
@@ -134,7 +160,7 @@ namespace Kyoto
                     if(owner==p&&(state.phase=="Charging"||state.phase=="Release"))Reset();
                     p.move=Vector2.zero;
                     break;
-                case "recall":if(owner==null||owner==p||state.phase=="Result"){if(state.phase=="Flight")Note(p.state.id,"Shot recalled. No score awarded.");Reset();}break;
+                case "recall":if(owner==null||owner==p||state.phase=="Result"){if(state.phase=="Flight"||ahead)Note(p.state.id,"Shot recalled. No score awarded.");Reset();}break;
                 case "home":
                     if(owner==null||state.phase=="Result"){if(state.phase=="Result")Reset();p.walker.Place((activeChallenge==null?layout.spawn:activeChallenge.start.center)+Vector3.up*.03f);p.state.yaw=0;p.state.pitch=15;p.move=Vector2.zero;}
                     break;
@@ -150,6 +176,7 @@ namespace Kyoto
                     var velocity=Quaternion.Euler(-owner.state.pitch,owner.state.yaw,0)*Vector3.forward*ThrowSpeed(pendingPower);
                     ball.Launch(release,velocity,SpinControls.Compose(owner.state.yaw,owner.state.top,owner.state.kick));
                     state.launchPosition=release;state.phase="Flight";state.releaseTime=StationMotion.Time(gameObject.scene);BeginRecording();
+                    ahead=true;shotWallTime=Time.realtimeSinceStartupAsDouble;shotStationTime=state.releaseTime;aheadSteps=0;walkerPoses.Clear();
                     Physics.SyncTransforms();
                 }
                 else{Note(owner.state.id,"Throw cancelled: the hand is blocked.");Reset();}
@@ -163,7 +190,7 @@ namespace Kyoto
                 if(GoalStep())Finish(true,"Target settled");
                 else if(sleepDwell>.6f)Finish(false,activeChallenge?.goal==null?"Ball stopped":"Ball stopped outside the goal");
                 else if(ball.Body.position.y < -5)
-                {Note(owner.state.id,"Ball left the station. Attempt cancelled; no score awarded.");Reset();}
+                {pendingNotice=new Notice{id=owner.state.id,message="Ball left the station. Attempt cancelled; no score awarded."};}
             }
             // A result is issued only after physical rest. Keep the station clock
             // running, while the finished ball and its complete replay stay still.
@@ -181,7 +208,15 @@ namespace Kyoto
             stationTime=StationMotion.Time(gameObject.scene);
         }
         void Reset()
-        {state.phase="Aim";state.owner="";owner=null;state.power=0;distinct.Clear();impactTimes.Clear();impactCount=0;goalDwell=0;state.diagnostics.endReason="";state.diagnostics.endedAt=0;}
+        {
+            if(ahead){
+                double elapsed=Math.Max(0,Time.realtimeSinceStartupAsDouble-shotWallTime);
+                stationTime=Math.Min(stationTime,shotStationTime+elapsed);ActivateClock();
+                for(int i=walkerPoses.Count-1;i>=0;i--)if(walkerPoses[i].t<=elapsed){owner?.walker.Place(walkerPoses[i].p);break;}
+            }
+            ahead=false;pendingResult=null;pendingNotice=null;walkerPoses.Clear();
+            state.phase="Aim";state.owner="";owner=null;state.power=0;distinct.Clear();impactTimes.Clear();impactCount=0;goalDwell=0;state.diagnostics.endReason="";state.diagnostics.endedAt=0;
+        }
         float ThrowSpeed(float power)
         {
             float precision=Mathf.Lerp(.5f,12f,power*power);
@@ -194,8 +229,9 @@ namespace Kyoto
             float drive=Mathf.InverseLerp(.4f,1f,power);
             return precision+(model=="robot-v3"?88f:20f)*drive*drive;
         }
-        public void Publish()
+        public void Publish(bool trajectory=false)
         {
+            if(ahead&&!trajectory)return;
             ActivateClock();
             state.stationTime=StationMotion.Time(gameObject.scene);state.challenge=activeChallenge;state.attempt=attempt;state.goalDwell=goalDwell;
             state.players=new PlayerState[players.Count];int i=0;
@@ -220,6 +256,12 @@ namespace Kyoto
             bool recording=state.phase=="Flight"||state.phase=="Result";
             state.scorePoses=recording?replayPoses.GetRange(scorePoseCursor,replayPoses.Count-scorePoseCursor).ToArray():Array.Empty<ReplayPose>();
             if(recording)scorePoseCursor=replayPoses.Count;
+            state.type=trajectory?"shot-frame":"state";
+            state.trajectoryEnd=trajectory&&(pendingResult!=null||pendingNotice!=null);
+            if(trajectory&&owner!=null){
+                walkerPoses.Add(new ReplayPose{t=ball.Clock,p=owner.walker.transform.position});
+                if(walkerPoses.Count>2000)walkerPoses.RemoveRange(0,200);
+            }
             Send(state);
         }
         public void Dispose(){ball.Impact-=RecordImpact;ball.Contact-=RecordWaypointContact;UnityEngine.Object.Destroy(gameObject);}

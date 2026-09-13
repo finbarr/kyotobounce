@@ -11,6 +11,7 @@ import { PhysicsWorker } from './worker.ts';
 import {ConnectionQueue} from './connection-queue.ts';
 import {monitorEventLoopDelay} from 'node:perf_hooks';
 import {ConnectionMetrics,clientPerformance} from './performance.ts';
+import {ShotStream,RequestBudget} from './shot-stream.ts';
 
 const root = resolve('web/public');
 const port = Number(process.env.KYOTO_PORT || 4173);
@@ -23,10 +24,11 @@ await mkdir(dataDir,{recursive:true});
 const store = new Store(resolve(dataDir,'kyoto.sqlite'));
 const starters=JSON.parse(await readFile(resolve('web/starter-challenges.json'),'utf8'));
 store.syncCampaign(starters);
-type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;metrics:ConnectionMetrics;lastClientReport:number;replaced?:boolean;intentional?:boolean;opened:number;tokens:number;updated:number;alive:boolean;lastWrite:number;lastReplay:number};
+type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;metrics:ConnectionMetrics;budget:RequestBudget;lastClientReport:number;requiresReload?:boolean;replaced?:boolean;intentional?:boolean;opened:number;alive:boolean;lastWrite:number;lastReplay:number};
 const connections = new Map<WebSocket,Connection>();
 const detached = new Map<string,ReturnType<typeof setTimeout>>();
 const worker = new PhysicsWorker();
+const shots=new Map<string,ShotStream>();
 const eventLoop=monitorEventLoopDelay({resolution:20});eventLoop.enable();
 let eventLoopMaxMs=0;
 const competition = new Competition(store,worker,broadcast);
@@ -42,7 +44,7 @@ const server = createServer(async (request,response) => {
     const url = new URL(request.url || '/',`http://127.0.0.1:${port}`);
     if (url.pathname === '/api/health') {
       response.writeHead(worker.ready?200:503,{'Content-Type':'application/json','Cache-Control':'no-store'});
-      response.end(JSON.stringify({status:worker.status,scope:publicOrigin?'online':'local',worker:worker.ready,error:publicOrigin?(workerFailure?'Physics temporarily unavailable':''):workerFailure}));return;
+      response.end(JSON.stringify({status:worker.status,scope:publicOrigin?'online':'local',worker:worker.ready,shotPlayback:worker.capabilities.includes('shot-stream-v1'),error:publicOrigin?(workerFailure?'Physics temporarily unavailable':''):workerFailure}));return;
     }
     // Local read-only game state, without guest credentials. Reject other origins.
     if (url.pathname === '/api/debug/sessions') {
@@ -64,27 +66,39 @@ const server = createServer(async (request,response) => {
     if (request.method==='HEAD') response.end();else createReadStream(path).on('error',()=>response.destroy()).pipe(response);
   } catch {if(!response.headersSent)response.writeHead(400);response.end('Invalid request');}
 });
-const wss=new WebSocketServer({server,maxPayload:65536,verifyClient:(info:{origin:string})=>connections.size<32&&(allowedOrigins.has(info.origin)||(!publicOrigin&&!info.origin))});
+const wss=new WebSocketServer({server,maxPayload:65536,perMessageDeflate:{serverNoContextTakeover:true,clientNoContextTakeover:true,concurrencyLimit:4,threshold:2048,zlibDeflateOptions:{level:3,memLevel:7}},verifyClient:(info:{origin:string})=>connections.size<32&&(allowedOrigins.has(info.origin)||(!publicOrigin&&!info.origin))});
 function send(socket:WebSocket,value:unknown){
   const metrics=connections.get(socket)?.metrics;if(metrics)metrics.bufferMax=Math.max(metrics.bufferMax,socket.bufferedAmount);
   // Snapshots are superseded every tick. Never queue seconds of stale motion
   // behind a slow network or a large replay; reliable results remain ordered.
   if((value as {type?:string})?.type==='state'&&socket.bufferedAmount>65536){if(metrics)metrics.droppedStates++;return;}
-  if(socket.bufferedAmount>8_000_000){if(metrics)metrics.closeCause='outbound-backlog';socket.close(1013,'Connection too slow. Please reconnect.');return;}if(socket.readyState===WebSocket.OPEN){const raw=JSON.stringify(value);if(metrics)metrics.bytesOut+=Buffer.byteLength(raw);socket.send(raw);}}
+  if(socket.bufferedAmount>8_000_000){if(metrics)metrics.closeCause='outbound-backlog';socket.close(1013,'Connection too slow. Please reconnect.');return;}if(socket.readyState===WebSocket.OPEN){const raw=JSON.stringify(value);if(metrics)metrics.bytesOut+=Buffer.byteLength(raw);socket.send(raw,{compress:['shot-chunk','replay'].includes((value as {type:string}).type)});}}
 function broadcast(value:unknown,sessionId?:string){for(const [socket,c]of connections)if(c.guest&&(!sessionId||c.id===sessionId))send(socket,value);}
 worker.on('message', message=>{
   if('challenge' in message&&!message.challenge?.id)message.challenge=null;
+  if(message.type==='shot-frame'){
+    message.type='state';const now=performance.now();for(const c of connections.values())if(c.id===message.id)c.metrics.state(now,message.stationTime);competition.state(message);
+    let shot=shots.get(message.id);
+    if(!shot||shot.attempt!==message.attempt){shot=new ShotStream(message.attempt);shots.set(message.id,shot);}
+    const chunk=shot.frame(message);if(chunk)broadcast(chunk,message.id);return;
+  }
   if(message.type==='state'){const now=performance.now();for(const c of connections.values())if(c.id===message.id)c.metrics.state(now,message.stationTime);competition.state(message);}
   if(message.type==='notice')competition.note(message);
   if(message.type==='impact')competition.impact(message);
   if(message.type==='waypoint-hit')competition.waypoint(message);
+  if(['impact','waypoint-hit'].includes(message.type)){
+    let shot=shots.get(message.id);
+    if(!shot||shot.attempt!==message.attempt){shot=new ShotStream(message.attempt);shots.set(message.id,shot);}
+    shot.events.push(message);return;
+  }
+  if(message.type==='notice'||(message.type==='state'&&['Aim','Charging'].includes(message.phase)))shots.delete(message.id);
   if(message.type==='ready'){workerFailure='';competition.ready(message).catch(error=>broadcast({type:'error',message:error.message}));}
   if(message.type==='result'){
     try{competition.result(message);}catch(error){competition.failed(message.id);broadcast({type:'error',message:`Result could not be saved: ${error instanceof Error?error.message:error}`},message.id);}return;
   }
   broadcast(message,['state','notice','impact','waypoint-hit'].includes(message.type)?message.id:undefined);
 });
-worker.on('failure',message=>{workerFailure=message;console.error(new Date().toISOString(),message);competition.failed();});
+worker.on('failure',message=>{shots.clear();workerFailure=message;console.error(new Date().toISOString(),message);competition.failed();});
 worker.on('status',message=>{
   if(message.status==='failed'){
     workerFailure=message.message;
@@ -94,7 +108,7 @@ worker.on('status',message=>{
   broadcast(message);
 });
 wss.on('connection',socket=>{
-  const id=randomUUID();const c:Connection={id,queue:new ConnectionQueue(handle),metrics:new ConnectionMetrics(id),lastClientReport:0,opened:performance.now(),tokens:180,updated:performance.now(),alive:true,lastWrite:0,lastReplay:0};connections.set(socket,c);
+  const id=randomUUID();const c:Connection={id,queue:new ConnectionQueue(handle),metrics:new ConnectionMetrics(id),budget:new RequestBudget(),lastClientReport:0,opened:performance.now(),alive:true,lastWrite:0,lastReplay:0};connections.set(socket,c);
   const authTimer=setTimeout(()=>{if(!c.guest){c.metrics.closeCause='join-timeout';socket.close(1008,'Join timed out');}},5000);
   socket.on('pong',()=>{c.alive=true;});
   socket.on('error',()=>{});
@@ -102,8 +116,8 @@ wss.on('connection',socket=>{
     let m;const text=raw.toString();try{m=JSON.parse(text);if(!m||typeof m.type!=='string')m=null;}
     catch{m=null;}
     c.metrics.message(m?.type||'unknown',Buffer.byteLength(text));
-    const now=performance.now();c.tokens=Math.min(180,c.tokens+(now-c.updated)*.09)-1;c.updated=now;
-    if(c.tokens<0){c.metrics.closeCause='request-rate';socket.close(1008,'Too many requests. Please reconnect.');return;}
+    const now=performance.now();
+    if(!c.budget.accept(!!c.guest&&m?.type==='input',Buffer.byteLength(text),now)){c.metrics.closeCause='request-rate';socket.close(1008,'Too many requests. Please reconnect.');return;}
     if(!m){send(socket,{type:'error',message:'Invalid message'});return;}
     if(c.guest&&m.type==='ping'){send(socket,{type:'pong',sequence:m.sequence,server:{eventLoopMaxMs,workerStateAgeMs:c.metrics.lastState?Math.round(now-c.metrics.lastState):0,pendingRequests:worker.requests.size}});return;}
     if(c.guest&&m.type==='client-performance'){
@@ -129,14 +143,18 @@ wss.on('connection',socket=>{
           for(const [old,connection]of connections)if(old!==socket&&connection.id===c.id){connection.replaced=true;connection.queue.close();old.close(4009,'Session resumed on a new connection');}
         }
         c.guest=guest;clearTimeout(authTimer);send(socket,{type:'welcome',...guest,sessionId:c.id,worker:worker.ready,resumed:!!resumed});
+        if(m.protocol!=='shot-stream-v1'){c.requiresReload=true;send(socket,{type:'worker-status',status:'failed',message:'The game has been updated. Reload this page to enable buffered shot playback.'});return;}
         send(socket,worker.lifecycle());send(socket,competition.catalog());
         if(resumed){
           competition.sync(resumed);competition.board(resumed);
-          if(resumed.snapshot)send(socket,resumed.snapshot);
+          const shot=shots.get(c.id);
+          if(shot){send(socket,shot.resume());for(const chunk of shot.chunks)send(socket,chunk);}
+          if(resumed.snapshot&&!resumed.attempt)send(socket,resumed.snapshot);
           if(resumed.snapshot?.phase==='Result'&&resumed.lastResult?.attempt!==m.lastResultAttempt&&resumed.lastResult)send(socket,resumed.lastResult);
         }else await competition.add(guest,c.id);
         return;
       }
+      if(c.requiresReload){send(socket,{type:'notice',message:'Reload this page to enable buffered shot playback.'});return;}
       const id=c.id;
       if(['name','save-challenge'].includes(m.type)){
         const time=performance.now();if(c.lastWrite&&time-c.lastWrite<1000)throw new Error('Please wait a moment before saving again');c.lastWrite=time;
@@ -162,10 +180,10 @@ wss.on('connection',socket=>{
   socket.on('close',code=>{
     clearTimeout(authTimer);c.queue.close();connections.delete(socket);
     if(c.guest&&!c.replaced){
-      if(c.intentional||stopping)competition.remove(c.id);
+      if(c.intentional||stopping){shots.delete(c.id);competition.remove(c.id);}
       else{
         competition.disconnect(c.id);
-        const timer=setTimeout(()=>{detached.delete(c.id);competition.remove(c.id);},30000);
+        const timer=setTimeout(()=>{detached.delete(c.id);shots.delete(c.id);competition.remove(c.id);},30000);
         timer.unref();detached.set(c.id,timer);
       }
     }
