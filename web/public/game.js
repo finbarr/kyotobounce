@@ -69,7 +69,7 @@ const performanceReport=clientPerformance();
 const updateShotDetails=shotDetails(()=>cancel());
 const connection=gameConnection({
   url:`${location.protocol==='https:'?'wss':'ws'}://${location.host}`,
-  hello:()=>({protocol:'shot-stream-v1',token:localStorage.getItem('kyoto-guest'),sessionId:guestId,lastResultAttempt}),
+  hello:()=>({protocol:'shot-stream-v2',token:localStorage.getItem('kyoto-guest'),sessionId:guestId,lastResultAttempt}),
   onStatus(status,extra){
     performanceReport.status(status,extra);
     if(status==='latency')return;connectionStatus=status;
