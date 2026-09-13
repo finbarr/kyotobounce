@@ -56,7 +56,7 @@ let heatPresentationKey='',heatPresentationTime=null;
 let station,robotAsset,motion,loaded=false,guestId='',identityId=localStorage.getItem('kyoto-guest-id')||'',snapshot=null,previous=null,received=0,workerReady=false;
 const history=[],ballRotations=new BallRotationBuffer();
 const shotPlayback=new ShotPlayback();
-let shotTimeline=null,fastForwardHeld=false,livePlaybackRate=1,replayRecenterPending=false;
+let shotTimeline=null,fastForwardHeld=false,livePlaybackRate=1;
 let renderClock=null;
 let spinExposure=1/60;
 let yaw=180,pitch=12,top=0,kick=0,azimuth=-Math.PI,elevation=.006,distance=3.8,manualCamera=false;
@@ -82,11 +82,15 @@ const flyControl=document.createElement('div');flyControl.id='fly-control';flyCo
 function setFly(active,capture=false){
  if(active&&(names?.active||briefing?.blocked||(!['editor','replay'].includes(ui?.state.mode)&&['Charging','Release','Flight'].includes(shotTimeline?.phase||snapshot?.phase)))){notice('Finish or recall your throw before scouting.');return;}
  if(active!==fly.active){cancel();if(active)fly.enter(camera);else fly.leave();keys.clear();if(ui?.state.mode!=='replay')send('input',{x:0,z:0,yaw,pitch,top,kick,fast:false});}
+ if(ui?.state.mode==='replay'){
+  $('replay-recenter').setAttribute('aria-pressed',String(!fly.active));$('replay-free').setAttribute('aria-pressed',String(fly.active));
+  $('replay-status').textContent=fly.active?'Free camera · WASD fly · Q/E height · Shift boost · Right-drag to look · F to follow':'Following the ball · Right-drag to orbit · Scroll to zoom · Hold Space for 2×';
+ }
  document.body.classList.toggle('is-flying',fly.active);$('toggle-fly').setAttribute('aria-pressed',String(fly.active));$('toggle-fly').textContent=fly.active?'F · RETURN TO ROBOT':'F · SCOUT COURSE';$('fly-help').hidden=!fly.active;
  if(active&&capture)captureMouse();canvas.focus();
 }
 $('toggle-fly').onclick=()=>setFly(!fly.active,true);
-function designerView(mode){if(mode!=='play')briefing?.dismiss();setFly(mode==='editor'||mode==='replay');replayRecenterPending=mode==='replay';if(mode==='design'){shotPlayback.clear(true);shotTimeline=null;returnRequested=true;flightPending=false;lastThrowAim=null;centerOnAim();}}
+function designerView(mode){if(mode!=='play')briefing?.dismiss();setFly(mode==='editor');if(mode==='play'){aimOrbit=null;ballCameraActive=false;robotResultCamera=false;flightManual=false;centerOnAim();}if(mode==='replay'){returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;manualCamera=false;aimOrbit=null;}if(mode==='design'){shotPlayback.clear(true);shotTimeline=null;returnRequested=true;flightPending=false;lastThrowAim=null;centerOnAim();}}
 function focusDesignTarget(target){setFly(true);fly.focus(target);canvas.focus();}
 
 const speedIndicator=document.createElement('button');speedIndicator.id='shot-speed';speedIndicator.hidden=true;speedIndicator.type='button';speedIndicator.setAttribute('aria-label','Fast forward shot');speedIndicator.setAttribute('aria-pressed','false');speedIndicator.innerHTML='<strong id="shot-speed-label">HOLD SPACE · 2×</strong><small id="shot-speed-help">OR CLICK TO FAST FORWARD</small>';document.body.append(speedIndicator);
@@ -273,10 +277,10 @@ window.addEventListener('keydown',e=>{
   if(briefing?.active){if(e.code==='Space'){e.preventDefault();if(!e.repeat)briefing.start();}if(e.code==='Escape'){e.preventDefault();briefing.start(false);}return;}
   if(briefing?.blocked)return;
   if(['INPUT','TEXTAREA','SELECT','BUTTON','SUMMARY'].includes(e.target.tagName))return;
-  if(e.code==='KeyF'&&!e.repeat&&ui.state.mode!=='replay'){e.preventDefault();setFly(!fly.active,true);return;}
+  if(e.code==='KeyF'&&!e.repeat){e.preventDefault();if(ui.state.mode==='replay'&&fly.active)$('replay-recenter').click();else setFly(!fly.active,ui.state.mode!=='replay');return;}
   if(ui.state.mode==='replay'&&e.code==='Space'){e.preventDefault();if(!e.repeat){sound.unlock();setFastForward(true);}return;}
   if(fly.active){if(['Space','KeyW','KeyA','KeyS','KeyD','KeyQ','KeyE','ControlLeft','ControlRight'].includes(e.code))e.preventDefault();if(e.code==='Escape'){cancel();return;}keys.add(e.code);return;}
-  if(ui.state.mode==='replay'){if(e.code==='Escape')$('close-replay').click();return;}
+  if(ui.state.mode==='replay'){if(e.code==='Escape'){cancel();return;}if(e.code.startsWith('Arrow')){e.preventDefault();keys.add(e.code);}return;}
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
   if(e.code==='Space'&&['play','design'].includes(ui.state.mode)&&shotTimeline?.phase==='Flight'){if(!e.repeat)setFastForward(true);return;}
   if(e.code==='Space'&&!e.repeat&&ui.advanceCompleted()){e.preventDefault();return;}
@@ -375,8 +379,9 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   centerOnAim();
   if(capture)captureMouse();else canvas.focus();
 }});
-ui=competitionUI({onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>briefing.open(c),sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){replayRecenterPending=true;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
-for(const id of ['replay-play','replay-recenter'])$(id).addEventListener('click',()=>canvas.focus());
+ui=competitionUI({onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>briefing.open(c),sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+$('replay-free').onclick=()=>setFly(true);
+for(const id of ['replay-play','replay-restart','replay-recenter','replay-free'])$(id).addEventListener('click',()=>canvas.focus());
 names=playerName({send,cancel,notice});
 if(sharedReplayId){document.body.classList.add('is-replay');$('connection').textContent='REPLAY VIEWER';$('edit-player-name').hidden=true;}
 const characterPicker=createCharacterPicker({onChange:id=>{characterChoice=id;for(const [owner,a]of avatars)if(owner===guestId||ui.state.mode==='replay')setAvatarCharacter(a,id);}});
@@ -405,14 +410,14 @@ function animate(now){
   if(heatKey!==heatPresentationKey||(heatPresentationTime!==null&&scorePresentation.time<heatPresentationTime-.0001)){trailCount=0;trailGeometry.setDrawRange(0,0);heatPresentationKey=heatKey;}heatPresentationTime=scorePresentation.time;
   const timeline=ui.timeline()||renderTimeline(now),snapshot=timeline.after,previous=timeline.before;
   const p=replaying?snapshot?.players[0]:snapshot?.players.find(p=>p.id===(snapshot?.owner||guestId)),phase=timeline.phase,alpha=timeline.alpha;
-  speedIndicator.hidden=(replaying?!ui.state.replayPlaying:phase!=='Flight')||briefing.blocked;
+  speedIndicator.hidden=(!replaying&&phase!=='Flight')||briefing.blocked;speedIndicator.disabled=replaying&&!ui.state.replayPlaying;
   speedIndicator.dataset.rate=String(presentationRate);speedIndicator.dataset.audioRate=String(sound.state.playbackRate);speedIndicator.dataset.musicBpm=String(sound.state.bpm);
   if(speedIndicator.dataset.active!==String(presentationRate===2)){speedIndicator.dataset.active=String(presentationRate===2);$('shot-speed-label').textContent=presentationRate===2?'⏩ 2× FAST FORWARD':'HOLD SPACE · 2×';$('shot-speed-help').textContent=presentationRate===2?'RELEASE SPACE / CLICK FOR NORMAL':'OR CLICK TO FAST FORWARD';speedIndicator.setAttribute('aria-pressed',String(presentationRate===2));}
   characterPicker.setDisabled(['Charging','Release','Flight'].includes(phase)||isAvatarCelebrating(avatars.get(guestId)));
   if(['Aim','Charging'].includes(phase))returnRequested=false;
   const inFlight=(phase==='Flight'||phase==='Result')&&!returnRequested;
   document.body.classList.toggle('is-ball-camera',inFlight&&!fly.active);
-  $('connection').textContent=sharedReplayId?'REPLAY VIEWER':workerReady?'Online · shared scores':workerStatus==='recovering'?'Restoring physics':workerStatus==='failed'?'Physics stopped':connectionStatus==='reconnecting'?'Reconnecting…':connectionStatus==='replaced'?'Session moved':'Physics starting';$('connection-dot').classList.toggle('ready',workerReady);
+  $('connection').textContent=replaying||sharedReplayId?'REPLAY VIEWER':workerReady?'Online · shared scores':workerStatus==='recovering'?'Restoring physics':workerStatus==='failed'?'Physics stopped':connectionStatus==='reconnecting'?'Reconnecting…':connectionStatus==='replaced'?'Session moved':'Physics starting';$('connection-dot').classList.toggle('ready',workerReady);
   ball.visible=!!snapshot;
   if(!snapshot){$('throw-panel').hidden=true;$('flight-panel').hidden=true;$('reticle').style.display='none';}
   if(snapshot){
@@ -517,15 +522,20 @@ function animate(now){
       const delta=Math.atan2(Math.sin(heading-azimuth),Math.cos(heading-azimuth));
       azimuth=approach(azimuth,azimuth+delta,1.2);
     }
-    if(velocity.length()>.75)elevation=approach(elevation,THREE.MathUtils.clamp(-Math.atan2(velocity.y,horizontal),-.95,.95),.8);
+    // A slow rolling replay needs a view above the floor, not the downward
+    // camera offset left over from its last upward bounce.
+    if(replaying&&Math.abs(velocity.y)<.2&&horizontal<3)elevation=approach(elevation,.16,.8);
+    else if(velocity.length()>.75)elevation=approach(elevation,THREE.MathUtils.clamp(-Math.atan2(velocity.y,horizontal),-.95,.95),.8);
   }
   camera=inFlight?ballCamera:aimCamera;
   const resultAvatar=avatars.get(replaying?p?.id:guestId),showRobotResult=inFlight&&phase==='Result'&&avatarWantsResultView(resultAvatar);
   if(showRobotResult&&!robotResultCamera){azimuth=resultAvatar.group.rotation.y+.25;elevation=.10;distance=3.4;cameraClearance=distance;manualCamera=false;}
   robotResultCamera=showRobotResult;
   document.body.classList.toggle('is-robot-result',showRobotResult);
-  const narrowResult=showRobotResult&&innerWidth<=900;
-  if(narrowResult&&!manualCamera)distance=4.3;
+  const replayViewport=replaying?ui.replayViewport():null;
+  const narrowResult=showRobotResult&&!replaying&&innerWidth<=900;
+  if(replayViewport&&!manualCamera&&(!inFlight||showRobotResult))distance=Math.max(3.8,innerHeight/replayViewport.height*2.4);
+  else if(narrowResult&&!manualCamera)distance=4.3;
   if(narrowResult)camera.setViewOffset(innerWidth,innerHeight,0,innerHeight*.18,innerWidth,innerHeight);
   else if(camera.view?.enabled)camera.clearViewOffset();
   if(showRobotResult)cameraTarget.copy(resultAvatar.group.position).add(new THREE.Vector3(0,1.05,0));
@@ -553,8 +563,10 @@ function animate(now){
   camera.lookAt(lookTarget);
   camera.updateMatrixWorld();
   briefing.update(camera,dt);
-  if(replayRecenterPending&&replaying){fly.enter(camera);replayRecenterPending=false;}
   if(fly.active){fly.move(keys,dt,{spaceAscends:!replaying});camera=fly.camera;}
+  // Keep the followed subject in the unobstructed scene, not behind the score rail.
+  if(replayViewport)camera.setViewOffset(innerWidth,innerHeight,innerWidth/2-replayViewport.x-replayViewport.width/2,innerHeight/2-replayViewport.y-replayViewport.height/2,innerWidth,innerHeight);
+  else if(fly.active&&camera.view?.enabled)camera.clearViewOffset();
   scoutTargets.update(camera,ui.state.mode==='editor'?ui.state.draft:ui.state.selected,fly.active&&!replaying);
   flyControl.hidden=briefing.blocked||replaying||['Charging','Release','Flight'].includes(phase);
   flyControl.dataset.speed=String(fly.speed);

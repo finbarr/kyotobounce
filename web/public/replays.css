@@ -21,9 +21,8 @@
 #result-leaderboard li.rank-ejected{position:absolute;left:0;right:0;z-index:1;pointer-events:none}
 .board-footnote{font-size:8px;line-height:1.5;color:#99a7c4;margin:12px 0 0}.is-results #competition,.is-results #shot-details{visibility:hidden}
 #share-result,#share-replay{border-color:#86e7d5;color:#b4ffec}#result-card .actions #share-result{flex-basis:100%;min-height:32px}
-.replay-share{margin:18px 0 12px;flex-direction:column}.replay-share a{color:#ffd260;text-decoration:none;font-size:12px;padding:10px 0}
-.is-replay #throw-panel,.is-replay #power-control,.is-replay #flight-panel,.is-replay #nickname,.is-replay #edit-player-name,.is-replay #shot-details{display:none!important}
-.is-replay #competition{visibility:visible;max-height:calc(100dvh - 170px)}.is-replay #replay-title{overflow-wrap:anywhere}
+
+
 #edit-player-name{max-width:130px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:9px}.session #nickname{display:none}
 #player-name-dialog,.share-link-dialog{color:#f8eed6;background:linear-gradient(140deg,#253555,#10182b);border:1px solid #a5b2cb;border-top:5px solid #ffd260;padding:30px;width:min(440px,calc(100vw - 32px));box-shadow:10px 10px 0 #050b1988}
 #player-name-dialog::backdrop,.share-link-dialog::backdrop{background:#061022b8;backdrop-filter:blur(6px)}
@@ -32,10 +31,10 @@
 #player-name-dialog input,.share-link-dialog input{box-sizing:border-box;display:block;width:100%;margin:10px 0;padding:14px;background:#0c152a;color:#fff5dd;border:1px solid #9ba8c6;font:18px ui-monospace,monospace;border-radius:0}
 #player-name-dialog button{width:100%;padding:15px;background:#ffd260;color:#151e32;font-weight:800;letter-spacing:1px}#player-name-dialog .name-status{min-height:18px;font-size:10px;color:#9fffe2}
 @media(max-height:740px) and (min-width:901px){#results-screen{top:95px;bottom:35px}#result-leaderboard{padding:10px}#result-leaderboard li{height:26px}#result-leaderboard [data-rank="1"],#result-leaderboard [data-rank="2"],#result-leaderboard [data-rank="3"]{height:33px}.board-heading{gap:6px;margin-bottom:8px}.board-heading>b{font-size:20px}#results-screen #result-card{padding:14px}#results-screen #result-breakdown{margin-bottom:6px}}
-@media(max-width:900px){#results-screen{inset:auto 14px 48px;display:block;max-height:54dvh;overflow:auto;scrollbar-width:thin;pointer-events:auto}#results-screen:not(:has(#result-card:not([hidden]))){pointer-events:none}#results-screen #result-card{width:100%;max-height:none;padding:14px}#results-screen #result-card h2{font-size:36px}#results-screen #result-card .result-rank{font-size:21px;margin:7px 0}#results-screen #result-math{display:none}#results-screen #result-breakdown{min-height:0;font-size:10px}#results-screen #result-tip{display:none}#result-leaderboard{margin-top:12px}#results-screen #result-card .actions{position:static}#edit-player-name{max-width:92px;font-size:8px;padding:7px}.is-replay #competition{top:auto;bottom:45px;left:14px;right:14px;width:auto;max-height:38dvh}.is-replay #competition h2{font-size:18px;margin:7px 0}.is-replay #replay-score{margin:8px 0}.is-replay .replay-share{flex-direction:row;align-items:center;margin:8px 0}.is-replay #replay-status{margin:4px 0}}
+@media(max-width:900px){#results-screen{inset:auto 14px 48px;display:block;max-height:54dvh;overflow:auto;scrollbar-width:thin;pointer-events:auto}#results-screen:not(:has(#result-card:not([hidden]))){pointer-events:none}#results-screen #result-card{width:100%;max-height:none;padding:14px}#results-screen #result-card h2{font-size:36px}#results-screen #result-card .result-rank{font-size:21px;margin:7px 0}#results-screen #result-math{display:none}#results-screen #result-breakdown{min-height:0;font-size:10px}#results-screen #result-tip{display:none}#result-leaderboard{margin-top:12px}#results-screen #result-card .actions{position:static}#edit-player-name{max-width:92px;font-size:8px;padding:7px}}
 @media(prefers-reduced-motion:reduce){#result-leaderboard li.new-rank{filter:none}}
 
-.is-replay footer>span{display:none}.is-replay footer::before{content:'WASD Fly · Q/E Height · SHIFT Boost · RIGHT DRAG Look · HOLD SPACE 2× · ESC Menus';font-size:9px}
+
 
 /* Keep one compact scoreboard in the upper-right throughout each level. */
 #result-leaderboard{position:fixed;z-index:9;top:106px;right:24px;width:260px;max-height:calc(100dvh - 182px);overflow:auto;padding:12px;scrollbar-width:thin;margin:0}
@@ -61,8 +60,8 @@ body:has(#result-leaderboard:not([hidden])) #shot-details{right:24px;bottom:43px
  .is-briefing .briefing-heading{right:248px}
  .is-briefing #result-leaderboard{top:175px;max-height:calc(100dvh - 390px)}
  .is-results #result-leaderboard{max-height:36dvh}
- .is-replay:has(#result-leaderboard:not([hidden])) #competition{left:14px;right:14px;width:auto}
- .is-replay #result-leaderboard{max-height:38dvh}
+
+
  #results-screen{max-height:40dvh}
 }
 @media(max-width:600px){
@@ -76,7 +75,7 @@ body:has(#result-leaderboard:not([hidden])) #shot-details{right:24px;bottom:43px
  body:has(#result-leaderboard:not([hidden])) #competition{left:8px;right:auto;top:100px;width:calc(100vw - 200px);padding:10px;max-height:calc(100dvh - 175px)}
  body:has(#result-leaderboard:not([hidden])) #competition h2{font-size:18px}
  body:has(#result-leaderboard:not([hidden])) #competition .panel-top{flex-wrap:wrap;gap:8px}
- .is-replay:has(#result-leaderboard:not([hidden])) #competition{top:auto;bottom:45px;width:auto;left:14px;right:14px;max-height:32dvh}
+
  .is-briefing .briefing-heading{right:20px}
  .is-briefing #result-leaderboard{top:175px;max-height:calc(100dvh - 445px);min-height:110px}
  .is-results #result-leaderboard{max-height:35dvh}
@@ -86,3 +85,90 @@ body:has(#result-leaderboard:not([hidden])) #shot-details{right:24px;bottom:43px
 #result-leaderboard>.board-heading,#result-leaderboard>.own-placement,#result-leaderboard>.board-footnote{flex-shrink:0}
 #result-leaderboard>ol{min-height:0;overflow:auto;scrollbar-width:thin;padding-bottom:2px}
 #result-leaderboard .share-level:hover,#result-leaderboard .share-level:focus-visible{color:#152634}
+
+/* Replay viewer: one score rail and one transport, with an open camera stage. */
+.is-replay #competition,.is-replay #results-screen,.is-replay #throw-panel,.is-replay #power-control,.is-replay #flight-panel,.is-replay #nickname,.is-replay #edit-player-name,.is-replay #shot-details,.is-replay footer,.is-replay #fly-control{display:none!important}
+#replay-view{position:fixed;inset:106px 24px 24px;z-index:9;display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:minmax(0,1fr) auto;gap:16px;pointer-events:none}
+#replay-view[hidden]{display:none}
+#replay-stage{grid-column:1;grid-row:1;position:relative;min-width:0;min-height:0}
+#replay-sidebar{grid-column:2;grid-row:1 / 3;min-height:0;display:flex;flex-direction:column;gap:12px}
+#replay-summary,#replay-transport{color:#f8eed6;background:linear-gradient(135deg,#17243bf5,#0e172afa);border:1px solid #aabbd344;box-shadow:4px 4px 0 #09102088;pointer-events:auto;padding:15px}
+#replay-summary{flex-shrink:0;border-top:3px solid #ffd260}
+#replay-summary .eyebrow{font-size:8px;letter-spacing:1.4px;color:#a8c6cc}
+#replay-title{font:900 27px/1.05 Impact,'Arial Narrow',sans-serif;letter-spacing:.5px;margin:10px 0;overflow-wrap:anywhere}
+#replay-score{font:10px/1.5 ui-monospace,monospace;color:#cfdbeb;margin:0 0 14px;overflow-wrap:anywhere}
+#play-replay-level{display:block;background:#ffd260;border:1px solid #ffeab1;color:#172035;text-decoration:none;font:900 22px/1 Impact,'Arial Narrow',sans-serif;padding:15px 12px;box-shadow:0 3px 0 #997035;letter-spacing:.4px}
+#play-replay-level>span{float:right}#play-replay-level small{display:block;margin-top:8px;font:9px/1.35 ui-monospace,monospace;letter-spacing:0}
+#play-replay-level:hover{background:#fff0bd}#play-replay-level:focus-visible{outline:3px solid #fff;outline-offset:4px}
+#close-replay{margin-top:12px;font-size:9px;color:#a9dfdc;border:0;padding:0;background:none}
+#replay-metrics{min-height:0;display:flex;flex-direction:column;gap:12px;overflow:hidden;scrollbar-width:thin;pointer-events:auto;padding-bottom:4px}
+#replay-view #combo-hud,#replay-view #result-leaderboard{position:relative;inset:auto;transform:none;grid-column:auto;grid-row:auto;align-self:stretch;width:100%;max-width:none;max-height:none;margin:0;padding:12px;box-shadow:none;flex-shrink:0}
+#replay-view #combo-hud{pointer-events:auto;max-height:calc(100% - 125px);overflow:auto;scrollbar-width:thin}#replay-view #result-leaderboard{flex:0 1 auto;min-height:0;max-height:100%}#replay-view #combo-total{font-size:42px;margin:10px 0 7px}#replay-view #combo-factors{flex-wrap:wrap;gap:5px;font-size:8px}
+#replay-view .combo-heading{display:flex;font-size:7px}#replay-view .special-label{margin-top:9px}#replay-view #combo-motion{font-size:8px}
+#replay-view #combo-trick:empty{display:none}#replay-view #combo-trick{height:auto;min-height:0;line-height:1.4;font-size:9px}
+#replay-view #result-leaderboard .board-course,#replay-view #result-leaderboard .share-level{display:none}
+#replay-view #result-leaderboard .board-heading{margin-bottom:9px}#replay-view #result-leaderboard .eyebrow{font-size:8px}
+#replay-view #result-leaderboard .board-footnote{font-size:8px;margin-top:9px}
+#replay-transport{grid-column:1;grid-row:2;min-width:0;padding:12px 15px}
+.replay-timeline{display:flex;align-items:center;gap:10px;min-width:0}
+#replay-play{min-width:62px;color:#19263c;background:#ffd260;border-color:#ffd260;font-weight:bold}
+#replay-restart{font-size:19px;line-height:1;padding:7px 9px}
+#replay-scrub{flex:1;min-width:35px;width:auto;margin:0;accent-color:#ffd260;cursor:pointer}
+#replay-time{font:10px ui-monospace,monospace;white-space:nowrap;color:#e1e7f0;font-variant-numeric:tabular-nums}
+.replay-tools{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px}
+.replay-camera{display:flex;gap:0}.replay-camera button{border-color:#68899266;color:#bed4e2;padding:8px;font-size:9px}
+.replay-camera button[aria-pressed=true]{background:#8eead8;color:#152b38;border-color:#8eead8}
+#replay-speed-slot{margin-left:auto}
+#replay-view #shot-speed{position:static;inset:auto;transform:none;min-height:31px;width:auto;padding:7px 10px;margin:0;box-shadow:none;display:block;border-radius:0;letter-spacing:0;white-space:nowrap}
+#replay-view #shot-speed strong,#replay-view #shot-speed[data-active=true] strong{font-size:9px}#replay-view #shot-speed small{display:none}
+#replay-view button:disabled{opacity:.4;cursor:default}
+#replay-view #share-replay{font-size:9px;padding:8px}
+#replay-status{font:9px/1.5 ui-monospace,monospace;color:#a9bacf;margin:10px 0 0;min-height:14px}
+#replay-view #combo-spectacle{position:absolute;inset:0;overflow:hidden}
+#replay-view #combo-confetti{width:100%;height:100%}
+#replay-view #combo-burst{right:4%;top:15%;width:55%}#replay-view #combo-line{bottom:12%;font-size:clamp(11px,1.5vw,23px)}
+#replay-view #waypoint-clear{max-width:80%;top:14%}
+.is-replay #notice{top:93px;left:35%;max-width:55vw}
+@media(max-width:1100px){
+ #replay-view{grid-template-columns:minmax(0,1fr) 260px;gap:12px;inset:98px 16px 16px}
+ #replay-title{font-size:24px}#replay-summary{padding:12px}#play-replay-level{font-size:20px}
+ .replay-tools{gap:6px}#replay-speed-slot{margin-left:0}
+}
+@media(max-width:760px) and (min-height:561px){
+ #replay-view{inset:94px 10px max(10px,env(safe-area-inset-bottom));grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) 155px auto;gap:10px}
+ #replay-sidebar{display:contents}
+ #replay-summary{grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(145px,.9fr);align-items:center;column-gap:12px;padding:10px}
+ #replay-title{font-size:21px;margin:6px 0}#replay-score{font-size:8px;line-height:1.5;margin:0}#replay-summary .eyebrow{font-size:6px;letter-spacing:.7px}
+ #play-replay-level{font:900 17px/1.1 Impact,'Arial Narrow',sans-serif;padding:12px 9px}#play-replay-level small{font-size:8px;margin-top:6px;max-width:100px}
+ #close-replay{grid-column:1 / -1;justify-self:start;margin-top:8px}
+ #replay-stage{grid-column:1;grid-row:2}
+ #replay-metrics{grid-column:1;grid-row:3;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;overflow:hidden;padding:0}
+ #replay-view #combo-hud,#replay-view #result-leaderboard{height:100%;min-height:0;max-height:100%;padding:9px;overflow:auto}
+ #replay-view #result-leaderboard{overflow:hidden}#replay-view .board-footnote{display:none}
+ #replay-view #combo-total{font-size:31px;margin:7px 0}#replay-view .combo-heading b{display:none}#replay-view #combo-motion{line-height:1.6;font-size:7px}
+ #replay-view .special-label{font-size:6px;margin-top:6px}#replay-view .combo-landing{font-size:7px;gap:5px;flex-wrap:wrap}#replay-view #combo-factors{font-size:7px}
+ #replay-transport{grid-column:1;grid-row:4;padding:10px}
+ .replay-timeline{gap:7px}#replay-time{font-size:9px}#replay-play{min-width:50px;padding:8px}#replay-restart{padding:6px}
+ .replay-tools{gap:6px}.replay-camera button{font-size:8px;padding:8px 6px}#replay-view #share-replay{font-size:8px;padding:7px;flex:1}#replay-view #shot-speed{padding:7px 6px}#replay-view #shot-speed strong{font-size:8px}
+ #replay-status{font-size:8px;margin-top:7px;line-height:1.5}
+ .is-replay #notice{top:83px;left:50%;max-width:90vw}
+}
+@media(max-height:560px){
+ .is-replay header{padding:10px 16px}.is-replay .seal{padding:5px;font-size:19px}.is-replay header p{display:none}.is-replay h1{font-size:20px}
+ #replay-view{inset:68px 10px 10px;grid-template-columns:minmax(0,1fr) 220px;gap:10px}
+ #replay-summary{padding:9px}#replay-title{font-size:21px;margin:5px 0}#replay-score{font-size:8px;margin-bottom:8px}#play-replay-level{font-size:17px;padding:9px}#play-replay-level small{font-size:7px;margin-top:4px}
+ #replay-sidebar,#replay-metrics{gap:8px}#replay-transport{padding:9px}
+ #replay-view #combo-hud{padding:8px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:5px;max-height:78px}
+ #replay-view #combo-total{font-size:28px;line-height:1;margin:0;grid-column:1;grid-row:1}
+ #replay-view #combo-factors{grid-column:2;grid-row:1;font-size:7px;gap:3px}#replay-view #waypoint-card{grid-column:1 / -1}
+ #replay-view #combo-hud .combo-heading,#replay-view #combo-hud .special-label,#replay-view #special-track,#replay-view .combo-landing,#replay-view #combo-motion,#replay-view #combo-trick,#replay-view .board-footnote{display:none}
+ #replay-status{font-size:8px;margin-top:6px}#replay-time{font-size:9px}.is-replay #notice{top:62px}
+}
+
+@media(max-width:760px) and (min-height:561px) and (max-height:700px){
+ .is-replay header{padding:9px 12px}.is-replay header p{display:none}.is-replay .seal{font-size:19px;padding:5px}
+ #replay-view{top:78px;grid-template-rows:auto minmax(0,1fr) 110px auto;gap:8px}
+ #replay-summary{padding:8px;column-gap:8px}#replay-title{font-size:19px}#play-replay-level{padding:9px;font-size:16px}#play-replay-level small{margin-top:5px}
+ #replay-view .board-heading{margin-bottom:6px}#replay-view .special-label,#replay-view #special-track{display:none}
+ #replay-view #combo-total{margin:4px 0;font-size:28px}#replay-transport{padding:8px}
+}

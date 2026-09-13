@@ -83,7 +83,7 @@ export function arcadeFeedback(sound){
    const now=performance.now(),elapsed=Math.max(0,(now-lastUpdate)/1000)*rate;lastUpdate=now;
    for(const animation of [...animations,...clearAnimations,...$('combo-total').getAnimations()])if(animation.playbackRate!==rate)animation.updatePlaybackRate(rate);
    const visible=['play','replay'].includes(mode)&&!!current;
-   hud.hidden=!visible||phase!=='Flight';cooldown=Math.max(0,cooldown-elapsed);burstTime=Math.max(0,burstTime-elapsed);clearTime=Math.max(0,clearTime-elapsed);
+   hud.hidden=!visible||!(phase==='Flight'||mode==='replay'&&phase==='Result');cooldown=Math.max(0,cooldown-elapsed);burstTime=Math.max(0,burstTime-elapsed);clearTime=Math.max(0,clearTime-elapsed);
    if(clearPending&&visible&&['Flight','Result'].includes(phase)&&rate>0)clearWaypoints();
    if(clearTime&&visible&&!reduced())while(clearVolley<3&&3.2-clearTime>=clearVolley*.28){particles.burst(6,true);clearVolley++;}
    clearBanner.hidden=!visible||!clearTime;
@@ -93,8 +93,8 @@ export function arcadeFeedback(sound){
    $('combo-burst').hidden=!burstTime;$('combo-line').hidden=phase!=='Flight'||!burstTime;
    if(!burstTime&&animations.length)cancelAnimations();
    if(!current)return;
-   const waypoint=current.version==='waypoint-v3',allClear=allWaypointsCollected(current,currentCourse),value=waypoint?current.total:current.potential,tier=allClear?6:heatTier(current),next=HEAT_STAGES[tier+1];
-   display=reduced()?value:display+(value-display)*(1-Math.exp(-dt*18));$('combo-total').textContent=format(display);
+   const waypoint=current.version==='waypoint-v3',allClear=allWaypointsCollected(current,currentCourse),value=waypoint||phase==='Result'?current.total:current.potential,tier=allClear?6:heatTier(current),next=HEAT_STAGES[tier+1];
+   display=reduced()||rate===0?value:display+(value-display)*(1-Math.exp(-dt*18));$('combo-total').textContent=format(display);
    hud.style.setProperty('--combo-tint','#'+HEAT_STAGES[tier].color.toString(16).padStart(6,'0'));hud.dataset.tier=tier;
    $('special-name').textContent=tier?HEAT_STAGES[tier].name:'SPECIAL';$('special-next').textContent=next?`${format(next.at)} PTS`:'MAXIMUM OVERDRIVE';
    const progress=next?Math.max(0,Math.min(1,((current.total||0)-HEAT_STAGES[tier].at)/(next.at-HEAT_STAGES[tier].at))):1;
@@ -102,9 +102,9 @@ export function arcadeFeedback(sound){
    $('combo-banks').textContent=`×${current.comboMultiplier.toLocaleString(undefined,{maximumFractionDigits:2})} COMBO`;
    $('combo-targets').textContent=`×${format(current.waypointMultiplier||1)} ${waypoint?'TARGETS':'BASE'} + ${current.bankBonus.toFixed(2)}× BANKS${allClear?' · 100%':''}`;
    $('combo-accuracy').textContent=waypoint?(tagged?'DESTINATION BONUS':!currentCourse?.goal?'NO DESTINATION':currentCourse?.waypoints?.length?'DESTINATION OPTIONAL':'LAND IN THE DESTINATION'):`${Math.round((current.landingMultiplier||0)*100)}% LANDING`;
-   $('combo-motion').textContent=`+${format(current.movementPoints||0)} MOVEMENT · 100 PTS / SEC${waypoint&&!allClear?' · COMPLETE THE ROUTE TO BANK':current.total>0?'':' · HIT A TARGET TO BANK'}`;
-   $('combo-cash').textContent=`${format(current.total)} ${waypoint?(phase==='Result'?'PTS BANKED':'PTS IN PLAY'):'PTS IF IT STOPS HERE'}`;
-   $('combo-status').textContent=allClear?'100% · ALL WAYPOINTS':tagged?'LAND THE FINISH':waypointCount?'KEEP COLLECTING':bankCount>=3?'KEEP LINKING':'FIND YOUR LINE';
+   $('combo-motion').textContent=`+${format(current.movementPoints||0)} MOVEMENT · 100 PTS / SEC`;
+   $('combo-cash').textContent=`${format(current.total)} ${phase==='Result'?'PTS BANKED':waypoint?'PTS IN PLAY':'PTS IF IT STOPS HERE'}`;
+   $('combo-status').textContent=phase==='Result'?'SHOT COMPLETE':allClear?'100% · ALL WAYPOINTS':tagged?'LAND THE FINISH':waypointCount?'KEEP COLLECTING':bankCount>=3?'KEEP LINKING':'FIND YOUR LINE';
    hud.classList.toggle('on-target',!!tagged);flash=Math.max(0,flash-elapsed);trickTime=Math.max(0,trickTime-elapsed);if(!flash)hud.dataset.cue='';$('combo-trick').style.opacity=trickTime?1:0;
    // DOM diagnostics make cue/particle behavior inspectable without private state.
    hud.dataset.events=String(bankCount+waypointCount);hud.dataset.particles=String(particles.active);
