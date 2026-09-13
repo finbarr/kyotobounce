@@ -36,3 +36,53 @@
 @media(prefers-reduced-motion:reduce){#result-leaderboard li.new-rank{filter:none}}
 
 .is-replay footer>span{display:none}.is-replay footer::before{content:'WASD Fly · Q/E Height · SHIFT Boost · RIGHT DRAG Look · HOLD SPACE 2× · ESC Menus';font-size:9px}
+
+/* Keep one compact scoreboard in the upper-right throughout each level. */
+#result-leaderboard{position:fixed;z-index:9;top:106px;right:24px;width:260px;max-height:calc(100dvh - 182px);overflow:auto;padding:12px;scrollbar-width:thin;margin:0}
+#result-leaderboard .board-heading{gap:7px;margin-bottom:10px}
+#result-leaderboard .board-course{font:800 15px/1.15 system-ui;color:#f8eed6;min-height:0;overflow-wrap:anywhere;letter-spacing:0}
+#result-leaderboard #ranking-announcement{font-size:19px;min-height:0}
+#result-leaderboard .share-level{justify-self:start;font-size:9px;padding:5px 7px;color:#acfff0;border-color:#86e7d555}
+#result-leaderboard li{height:27px}
+#result-leaderboard [data-rank="1"],#result-leaderboard [data-rank="2"],#result-leaderboard [data-rank="3"]{height:33px}
+#result-leaderboard li.own-score>button{background:linear-gradient(105deg,#174d52,#203d58);color:#dbfff8;border-color:#81ead3;outline:0;box-shadow:inset 3px 0 #81ead3}
+#result-leaderboard li.own-score .rank-place{color:#b7ffe7}
+#result-leaderboard li.own-score[data-rank="1"] .rank-place{color:#ffd260}
+#result-leaderboard li.own-score[data-rank="2"] .rank-place{color:#d6e7f2}
+#result-leaderboard li.own-score[data-rank="3"] .rank-place{color:#e8b398}
+.board-empty{color:#a7b7cc;font:10px/1.7 ui-monospace,monospace}
+body:has(#result-leaderboard:not([hidden])) #competition{right:302px;width:270px}
+body:has(#result-leaderboard:not([hidden])) #shot-details{right:24px;bottom:43px}
+.is-briefing .briefing-heading{right:305px}
+.is-briefing #result-leaderboard{top:155px;max-height:calc(100dvh - 405px)}
+@media(max-width:900px){
+ #result-leaderboard{right:14px;width:220px;top:100px;max-height:calc(100dvh - 180px);padding:9px}
+ body:has(#result-leaderboard:not([hidden])) #competition{right:248px;width:240px}
+ .is-briefing .briefing-heading{right:248px}
+ .is-briefing #result-leaderboard{top:175px;max-height:calc(100dvh - 390px)}
+ .is-results #result-leaderboard{max-height:36dvh}
+ .is-replay:has(#result-leaderboard:not([hidden])) #competition{left:14px;right:14px;width:auto}
+ .is-replay #result-leaderboard{max-height:38dvh}
+ #results-screen{max-height:40dvh}
+}
+@media(max-width:600px){
+ #result-leaderboard{right:8px;top:100px;width:176px;padding:8px;max-height:43dvh}
+ #result-leaderboard .eyebrow{font-size:7px;letter-spacing:.7px}
+ #result-leaderboard .board-course{font-size:12px}
+ #result-leaderboard li>button{grid-template-columns:25px minmax(0,1fr) auto;gap:4px;padding:4px;font-size:8px}
+ #result-leaderboard strong,#result-leaderboard [data-rank="1"] strong{font-size:9px}
+ #result-leaderboard .own-score .rank-name::after{content:''}
+ #result-leaderboard .board-footnote{font-size:7px}
+ body:has(#result-leaderboard:not([hidden])) #competition{left:8px;right:auto;top:100px;width:calc(100vw - 200px);padding:10px;max-height:calc(100dvh - 175px)}
+ body:has(#result-leaderboard:not([hidden])) #competition h2{font-size:18px}
+ body:has(#result-leaderboard:not([hidden])) #competition .panel-top{flex-wrap:wrap;gap:8px}
+ .is-replay:has(#result-leaderboard:not([hidden])) #competition{top:auto;bottom:45px;width:auto;left:14px;right:14px;max-height:32dvh}
+ .is-briefing .briefing-heading{right:20px}
+ .is-briefing #result-leaderboard{top:175px;max-height:calc(100dvh - 445px);min-height:110px}
+ .is-results #result-leaderboard{max-height:35dvh}
+}
+/* Small screens scroll the top ten while keeping your placement visible. */
+#result-leaderboard{display:flex;flex-direction:column;overflow:hidden}
+#result-leaderboard>.board-heading,#result-leaderboard>.own-placement,#result-leaderboard>.board-footnote{flex-shrink:0}
+#result-leaderboard>ol{min-height:0;overflow:auto;scrollbar-width:thin;padding-bottom:2px}
+#result-leaderboard .share-level:hover,#result-leaderboard .share-level:focus-visible{color:#152634}

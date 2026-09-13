@@ -5,6 +5,7 @@ import { stat, mkdir, readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { Store } from './store.ts';
 import {serveReplay} from './replay-http.ts';
+import {serveLevel} from './level-http.ts';
 import { Competition } from './competition.ts';
 import type { Guest } from './types.ts';
 import { WebSocketServer, WebSocket } from 'ws';
@@ -58,6 +59,7 @@ const server = createServer(async (request,response) => {
       response.end(JSON.stringify({capturedAt:new Date().toISOString(),worker:worker.status,sessions:[...competition.members.values()].map(m=>({id:m.id,snapshotAgeMs:m.snapshotAt===undefined?null:Date.now()-m.snapshotAt,snapshot:m.snapshot}))}));return;
     }
     if(await serveReplay(request,response,url.pathname,store,replayShell))return;
+    if(serveLevel(request,response,url.pathname,store,replayShell))return;
     let base=root, relative=decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
     for (const [prefix,path] of vendors) if (url.pathname.startsWith(prefix!)) {base=path!;relative=decodeURIComponent(url.pathname.slice(prefix!.length));break;}
     const path=resolve(base,relative);

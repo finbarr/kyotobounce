@@ -1,3 +1,4 @@
+import {levelIdFromPath} from './level-links.js';
 import {freezeStaticTransforms} from './static-transforms.js';
 import {FlyCamera,flyTargets} from './fly-camera.js';
 import {CameraObstacles,easeCameraClearance} from './camera-obstacles.js';
@@ -52,7 +53,7 @@ const trailPositions=new Float32Array(180*3),trailGeometry=new THREE.BufferGeome
 const trail=new THREE.Line(trailGeometry,new THREE.LineBasicMaterial({color:0xf49368,transparent:true,opacity:.35,depthWrite:false}));trail.frustumCulled=false;scene.add(trail);let trailCount=0;
 const heat=ballHeat({scene,ball,trail}),blur=speedBlur(renderer);
 let heatPresentationKey='',heatPresentationTime=null;
-let station,robotAsset,motion,loaded=false,guestId='',identityId='',snapshot=null,previous=null,received=0,workerReady=false;
+let station,robotAsset,motion,loaded=false,guestId='',identityId=localStorage.getItem('kyoto-guest-id')||'',snapshot=null,previous=null,received=0,workerReady=false;
 const history=[],ballRotations=new BallRotationBuffer();
 const shotPlayback=new ShotPlayback();
 let shotTimeline=null,fastForwardHeld=false,livePlaybackRate=1,replayRecenterPending=false;
@@ -74,7 +75,7 @@ let stationLook,robotShadow,ballShadow;
 let cameraClearance=3.8,cameraObstacles;
 function notice(text,duration=4500){$('notice').textContent=text;$('notice').classList.remove('quiet');noticeUntil=performance.now()+duration;}
 function send(type,extra={}){return connection?.send(type,extra);}
-const sharedReplayId=replayIdFromPath(location.pathname);let requestedLevel=new URLSearchParams(location.search).get('level');
+const sharedReplayId=replayIdFromPath(location.pathname);let requestedLevel=levelIdFromPath(location.pathname)||new URLSearchParams(location.search).get('level');
 let ui,briefing,names;
 const sound=arcadeAudio();
 const flyControl=document.createElement('div');flyControl.id='fly-control';flyControl.innerHTML='<button id="toggle-fly" aria-pressed="false">F · SCOUT COURSE</button><span id="fly-help" hidden>WASD · FLY / MOUSE · LOOK / E Q · UP DOWN / SHIFT · BOOST / F · RETURN</span>';document.body.append(flyControl);
@@ -85,7 +86,7 @@ function setFly(active,capture=false){
  if(active&&capture)captureMouse();canvas.focus();
 }
 $('toggle-fly').onclick=()=>setFly(!fly.active,true);
-function designerView(mode){setFly(mode==='editor'||mode==='replay');replayRecenterPending=mode==='replay';if(mode==='design'){shotPlayback.clear(true);shotTimeline=null;returnRequested=true;flightPending=false;lastThrowAim=null;centerOnAim();}}
+function designerView(mode){if(mode!=='play')briefing?.dismiss();setFly(mode==='editor'||mode==='replay');replayRecenterPending=mode==='replay';if(mode==='design'){shotPlayback.clear(true);shotTimeline=null;returnRequested=true;flightPending=false;lastThrowAim=null;centerOnAim();}}
 function focusDesignTarget(target){setFly(true);fly.focus(target);canvas.focus();}
 
 const speedIndicator=document.createElement('button');speedIndicator.id='shot-speed';speedIndicator.hidden=true;speedIndicator.type='button';speedIndicator.setAttribute('aria-label','Fast forward shot');speedIndicator.setAttribute('aria-pressed','false');speedIndicator.innerHTML='<strong id="shot-speed-label">HOLD SPACE · 2×</strong><small id="shot-speed-help">OR CLICK TO FAST FORWARD</small>';document.body.append(speedIndicator);
@@ -141,7 +142,7 @@ function handleMessage(m,playback=false){
   if(m.type==='selected'||m.type==='replay')pendingRobotResult=null;
   if(m.type==='session'){if(requestedLevel&&!m.restoring){const level=requestedLevel;requestedLevel=null;send('select-challenge',{challengeId:level});}const level=`${m.challenge?.id||''}:${m.challenge?.revision||''}`;if(level!==powerLevel){powerLevel=level;setPowerRange(m.challenge?.hint?.powerRange||'full',true);}}
   if(m.type==='welcome'){
-    const returning=!!guestId;guestId=m.sessionId;identityId=m.id;localStorage.setItem('kyoto-guest',m.token);$('nickname').value=m.name;
+    const returning=!!guestId;guestId=m.sessionId;identityId=m.id;localStorage.setItem('kyoto-guest-id',m.id);localStorage.setItem('kyoto-guest',m.token);$('nickname').value=m.name;
     // Input stays disabled until a fresh authoritative state arrives.
     workerReady=false;
     if(returning){

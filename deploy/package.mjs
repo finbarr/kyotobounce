@@ -13,7 +13,7 @@ for(const name of ['atrium.glb','atrium-detail.glb','ori.glb','optimization.json
 }
 await mkdir(output,{recursive:true});
 // Explicit runtime allowlist: no local database, guest tokens, logs, tests, or editor project.
-const files=['package.json','package-lock.json','web/public','web/server.ts','web/connection-queue.ts','web/performance.ts','web/shot-stream.ts','web/store.ts','web/replay-cache.ts','web/replay-http.ts','web/competition.ts','web/types.ts','web/scoring.ts','web/worker.ts','web/starter-challenges.json','Builds/PhysicsWorkerLinux','deploy'];
+const files=['package.json','package-lock.json','web/public','web/server.ts','web/connection-queue.ts','web/performance.ts','web/shot-stream.ts','web/store.ts','web/replay-cache.ts','web/replay-http.ts','web/level-http.ts','web/competition.ts','web/types.ts','web/scoring.ts','web/worker.ts','web/starter-challenges.json','Builds/PhysicsWorkerLinux','deploy'];
 const authoringGLBs=new Set(['atrium.glb','atrium-detail.glb','ori.glb'].map(name=>resolve('web/public/assets',name)));
 for(const name of files)await cp(name,join(output,name),{recursive:true,filter:path=>!authoringGLBs.has(resolve(path).replace(/\.(br|gz)$/,''))&&!path.includes('web/public/assets/layouts')&&!path.split('/').some(part=>part.endsWith('_DoNotShip'))});
 await mkdir(join(output,'runtime'),{recursive:true});

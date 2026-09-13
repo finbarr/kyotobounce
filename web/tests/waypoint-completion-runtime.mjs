@@ -13,11 +13,22 @@ try{
  await client.request('select-challenge',{challengeId:challenge.id,revision:challenge.revision},'selected');
  const partial=await client.throw(source.hint.holdMs,source.hint);
  assert.equal(partial.result.breakdown.waypointCount,2);assert.equal(partial.result.destinationReached,true,'The missed waypoint cannot be bypassed by landing in the destination');
- assert.equal(partial.result.success,false);assert.equal(partial.result.saved,false);assert.equal(partial.result.score,0);assert.equal(partial.result.breakdown.outcome,'incomplete');
+ assert.equal(partial.result.success,false);assert.equal(partial.result.saved,true);assert.ok(partial.result.score>0);assert.equal(partial.result.breakdown.outcome,'perfect');
  assert.ok(partial.result.breakdown.potential>0);assert.equal(partial.state.diagnostics.sleeping,true);
  assert.ok(client.messages.some(m=>m.type==='state'&&m.liveScore?.waypointCount===2&&m.liveScore.total>0),'Partial points accumulate during flight');
- assert.equal(partial.result.standings.rank,null);assert.deepEqual(partial.result.standings.after,[]);
- await assert.rejects(client.request('replay',{attempt:partial.result.attempt},'replay'),/not found/i);
+ assert.equal(partial.result.standings.rank,1);assert.equal(partial.result.standings.after[0].attempt,partial.result.attempt);
+ assert.equal((await client.request('replay',{attempt:partial.result.attempt},'replay')).replay.score,partial.result.score);
+ const shared=await fetch(`${origin}/api/level/${challenge.id}`);assert.equal(shared.status,200);const publicLevel=await shared.json();assert.equal(publicLevel.challenge.id,challenge.id);assert.equal(publicLevel.entries[0].attempt,partial.result.attempt);
+ const page=await fetch(`${origin}/level/${challenge.id}`);assert.equal(page.status,200);assert.match(await page.text(),/Full route qualification check — Kyoto Bounce/);
+ await delay(1100);
+ const zeroDraft={...draft,editId:challenge.id,waypoints:[{...extra,id:'missing-target'}],goal:null};
+ const zeroSaved=await client.request('save-challenge',zeroDraft,'saved-challenge');
+ await client.request('select-challenge',{challengeId:challenge.id},'selected');
+ const zero=await client.throw(source.hint.holdMs,source.hint);
+ assert.equal(zero.result.breakdown.waypointCount,0);assert.equal(zero.result.success,false);assert.equal(zero.result.saved,true);assert.ok(zero.result.score>=10000);assert.equal(zero.result.standings.rank,1);assert.equal(zero.state.diagnostics.sleeping,true);
+ const zeroReplay=(await client.request('replay',{attempt:zero.result.attempt},'replay')).replay;assert.deepEqual(zeroReplay.breakdown,zero.result.breakdown);
+ const latest=await (await fetch(`${origin}/api/level/${challenge.id}`)).json();assert.equal(latest.challenge.revision,zeroSaved.challenge.revision,'Stable URL resolves the latest saved level');
+ const personal=await client.request('leaderboard',{challengeId:challenge.id},'leaderboard');assert.equal(personal.personal.guest,client.messages.find(m=>m.type==='welcome').id);assert.equal(personal.personal.rank,1);
  await delay(1100);
  const completeDraft={...draft,editId:challenge.id,waypoints:source.waypoints,goal:null};
  const updated=await client.request('save-challenge',completeDraft,'saved-challenge');
@@ -26,6 +37,6 @@ try{
  assert.equal(complete.result.breakdown.waypointCount,2);assert.equal(complete.result.destinationReached,false);
  assert.equal(complete.result.success,true);assert.equal(complete.result.saved,true);assert.ok(complete.result.score>0);assert.equal(complete.result.standings.rank,1);
  const replay=(await client.request('replay',{attempt:complete.result.attempt},'replay')).replay;assert.deepEqual(replay.breakdown,complete.result.breakdown);
- await mkdir('.local',{recursive:true});await writeFile('.local/waypoint-completion-runtime.json',JSON.stringify({partial:partial.result,complete:complete.result},null,2));
- console.log('PASS native partial route plus destination stays unranked; full waypoint route without destination passes, ranks and shares');
+ await mkdir('.local',{recursive:true});await writeFile('.local/waypoint-completion-runtime.json',JSON.stringify({partial:partial.result,zero:zero.result,complete:complete.result},null,2));
+ console.log('PASS native partial and zero-waypoint shots rank/share at rest; only complete routes pass; stable public level URLs and personal standings');
 }finally{client.close();}

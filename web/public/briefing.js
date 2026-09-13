@@ -21,9 +21,9 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
   $('map-goal').hidden=!c.goal;$('map-goal-name').textContent=c.scoring==='waypoint-v3'&&c.waypoints?.length?'OPTIONAL BONUS':'LAND HERE';$('map-goal-radius').textContent=c.goal?`${c.goal.radius.toFixed(2)} m ${c.scoring==='waypoint-v3'?'bonus':'target'} radius`:'';
   const end=c.goal||[...(c.waypoints||[])].sort((a,b)=>v(b.center).distanceTo(v(c.start.center))-v(a.center).distanceTo(v(c.start.center)))[0]||c.start,length=v(c.start.center).distanceTo(v(end.center)),rise=end.center.y-c.start.center.y;
   $('briefing-distance').textContent=(c.campaign?`${c.campaign.distance} m SUGGESTED ROUTE / `:'')+`${length.toFixed(1)} m TO ${c.goal?'DESTINATION':'FARTHEST WAYPOINT'}${Math.abs(rise)>.1?` / ${rise>0?'+':''}${rise.toFixed(1)} m ELEVATION`:''}`;
-  $('briefing-rule').textContent=c.requiredSurface?'SPECIAL ROUTE · Touch the moving escalator before scoring.':'ONE BALL. FIND YOUR ANGLE.';
+  $('briefing-rule').textContent=c.requiredSurface?'SPECIAL ROUTE · Touch the moving escalator to clear the course.':'ONE BALL. FIND YOUR ANGLE.';
   const waypoint=c.scoring==='waypoint-v3';host.classList.toggle('waypoint-briefing',waypoint);
-  if(waypoint){$('briefing-rule').textContent=`${c.waypoints?.length||0} REQUIRED WAYPOINTS · ANY ORDER · ONCE PER SHOT${c.requiredSurface?' · REQUIRED ROUTE CONTACT':''}`;host.querySelector('.map-key').innerHTML='<i></i> Throw from the blue start.<br><i></i> Collect every purple numbered patch to pass and rank.<br><i></i> Gold is a landing bonus. With no waypoints, it is required.';host.querySelector('.briefing-points').innerHTML='<span>FIRST WAYPOINT <b>×2 TARGETS</b></span><span>WAYPOINT COMPONENT <b>DOUBLES</b></span><span>DESTINATION <b>OPTIONAL BONUS</b></span><small>Each new bank adds +0.5× separately. Movement adds 100 PTS / SEC separately. Full rest locks the score.</small>';}
+  if(waypoint){$('briefing-rule').textContent=`${c.waypoints?.length||0} REQUIRED WAYPOINTS · ANY ORDER · ONCE PER SHOT${c.requiredSurface?' · REQUIRED ROUTE CONTACT':''}`;host.querySelector('.map-key').innerHTML='<i></i> Throw from the blue start.<br><i></i> Every in-bounds shot can rank. Collect every purple patch to clear.<br><i></i> Gold is a landing bonus; required to clear destination-only courses.';host.querySelector('.briefing-points').innerHTML='<span>FIRST WAYPOINT <b>×2 TARGETS</b></span><span>WAYPOINT COMPONENT <b>DOUBLES</b></span><span>DESTINATION <b>OPTIONAL BONUS</b></span><small>Each new bank adds +0.5× separately. Movement adds 100 PTS / SEC separately. Full rest locks the score.</small>';}
   else{host.querySelector('.map-key').innerHTML='<i></i> Stay inside the blue start circle.<br><i></i> Settle inside the gold target.';host.querySelector('.briefing-points').innerHTML='<span>BASE SCORE <b>10,000 × COMBO</b></span><span>EACH NEW BANK <b>+0.5×</b></span><span>BULLSEYE LANDING <b>KEEP 100%</b></span><small>Link distinct banks. Outer rings keep 75 / 50 / 25%. Add 100 PTS / SEC while moving.</small>';}
   $('briefing-play').disabled=!isReady();$('briefing-play').focus({preventScroll:true});
  }
@@ -36,7 +36,8 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
   const left=THREE.MathUtils.clamp(id==='map-start'?x-el.offsetWidth-8:x+8,12,innerWidth-el.offsetWidth-12);
   el.style.left=`${left}px`;el.style.top=`${(-projected.y*.5+.5)*innerHeight}px`;el.style.setProperty('--anchor-x',`${x-left}px`);
  }
- return {open,start,get target(){return target;},get active(){return active;},get blocked(){return active||transition>0;},get challenge(){return challenge;},
+ function dismiss(){active=false;transition=0;host.hidden=true;document.body.classList.remove('is-briefing');renderer.clippingPlanes=[];}
+ return {open,start,dismiss,get target(){return target;},get active(){return active;},get blocked(){return active||transition>0;},get challenge(){return challenge;},
   update(camera,dt){
    if(active){
     $('briefing-play').disabled=!isReady();

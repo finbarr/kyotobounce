@@ -11,13 +11,13 @@ const result=(extra={})=>({challenge:c,success:false,destinationReached:false,re
 const earned=scoreAttempt(result());assert.equal(earned.waypointBase,80000);assert.equal(earned.total,81200);assert.equal(earned.movementPoints,1200);assert.equal(earned.waypointMultiplier,8,'Label is the current waypoint component');
 assert.equal(scoreAttempt(result({challenge:{...c,goal}})).total,earned.total,'Missing a destination never removes waypoint points');
 const dest=scoreAttempt(result({challenge:{...c,goal},success:true,destinationReached:true}));assert.equal(dest.destinationBonus,earned.total-earned.movementPoints);assert.equal(dest.total,161200);
-assert.equal(scoreAttempt(result({challenge:{...c,goal,waypoints:[]},waypointHits:[],destinationReached:true})).total,11200,'Destination-only course earns the base bonus');
-assert.equal(scoreAttempt(result({waypointHits:[]})).total,0);assert.equal(scoreAttempt(result({reason:'Recalled'})).total,0);assert.equal(scoreAttempt(result({challenge:{...c,requiredSurface:'missing'}})).total,0);
+assert.equal(scoreAttempt(result({challenge:{...c,goal,waypoints:[]},waypointHits:[],destinationReached:true})).total,21200,'Destination-only course earns base points and the landing bonus');
+assert.equal(scoreAttempt(result({waypointHits:[]})).total,11200,'Zero waypoints still bank the base and movement');assert.equal(scoreAttempt(result({reason:'Recalled'})).total,0);assert.equal(scoreAttempt(result({challenge:{...c,requiredSurface:'missing'}})).total,earned.total);
 assert.equal(scoreAttempt(result({waypointHits:[...hits,...hits]})).total,earned.total,'Repeated waypoint contacts score once');
 assert.throws(()=>scoreAttempt(result({waypointHits:[{...hits[0],normal:p(0,-1)}]})),/contact/);
 assert.throws(()=>scoreAttempt(result({waypointHits:[{...hits[0],point:p(0,.02)}]})),/contact/);
 assert.throws(()=>scoreAttempt(result({waypointHits:[{...hits[0],waypointId:'forged'}]})),/hit/);
-const live=new ComboTracker(c);live.poses(result().poses.slice(0,1));for(const h of hits)live.waypoint(h);assert.equal(live.value().total,0,'Future native hits wait for trajectory time');live.poses(result().poses.slice(1));assert.deepEqual(live.value(),earned);
+const live=new ComboTracker(c);live.poses(result().poses.slice(0,1));for(const h of hits)live.waypoint(h);assert.equal(live.value().total,10000,'Future native hits wait for trajectory time; only the base is present');live.poses(result().poses.slice(1));assert.deepEqual(live.value(),earned);
 const quiet=structuredClone(result());quiet.poses.push({...quiet.poses.at(-1),t:240,q:{x:0,y:1,z:0,w:0}});assert.deepEqual(scoreAttempt(quiet),earned,'A long spin after collecting waypoints leaves every factor and score unchanged');
 const postGoalBank={surface:'wall',label:'Wall',qualifying:true,speed:3,time:11,point:p(30)};
 assert.equal(scoreAttempt(result({challenge:{...c,goal:{...goal,center:p(0)}},contacts:[postGoalBank]})).styleBanks,1,'Waypoint mode does not freeze banks at destination entry');
@@ -42,12 +42,12 @@ const one=scoreAttempt(result({waypointHits:[hits[0]],contacts:[postGoalBank]}))
 const two=scoreAttempt(result({waypointHits:hits.slice(0,2),contacts:[postGoalBank]}));
 assert.equal(one.potential-one.movementPoints,25000);assert.equal(two.potential-two.movementPoints,45000);
 assert.equal(two.potential-one.potential,20000,'The next waypoint doubles only the 20000 target component, never the 5000 bank credit');
-for(const partial of [one,two]){assert.equal(partial.total,0);assert.equal(partial.outcome,'incomplete');}
+for(const partial of [one,two]){assert.equal(partial.total,partial.potential);assert.equal(partial.outcome,'tagged');}
 const partialLanding=scoreAttempt(result({challenge:{...c,goal},success:true,destinationReached:true,waypointHits:hits.slice(0,2)}));
-assert.equal(partialLanding.total,0,'A destination cannot bypass a missing waypoint');assert.equal(partialLanding.destinationBonus,0);assert.equal(partialLanding.outcome,'incomplete');
-assert.equal(scoreAttempt(result({waypointHits:[hits[0],hits[0],hits[1]]})).total,0,'Duplicate hits cannot stand in for the missing target');
-const inPlay=new ComboTracker(c);inPlay.waypoint(hits[0]);inPlay.poses(result().poses);assert.ok(inPlay.value().total>0,'Live partial routes still show points in play');assert.equal(inPlay.value({final:true}).total,0);
-assert.equal(scoreAttempt(result({waypointHits:[],contacts:sequence.contacts})).total,0,'A high-speed surface-only shot still needs a target');
+assert.equal(partialLanding.total,81200,'Partial routes bank target points and destination bonus');assert.equal(partialLanding.destinationBonus,40000);assert.equal(partialLanding.outcome,'perfect');
+assert.equal(scoreAttempt(result({waypointHits:[hits[0],hits[0],hits[1]]})).total,41200,'Duplicate hits cannot stand in for the missing target');
+const inPlay=new ComboTracker(c);inPlay.waypoint(hits[0]);inPlay.poses(result().poses);assert.ok(inPlay.value().total>0,'Live partial routes still show points in play');assert.equal(inPlay.value({final:true}).total,inPlay.value().total);
+assert.equal(scoreAttempt(result({waypointHits:[],contacts:sequence.contacts})).total,26200,'Surface-only shots rank without exponential bank growth');
 assert.equal(scoreAttempt(result({contacts:[...sequence.contacts,...sequence.contacts]})).comboMultiplier,9.5,'Repeated surfaces never farm bank credit');
 assert.equal(scoreAttempt(result({contacts:sequence.contacts.map(h=>({...h,speed:1}))})).comboMultiplier,9.5,'Speed above qualification does not increase bank value');
 
@@ -67,25 +67,27 @@ const store=new Store(':memory:');try{
   const course={...c,goal};store.db.prepare('UPDATE challenges SET body=? WHERE id=?').run(JSON.stringify(course),c.id);
   const attempt=`partial-${destinationReached}`;member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:course});
   game.result({...result({challenge:course,waypointHits:hits.slice(0,2),destinationReached,success:destinationReached,score:destinationReached?1000:0}),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
-  assert.equal(member.lastResult.success,false);assert.equal(member.lastResult.saved,false);assert.equal(member.lastResult.score,0);assert.equal(member.lastResult.breakdown.outcome,'incomplete');assert.equal(store.replay(attempt),null);assert.equal(store.attemptRank(c,attempt),null);assert.equal(store.leaderboard(c).length,0);
+  assert.equal(member.lastResult.success,false,'Partial routes do not clear the course');assert.equal(member.lastResult.saved,true);assert.ok(member.lastResult.score>0);assert.equal(store.replay(attempt).score,member.lastResult.score);assert.ok(store.attemptRank(c,attempt)>0);
  }
  store.db.prepare('UPDATE challenges SET body=? WHERE id=?').run(JSON.stringify(c),c.id);
- assert.throws(()=>store.saveResult({...result({waypointHits:hits.slice(0,2)}),id:guest.id,attempt:'invalid-ranking',score:900000,duration:12},'animation'),/Incomplete waypoint/);
+ member.attempt='zero-targets';game.pending.set(member.attempt,{id:member.id,challenge:c});game.result({...result({waypointHits:[]}),id:member.id,attempt:member.attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});assert.equal(member.lastResult.score,11200);assert.equal(member.lastResult.success,false);assert.equal(store.replay('zero-targets').score,11200);
+ member.guest=store.guest();
  for(const [attempt,expected]of [['record-one',true],['record-tie',false]]){
   member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:c});
   game.result({...result(),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
-  assert.deepEqual(store.replay(attempt).records,{personalBest:expected,courseBest:expected},'Only strict improvements are record events');
+  assert.deepEqual(store.replay(attempt).records,{personalBest:expected,courseBest:false},'Only strict improvements are record events');
  }
  const champion=store.guest();
  for(let i=0;i<10;i++)store.saveResult({...result(),id:champion.id,attempt:`champion-${i}`,score:1_000_000_000+i,duration:12},'animation');
- for(const [attempt,player,personalBest]of [['off-board-tie',guest,false],['off-board-first',store.guest(),true]]){
+ for(const [attempt,player,personalBest]of [['off-board-tie',member.guest,false],['off-board-first',store.guest(),true]]){
   member.guest=player;member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:c});
   game.result({...result(),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
   const replay=store.replay(attempt);assert.ok(replay.standings.rank>10,'Off-board scores retain their overall placement');assert.deepEqual(replay.records,{personalBest,courseBest:false},'Off-board players retain accurate personal records');
  }
- const retired=store.replay('record-one');retired.waypointHits=[hits[0],hits[0],hits[1]];
- store.db.prepare('UPDATE attempts SET replay=? WHERE id=?').run(JSON.stringify(retired),'record-one');
- store.discardRetired(c.layout,c.physics);
- assert.equal(store.replay('record-one'),null,'Old incomplete routes leave the board and replay cache');assert.equal(store.attemptRank(c,'record-one'),null);assert.ok(store.replay('record-tie'),'Complete development records remain valid');
+ store.discardRetired(c.layout,c.physics);assert.ok(store.replay('partial-false'));assert.ok(store.replay('zero-targets'),'Current zero-target replays survive restart cleanup');
+ assert.ok(store.personalPlacement(c,guest.id).rank>10);
 }finally{store.close();}
-console.log('PASS full-route ranking/pass requirement, partial live points, destination bonus, old partial cleanup, once-only contacts, anti-spoof and safe integers');
+console.log('PASS in-bounds partial/zero-target ranking, separate full-route completion, destination bonus, restart retention, once-only contacts, anti-spoof and safe integers');
+
+for(const reason of ['Recalled','Player left','Ball left the station'])assert.equal(scoreAttempt(result({reason})).total,0);
+const escaped=result({poses:[{t:0,p:p(0,1),q},{t:3,p:p(0,-5.1),q},{t:12,p:p(0,1),q}]});assert.equal(scoreAttempt(escaped).total,0,'Crossing the native boundary forfeits even if later poses return');

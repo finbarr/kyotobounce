@@ -6,12 +6,15 @@ export async function fetchReplay(attempt,{signal}={}){
  return (await response.json()).replay;
 }
 export async function copyReplay(attempt,button){
- const url=replayURL(attempt),label=button.textContent;
+ return copyLink(replayURL(attempt),button,'replay');
+}
+export async function copyLink(url,button,kind){
+ const label=button.textContent;
  try{await navigator.clipboard.writeText(url);button.textContent='LINK COPIED ✓';setTimeout(()=>button.textContent=label,2200);}
  catch{
   const panel=document.createElement('dialog');panel.className='share-link-dialog';
-  const title=document.createElement('h2');title.textContent='Share this replay';
-  const input=document.createElement('input');input.readOnly=true;input.value=url;input.setAttribute('aria-label','Replay link');
+  const title=document.createElement('h2');title.textContent=`Share this ${kind}`;
+  const input=document.createElement('input');input.readOnly=true;input.value=url;input.setAttribute('aria-label',`${kind==='level'?'Level':'Replay'} link`);
   const close=document.createElement('button');close.textContent='Done';close.onclick=()=>panel.close();panel.append(title,input,close);
   panel.onclose=()=>panel.remove();document.body.append(panel);panel.showModal();input.select();
  }

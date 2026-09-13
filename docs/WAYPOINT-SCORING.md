@@ -1,9 +1,6 @@
 # Waypoint chains and jackpot presentation
 
-Collect every waypoint to pass and enter the leaderboard. A destination is an
-optional bonus on waypoint courses. **Missing a waypoint leaves the shot unranked;
-missing only the destination keeps the full waypoint score.** Classic destination
-courses remain available.
+Every shot that settles inside the station can rank, including shots that miss all targets. Collect every waypoint to clear the course and advance. A destination is a bonus on waypoint courses and is required only to clear destination-only courses. Classic destination courses remain available.
 
 ## First playable scope
 
@@ -19,32 +16,24 @@ courses remain available.
   is credited by native ball contact, including slow rolling, on its actual face;
   flying nearby or touching the opposite side of a wall does not count.
 - First slice includes authoring, saving, playing and replaying a waypoint-only
-  course and a mixed course. Current classic and waypoint courses remain playable. Pre-launch updates discard incomplete-route records; complete current records remain valid. No historical rules are retained.
+  course and a mixed course. Current classic and waypoint courses remain playable. Pre-launch updates discard retired station/course records; current partial and complete records remain valid. No historical rules are retained.
 
 ## Current tuning
 
 See [ARCADE-SCORING.md](ARCADE-SCORING.md) for the authoritative rules.
-The multiplier is `2^collected + 0.5 × distinct banks`. Once a waypoint is collected,
+The multiplier is `2^collected + 0.5 × distinct banks`. Even with zero waypoints (×1),
 target points are `10,000 × multiplier`. Waypoints double only their own component;
 banks never compound. Five waypoints earn 320,000 before additive bank credit.
 A new bank adds 5,000 target points regardless of collection order or impact speed.
 
 Translating flight and rolling add 100 points per second after all multipliers and
-the destination bonus. Stationary time and spin alone add nothing. The complete
-route must qualify to bank movement points. Banks continue throughout the shot;
+the destination bonus. Stationary time and spin alone add nothing. Every in-bounds shot banks movement points. Banks continue throughout the shot;
 repeated waypoints and repeated surfaces never earn again.
 
 At full supported rest inside the destination, add `10,000 × multiplier` as a bonus.
-Missing it preserves all waypoint points. Without a waypoint or destination, the
-shot scores zero. Recall and missing a required route forfeit the shot.
+Missing it preserves target and movement points. With zero hits, the score is 10,000 plus 5,000 per distinct bank and 100 per moving second. Recall and leaving the station forfeit all points.
 
-A waypoint shot completes only after every actual target ID is collected and the
-ball comes to true rest. With zero waypoints, the destination must be reached.
-A destination cannot substitute for a missing waypoint. Live partial scores are
-provisional; a final incomplete route has zero `total`, `outcome: incomplete`,
-and retains its provisional points in `potential`.
-Existing required-surface route rules still apply. No timed finish, freeze,
-magnet, fabricated contact or client-submitted result is introduced.
+Full route completion remains separate: every waypoint must be collected, or the destination must be reached on destination-only courses, after full physical rest. Required-surface route rules still apply to completion. Partial shots have positive `total` and can be saved, ranked and replayed. No timed finish, freeze, magnet, fabricated contact or client-submitted result is introduced.
 
 ## Shared contract
 
@@ -91,8 +80,8 @@ Celebrations use verified score/record events and end cleanly before the next sh
 
 Verify floor/wall/ceiling and slow contact; reject backside/near-miss/forged hits;
 verify once-only awards, destination miss preserving waypoint points, destination
-bonus, all targets required for ranking/progression, full rest, recall forfeiture,
-partial-record cleanup and current saved replay parity.
+bonus, partial/zero-target ranking with full-route progression, full rest, recall forfeiture,
+current partial-record retention and saved replay parity.
 Prove both new course forms through an isolated rebuilt native worker and real
 browser create/play/replay controls. Test score/FX reset on recall, retry, stage
 change and replay scrub. Capture actual escalation and character dance evidence,

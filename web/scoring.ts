@@ -17,8 +17,8 @@ function entersGoal(a:Vector,b:Vector,g:Vector,r:number,ballRadius:number){
 type Pose=NativeResult['poses'][number];
 type Contact=NativeResult['contacts'][number];
 type Challenge=NonNullable<NativeResult['challenge']>;
-// Use actual target IDs, never a client count. Destination-only courses still
-// need a landing; on waypoint courses it is a bonus after the complete route.
+// Course completion is separate from score eligibility. Use actual target IDs,
+// never a client count; destination-only courses still need a landing to clear.
 export function waypointRouteComplete(c:Challenge,hits:WaypointHit[],destinationReached:boolean){
  const targets=c.waypoints||[],ids=new Set(hits.map(h=>h.waypointId));
  return targets.length>0?targets.every(w=>ids.has(w.id)):!!c.goal&&destinationReached;
@@ -30,7 +30,7 @@ export const proximityRange=(c:Challenge)=>clamp(distance(c.start.center,c.goal!
 // A tracker consumes every native physics pose, including between network frames.
 // The identical calculation drives the live HUD and the immutable final replay.
 export class ComboTracker {
- c:Challenge;last:Pose|null=null;movingSeconds=0;firstVisit=Infinity;contacts:Contact[]=[];waypointHits:WaypointHit[]=[];
+ c:Challenge;leftStation=false;last:Pose|null=null;movingSeconds=0;firstVisit=Infinity;contacts:Contact[]=[];waypointHits:WaypointHit[]=[];
  constructor(challenge:Challenge){this.c=challenge;}
  waypoint(hit:WaypointHit){
   if(this.c.scoring!==WAYPOINT_SCORING)return;
@@ -45,6 +45,8 @@ export class ComboTracker {
  poses(poses:Pose[]){
   for(const pose of poses){
    if(!Number.isFinite(pose.t)||Object.values(pose.p).some(x=>!Number.isFinite(x)))throw new Error('Invalid recorded trajectory');
+   // Same boundary used by the native worker, retained as a storage safeguard.
+   if(pose.p.y < -5)this.leftStation=true;
    const a=this.last;
    if(a&&pose.t<a.t)throw new Error('Trajectory time moved backwards');
    if(a&&pose.t>a.t){
@@ -69,14 +71,14 @@ export class ComboTracker {
   const bankBonus=BANK_BONUS*banks,bankMultiplier=1+bankBonus,comboMultiplier=bankMultiplier;
   // No gameplay ceiling: only guard the integer storage/transport precision.
   const bankPoints=Math.min(Number.MAX_SAFE_INTEGER,Math.round(BASE_POINTS*bankMultiplier));
-  const forfeit=['Recalled','Player left'].includes(options.reason||'');
-  const routeOK=!this.c.requiredSurface||this.contacts.some(h=>h.qualifying&&h.surface===this.c.requiredSurface);
-  const landingMultiplier=forfeit||!routeOK?0:options.success?1:Math.max(goalVisited?.25:0,clamp(1-gap/range));
-  const movementPoints=forfeit||!routeOK?0:Math.min(Number.MAX_SAFE_INTEGER,Math.floor(this.movingSeconds*MOVEMENT_POINTS_PER_SECOND+1e-6));
+  const forfeit=this.forfeited(options.reason);
+  const landingMultiplier=forfeit?0:options.success?1:Math.max(goalVisited?.25:0,clamp(1-gap/range));
+  const movementPoints=forfeit?0:Math.min(Number.MAX_SAFE_INTEGER,Math.floor(this.movingSeconds*MOVEMENT_POINTS_PER_SECOND+1e-6));
   const targetPoints=Math.round(bankPoints*landingMultiplier),accuracy=Math.round(BASE_POINTS*landingMultiplier);
-  const total=targetPoints?Math.min(Number.MAX_SAFE_INTEGER,targetPoints+movementPoints):0,potential=Math.min(Number.MAX_SAFE_INTEGER,bankPoints+movementPoints);
-  return {version:ARCADE_SCORING,movingSeconds:this.movingSeconds,movementPoints,outcome:forfeit?'forfeit':!routeOK?'route-missed':options.success?'perfect':goalVisited?'tagged':total?'near':'miss',accuracy,style:targetPoints-accuracy,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,bankBonus,comboMultiplier,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
+  const total=Math.min(Number.MAX_SAFE_INTEGER,targetPoints+movementPoints),potential=forfeit?0:Math.min(Number.MAX_SAFE_INTEGER,bankPoints+movementPoints);
+  return {version:ARCADE_SCORING,movingSeconds:this.movingSeconds,movementPoints,outcome:forfeit?'forfeit':options.success?'perfect':goalVisited?'tagged':targetPoints?'near':'miss',accuracy,style:targetPoints-accuracy,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,bankBonus,comboMultiplier,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
  }
+ forfeited(reason?:string){return this.leftStation||['Recalled','Player left','Ball left the station'].includes(reason||'');}
  waypointValue(options:{destinationReached?:boolean;reason?:string;final?:boolean}):ScoreBreakdown{
   const hits=this.waypointHits.filter(h=>h.time<=(this.last?.t??0));
   const seen=new Set<string>();let banks=0,lastTime=-Infinity,lastPoint:Vector|null=null,lastBank='';
@@ -89,17 +91,16 @@ export class ComboTracker {
   const waypointCount=hits.length,waypointMultiplier=WAYPOINT_FACTOR**waypointCount;
   // Bank credit never doubles when a waypoint is collected. Order does not matter.
   const bankBonus=BANK_BONUS*banks,bankMultiplier=1+bankBonus,comboMultiplier=waypointMultiplier+bankBonus;
-  const waypointBase=waypointCount?BASE_POINTS*waypointMultiplier:0;
-  const forfeit=['Recalled','Player left'].includes(options.reason||''),routeOK=!this.c.requiredSurface||this.contacts.some(h=>h.qualifying&&h.surface===this.c.requiredSurface);
+  const waypointBase=BASE_POINTS*waypointMultiplier;
+  const forfeit=this.forfeited(options.reason);
   const destinationReached=!!this.c.goal&&!!options.destinationReached;
-  const earned=waypointCount?safe(BASE_POINTS*comboMultiplier):0;
+  const earned=safe(BASE_POINTS*comboMultiplier);
   const destinationBonus=destinationReached?safe(BASE_POINTS*comboMultiplier):0;
-  const movementPoints=forfeit||!routeOK?0:Math.min(Number.MAX_SAFE_INTEGER,Math.floor(this.movingSeconds*MOVEMENT_POINTS_PER_SECOND+1e-6));
+  const movementPoints=forfeit?0:Math.min(Number.MAX_SAFE_INTEGER,Math.floor(this.movingSeconds*MOVEMENT_POINTS_PER_SECOND+1e-6));
   // Movement is additive, outside every multiplier and destination bonus.
-  // Live points remain in play. Only the complete route can bank them at rest.
-  const incomplete=!!options.final&&!waypointRouteComplete(this.c,hits,destinationReached);
-  const potential=forfeit||!routeOK||!(earned+destinationBonus)?0:safe(earned+destinationBonus+movementPoints),total=incomplete?0:potential;
-  return {version:WAYPOINT_SCORING,movingSeconds:this.movingSeconds,movementPoints,outcome:forfeit?'forfeit':!routeOK?'route-missed':incomplete?'incomplete':destinationReached?'perfect':waypointCount?'tagged':'miss',accuracy:total,style:0,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited:Number.isFinite(this.firstVisit)||destinationReached,distance:0,proximityRange:0,endPosition:this.last?.p||this.c.start.center,total,base:BASE_POINTS,bankMultiplier,bankBonus,comboMultiplier,landingMultiplier:total?1:0,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank,waypointCount,waypointIds:hits.map(h=>h.waypointId),waypointHits:hits,waypointBase,waypointMultiplier,destinationReached,destinationBonus:forfeit||!routeOK||incomplete?0:destinationBonus};
+  // Every in-bounds shot banks at full rest, including a zero-target shot.
+  const potential=forfeit?0:safe(earned+destinationBonus+movementPoints),total=potential;
+  return {version:WAYPOINT_SCORING,movingSeconds:this.movingSeconds,movementPoints,outcome:forfeit?'forfeit':destinationReached?'perfect':waypointCount?'tagged':'miss',accuracy:total,style:0,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited:Number.isFinite(this.firstVisit)||destinationReached,distance:0,proximityRange:0,endPosition:this.last?.p||this.c.start.center,total,base:BASE_POINTS,bankMultiplier,bankBonus,comboMultiplier,landingMultiplier:total?1:0,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank,waypointCount,waypointIds:hits.map(h=>h.waypointId),waypointHits:hits,waypointBase,waypointMultiplier,destinationReached,destinationBonus:forfeit?0:destinationBonus};
  }
 
 }
