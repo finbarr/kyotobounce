@@ -2,10 +2,10 @@
 // The server supplies both snapshots, including deterministic tie breakers.
 export function resultBoard({host,watch,sound}){
  const panel=document.createElement('section');panel.id='result-leaderboard';panel.hidden=true;
- panel.innerHTML='<div class="board-heading"><span class="eyebrow">LEVEL TOP 10 / ランキング</span><b id="ranking-announcement" role="status"></b></div><ol aria-label="Level high scores"></ol><p class="board-footnote">Every shot can rank · select a score to watch</p>';
- host.append(panel);const list=panel.querySelector('ol'),announcement=panel.querySelector('[role=status]');let timers=[],animations=[],generation=0;
+ panel.innerHTML='<div class="board-heading"><span class="eyebrow">LEVEL TOP 10 / ランキング</span><b id="ranking-announcement" role="status"></b></div><ol aria-label="Level high scores"></ol><div class="own-placement" hidden><p>YOUR SHOT</p><ol aria-label="Your placement"></ol></div><p class="board-footnote">Every shot can rank · select a score to watch</p>';
+ host.append(panel);const list=panel.querySelector('ol'),announcement=panel.querySelector('[role=status]'),placement=panel.querySelector('.own-placement'),ownList=placement.querySelector('ol');let timers=[],animations=[],generation=0;
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
- function clear(){generation++;timers.forEach(clearTimeout);timers=[];animations.forEach(a=>a.cancel());animations=[];panel.hidden=true;list.replaceChildren();}
+ function clear(){generation++;timers.forEach(clearTimeout);timers=[];animations.forEach(a=>a.cancel());animations=[];panel.hidden=true;list.replaceChildren();placement.hidden=true;ownList.replaceChildren();}
  function later(fn,ms){timers.push(setTimeout(fn,ms));}
  function animate(element,frames,options){if(!reduced())animations.push(element.animate(frames,{fill:'both',...options}));}
  function row(entry,rank,own){
@@ -21,9 +21,16 @@ export function resultBoard({host,watch,sound}){
   const initial=winner?before:after;const token=generation;
   later(()=>{
    if(token!==generation)return;panel.hidden=false;panel.dataset.phase='reveal';
-   announcement.textContent=winner?'MAKE ROOM.':after.length?'THE SCORES TO BEAT':'BE THE FIRST';
+   announcement.textContent=winner?'MAKE ROOM.':rank?`YOUR RANK · #${rank.toLocaleString()}`:after.length?'THE SCORES TO BEAT':'BE THE FIRST';
    initial.forEach((entry,i)=>{const li=row(entry,i+1,entry.guest===own);list.append(li);animate(li,[{opacity:0,transform:'translateY(-14px)'},{opacity:1,transform:'translateY(0)'}],{duration:180,delay:i*35,easing:'ease-out'});});
-   if(!winner)return;
+   if(!winner){
+    if(rank>10){
+     placement.hidden=false;ownList.start=rank;
+     const li=row({attempt:result.attempt,guest:own||'',name:result.playerName||'You',score:result.score},rank,true);ownList.append(li);
+     animate(li,[{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'translateY(0)'}],{duration:260,delay:initial.length*35,easing:'ease-out'});
+    }
+    later(()=>panel.dataset.phase='settled',initial.length*35+260);return;
+   }
    later(()=>{
     if(token!==generation)return;
     // Finish the reveal before measuring row positions for the insertion.

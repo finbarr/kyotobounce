@@ -45,7 +45,7 @@ const store=new Store(':memory:');try{
  for(const [attempt,player,personalBest]of [['off-board-tie',guest,false],['off-board-first',store.guest(),true]]){
   member.guest=player;member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:c});
   game.result({...result(),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
-  const replay=store.replay(attempt);assert.equal(replay.standings.rank,null);assert.deepEqual(replay.records,{personalBest,courseBest:false},'Off-board players retain accurate personal records');
+  const replay=store.replay(attempt);assert.ok(replay.standings.rank>10,'Off-board scores retain their overall placement');assert.deepEqual(replay.records,{personalBest,courseBest:false},'Off-board players retain accurate personal records');
  }
 }finally{store.close();}
 console.log('PASS waypoint chain, destination bonus/miss, once-only contacts, anti-spoof, capability gating and safe integers');

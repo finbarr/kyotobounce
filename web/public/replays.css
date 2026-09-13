@@ -6,7 +6,7 @@
 .board-heading{display:grid;gap:10px;margin-bottom:14px}.board-heading .eyebrow{font-size:9px;color:#b9a8ec}.board-heading>b{font:900 24px/1 Impact,'Arial Narrow',sans-serif;letter-spacing:.7px;color:#f6d57f;min-height:24px}
 #result-leaderboard ol{list-style:none;padding:0;margin:0;position:relative;display:grid;gap:4px}
 #result-leaderboard li{height:31px;min-width:0;position:relative;transform-origin:center right}
-#result-leaderboard li>button{width:100%;height:100%;display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:7px;background:#f1f2ff07;border:1px solid #ffffff0e;border-radius:0;text-align:left;padding:4px 8px;font-size:10px;color:#cdd6ed}
+#result-leaderboard li>button{width:100%;height:100%;display:grid;grid-template-columns:minmax(36px,max-content) minmax(0,1fr) auto;align-items:center;gap:7px;background:#f1f2ff07;border:1px solid #ffffff0e;border-radius:0;text-align:left;padding:4px 8px;font-size:10px;color:#cdd6ed}
 #result-leaderboard .rank-name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}#result-leaderboard strong{font-variant-numeric:tabular-nums;font-size:11px}
 #result-leaderboard [data-rank="1"],#result-leaderboard [data-rank="2"],#result-leaderboard [data-rank="3"]{height:40px}
 #result-leaderboard [data-rank="1"]>button{background:linear-gradient(110deg,#ffdb83,#dda644);border-color:#fff0b0;color:#282015;box-shadow:0 0 18px #e3b64c22}
@@ -14,6 +14,9 @@
 #result-leaderboard [data-rank="3"]>button{background:linear-gradient(110deg,#e8b398,#a5654e);color:#31180e;border-color:#e0aa8d}
 #result-leaderboard [data-rank="1"] strong{font-size:14px}.rank-place{font-weight:800;letter-spacing:.5px}
 #result-leaderboard li.own-score>button{outline:2px solid #92ffe0;outline-offset:-2px}.own-score .rank-name::after{content:' YOU';font-size:7px;font-weight:800;margin-left:5px}
+#result-leaderboard .own-placement{border-top:1px solid #92ffe04d;margin-top:12px;padding-top:10px}
+#result-leaderboard .own-placement>p{font-size:9px;letter-spacing:1px;color:#92ffe0;margin:0 0 7px}
+#result-leaderboard .own-placement li{height:36px}
 #result-leaderboard li.new-rank{z-index:2;filter:drop-shadow(0 0 10px #85ffe47a)}
 #result-leaderboard li.rank-ejected{position:absolute;left:0;right:0;z-index:1;pointer-events:none}
 .board-footnote{font-size:8px;line-height:1.5;color:#99a7c4;margin:12px 0 0}.is-results #competition,.is-results #shot-details{visibility:hidden}

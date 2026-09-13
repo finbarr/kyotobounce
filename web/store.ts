@@ -87,8 +87,7 @@ export class Store {
    const before=this.leaderboard(c);
    const insert=this.db.prepare('INSERT OR IGNORE INTO attempts VALUES (?,?,?,?,?,?,?,?,?,?)').run(result.attempt,result.id,c.id,c.revision,result.success?1:0,result.score,result.surfaces,result.duration,Date.now(),null);
    if(insert.changes===1){
-    const after=this.leaderboard(c),rank=after.findIndex(row=>row.attempt===result.attempt);
-    result.standings={before,after,rank:rank<0?null:rank+1};
+    result.standings={before,after:this.leaderboard(c),rank:this.attemptRank(c,result.attempt)};
     if(result.score>0){replayJson=JSON.stringify({...result,challenge:withChallengeRules(c),animation,scoring:c.scoring||SCORING_VERSION});this.db.prepare('UPDATE attempts SET replay=? WHERE id=?').run(replayJson,result.attempt);}
    }
    this.db.exec('COMMIT');inserted=insert.changes===1;
@@ -101,6 +100,16 @@ export class Store {
   return this.db.prepare(`SELECT a.id AS attempt,a.guest,g.name,a.score,a.surfaces,a.duration,a.accepted
     FROM attempts a JOIN guests g ON a.guest=g.id WHERE a.challenge=? AND a.revision=? AND a.score>0
     ORDER BY a.score DESC,a.duration ASC,a.accepted ASC,a.id ASC LIMIT 10`).all(c.id,c.revision) as LeaderboardEntry[];
+ }
+ attemptRank(c:Challenge,attempt:string):number|null{
+  // Count every qualifying shot using the same ordering as the displayed ten.
+  // Read the accepted row so ties use its server timestamp and attempt ID.
+  const row=this.db.prepare(`SELECT (SELECT COUNT(*)+1 FROM attempts a JOIN guests g ON a.guest=g.id
+    WHERE a.challenge=t.challenge AND a.revision=t.revision AND a.score>0
+    AND (a.score>t.score OR (a.score=t.score AND (a.duration,a.accepted,a.id)<(t.duration,t.accepted,t.id)))) AS rank
+    FROM attempts t JOIN guests owner ON t.guest=owner.id
+    WHERE t.id=? AND t.challenge=? AND t.revision=? AND t.score>0`).get(attempt,c.id,c.revision);
+  return row?Number(row.rank):null;
  }
  personalBest(c:Challenge,guest:string):number{
   return Number(this.db.prepare('SELECT score FROM attempts WHERE challenge=? AND revision=? AND guest=? ORDER BY score DESC LIMIT 1').get(c.id,c.revision,guest)?.score||0);
