@@ -12,9 +12,9 @@ Supported rest inside the target keeps 100%. Outside, accuracy falls linearly wi
 
 ## Waypoint courses (`waypoint-v2`)
 
-Courses have up to 32 optional waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings.
+Courses have up to 32 optional waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; the two first awards total 30,000 base points. The outer edge of each drawn ring matches its scoring radius.
 
-Each new waypoint doubles the next award: 10,000, 20,000, 40,000… After `W` hits, base points are `10,000 × (2^W − 1)`. Multiply by `1.75^banks`. Banks can continue throughout the shot, including after destination entry. The protocol's `waypointMultiplier = 2^W` describes the next award; hit celebrations show half that value, the award just earned.
+Each new waypoint doubles the next award: 10,000, 20,000, 40,000… After `W` hits, base points are `10,000 × (2^W − 1)`. Multiply by `1.75^banks`. Banks can continue throughout the shot, including after destination entry. The protocol's `waypointMultiplier = 2^W` describes the next award; single-hit celebrations show half that value, the award just earned.
 
 Supported rest in the destination adds a bonus equal to the multiplied waypoint score, or the multiplied 10,000 base if no waypoint was collected. Missing it preserves waypoint points. A positive target score completes the course. Recall, leaving the station and missing a required route forfeit. Only JavaScript's safe-integer storage limit caps the score.
 
@@ -35,7 +35,7 @@ A named trick chain links banks and waypoints. Earned score fills a special mete
 
 New banks, waypoints, target entry and earned stage changes trigger score stamps, medal/shard bursts, edge light chases and short original synthesized stingers. Repeated state frames and landing-accuracy changes produce no fanfares. Audio varies melody, rhythm and timbre within a bounded register. Particles and flame activity subside during uneventful rolling; the earned color remains.
 
-The world effect uses a fixed 128-particle pool and at most six draw calls, without dynamic lights or changing physical ball size/spin marks. Screen medals use one canvas and a fixed 180-particle pool. Reduced motion keeps color and text while removing bursts, orbiting effects and number scaling. Slow frames suppress animated world effects. Recall, course changes and backward replay scrubs reset presentation.
+The world effect uses a fixed 128-particle pool and at most six draw calls, without dynamic lights or changing physical ball size/spin marks. Screen medals use one canvas and a fixed 180-particle pool. Simultaneous collections show a double or multi-target popup even when they also trigger a heat stage. Reduced motion keeps color and text while removing bursts, orbiting effects and number scaling. Slow frames suppress animated world effects. Recall, course changes and backward replay scrubs reset presentation.
 
 Visual references: the named trick chain, special meter and italic score in [THPS2 gameplay](https://www.mobygames.com/game/2575/tony-hawks-pro-skater-2/screenshots/dreamcast/35031/); the mechanical rings, colored multiplier plaques, light chases and medal payout of [WINNING THE MEGA JACKPOT!!!](https://www.youtube.com/watch?v=i0OnmhhFk9g). All game graphics and audio are original code, with no copied media.
 

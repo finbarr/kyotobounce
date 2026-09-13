@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import {scoreAt,heatTier,collectedIds,scoreEvents,HEAT_STAGES} from '../public/waypoint-score.js';
-import {routeBounds} from '../public/waypoint-targets.js';
+import {scoreAt,heatTier,collectedIds,scoreEvents,pendingScoreEvent,HEAT_STAGES} from '../public/waypoint-score.js';
+import {routeBounds,waypointGeometry} from '../public/waypoint-targets.js';
 import {ballHeat} from '../public/ball-heat.js';
 import * as THREE from 'three';
 const frames=[{t:0,score:{version:'waypoint-v2',total:0,waypointIds:[]}},{t:2,score:{version:'waypoint-v2',total:310000,waypointIds:['a','b']}}];
@@ -25,3 +25,24 @@ assert.deepEqual(scoreEvents(bank,{...bank,waypointCount:4,waypointMultiplier:16
 assert.deepEqual(scoreEvents(bank,base),[],'Backward scrubs do not fire old cues');
 for(const [tier,stage] of HEAT_STAGES.entries())assert.equal(heatTier({version:'waypoint-v2',total:stage.at}),tier);
 console.log('PASS action-only celebration events, no idle cues, six earned heat stages');
+
+const simultaneous={version:'waypoint-v2',total:52500,styleBanks:1,bankMultiplier:1.75,waypointCount:2,waypointMultiplier:4,waypointIds:['patch-1','patch-2']};
+const doubleEvents=scoreEvents(null,simultaneous);
+assert.deepEqual(doubleEvents.map(e=>e.kind),['bank','waypoint','special']);
+const doublePopup=doubleEvents.reduce(pendingScoreEvent,null);
+assert.equal(doublePopup.kind,'waypoint');assert.equal(doublePopup.label,'DOUBLE TARGET');assert.equal(doublePopup.count,2);assert.equal(doublePopup.tier,1);
+assert.deepEqual([...collectedIds(simultaneous)],['patch-1','patch-2']);
+assert.deepEqual(scoreEvents(simultaneous,simultaneous),[],'Repeated frames cannot replay a double hit');
+assert.equal(scoreEvents(null,{...simultaneous,waypointCount:3,waypointMultiplier:8}).find(e=>e.kind==='waypoint').label,'3 TARGETS AT ONCE');
+assert.equal(pendingScoreEvent(doublePopup,{kind:'bank'}),doublePopup,'A following bank cannot hide the double hit');
+console.log('PASS simultaneous waypoint cue survives bank/tier coalescing and retains both markers');
+
+for(const radius of [.1,.85,2]){
+ const geometry=waypointGeometry(radius);
+ for(const mesh of Object.values(geometry)){
+  const p=mesh.attributes.position;let farthest=0;
+  for(let i=0;i<p.count;i++)farthest=Math.max(farthest,Math.hypot(p.getX(i),p.getY(i)));
+  assert.ok(Math.abs(farthest-radius)<1e-6,'Both fill and painted ring end at the scoring radius');mesh.dispose();
+ }
+}
+console.log('PASS visible waypoint borders match native scoring bounds');

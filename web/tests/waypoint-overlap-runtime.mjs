@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {Client,delay} from './api-client.mjs';
+import {scoreAttempt} from '../scoring.ts';
+const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173';
+if(!['localhost','127.0.0.1'].includes(new URL(origin).hostname))throw Error('Use an isolated local server');
+const client=new Client(origin.replace(/^http/,'ws'));
+try{
+ await client.join();
+ const course=client.messages.findLast(m=>m.type==='catalog').challenges.find(c=>c.id==='kyoto-vending');
+ assert.equal(course.name,'Exact Change');
+ await client.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');
+ client.messages.length=0;
+ const shot=await client.throw((8-.5)/11.5*2800,{yaw:-170.75955,pitch:0,top:0,kick:0,powerRange:'precision'},180000);
+ const hits=client.messages.filter(m=>m.type==='waypoint-hit');
+ assert.equal(hits.length,2,'A contact inside the overlap must collect both targets exactly once');
+ assert.equal(hits[0].time,hits[1].time,'Both targets are collected by the same native contact');
+ assert.deepEqual(hits[0].point,hits[1].point);
+ assert.deepEqual(new Set(hits.map(h=>h.waypointId)),new Set(course.waypoints.map(w=>w.id)));
+ const live=client.messages.filter(m=>m.type==='state'&&m.liveScore?.waypointCount);
+ assert.ok(live.length);assert.equal(live[0].liveScore.waypointCount,2,'Both awards must arrive in one authoritative score update');
+ assert.equal(live[0].liveScore.waypointBase,30000,'The shared contact earns both 10000 and 20000 awards');
+ assert.equal(shot.result.breakdown.waypointCount,2);
+ const {replay}=await client.request('replay',{attempt:shot.result.attempt},'replay');
+ assert.deepEqual(scoreAttempt(replay),shot.result.breakdown);
+ assert.deepEqual(replay.scoreFrames.at(-1).score,shot.result.breakdown);
+ assert.deepEqual(replay.waypointHits,hits.map(({at,...hit})=>hit),'Playback timestamps do not alter native hit records');
+ await mkdir('.local',{recursive:true});await writeFile('.local/waypoint-overlap-runtime.json',JSON.stringify({origin,hits,live:live[0].liveScore,result:shot.result.breakdown},null,2));
+ console.log('PASS Exact Change same-contact double collection, once-only awards, live count, 30000 base and final replay parity');
+}finally{client.close();}

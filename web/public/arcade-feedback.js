@@ -1,4 +1,4 @@
-import {currentScore,scoreEvents,heatTier,HEAT_STAGES} from './waypoint-score.js';
+import {currentScore,scoreEvents,pendingScoreEvent,heatTier,HEAT_STAGES} from './waypoint-score.js';
 import {arcadeParticles} from './arcade-particles.js';
 const $=id=>document.getElementById(id),format=n=>Math.round(n).toLocaleString();
 export function arcadeFeedback(sound){
@@ -20,8 +20,8 @@ export function arcadeFeedback(sound){
   cancelAnimations();const tier=Math.max(heatTier(current),event.tier||0),big=['special','result','destination','goal'].includes(event.kind);
   spectacle.hidden=false;spectacle.dataset.tier=tier;spectacle.dataset.kind=event.kind;burstTime=big?2.1:1.15;cooldown=big?.45:.22;
   const color='#'+HEAT_STAGES[tier].color.toString(16).padStart(6,'0');spectacle.style.setProperty('--combo-tint',color);
-  $('combo-call').textContent=event.kind==='special'?event.label:event.kind==='result'?'LINE COMPLETE / 大当たり':event.kind==='waypoint'?'WAYPOINT LINK / 連鎖':event.kind==='destination'?'DESTINATION BONUS':event.kind==='goal'?'TARGET TAGGED':'CLEAN BANK';
-  $('combo-mult').textContent=event.kind==='special'?event.label:event.kind==='result'?format(current.total):event.kind==='destination'?`+${format(current.destinationBonus)}`:`×${Number(event.multiplier).toLocaleString(undefined,{maximumFractionDigits:2})}`;
+  $('combo-call').textContent=event.kind==='special'?event.label:event.kind==='result'?'LINE COMPLETE / 大当たり':event.kind==='waypoint'?(event.count>1?`${event.label} / 同時ヒット`:'WAYPOINT LINK / 連鎖'):event.kind==='destination'?'DESTINATION BONUS':event.kind==='goal'?'TARGET TAGGED':'CLEAN BANK';
+  $('combo-mult').textContent=event.kind==='special'?event.label:event.kind==='result'?format(current.total):event.kind==='destination'?`+${format(current.destinationBonus)}`:event.kind==='waypoint'&&event.count>1?`${event.count} HITS`:`×${Number(event.multiplier).toLocaleString(undefined,{maximumFractionDigits:2})}`;
   $('combo-mult').classList.toggle('word-burst',event.kind==='special');
   const digits=$('combo-mult').textContent.length;$('combo-mult').style.fontSize=event.kind==='special'?'':`clamp(30px,${Math.min(6,60/digits)}vw,${Math.min(100,700/digits)}px)`;
   $('combo-sub').textContent=event.kind==='special'?`${format(current.total)} POINTS · LEVEL ${tier}`:event.kind==='result'?'POINTS BANKED':event.kind==='goal'?'25% SECURED · LAND THE FINISH':event.kind==='waypoint'?`${event.label} · ${format(current.total)} PTS` :event.label;
@@ -42,11 +42,11 @@ export function arcadeFeedback(sound){
    for(const event of events){
     if(event.kind==='special'){if(event.tier<=highestTier)continue;highestTier=event.tier;}
     else {
-     const label=event.kind==='waypoint'?`${event.label}${event.count>1?` (+${event.count})`:''}`:event.label.toUpperCase();
+     const label=event.label.toUpperCase();
      tricks.push(label);if(tricks.length>5)tricks.shift();$('combo-line').textContent=tricks.join(' + ');pop(label,event.kind==='goal'||event.kind==='destination'?'goal':'bank');
     }
     // Events arriving within one beat share one stinger, keeping a fast chain punchy.
-    if(!pending||event.kind!=='bank')pending=event;
+    pending=pendingScoreEvent(pending,event);
    }
   },
   result(result){
