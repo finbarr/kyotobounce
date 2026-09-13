@@ -4,6 +4,7 @@ import { createReadStream } from 'node:fs';
 import { stat, mkdir, readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { Store } from './store.ts';
+import {serveReplay} from './replay-http.ts';
 import { Competition } from './competition.ts';
 import type { Guest } from './types.ts';
 import { WebSocketServer, WebSocket } from 'ws';
@@ -21,7 +22,8 @@ if(publicOrigin && (new URL(publicOrigin).origin!==publicOrigin||!publicOrigin.s
 const allowedOrigins=new Set(publicOrigin?[publicOrigin]:[`http://127.0.0.1:${port}`,`http://localhost:${port}`]);
 const dataDir=resolve(process.env.KYOTO_DATA_DIR||'web/data');
 await mkdir(dataDir,{recursive:true});
-const store = new Store(resolve(dataDir,'kyoto.sqlite'));
+const store = new Store(resolve(dataDir,'kyoto.sqlite'),{maxBytes:Number(process.env.KYOTO_REPLAY_CACHE_MB||128)*1024*1024});
+const replayShell=await readFile(resolve(root,'index.html'),'utf8');
 const starters=JSON.parse(await readFile(resolve('web/starter-challenges.json'),'utf8'));
 store.syncCampaign(starters);
 type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;metrics:ConnectionMetrics;budget:RequestBudget;lastClientReport:number;requiresReload?:boolean;replaced?:boolean;intentional?:boolean;opened:number;alive:boolean;lastWrite:number;lastReplay:number};
@@ -47,28 +49,15 @@ const server = createServer(async (request,response) => {
       response.end(JSON.stringify({status:worker.status,scope:publicOrigin?'online':'local',worker:worker.ready,shotPlayback:worker.capabilities.includes('shot-stream-v1'),error:publicOrigin?(workerFailure?'Physics temporarily unavailable':''):workerFailure}));return;
     }
     // Local read-only game state, without guest credentials. Reject other origins.
-    if (url.pathname === '/api/debug/sessions') {
+    if (['/api/debug/sessions','/api/debug/replay-cache'].includes(url.pathname)) {
       if(publicOrigin){response.writeHead(404);response.end();return;}
       const localOrigins=[`http://127.0.0.1:${port}`,`http://localhost:${port}`];
       if(!localOrigins.includes(`http://${request.headers.host}`)||(request.headers.origin&&!localOrigins.includes(request.headers.origin))){response.writeHead(403);response.end();return;}
       response.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+      if(url.pathname==='/api/debug/replay-cache'){response.end(JSON.stringify(store.replayCache.stats()));return;}
       response.end(JSON.stringify({capturedAt:new Date().toISOString(),worker:worker.status,sessions:[...competition.members.values()].map(m=>({id:m.id,snapshotAgeMs:m.snapshotAt===undefined?null:Date.now()-m.snapshotAt,snapshot:m.snapshot}))}));return;
     }
-    const replayRoute=url.pathname.match(/^\/(api\/)?replay\/([a-zA-Z0-9_-]{1,64})\/?$/);
-    if(replayRoute?.[1]){
-      const replay=store.replay(replayRoute[2]!);
-      response.writeHead(replay?200:404,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
-      response.end(request.method==='HEAD'?undefined:JSON.stringify(replay?{replay}:{error:'Replay not found. This shot may no longer be available.'}));return;
-    }
-    if(replayRoute){
-      const replay=store.replay(replayRoute[2]!);
-      const title=replay?`${replay.playerName||'Player'} · ${replay.score.toLocaleString('en-US')} PTS — Kyoto Bounce`:'Replay unavailable — Kyoto Bounce';
-      const description=replay?`Watch this shot on ${replay.challenge.name}. Orbit the station, slow it down, then try to beat it.`:'This replay could not be found.';
-      const escape=(text:string)=>text.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!));
-      const html=(await readFile(resolve(root,'index.html'),'utf8')).replace('<title>Kyoto Bounce — Station Arcade</title>',`<title>${escape(title)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">`);
-      response.writeHead(replay?200:404,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
-      response.end(request.method==='HEAD'?undefined:html);return;
-    }
+    if(await serveReplay(request,response,url.pathname,store,replayShell))return;
     let base=root, relative=decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
     for (const [prefix,path] of vendors) if (url.pathname.startsWith(prefix!)) {base=path!;relative=decodeURIComponent(url.pathname.slice(prefix!.length));break;}
     const path=resolve(base,relative);
@@ -205,9 +194,12 @@ wss.on('connection',socket=>{
     console.info(JSON.stringify({event:'connection-closed',code,cause:c.metrics.closeCause,receivedTotal:c.metrics.total,...c.metrics.take(),authenticated:!!c.guest,resumable:!!c.guest&&!c.intentional&&!c.replaced,seconds:Math.round((performance.now()-c.opened)/1000)}));
   });
 });
+let lastReplayCacheStats='';
 const telemetry=setInterval(()=>{
   eventLoopMaxMs=Math.round(eventLoop.max/1e6);const loopP99Ms=Math.round(eventLoop.percentile(99)/1e6);eventLoop.reset();
-  if(connections.size)console.info(JSON.stringify({event:'server-performance',eventLoopMaxMs,eventLoopP99Ms:loopP99Ms,rssBytes:process.memoryUsage().rss,workerReady:worker.ready,pendingRequests:worker.requests.size,workerBufferedBytes:worker.socket?.writableLength||0,connections:[...connections.values()].map(c=>c.metrics.take())}));
+  const replayCache=store.replayCache.stats(),cacheStats=JSON.stringify(replayCache);
+  if(connections.size||cacheStats!==lastReplayCacheStats)console.info(JSON.stringify({event:'server-performance',replayCache,eventLoopMaxMs,eventLoopP99Ms:loopP99Ms,rssBytes:process.memoryUsage().rss,workerReady:worker.ready,pendingRequests:worker.requests.size,workerBufferedBytes:worker.socket?.writableLength||0,connections:[...connections.values()].map(c=>c.metrics.take())}));
+  lastReplayCacheStats=cacheStats;
 },5000);telemetry.unref();
 const heartbeat=setInterval(()=>{for(const [socket,c]of connections){if(!c.alive){c.metrics.closeCause='heartbeat-timeout';socket.terminate();continue;}c.alive=false;socket.ping();}},30000);
 heartbeat.unref();

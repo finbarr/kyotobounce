@@ -1,10 +1,13 @@
 import { DatabaseSync } from 'node:sqlite';
+import {ReplayCache,type ReplayCacheOptions} from './replay-cache.ts';
 import { randomUUID } from 'node:crypto';
 import type { Challenge,Guest,NativeResult,LeaderboardEntry } from './types.ts';
 import { withChallengeRules,SCORING_VERSION,ACTIVE_SCORING,THROW_MODEL,PHYSICS_VERSION } from './types.ts';
 export class Store {
  db:DatabaseSync;
- constructor(path:string){
+ replayCache:ReplayCache;
+ constructor(path:string,cacheOptions:ReplayCacheOptions={}){
+  this.replayCache=new ReplayCache(cacheOptions);
   this.db=new DatabaseSync(path);this.db.exec(`PRAGMA journal_mode=WAL;
   CREATE TABLE IF NOT EXISTS guests (id TEXT PRIMARY KEY,token TEXT UNIQUE NOT NULL,name TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS challenges (id TEXT NOT NULL,revision INTEGER NOT NULL,creator TEXT NOT NULL,body TEXT NOT NULL,created INTEGER NOT NULL,PRIMARY KEY(id,revision));
@@ -31,7 +34,7 @@ export class Store {
    this.db.prepare('DELETE FROM attempts WHERE challenge=? AND revision<>?').run(c.id,c.revision);
    this.db.prepare('DELETE FROM challenges WHERE id=? AND revision<>?').run(c.id,c.revision);
    this.db.prepare('INSERT INTO challenges VALUES (?,?,?,?,?)').run(c.id,c.revision,c.creator,JSON.stringify(withChallengeRules(c)),Date.now());
-   this.db.exec('COMMIT');
+   this.db.exec('COMMIT');this.replayCache.invalidateChallenge(c.id);
   }catch(error){this.db.exec('ROLLBACK');throw error;}
  }
  // The checked-in campaign is the complete set of station-authored courses.
@@ -39,11 +42,13 @@ export class Store {
  // player-created courses and unchanged campaign scores remain available.
  syncCampaign(courses:Challenge[]){
   if(!courses.length||new Set(courses.map(c=>c.id)).size!==courses.length||courses.some(c=>c.creator!=='station'))throw new Error('Invalid station campaign');
+  const invalidated=new Set<string>();
   this.db.exec('BEGIN IMMEDIATE');try{
    const desired=new Map(courses.map(c=>[c.id,withChallengeRules(c)]));
    for(const row of this.db.prepare('SELECT id,revision,body FROM challenges WHERE creator=?').all('station')){
     const c=desired.get(String(row.id));
     if(!c||JSON.stringify(c)!==String(row.body)){
+     invalidated.add(String(row.id));
      this.db.prepare('DELETE FROM attempts WHERE challenge=? AND revision=?').run(String(row.id),Number(row.revision));
      this.db.prepare('DELETE FROM challenges WHERE id=? AND revision=?').run(String(row.id),Number(row.revision));
     }
@@ -53,18 +58,19 @@ export class Store {
     if(existing&&existing.creator!=='station')throw new Error('Campaign ID belongs to a player');
     if(!this.challenge(c.id,c.revision))this.db.prepare('INSERT INTO challenges VALUES (?,?,?,?,?)').run(c.id,c.revision,c.creator,JSON.stringify(c),Date.now());
    }
-   this.db.exec('COMMIT');
+   this.db.exec('COMMIT');for(const id of invalidated)this.replayCache.invalidateChallenge(id);
   }catch(error){this.db.exec('ROLLBACK');throw error;}
  }
  discardRetired(layout:string,physics:string){
   if(physics!==PHYSICS_VERSION)throw new Error('Unsupported physics worker');
+  const invalidated=new Set<string>();
   this.db.exec('BEGIN IMMEDIATE');try{
    const rows=this.db.prepare('SELECT id,revision,body FROM challenges').all();
    const latest=new Map<string,number>();for(const row of rows)latest.set(String(row.id),Math.max(latest.get(String(row.id))||0,Number(row.revision)));
    for(const row of rows){const c=JSON.parse(String(row.body));
-    if(c.layout!==layout||c.physics!==physics||c.throwModel!==THROW_MODEL||!ACTIVE_SCORING.includes(c.scoring)||c.revision!==latest.get(c.id))this.db.prepare('DELETE FROM challenges WHERE id=? AND revision=?').run(String(row.id),Number(row.revision));
+    if(c.layout!==layout||c.physics!==physics||c.throwModel!==THROW_MODEL||!ACTIVE_SCORING.includes(c.scoring)||c.revision!==latest.get(c.id)){invalidated.add(String(row.id));this.db.prepare('DELETE FROM challenges WHERE id=? AND revision=?').run(String(row.id),Number(row.revision));}
    }
-   this.db.exec('DELETE FROM attempts WHERE NOT EXISTS (SELECT 1 FROM challenges c WHERE c.id=attempts.challenge AND c.revision=attempts.revision); DROP TABLE IF EXISTS layout_migrations; COMMIT;');
+   this.db.exec('DELETE FROM attempts WHERE NOT EXISTS (SELECT 1 FROM challenges c WHERE c.id=attempts.challenge AND c.revision=attempts.revision); DROP TABLE IF EXISTS layout_migrations; COMMIT;');for(const id of invalidated)this.replayCache.invalidateChallenge(id);
   }catch(error){this.db.exec('ROLLBACK');throw error;}
  }
  setting(key:string){const r=this.db.prepare('SELECT value FROM settings WHERE key=?').get(key);return r?JSON.parse(r.value as string):null;}
@@ -74,6 +80,7 @@ export class Store {
   if(!c||!this.challenge(c.id,c.revision))return false;
   // The replay and ranking row are one SQLite commit; a leaderboard entry can
   // never point to a half-written replay. Attempt IDs make delivery idempotent.
+  let replayJson:string|undefined,inserted=false;
   this.db.exec('BEGIN IMMEDIATE');
   try{
    const before=this.leaderboard(c);
@@ -81,10 +88,13 @@ export class Store {
    if(insert.changes===1){
     const after=this.leaderboard(c),rank=after.findIndex(row=>row.attempt===result.attempt),previousRank=before.findIndex(row=>row.guest===result.id);
     result.standings={before:before.slice(0,10),after:after.slice(0,10),rank:rank<0?null:rank+1,previousRank:previousRank<0?null:previousRank+1,improved:rank>=0};
-    if(result.score>0)this.db.prepare('UPDATE attempts SET replay=? WHERE id=?').run(JSON.stringify({...result,challenge:withChallengeRules(c),animation,scoring:c.scoring||SCORING_VERSION}),result.attempt);
+    if(result.score>0){replayJson=JSON.stringify({...result,challenge:withChallengeRules(c),animation,scoring:c.scoring||SCORING_VERSION});this.db.prepare('UPDATE attempts SET replay=? WHERE id=?').run(replayJson,result.attempt);}
    }
-   this.db.exec('COMMIT');return insert.changes===1;
+   this.db.exec('COMMIT');inserted=insert.changes===1;
   }catch(error){this.db.exec('ROLLBACK');throw error;}
+  // Publish to the cache only after the replay and score commit succeeds.
+  if(replayJson)this.replayCache.put(result.attempt,replayJson,{playerName:result.playerName,score:result.score,challenge:c});
+  return inserted;
  }
  leaderboard(c:Challenge):LeaderboardEntry[]{
   return this.db.prepare(`SELECT id AS attempt,guest,name,score,surfaces,duration,accepted FROM (
@@ -92,6 +102,12 @@ export class Store {
     FROM attempts a JOIN guests g ON a.guest=g.id WHERE a.challenge=? AND a.revision=? AND a.score>0
   ) WHERE rank=1 ORDER BY score DESC,duration ASC,accepted ASC,id ASC`).all(c.id,c.revision) as LeaderboardEntry[];
  }
- replay(id:string){const r=this.db.prepare('SELECT replay FROM attempts WHERE id=? AND score>0').get(id);return r?.replay?JSON.parse(r.replay as string):null;}
- close(){this.db.close();}
+ replayResponse(id:string){
+  const cached=this.replayCache.get(id);if(cached)return {entry:cached,status:'HIT'};
+  const r=this.db.prepare('SELECT replay FROM attempts WHERE id=? AND score>0').get(id);
+  if(!r?.replay)return {entry:undefined,status:'MISS'};
+  const entry=this.replayCache.put(id,r.replay as string);return {entry,status:entry.cached?'MISS':'BYPASS'};
+ }
+ replay(id:string){const {entry}=this.replayResponse(id);return entry?JSON.parse(entry.body.toString()).replay:null;}
+ close(){this.replayCache.close();this.db.close();}
 }

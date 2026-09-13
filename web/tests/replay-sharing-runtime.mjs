@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {writeFile,mkdir} from 'node:fs/promises';
 import {Client} from './api-client.mjs';
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173';
@@ -13,11 +14,18 @@ try{
  assert.ok(result.saved&&result.score>0);assert.equal(result.playerName,'Runtime Replay Ace');assert.equal(result.character,'don');assert.ok(result.standings.rank>0);
  const sessions=async()=> (await(await fetch(origin+'/api/debug/sessions')).json()).sessions.length;
  const before=await sessions(),response=await fetch(`${origin}/api/replay/${result.attempt}`);assert.equal(response.status,200);
- const {replay}=await response.json();assert.equal(replay.score,result.score);assert.equal(replay.character,'don');assert.deepEqual(replay.standings,result.standings);assert.deepEqual(replay.scoreFrames.at(-1).score,result.breakdown);assert.ok(replay.poses.length>1);assert.ok(replay.thrower.feet&&replay.thrower.yaw!==undefined&&replay.thrower.power>0);
+ assert.equal(response.headers.get('x-replay-cache'),'HIT','A saved native shot is already warm');assert.equal(response.headers.get('content-encoding'),'gzip');
+ const bytes=Buffer.from(await response.arrayBuffer()),hash=body=>createHash('sha256').update(body).digest('hex');
+ const {replay}=JSON.parse(bytes);assert.equal(replay.score,result.score);assert.equal(replay.character,'don');assert.deepEqual(replay.standings,result.standings);assert.deepEqual(replay.scoreFrames.at(-1).score,result.breakdown);assert.ok(replay.poses.length>1);assert.ok(replay.thrower.feet&&replay.thrower.yaw!==undefined&&replay.thrower.power>0);
  assert.ok(!JSON.stringify(replay).includes(client.token));
  const page=await fetch(`${origin}/replay/${result.attempt}`);assert.equal(page.status,200);assert.match(await page.text(),/src="\/game.js"/);
  assert.equal((await fetch(`${origin}/api/replay/${result.attempt}`,{method:'HEAD'})).status,200);
  assert.equal((await fetch(origin+'/api/replay/not-present')).status,404);assert.equal(await sessions(),before,'Watching via HTTP does not allocate a physics session');
+ const cacheStats=async()=> (await(await fetch(origin+'/api/debug/replay-cache')).json());
+ const cacheBefore=await cacheStats(),burstStart=performance.now();
+ await Promise.all(Array.from({length:64},async()=>{const r=await fetch(`${origin}/api/replay/${result.attempt}`);assert.equal(r.status,200);assert.equal(r.headers.get('x-replay-cache'),'HIT');assert.equal(hash(Buffer.from(await r.arrayBuffer())),hash(bytes));}));
+ const cacheAfter=await cacheStats();assert.equal(cacheAfter.misses,cacheBefore.misses);assert.equal(cacheAfter.compressions,cacheBefore.compressions);assert.equal(await sessions(),before);
+ console.log(`PASS 64 concurrent native replay reads in ${Math.round(performance.now()-burstStart)} ms with no cache misses, recompression or extra physics sessions`);
  const fromSocket=await client.request('replay',{attempt:result.attempt},'replay');assert.deepEqual(replay,fromSocket.replay);
  await mkdir('.local',{recursive:true});await writeFile('.local/shared-replay.json',JSON.stringify(replay));
  console.log(`PASS named native shot, saved robot identity, atomic ranks, public HTTP playback without a new session; replay ${result.attempt}`);
