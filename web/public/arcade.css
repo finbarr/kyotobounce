@@ -133,3 +133,5 @@ body.is-briefing #waypoint-progress{display:none}
 @media(max-width:800px){#combo-hud{width:310px}#combo-total{font-size:36px}#combo-burst{top:21%;width:51vw;right:2%}#combo-line{left:12%;right:10%;bottom:36%;font-size:13px}#combo-burst small{font-size:8px;letter-spacing:.06em}}
 @media(max-height:520px){.special-label{margin-top:0;font-size:8px}#special-track{height:5px;margin-bottom:5px}#combo-total{font-size:30px}#combo-line{bottom:6%;left:44%;font-size:13px}#combo-burst{top:17%;width:36vw}}
 @media(prefers-reduced-motion:reduce){#special-fill{transition:none}#combo-total,#combo-burst,#combo-line{transform:none!important}.combo-led,#combo-confetti{display:none!important}#combo-burst{filter:none}}
+
+#combo-motion{font-size:8px;line-height:1.5;color:#a8bdce;margin-top:7px;font-variant-numeric:tabular-nums}

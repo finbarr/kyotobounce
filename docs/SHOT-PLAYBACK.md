@@ -35,7 +35,7 @@ After rebuilding the native worker, use an isolated local service for
 `web/tests/network-stall-runtime.mjs` and `web/tests/connection-runtime.mjs`.
 Use `KYOTO_TEST_ORIGIN` for its URL. Never create test scores on production.
 
-Browser/service protocol: `shot-stream-v2` (action-only scoring). The native stream capability remains `shot-stream-v1`. Old open pages receive a reload
+Browser/service protocol: `shot-stream-v3` (action multipliers with linear movement points). The native stream capability remains `shot-stream-v1`. Old open pages receive a reload
 message rather than silently waiting for snapshots that no longer arrive.
 
 ## Sharing and results

@@ -14,13 +14,13 @@ export const HEAT_STAGES=[
  {name:'HYPERDRIVE',at:5_000_000,color:0xf27aff},
  {name:'MEGA JACKPOT',at:20_000_000,color:0xffefaa}
 ];
-export const currentScore=score=>!!score&&['waypoint-v2','combo-v6'].includes(score.version);
+export const currentScore=score=>!!score&&['waypoint-v3','combo-v7'].includes(score.version);
 export function heatTier(score){
  if(!currentScore(score))return 0;
  const earned=Number(score.total)||0;
  return HEAT_STAGES.findLastIndex(stage=>earned>=stage.at);
 }
-export function collectedIds(score){return new Set(score?.version==='waypoint-v2'?(score.waypointIds||[]):[]);}
+export function collectedIds(score){return new Set(score?.version==='waypoint-v3'?(score.waypointIds||[]):[]);}
 export const actionCount=score=>(score?.styleBanks||0)+(score?.waypointCount||0)+(score?.destinationReached?1:0);
 export function scoreEvents(previous,score){
  if(!currentScore(score))return [];
@@ -28,7 +28,7 @@ export function scoreEvents(previous,score){
  const events=[],banks=score.styleBanks-(previous?.styleBanks||0),waypoints=(score.waypointCount||0)-(previous?.waypointCount||0);
  if(banks>0)events.push({kind:'bank',label:score.lastBank||'CLEAN BANK',multiplier:score.bankMultiplier,count:banks});
  if(waypoints>0)events.push({kind:'waypoint',label:waypoints===2?'DOUBLE TARGET':waypoints>2?`${waypoints} TARGETS AT ONCE`:`TARGET ${score.waypointCount}`,multiplier:score.waypointMultiplier/2,count:waypoints});
- if(score.version==='waypoint-v2'?score.destinationReached&&!previous?.destinationReached:score.goalVisited&&!previous?.goalVisited)events.push({kind:score.version==='waypoint-v2'?'destination':'goal',label:score.version==='waypoint-v2'?'DESTINATION BONUS':'TARGET TAGGED',multiplier:score.bankMultiplier,count:1});
+ if(score.version==='waypoint-v3'?score.destinationReached&&!previous?.destinationReached:score.goalVisited&&!previous?.goalVisited)events.push({kind:score.version==='waypoint-v3'?'destination':'goal',label:score.version==='waypoint-v3'?'DESTINATION BONUS':'TARGET TAGGED',multiplier:score.bankMultiplier,count:1});
  // Changes in position, spin, time or landing accuracy cannot ring the machine.
  const tier=heatTier(score);
  if(events.length&&tier>heatTier(previous))events.push({kind:'special',label:HEAT_STAGES[tier].name,tier,multiplier:score.bankMultiplier,count:1});

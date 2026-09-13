@@ -147,7 +147,7 @@ wss.on('connection',socket=>{
           for(const [old,connection]of connections)if(old!==socket&&connection.id===c.id){connection.replaced=true;connection.queue.close();old.close(4009,'Session resumed on a new connection');}
         }
         c.guest=guest;clearTimeout(authTimer);send(socket,{type:'welcome',...guest,nameChosen:store.setting(`named:${guest.id}`)===true,sessionId:c.id,worker:worker.ready,resumed:!!resumed});
-        if(m.protocol!=='shot-stream-v2'){c.requiresReload=true;send(socket,{type:'worker-status',status:'failed',message:'The game has been updated. Reload this page to load the new scoring and effects.'});return;}
+        if(m.protocol!=='shot-stream-v3'){c.requiresReload=true;send(socket,{type:'worker-status',status:'failed',message:'The game has been updated. Reload this page to load the new scoring and effects.'});return;}
         send(socket,worker.lifecycle());send(socket,competition.catalog());
         if(resumed){
           competition.sync(resumed);competition.board(resumed);

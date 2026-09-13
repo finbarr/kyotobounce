@@ -1,22 +1,24 @@
 # Kyoto Bounce scoring
 
-Only scoring actions build a combo. Elapsed time, airtime, rolling and spin add no points or multiplier. The native ball still finishes only when translation and rotation stop; recall forfeits.
+Only scoring actions build a combo. Translating flight and rolling add **100 points per second**, linearly and outside every multiplier. Time at rest and spinning in place add nothing. Movement points are banked only when the shot earns a target score; time alone cannot clear a course. The native ball still finishes only when translation and rotation stop; recall forfeits.
 
-## Classic courses (`combo-v6`)
+## Classic courses (`combo-v7`)
 
-`10,000 × 1.75^banks × landing accuracy`
+`10,000 × 1.75^banks × landing accuracy + movement points`
 
 Each qualifying distinct surface multiplies the combo by 1.75. Contacts need at least 1 m/s impact speed, 0.18 seconds between awarded banks and 0.6 m separation. Repeated surfaces and numbered stair/escalator treads count once. Banks freeze at first target entry.
 
 Supported rest inside the target keeps 100%. Outside, accuracy falls linearly with distance from the usable target edge, including height. The falloff range is 35% of start-to-target distance, clamped to 3–12 m. A target visit secures at least 25% if the completed shot finishes outside. Required routes still apply; distant untagged misses score zero.
 
-## Waypoint courses (`waypoint-v2`)
+## Waypoint courses (`waypoint-v3`)
 
 Courses have up to 32 optional waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; the two first awards total 30,000 base points. The outer edge of each drawn ring matches its scoring radius.
 
 Each new waypoint doubles the next award: 10,000, 20,000, 40,000… After `W` hits, base points are `10,000 × (2^W − 1)`. Multiply by `1.75^banks`. Banks can continue throughout the shot, including after destination entry. The protocol's `waypointMultiplier = 2^W` describes the next award; single-hit celebrations show half that value, the award just earned.
 
 Supported rest in the destination adds a bonus equal to the multiplied waypoint score, or the multiplied 10,000 base if no waypoint was collected. Missing it preserves waypoint points. A positive target score completes the course. Recall, leaving the station and missing a required route forfeit. Only JavaScript's safe-integer storage limit caps the score.
+
+Movement time is measured from consecutive authoritative 180 Hz positions, excluding numerical drift below 0.001 m/s. Fractional seconds accrue individual points (`floor(movingSeconds × 100)`). The bonus continues while the ball translates after a target hit, is added after landing accuracy and the destination bonus, and is forfeited on recall or a missed required route.
 
 The server calculates live frames and final results from the same native records. Clients cannot submit a score. Pre-launch rule changes discard retired development courses, boards and replays; only the current rules remain.
 
@@ -41,4 +43,4 @@ Visual references: the named trick chain, special meter and italic score in [THP
 
 ## Verification
 
-`npm test` checks scoring arithmetic, no time/rolling/spin farming, once-only contacts, live/final parity, action-only feedback and bounded heat lifecycle. `npm run test:runtime` exercises the native worker, true rest, target collection, authoritative score/replay parity and rejection of forged scores. Visible effects also require a real browser check.
+`npm test` checks scoring arithmetic, linear movement, rest/spin exclusion, unmultiplied bonuses, once-only contacts, live/final parity, action-only feedback and bounded heat lifecycle. `npm run test:runtime` exercises the native worker, true rest, target collection, authoritative score/replay parity and rejection of forged scores. Visible effects also require a real browser check.

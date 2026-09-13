@@ -121,7 +121,7 @@ namespace Kyoto
         bool ValidateChallenge(BrowserChallenge challenge,out string message)
         {
             if(!ValidateDisk(challenge.start,true,out message))return false;
-            if(challenge.scoring!="waypoint-v2")return ValidateDisk(challenge.goal,false,out message);
+            if(challenge.scoring!="waypoint-v3")return ValidateDisk(challenge.goal,false,out message);
             // JsonUtility sometimes creates an empty object for JSON null.
             if(challenge.goal!=null&&string.IsNullOrEmpty(challenge.goal.surface)&&challenge.goal.radius==0)challenge.goal=null;
             int count=(challenge.waypoints?.Length??0)+(challenge.goal==null?0:1);
@@ -152,7 +152,7 @@ namespace Kyoto
         }
         void RecordWaypointContact(ContactSample contact)
         {
-            if(state.phase!="Flight"||activeChallenge?.scoring!="waypoint-v2")return;
+            if(state.phase!="Flight"||activeChallenge?.scoring!="waypoint-v3")return;
             foreach(var target in activeChallenge.waypoints??Array.Empty<BrowserWaypoint>())
             {
                 if(visitedWaypoints.Contains(target.id)||contact.surfaceId!=target.surface||Vector3.Dot(contact.normal,target.normal)<.995f)continue;

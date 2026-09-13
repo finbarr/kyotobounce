@@ -30,7 +30,8 @@ try{
   if(name==='perfect'){
    const entered=replay.scoreFrames.find(f=>f.score.goalVisited);
    assert.ok(entered&&replay.duration>entered.t+.05,'Native completion still waits after target entry for physical rest');
-   assert.equal(r.breakdown.potential,entered.score.potential,'Settling does not inflate the combo');
+   assert.equal(r.breakdown.bankMultiplier,entered.score.bankMultiplier,'Settling never inflates the multiplier');
+   assert.equal(r.breakdown.potential-entered.score.potential,r.breakdown.movementPoints-entered.score.movementPoints,'Settling adds only linear movement points');
    const atRest=replay.poses.at(-1),extraRest={...replay,poses:[...replay.poses,{...atRest,t:atRest.t+10}]};
    assert.deepEqual(scoreAttempt(extraRest),r.breakdown,'Rest adds no points');
    settlingRegression={entry:entered.t,finish:replay.duration,potential:entered.score.potential};

@@ -29,7 +29,7 @@ and so on. The waypoint base is `10,000 × (2^collected − 1)`. Five targets yi
 choices; each further scoring change requires a new version.
 
 Apply the distinct-bank multiplier (`1.75^banks`) to the waypoint base.
-Elapsed time, rolling and spin never grow the score. New-mode bank awards
+Translating flight and rolling add 100 points per second after all multipliers and the destination bonus. Stationary time and spin alone add nothing. At least one target must score to bank these movement points. New-mode bank awards
 continue throughout the shot; hitting a waypoint or crossing the destination does
 not freeze them. Repeated contacts with the same waypoint never earn again.
 
@@ -47,9 +47,9 @@ magnet, fabricated contact or client-submitted result is introduced.
 
 ## Shared contract
 
-`scoring: 'waypoint-v2'` runs alongside active `combo-v6`.
+`scoring: 'waypoint-v3'` runs alongside active `combo-v7`.
 `goal: Disk | null`; `waypoints: {id, center, normal, radius, surface}[]`.
-The native worker advertises `capabilities: ['waypoint-v2']`; the service refuses
+The native worker advertises `capabilities: ['waypoint-v3']`; the service refuses
 new-mode placement/save/select on an older worker.
 
 Native `waypoint-hit` records contain session `id`, `attempt`, `waypointId`,

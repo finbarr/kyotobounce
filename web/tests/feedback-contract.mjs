@@ -8,7 +8,7 @@ try{
  await page.evaluate(async()=>{
   const Original=AudioContext;window.probe={active:0,max:0,created:0,gains:[]};window.AudioContext=class extends Original{constructor(){super();probe.ctx=this;for(const name of ['createOscillator','createBufferSource']){const f=this[name].bind(this);this[name]=()=>{const n=f();probe.active++;probe.created++;probe.max=Math.max(probe.max,probe.active);n.addEventListener('ended',()=>probe.active--);return n;};}const gain=this.createGain.bind(this);this.createGain=()=>{const g=gain();probe.gains.push(g);return g;};}};
   window.sound=(await import('/arcade-audio.js')).arcadeAudio();window.feedback=(await import('/arcade-feedback.js')).arcadeFeedback({cue(...args){window.feedbackCues=(window.feedbackCues||0)+1;if(!window.stress)sound.cue(...args);}});
-  window.fixture=(mult=1,version='combo-v6')=>({version,potential:10000*mult,total:2500*mult,bankMultiplier:mult,styleBanks:Math.floor(mult),goalVisited:false,landingMultiplier:.25,lastBank:'STEEL BANK'});
+  window.fixture=(mult=1,version='combo-v7')=>({version,potential:10000*mult,total:2500*mult,bankMultiplier:mult,styleBanks:Math.floor(mult),goalVisited:false,landingMultiplier:.25,lastBank:'STEEL BANK'});
  });
  assert.equal(await page.evaluate(()=>sound.state.initialized),false);await page.locator('#sound-toggle').click();await page.locator('#sound-toggle').click();await page.waitForTimeout(200);
  const checks=await page.evaluate(()=>{

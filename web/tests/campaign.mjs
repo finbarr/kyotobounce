@@ -21,10 +21,15 @@ for(const [i,c] of courses.entries()){
  for(const t of targets){assert.ok(Object.values(t.center).every(Number.isFinite));assert.ok(t.radius>=.1&&t.radius<=3);assert.ok(t.surface);}
  assert.equal(new Set((c.waypoints||[]).map(w=>w.id)).size,c.waypoints?.length||0);
  for(const w of c.waypoints||[])assert.ok(Math.abs(Math.hypot(...Object.values(w.normal))-1)<.001);
- assert.ok(c.goal||c.waypoints?.length);assert.ok(['waypoint-v2','combo-v6'].includes(c.scoring));
+ assert.ok(c.goal||c.waypoints?.length);assert.ok(['waypoint-v3','combo-v7'].includes(c.scoring));
  heights.add(Math.round(c.start.center.y));signatures.add(JSON.stringify([c.start.center,proof.shot.input,proof.shot.speed]));
 }
 assert.equal(signatures.size,30,'No duplicate route and throw');assert.ok(heights.size>=8,'Routes explore the station vertically');
 assert.ok(courses.at(-1).campaign.distance>=200,'The finale covers a substantial station route');
 assert.ok(courses.filter(c=>c.waypoints?.length).length>=25,'The campaign retains waypoint play');
-console.log('PASS campaign progression, unique routes, complete proof coverage, target geometry and hints');
+const ricochets=proofs.courses.filter(p=>p.features);
+assert.equal(ricochets.length,10,'Ten routes replace straight floor chains with authored ricochets');
+for(const p of ricochets){const c=courses.find(c=>c.id===p.id);assert.ok(c.waypoints.filter(w=>w.normal.y<.5).length>=p.features.minNonFloorTargets);assert.ok(p.features.minSharpTurns>=1);}
+assert.ok(courses.filter(c=>c.waypoints?.some(w=>w.normal.y<.5)).length>=11,'Wall and ceiling routes remain a substantial part of the campaign');
+assert.ok(courses.filter(c=>c.waypoints?.some(w=>w.normal.y<-.3)).length>=3,'The campaign includes overhead targets');
+console.log('PASS campaign progression, ten sharp-bank routes, wall/ceiling targets, complete proof coverage and hints');

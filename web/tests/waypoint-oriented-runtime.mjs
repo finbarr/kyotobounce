@@ -6,7 +6,7 @@ const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4193',out=process.
 const client=new Client(origin.replace(/^http/,'ws')),checks=[];
 const p=(x,y,z)=>({x,y,z});
 async function place(slot,origin,direction,radius){return (await client.request('place',{slot,origin,direction,radius},'placement')).disk;}
-async function save(name,start,goal,waypoints){await delay(1050);return (await client.request('save-challenge',{name,start,goal,waypoints,scoring:'waypoint-v2'},'saved-challenge')).challenge;}
+async function save(name,start,goal,waypoints){await delay(1050);return (await client.request('save-challenge',{name,start,goal,waypoints,scoring:'waypoint-v3'},'saved-challenge')).challenge;}
 async function play(course,settings={}){
  await client.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');client.messages.length=0;
  const shot=await client.throw(settings.holdMs??260,{yaw:90,pitch:15,powerRange:'precision',...settings},60000),r=shot.result;

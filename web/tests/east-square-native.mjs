@@ -7,7 +7,7 @@ const out='artifacts/station-detail/east-square/native.json',c=new Client('ws://
 const p=(x,y,z)=>({x,y,z});
 const layout=createHash('sha256').update(await readFile('.local/station-detail/candidate/station-layout.json')).digest('hex');
 async function ray(origin,direction,radius=.1){return (await c.request('place',{slot:'waypoint',origin,direction,radius},'placement')).disk;}
-async function course(name,start,goal){await delay(1100);const s=await c.place(start,.5,'start'),g=await c.place(goal,.6,'goal');return (await c.request('save-challenge',{name:`K027 proof ${name}`,start:s,goal:g,waypoints:[],scoring:'waypoint-v2'},'saved-challenge')).challenge;}
+async function course(name,start,goal){await delay(1100);const s=await c.place(start,.5,'start'),g=await c.place(goal,.6,'goal');return (await c.request('save-challenge',{name:`K027 proof ${name}`,start:s,goal:g,waypoints:[],scoring:'waypoint-v3'},'saved-challenge')).challenge;}
 async function select(co,explore=false){await c.request('select-challenge',{challengeId:co.id,revision:co.revision},'selected');if(explore)await c.request('select-challenge',{challengeId:null},'selected');await delay(250);}
 const feet=()=>c.state.players.find(v=>v.id===c.id).feet;
 async function walkTo(x,z){const began=Date.now(),samples=[];while(Date.now()-began<15000){const f=feet(),dx=x-f.x,dz=z-f.z,d=Math.hypot(dx,dz);samples.push({...f});if(d<.09)break;c.input({yaw:Math.atan2(dx,dz)*180/Math.PI,z:1,fast:false});await delay(Math.min(120,Math.max(25,d/2*1000)));}c.input();await delay(150);assert.ok(Math.hypot(feet().x-x,feet().z-z)<.15,`walk to ${x},${z}: ${JSON.stringify(feet())}`);assert.ok(samples.every(s=>Math.abs(s.y-34.62)<.06),'Continuous supported feet');return samples;}

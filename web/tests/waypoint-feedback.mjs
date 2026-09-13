@@ -10,7 +10,7 @@ try{
  await page.route('**/waypoint-fixture',r=>r.fulfill({contentType:'text/html; charset=utf-8',body:'<link rel="stylesheet" href="/arcade.css"><body style="background:#101c2c"><p style="color:white;margin:30px">ISOLATED WAYPOINT CONTRACT FIXTURE · NOT NATIVE GAMEPLAY</p><button id="sound-toggle">Sound</button><button id="music-toggle">Music</button></body>'}));await page.goto((process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173')+'/waypoint-fixture');
  await page.evaluate(async()=>{
   window.calls=[];window.sound=(await import('/arcade-audio.js')).arcadeAudio();window.feedback=(await import('/arcade-feedback.js')).arcadeFeedback({cue(...args){calls.push(args);sound.cue(...args);}});
-  window.score=n=>({version:'waypoint-v2',waypointCount:n,waypointIds:Array.from({length:n},(_,i)=>`target-${i+1}`),waypointHits:Array.from({length:n},(_,i)=>({waypointId:`target-${i+1}`,time:i,point:{x:i,y:1,z:0},normal:{x:0,y:1,z:0},surface:'floor'})),waypointBase:10000*(2**n-1),waypointMultiplier:2**n,destinationReached:false,destinationBonus:0,bankMultiplier:1,total:10000*(2**n-1),potential:10000*(2**n-1),styleBanks:0,landingMultiplier:0});
+  window.score=n=>({version:'waypoint-v3',waypointCount:n,waypointIds:Array.from({length:n},(_,i)=>`target-${i+1}`),waypointHits:Array.from({length:n},(_,i)=>({waypointId:`target-${i+1}`,time:i,point:{x:i,y:1,z:0},normal:{x:0,y:1,z:0},surface:'floor'})),waypointBase:10000*(2**n-1),waypointMultiplier:2**n,destinationReached:false,destinationBonus:0,bankMultiplier:1,total:10000*(2**n-1),potential:10000*(2**n-1),styleBanks:0,landingMultiplier:0});
   window.tick=setInterval(()=>feedback.update(.016,'Flight','play'),16);
  });
  await page.locator('#music-toggle').click();await page.evaluate(()=>sound.unlock());

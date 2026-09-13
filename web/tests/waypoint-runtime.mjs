@@ -6,7 +6,7 @@ const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4193',out=process.
 const client=new Client(origin.replace(/^http/,'ws')),checks=[];
 const p=(x,y,z)=>({x,y,z});
 async function place(slot,origin,direction,radius){return (await client.request('place',{slot,origin,direction,radius},'placement')).disk;}
-async function save(name,start,goal,waypoints){await delay(1050);return (await client.request('save-challenge',{name,start,goal,waypoints,scoring:'waypoint-v2'},'saved-challenge')).challenge;}
+async function save(name,start,goal,waypoints){await delay(1050);return (await client.request('save-challenge',{name,start,goal,waypoints,scoring:'waypoint-v3'},'saved-challenge')).challenge;}
 async function play(course,settings={}){
  await client.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');client.messages.length=0;
  const shot=await client.throw(settings.holdMs??260,{yaw:90,pitch:15,powerRange:'precision',...settings},60000),r=shot.result;
@@ -28,7 +28,7 @@ try{
  const h=a.events.find(h=>h.waypointId==='slow'),i=a.replay.poses.findIndex(p=>p.t>=h.time),x=a.replay.poses[i-1],y=a.replay.poses[i];
  const speed=Math.hypot(y.p.x-x.p.x,y.p.y-x.p.y,y.p.z-x.p.z)/(y.t-x.t);assert.ok(!a.replay.contacts.some(impact=>Math.abs(impact.time-h.time)<.012),'The slow rolling touch has no >0.28 m/s impact event; full native contact stream must credit it');checks.at(-1).rollingSpeed=speed;checks.at(-1).slowNormalContact=true;
  const mixed=await save('Destination miss keeps chain',start,far,[early,late]),b=await play(mixed);assert.equal(b.r.success,true);assert.equal(b.r.destinationReached,false);assert.equal(b.r.breakdown.destinationBonus,0);assert.equal(b.r.breakdown.waypointCount,2);
- const landed=await save('Destination adds bonus',start,near,[early]),d=await play(landed);assert.equal(d.r.destinationReached,true);assert.equal(d.r.breakdown.destinationBonus,d.r.score/2);assert.ok(d.r.records.personalBest&&d.r.records.courseBest,'Authoritative record flags accompany rested result');
+ const landed=await save('Destination adds bonus',start,near,[early]),d=await play(landed);assert.equal(d.r.destinationReached,true);assert.equal(d.r.breakdown.destinationBonus,(d.r.score-d.r.breakdown.movementPoints)/2);assert.ok(d.r.records.personalBest&&d.r.records.courseBest,'Authoritative record flags accompany rested result');
  // The native validation must reject a fabricated opposite face and a patch off its plane.
  await assert.rejects(save('Backside',start,null,[{...early,normal:p(0,-1,0)}]),/face|blocked/);
  await assert.rejects(save('Off plane',start,null,[{...early,center:p(early.center.x,.02,early.center.z)}]),/face/);

@@ -24,7 +24,7 @@ try{
   if(s.result?.success&&s.result?.score>0)break;
   if(shots.length<holds.length){await page.keyboard.press('r');await page.waitForFunction(()=>window.kyotoState?.phase==='Aim');await page.keyboard.press('h');await page.waitForTimeout(300);}
  }
- const final=shots.at(-1);assert.equal(final.challenge.scoring,'waypoint-v2');assert.equal(final.result.success,true);assert.ok(final.result.score>0);assert.ok(final.result.waypointHits.length>0);if(final.challenge.requiredSurface)assert.ok(final.result.contacts.some(c=>c.surface===final.challenge.requiredSurface),'Required route contact');assert.ok(Object.values(final.velocity).every(v=>v===0)&&Object.values(final.spin).every(v=>v===0));
+ const final=shots.at(-1);assert.equal(final.challenge.scoring,'waypoint-v3');assert.equal(final.result.success,true);assert.ok(final.result.score>0);assert.ok(final.result.waypointHits.length>0);if(final.challenge.requiredSurface)assert.ok(final.result.contacts.some(c=>c.surface===final.challenge.requiredSurface),'Required route contact');assert.ok(Object.values(final.velocity).every(v=>v===0)&&Object.values(final.spin).every(v=>v===0));
  // Watch the persisted replay and scrub with actual controls; do not fabricate state.
  await page.keyboard.press('Escape');await page.locator('#watch-result').click();await page.waitForFunction(()=>window.kyotoState?.mode==='replay');
  const replay=replays.at(-1);assert.ok(replay?.poses?.length>1);assert.equal(replay.score,final.result.score);assert.equal(replay.layout,final.challenge.layout);assert.deepEqual(replay.waypointHits,final.result.waypointHits);

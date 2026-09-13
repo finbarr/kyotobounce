@@ -22,12 +22,12 @@ worker.on('message',m=>{if(m.type==='ready')ready=m;if(m.type==='state')states.s
 const until=async(f,ms=15000)=>{const end=performance.now()+ms;while(!f()){if(performance.now()>end)throw Error('Observation timed out before rest');await delay(10);}};
 const jobs=fixture.courses.filter(p=>!selectedIds||selectedIds.includes(p.id)).flatMap(proof=>{
  const challenge=courses.find(c=>c.id===proof.id&&c.revision===proof.revision);assert.ok(challenge,`Current course ${proof.id}`);
- return [...Array.from({length:proof.repeat},()=>({kind:'hint',shot:proof.shot})),...proof.neighbors.map(shot=>({kind:'neighbor',shot}))].map(job=>({...job,challenge}));
+ return [...Array.from({length:proof.repeat},()=>({kind:'hint',shot:proof.shot})),...proof.neighbors.map(shot=>({kind:'neighbor',shot}))].map(job=>({...job,challenge,features:proof.features}));
 });
 let next=0;const receipts=[];
 async function run(slot){
  const id=`campaign-proof-${slot}`;worker.send({type:'join',id});await until(()=>states.get(id)?.players?.length,30000);
- while(next<jobs.length){const index=next++,{challenge,shot,kind}=jobs[index];const receipt={index,id:challenge.id,kind,shot};
+ while(next<jobs.length){const index=next++,{challenge,shot,kind,features}=jobs[index];const receipt={index,id:challenge.id,kind,shot};
   try{
    assert.equal(challenge.layout,layout);assert.equal(challenge.physics,ready.physics);
    await worker.request({type:'select',id,challenge});await delay(150);events.delete(id);
@@ -44,7 +44,21 @@ async function run(slot){
    const state=states.get(id);assert.equal(state.diagnostics.sleeping,true);assert.ok(Math.hypot(...Object.values(state.velocity))<1e-5);assert.ok(Math.hypot(...Object.values(state.spin))<1e-5);
    const hitIds=new Set(result.waypointHits.map(h=>h.waypointId));
    receipt.duration=result.duration;receipt.hits=[...hitIds];receipt.destinationReached=result.destinationReached;receipt.final=result.poses.at(-1).p;
-   if(challenge.scoring==='waypoint-v2'){
+   if(features&&kind==='hint'){
+    const nonFloor=result.waypointHits.filter(h=>h.normal.y<.5);
+    receipt.nonFloorTargets=nonFloor.length;receipt.sharpTurns=0;
+    const delta=(a,b)=>[b.x-a.x,b.y-a.y,b.z-a.z];
+    for(const hit of nonFloor){
+     const i=result.poses.findIndex(p=>p.t>=hit.time),poses=result.poses;
+     if(i<5||i+5>=poses.length)continue;
+     const before=delta(poses[i-5].p,poses[i-2].p),after=delta(poses[i+2].p,poses[i+5].p),length=Math.hypot(...before)*Math.hypot(...after);
+     const angle=length?Math.acos(Math.max(-1,Math.min(1,before.reduce((n,v,k)=>n+v*after[k],0)/length)))*180/Math.PI:0;
+     if(angle>=45)receipt.sharpTurns++;
+    }
+    assert.ok(receipt.nonFloorTargets>=features.minNonFloorTargets,'The route must collect its wall/ceiling targets');
+    assert.ok(receipt.sharpTurns>=features.minSharpTurns,'The route must make a sharp turn at a wall/ceiling target');
+   }
+   if(challenge.scoring==='waypoint-v3'){
     assert.ok(hitIds.size>0||result.destinationReached,'A completed shot must earn points');
     if(kind==='hint')for(const target of challenge.waypoints)assert.ok(hitIds.has(target.id),`Suggested shot misses ${target.id}`);
    }else assert.ok(result.success,'Suggested classic shot must reach its destination');
@@ -55,7 +69,7 @@ async function run(slot){
  worker.send({type:'leave',id});
 }
 for(const sig of ['SIGINT','SIGTERM'])process.on(sig,()=>{worker.stop();process.exit(130);});
-try{await worker.start();await until(()=>worker.ready,65000);assert.ok(worker.capabilities.includes('waypoint-v2'));await Promise.all(Array.from({length:4},(_,i)=>run(i)));}
+try{await worker.start();await until(()=>worker.ready,65000);assert.ok(worker.capabilities.includes('waypoint-v3'));await Promise.all(Array.from({length:4},(_,i)=>run(i)));}
 finally{worker.stop();await writeFile(resolve(out,'summary.json'),JSON.stringify({layout,physics:ready?.physics,executable:process.env.KYOTO_WORKER_EXECUTABLE,campaignHash:createHash('sha256').update(campaignBytes).digest('hex'),receipts:receipts.sort((a,b)=>a.index-b.index)},null,2));}
 assert.equal(receipts.length,jobs.length);assert.ok(receipts.every(r=>r.pass),'Campaign proof failed; inspect summary.json');
 console.log(`PASS ${new Set(jobs.map(j=>j.challenge.id)).size} stages, ${receipts.length} shots at full native rest`);

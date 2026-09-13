@@ -3,7 +3,7 @@
   "courses": [
     {
       "id": "kyoto-konbinidirect",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 1.5,
@@ -31,8 +31,74 @@
       ]
     },
     {
-      "id": "kyoto-ticket",
+      "id": "kyoto-corner-store",
       "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "speed": 12,
+        "range": "precision",
+        "input": {
+          "yaw": 25,
+          "pitch": 15,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 12,
+          "range": "precision",
+          "input": {
+            "yaw": 25.2,
+            "pitch": 15,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "kyoto-ceiling-service",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "speed": 16,
+        "range": "full",
+        "input": {
+          "yaw": 20,
+          "pitch": 55,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 16,
+          "range": "full",
+          "input": {
+            "yaw": 20.2,
+            "pitch": 55,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "kyoto-ticket",
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 5,
@@ -60,8 +126,41 @@
       ]
     },
     {
-      "id": "kyoto-terrace",
+      "id": "kyoto-garden-switchback",
       "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "speed": 14,
+        "range": "full",
+        "input": {
+          "yaw": 165,
+          "pitch": 25,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 14,
+          "range": "full",
+          "input": {
+            "yaw": 165.2,
+            "pitch": 25,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "kyoto-terrace",
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 5,
@@ -90,7 +189,7 @@
     },
     {
       "id": "atrium-first-bank",
-      "revision": 10,
+      "revision": 11,
       "repeat": 2,
       "shot": {
         "speed": 1.56375,
@@ -118,95 +217,8 @@
       ]
     },
     {
-      "id": "kyoto-eastgarden",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "speed": 10,
-        "range": "precision",
-        "input": {
-          "yaw": 70,
-          "pitch": 10,
-          "top": -70,
-          "kick": 0
-        },
-        "observeSeconds": 90
-      },
-      "neighbors": [
-        {
-          "speed": 10,
-          "range": "precision",
-          "input": {
-            "yaw": 70.2,
-            "pitch": 10,
-            "top": -70,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        }
-      ]
-    },
-    {
-      "id": "kyoto-terracecross",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "speed": 8,
-        "range": "precision",
-        "input": {
-          "yaw": 90,
-          "pitch": 15,
-          "top": -70,
-          "kick": 0
-        },
-        "observeSeconds": 90
-      },
-      "neighbors": [
-        {
-          "speed": 8,
-          "range": "precision",
-          "input": {
-            "yaw": 90.2,
-            "pitch": 15,
-            "top": -70,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        }
-      ]
-    },
-    {
-      "id": "kyoto-cascade2",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "speed": 3,
-        "range": "precision",
-        "input": {
-          "yaw": 76.5,
-          "pitch": 0,
-          "top": -100,
-          "kick": 0
-        },
-        "observeSeconds": 90
-      },
-      "neighbors": [
-        {
-          "speed": 3,
-          "range": "precision",
-          "input": {
-            "yaw": 76.55,
-            "pitch": 0,
-            "top": -100,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        }
-      ]
-    },
-    {
       "id": "kyoto-platform",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 2.1,
@@ -235,7 +247,7 @@
     },
     {
       "id": "kyoto-locker",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 6,
@@ -264,7 +276,7 @@
     },
     {
       "id": "kyoto-garden",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 8,
@@ -293,7 +305,7 @@
     },
     {
       "id": "kyoto-vending",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 7,
@@ -321,37 +333,74 @@
       ]
     },
     {
-      "id": "kyoto-information",
+      "id": "kyoto-fascia-flip",
       "revision": 1,
       "repeat": 2,
       "shot": {
-        "speed": 5.2,
-        "range": "precision",
+        "speed": 18,
+        "range": "full",
         "input": {
-          "yaw": 150,
-          "pitch": 10,
-          "top": -80,
+          "yaw": 110,
+          "pitch": 20,
+          "top": 0,
           "kick": 0
         },
         "observeSeconds": 90
       },
       "neighbors": [
         {
-          "speed": 5.2,
-          "range": "precision",
+          "speed": 18,
+          "range": "full",
           "input": {
-            "yaw": 150.2,
-            "pitch": 10,
-            "top": -80,
+            "yaw": 110.2,
+            "pitch": 20,
+            "top": 0,
             "kick": 0
           },
           "observeSeconds": 90
         }
-      ]
+      ],
+      "features": {
+        "minNonFloorTargets": 3,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "kyoto-skyway",
+      "revision": 2,
+      "repeat": 2,
+      "shot": {
+        "speed": 20,
+        "range": "full",
+        "input": {
+          "yaw": 45,
+          "pitch": 8,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 20,
+          "range": "full",
+          "input": {
+            "yaw": 45.2,
+            "pitch": 8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "features": {
+        "minNonFloorTargets": 3,
+        "minSharpTurns": 1
+      }
     },
     {
       "id": "kyoto-cafe",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 9,
@@ -379,37 +428,8 @@
       ]
     },
     {
-      "id": "kyoto-gardenlong",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "speed": 18,
-        "range": "full",
-        "input": {
-          "yaw": 0,
-          "pitch": 15,
-          "top": -100,
-          "kick": 0
-        },
-        "observeSeconds": 90
-      },
-      "neighbors": [
-        {
-          "speed": 18,
-          "range": "full",
-          "input": {
-            "yaw": 0.05,
-            "pitch": 15,
-            "top": -100,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        }
-      ]
-    },
-    {
       "id": "kyoto-plaza",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 5.4,
@@ -437,37 +457,41 @@
       ]
     },
     {
-      "id": "kyoto-undercroft",
+      "id": "kyoto-pillar-carom",
       "revision": 1,
       "repeat": 2,
       "shot": {
-        "speed": 5.7,
-        "range": "precision",
+        "speed": 15,
+        "range": "full",
         "input": {
-          "yaw": 95,
+          "yaw": 155,
           "pitch": 15,
-          "top": -70,
+          "top": 0,
           "kick": 0
         },
         "observeSeconds": 90
       },
       "neighbors": [
         {
-          "speed": 5.7,
-          "range": "precision",
+          "speed": 15,
+          "range": "full",
           "input": {
-            "yaw": 95.05,
+            "yaw": 155.2,
             "pitch": 15,
-            "top": -70,
+            "top": 0,
             "kick": 0
           },
           "observeSeconds": 90
         }
-      ]
+      ],
+      "features": {
+        "minNonFloorTargets": 1,
+        "minSharpTurns": 1
+      }
     },
     {
       "id": "kyoto-cascade3",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 4,
@@ -495,8 +519,85 @@
       ]
     },
     {
-      "id": "kyoto-longconcourse",
+      "id": "kyoto-cafe-carom",
       "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "speed": 18,
+        "range": "full",
+        "input": {
+          "yaw": 145,
+          "pitch": 30,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 18,
+          "range": "full",
+          "input": {
+            "yaw": 144.8,
+            "pitch": 30,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "speed": 18,
+          "range": "full",
+          "input": {
+            "yaw": 145,
+            "pitch": 30.2,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "kyoto-underpass-uppercut",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "speed": 22,
+        "range": "full",
+        "input": {
+          "yaw": 75,
+          "pitch": 55,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 22,
+          "range": "full",
+          "input": {
+            "yaw": 75.2,
+            "pitch": 55,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "kyoto-longconcourse",
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 8,
@@ -525,7 +626,7 @@
     },
     {
       "id": "kyoto-balcony",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 8,
@@ -554,7 +655,7 @@
     },
     {
       "id": "kyoto-cascade6",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 6,
@@ -582,95 +683,8 @@
       ]
     },
     {
-      "id": "kyoto-skyway",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "speed": 20,
-        "range": "full",
-        "input": {
-          "yaw": 90,
-          "pitch": 0,
-          "top": -70,
-          "kick": 0
-        },
-        "observeSeconds": 90
-      },
-      "neighbors": [
-        {
-          "speed": 20,
-          "range": "full",
-          "input": {
-            "yaw": 90.05,
-            "pitch": 0,
-            "top": -70,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        }
-      ]
-    },
-    {
-      "id": "kyoto-cascade7",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "speed": 7,
-        "range": "precision",
-        "input": {
-          "yaw": 76.5,
-          "pitch": 0,
-          "top": -100,
-          "kick": 0
-        },
-        "observeSeconds": 90
-      },
-      "neighbors": [
-        {
-          "speed": 7,
-          "range": "precision",
-          "input": {
-            "yaw": 76.55,
-            "pitch": 0,
-            "top": -100,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        }
-      ]
-    },
-    {
-      "id": "kyoto-cascade10",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "speed": 10,
-        "range": "precision",
-        "input": {
-          "yaw": 76.5,
-          "pitch": 0,
-          "top": -100,
-          "kick": 0
-        },
-        "observeSeconds": 90
-      },
-      "neighbors": [
-        {
-          "speed": 10,
-          "range": "precision",
-          "input": {
-            "yaw": 76.55,
-            "pitch": 0,
-            "top": -100,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        }
-      ]
-    },
-    {
       "id": "kyoto-lastorder",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 29.65,
@@ -699,7 +713,7 @@
     },
     {
       "id": "kyoto-cascade5",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 5,
@@ -727,37 +741,8 @@
       ]
     },
     {
-      "id": "kyoto-cascade13",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "speed": 14,
-        "range": "full",
-        "input": {
-          "yaw": 76.5,
-          "pitch": 0,
-          "top": -100,
-          "kick": 0
-        },
-        "observeSeconds": 90
-      },
-      "neighbors": [
-        {
-          "speed": 14,
-          "range": "full",
-          "input": {
-            "yaw": 76.55,
-            "pitch": 0,
-            "top": -100,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        }
-      ]
-    },
-    {
       "id": "kyoto-eastdrop",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 22,
@@ -786,7 +771,7 @@
     },
     {
       "id": "kyoto-terracedrop",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 14,
@@ -815,7 +800,7 @@
     },
     {
       "id": "kyoto-roofdrop",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 25,
@@ -843,8 +828,96 @@
       ]
     },
     {
-      "id": "kyoto-crossstation",
+      "id": "kyoto-skyway-trapdoor",
       "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "speed": 30,
+        "range": "full",
+        "input": {
+          "yaw": 160,
+          "pitch": 35,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 29.8,
+          "range": "full",
+          "input": {
+            "yaw": 160,
+            "pitch": 35,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "speed": 30,
+          "range": "full",
+          "input": {
+            "yaw": 160,
+            "pitch": 35.2,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "features": {
+        "minNonFloorTargets": 3,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "kyoto-roof-bank-cascade",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "speed": 20,
+        "range": "full",
+        "input": {
+          "yaw": 40,
+          "pitch": 20,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 20,
+          "range": "full",
+          "input": {
+            "yaw": 40,
+            "pitch": 20.2,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "speed": 20,
+          "range": "full",
+          "input": {
+            "yaw": 40,
+            "pitch": 19.8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "kyoto-crossstation",
+      "revision": 2,
       "repeat": 2,
       "shot": {
         "speed": 38,
