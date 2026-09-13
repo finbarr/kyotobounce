@@ -18,17 +18,17 @@ heat.update({score:null,attempt:'a',mode:'replay',time:-1},1/60,'Charging');asse
 heat.update({score:{version:'waypoint-v3',total:10000000},attempt:'b',mode:'play',time:2},1/60,'Flight');heat.update({score:null,attempt:'b',mode:'play',time:3},1/60,'Aim');assert.equal(heat.state.tier,0,'recall resets heat');
 heat.dispose();assert.equal(scene.children.length,2);console.log('PASS waypoint score-frame selection, route bounds and bounded heat lifecycle');
 
-const base={version:'waypoint-v3',total:70000,styleBanks:0,bankMultiplier:1,waypointCount:3,waypointMultiplier:8};
+const base={version:'waypoint-v3',total:70000,styleBanks:0,bankMultiplier:1,bankBonus:0,comboMultiplier:8,waypointCount:3,waypointMultiplier:8};
 for(let i=0;i<2000;i++)assert.deepEqual(scoreEvents(base,{...base,activeSeconds:i,timeMultiplier:i,total:70000+i}),[],'Time/accuracy-only changes cannot trigger celebrations');
 assert.deepEqual(scoreEvents({...base,total:24950},{...base,total:25150,movementPoints:200}),[],'A movement-only heat threshold cannot fire a stinger');
-const bank={...base,styleBanks:1,bankMultiplier:1.75,total:122500,lastBank:'Steel bank'};
+const bank={...base,styleBanks:1,bankMultiplier:1.5,bankBonus:.5,comboMultiplier:8.5,total:122500,lastBank:'Steel bank'};
 assert.deepEqual(scoreEvents(base,bank).map(e=>e.kind),['bank','special']);assert.deepEqual(scoreEvents(bank,bank),[]);
-assert.deepEqual(scoreEvents(bank,{...bank,waypointCount:4,waypointMultiplier:16,total:262500}).map(e=>e.kind),['waypoint']);
+assert.deepEqual(scoreEvents(bank,{...bank,waypointCount:4,waypointMultiplier:16,comboMultiplier:16.5,total:262500}).map(e=>e.kind),['waypoint']);
 assert.deepEqual(scoreEvents(bank,base),[],'Backward scrubs do not fire old cues');
 for(const [tier,stage] of HEAT_STAGES.entries())assert.equal(heatTier({version:'waypoint-v3',total:stage.at}),tier);
 console.log('PASS action-only celebration events, no idle cues, six earned heat stages');
 
-const simultaneous={version:'waypoint-v3',total:52500,styleBanks:1,bankMultiplier:1.75,waypointCount:2,waypointMultiplier:4,waypointIds:['patch-1','patch-2']};
+const simultaneous={version:'waypoint-v3',total:52500,styleBanks:1,bankMultiplier:1.5,bankBonus:.5,comboMultiplier:4.5,waypointCount:2,waypointMultiplier:4,waypointIds:['patch-1','patch-2']};
 const doubleEvents=scoreEvents(null,simultaneous);
 assert.deepEqual(doubleEvents.map(e=>e.kind),['bank','waypoint','special']);
 const doublePopup=doubleEvents.reduce(pendingScoreEvent,null);
@@ -76,3 +76,6 @@ assert.ok(clearHeat.state.activeParticles<=128);assert.ok(ball.scale.equals(scal
 clearHeat.update({score:complete,challenge:course,attempt:'clear',mode:'play',time:3},1/60,'Flight',true);assert.equal(clearHeat.state.tier,6);assert.equal(clearHeat.state.activeParticles,0);
 clearHeat.update({score:null,challenge:course,attempt:'clear',mode:'play',time:4},1/60,'Aim');assert.equal(clearHeat.state.tier,0);clearHeat.dispose();
 console.log('PASS all-waypoint ID validation, one-shot priority, optional destination, maximum dance and bounded ball effects');
+
+assert.equal(scoreEvents(base,bank).find(e=>e.kind==='bank').bonus,.5,'Bank feedback displays the additive award');
+assert.equal(scoreEvents(bank,{...bank,waypointCount:4,waypointMultiplier:16,comboMultiplier:16.5}).find(e=>e.kind==='waypoint').multiplier,16.5,'Waypoint feedback displays the actual combined multiplier');

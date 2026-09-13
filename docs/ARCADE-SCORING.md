@@ -4,23 +4,27 @@ Only scoring actions build a combo. Translating flight and rolling add **100 poi
 
 ## Classic courses (`combo-v7`)
 
-`10,000 × 1.75^banks × landing accuracy + movement points`
+`10,000 × (1 + 0.5 × banks) × landing accuracy + movement points`
 
-Each qualifying distinct surface multiplies the combo by 1.75. Contacts need at least 1 m/s impact speed, 0.18 seconds between awarded banks and 0.6 m separation. Repeated surfaces and numbered stair/escalator treads count once. Banks freeze at first target entry.
+Each qualifying distinct surface adds +0.5× to the combo, independent of impact speed above the qualification threshold. Contacts need at least 1 m/s impact speed, 0.18 seconds between awarded banks and 0.6 m separation. Repeated surfaces and numbered stair/escalator treads count once. Banks freeze at first target entry.
 
 Supported rest inside the target keeps 100%. Outside, accuracy falls linearly with distance from the usable target edge, including height. The falloff range is 35% of start-to-target distance, clamped to 3–12 m. A target visit secures at least 25% if the completed shot finishes outside. Required routes still apply; distant untagged misses score zero.
 
 ## Waypoint courses (`waypoint-v3`)
 
-Courses have up to 32 optional waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; the two first awards total 30,000 base points. The outer edge of each drawn ring matches its scoring radius.
+Courses have up to 32 optional waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; two collected waypoints produce ×4, or 40,000 target points before bank credit. The outer edge of each drawn ring matches its scoring radius.
 
-Each new waypoint doubles the next award: 10,000, 20,000, 40,000… After `W` hits, base points are `10,000 × (2^W − 1)`. Multiply by `1.75^banks`. Banks can continue throughout the shot, including after destination entry. The protocol's `waypointMultiplier = 2^W` describes the next award; single-hit celebrations show half that value, the award just earned.
+The combined multiplier is **`2^W + 0.5 × B`**, where `W` is collected waypoints and `B` is qualifying distinct banks. With at least one waypoint, target points are **`10,000 × combined multiplier`**. This replaces the cumulative 10k/20k/40k award sum. Each waypoint doubles only the waypoint component; bank credit is always additive and never gets doubled by later waypoints. Order does not affect the final multiplier.
 
-Supported rest in the destination adds a bonus equal to the multiplied waypoint score, or the multiplied 10,000 base if no waypoint was collected. Missing it preserves waypoint points. A positive target score completes the course. Recall, leaving the station and missing a required route forfeit. Only JavaScript's safe-integer storage limit caps the score.
+Example: waypoint → bank → waypoint → bank → bank → waypoint gives **2× → 2.5× → 4.5× → 5× → 5.5× → 9.5×**, or 95,000 target points. Three waypoints alone earn 80,000; three banks add 15,000 regardless of when they occurred. Twelve banks in classic mode produce 7×, instead of an exponential surface chain.
+
+Banks can continue throughout waypoint shots, including after destination entry. `waypointMultiplier` is the current `2^W` component, `bankBonus` is `0.5 × B`, and `comboMultiplier` is their sum. `waypointBase` contains target points before bank credit; `bankMultiplier` is the surface-only `1 + bankBonus`, never a factor applied to waypoint points.
+
+Supported rest in the destination adds a bonus equal to the target score, or `10,000 × (1 + 0.5 × B)` if no waypoint was collected. Missing it preserves waypoint points. A positive target score completes the course. Recall, leaving the station and missing a required route forfeit. Only JavaScript's safe-integer storage limit caps the score.
 
 Movement time is measured from consecutive authoritative 180 Hz positions, excluding numerical drift below 0.001 m/s. Fractional seconds accrue individual points (`floor(movingSeconds × 100)`). The bonus continues while the ball translates after a target hit, is added after landing accuracy and the destination bonus, and is forfeited on recall or a missed required route.
 
-The server calculates live frames and final results from the same native records. Clients cannot submit a score. Pre-launch rule changes discard retired development courses, boards and replays; only the current rules remain.
+The server calculates live frames and final results from the same native records. Clients cannot submit a score. The game is pre-launch: this scoring change clears existing scores and replays. Courses keep their current IDs and revisions; no legacy scoring implementation or migration is retained.
 
 ## Presentation
 
@@ -35,7 +39,7 @@ A named trick chain links banks and waypoints. Earned score fills a special mete
 | 5,000,000 | Hyperdrive | Magenta plasma and multicolored sparks |
 | 20,000,000 | Mega Jackpot | Cycling rainbow energy |
 
-New banks, waypoints, target entry and earned stage changes trigger score stamps, medal/shard bursts, edge light chases and short original synthesized stingers. Repeated state frames and landing-accuracy changes produce no fanfares. Audio varies melody, rhythm and timbre within a bounded register. Particles and flame activity subside during uneventful rolling; the earned color remains.
+The HUD shows the combined multiplier and its separate waypoint and bank components. Bank popups show +0.50×; waypoint popups show the new combined multiplier. New banks, waypoints, target entry and earned stage changes trigger score stamps, medal/shard bursts, edge light chases and short original synthesized stingers. Repeated state frames and landing-accuracy changes produce no fanfares. Audio varies melody, rhythm and timbre within a bounded register. Particles and flame activity subside during uneventful rolling; the earned color remains.
 
 The world effect uses a fixed 128-particle pool and at most six draw calls, without dynamic lights or changing physical ball size/spin marks. Screen medals use one canvas and a fixed 180-particle pool. Simultaneous collections show a double or multi-target popup even when they also trigger a heat stage. Reduced motion keeps color and text while removing bursts, orbiting effects and number scaling. Slow frames suppress animated world effects. Recall, course changes and backward replay scrubs reset presentation.
 

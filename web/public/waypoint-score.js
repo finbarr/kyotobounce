@@ -31,12 +31,12 @@ export function scoreEvents(previous,score,challenge){
  if(!currentScore(score))return [];
  if(previous&&(score.styleBanks<previous.styleBanks||(score.waypointCount||0)<(previous.waypointCount||0)))return [];
  const events=[],banks=score.styleBanks-(previous?.styleBanks||0),waypoints=(score.waypointCount||0)-(previous?.waypointCount||0);
- if(banks>0)events.push({kind:'bank',label:score.lastBank||'CLEAN BANK',multiplier:score.bankMultiplier,count:banks});
- if(waypoints>0)events.push({kind:'waypoint',label:waypoints===2?'DOUBLE TARGET':waypoints>2?`${waypoints} TARGETS AT ONCE`:`TARGET ${score.waypointCount}`,multiplier:score.waypointMultiplier/2,count:waypoints});
- if(score.version==='waypoint-v3'?score.destinationReached&&!previous?.destinationReached:score.goalVisited&&!previous?.goalVisited)events.push({kind:score.version==='waypoint-v3'?'destination':'goal',label:score.version==='waypoint-v3'?'DESTINATION BONUS':'TARGET TAGGED',multiplier:score.bankMultiplier,count:1});
+ if(banks>0)events.push({kind:'bank',label:score.lastBank||'CLEAN BANK',multiplier:score.comboMultiplier,bonus:score.bankBonus-(previous?.bankBonus||0),count:banks});
+ if(waypoints>0)events.push({kind:'waypoint',label:waypoints===2?'DOUBLE TARGET':waypoints>2?`${waypoints} TARGETS AT ONCE`:`TARGET ${score.waypointCount}`,multiplier:score.comboMultiplier,count:waypoints});
+ if(score.version==='waypoint-v3'?score.destinationReached&&!previous?.destinationReached:score.goalVisited&&!previous?.goalVisited)events.push({kind:score.version==='waypoint-v3'?'destination':'goal',label:score.version==='waypoint-v3'?'DESTINATION BONUS':'TARGET TAGGED',multiplier:score.comboMultiplier,count:1});
  // Changes in position, spin, time or landing accuracy cannot ring the machine.
  const tier=heatTier(score);
- if(events.length&&tier>heatTier(previous))events.push({kind:'special',label:HEAT_STAGES[tier].name,tier,multiplier:score.bankMultiplier,count:1});
+ if(events.length&&tier>heatTier(previous))events.push({kind:'special',label:HEAT_STAGES[tier].name,tier,multiplier:score.comboMultiplier,count:1});
  if(allWaypointsCollected(score,challenge)&&!allWaypointsCollected(previous,challenge))events.push({kind:'clear',label:'ALL WAYPOINTS',tier:6,count:challenge.waypoints.length});
  return events;
 }

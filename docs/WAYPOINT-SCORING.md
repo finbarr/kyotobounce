@@ -18,27 +18,24 @@ points.** This is a new scoring family alongside existing destination courses.
   is credited by native ball contact, including slow rolling, on its actual face;
   flying nearby or touching the opposite side of a wall does not count.
 - First slice includes authoring, saving, playing and replaying a waypoint-only
-  course and a mixed course. Current classic and waypoint courses remain playable. Retired development
-  layouts and rule versions are discarded.
+  course and a mixed course. Current classic and waypoint courses remain playable. Pre-launch scoring changes clear existing scores and replays; no historical rules are retained.
 
-## Initial tuning
+## Current tuning
 
-Successive unique waypoints award base values of 10,000, 20,000, 40,000, 80,000,
-and so on. The waypoint base is `10,000 × (2^collected − 1)`. Five targets yield
-310,000 before bank multipliers. These initial constants are tuning
-choices; each further scoring change requires a new version.
+See [ARCADE-SCORING.md](ARCADE-SCORING.md) for the authoritative rules.
+The multiplier is `2^collected + 0.5 × distinct banks`. Once a waypoint is collected,
+target points are `10,000 × multiplier`. Waypoints double only their own component;
+banks never compound. Five waypoints earn 320,000 before additive bank credit.
+A new bank adds 5,000 target points regardless of collection order or impact speed.
 
-Apply the distinct-bank multiplier (`1.75^banks`) to the waypoint base.
-Translating flight and rolling add 100 points per second after all multipliers and the destination bonus. Stationary time and spin alone add nothing. At least one target must score to bank these movement points. New-mode bank awards
-continue throughout the shot; hitting a waypoint or crossing the destination does
-not freeze them. Repeated contacts with the same waypoint never earn again.
+Translating flight and rolling add 100 points per second after all multipliers and
+the destination bonus. Stationary time and spin alone add nothing. At least one
+target must score to bank movement points. Banks continue throughout the shot;
+repeated waypoints and repeated surfaces never earn again.
 
-At full supported rest inside the destination, add a landing bonus equal to
-`max(10,000, waypoint base) × bank factor`. Thus landing doubles an
-earned waypoint chain, while a destination-only course still earns a base award.
-Missing the destination earns zero landing bonus and preserves the entire
-waypoint score. A normal shot with no target earned scores zero. Recall and leaving
-still forfeit. Safe-integer storage is the only numerical clamp.
+At full supported rest inside the destination, add `10,000 × multiplier` as a bonus.
+Missing it preserves all waypoint points. Without a waypoint or destination, the
+shot scores zero. Recall and missing a required route forfeit the shot.
 
 A new-mode shot counts as completed when it earns any target and comes to true
 rest; its result separately identifies whether the destination was reached.
@@ -59,9 +56,10 @@ IDs are unique within the course and are awarded at most once per attempt.
 
 The score breakdown contains `waypointCount`, `waypointIds`, `waypointHits`,
 `waypointBase`, `waypointMultiplier`, `destinationReached`, `destinationBonus`,
-bank fields, `total` and `potential`. **`waypointMultiplier = 2^waypointCount`
-is the NEXT award multiplier**; a hit celebration labels the award just earned,
-not the next one. The native destination-rest attestation is distinct from the
+bank fields, `total` and `potential`. `waypointMultiplier = 2^waypointCount` is
+the current waypoint component, `bankBonus = 0.5 × styleBanks`, and
+`comboMultiplier` is their sum. Hit celebrations display the combined multiplier;
+bank celebrations display their additive increment. The native destination-rest attestation is distinct from the
 public completion flag. Final and live scoring consume the same native records.
 
 ## Jackpot presentation

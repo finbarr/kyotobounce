@@ -19,12 +19,12 @@ try{
  assert.deepEqual(new Set(hits.map(h=>h.waypointId)),new Set(course.waypoints.map(w=>w.id)));
  const live=client.messages.filter(m=>m.type==='state'&&m.liveScore?.waypointCount);
  assert.ok(live.length);assert.equal(live[0].liveScore.waypointCount,2,'Both awards must arrive in one authoritative score update');
- assert.equal(live[0].liveScore.waypointBase,30000,'The shared contact earns both 10000 and 20000 awards');
+ assert.equal(live[0].liveScore.waypointBase,40000,'The shared contact earns two waypoint doublings on the 10000 base');
  assert.equal(shot.result.breakdown.waypointCount,2);
  const {replay}=await client.request('replay',{attempt:shot.result.attempt},'replay');
  assert.deepEqual(scoreAttempt(replay),shot.result.breakdown);
  assert.deepEqual(replay.scoreFrames.at(-1).score,shot.result.breakdown);
  assert.deepEqual(replay.waypointHits,hits.map(({at,...hit})=>hit),'Playback timestamps do not alter native hit records');
  await mkdir('.local',{recursive:true});await writeFile('.local/waypoint-overlap-runtime.json',JSON.stringify({origin,hits,live:live[0].liveScore,result:shot.result.breakdown},null,2));
- console.log('PASS Exact Change same-contact double collection, once-only awards, live count, 30000 base and final replay parity');
+ console.log('PASS Exact Change same-contact double collection, once-only awards, live count, 40000 base and final replay parity');
 }finally{client.close();}

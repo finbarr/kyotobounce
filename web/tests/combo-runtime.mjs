@@ -24,7 +24,7 @@ try{
   assert.ok(replay.scoreFrames.length>20);assert.deepEqual(replay.scoreFrames.at(-1).score,r.breakdown);assert.deepEqual(scoreAttempt(replay),r.breakdown);assert.equal(replay.score,r.score);
   assert.equal(replay.thrower.powerRange,'precision');assert.ok(Math.abs(Math.hypot(...Object.values(replay.velocity))-(.5+11.5*replay.thrower.power))<.00001,'The displayed linear speed is the actual native launch speed');
   assert.ok(Math.abs(live.at(-1).potential-r.breakdown.potential)<=1,'Live multiplier exactly agrees with final replay');
-  if(name==='perfect'){assert.equal(r.breakdown.landingMultiplier,1);assert.ok(live.some(m=>m.goalVisited),'The goal must light before the result');assert.ok(r.score>=17500);}
+  if(name==='perfect'){assert.equal(r.breakdown.landingMultiplier,1);assert.ok(live.some(m=>m.goalVisited),'The goal must light before the result');assert.ok(r.score>=15000);}
   if(name==='tagged'){assert.equal(r.breakdown.goalVisited,true);assert.ok(r.breakdown.landingMultiplier>=.25);}
   let settlingRegression;
   if(name==='perfect'){
