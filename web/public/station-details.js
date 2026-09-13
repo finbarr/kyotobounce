@@ -5,17 +5,16 @@ function artwork(width,height,paint){
   const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;
 }
 // Original procedural artwork and exact registrations; audit: web/station/wayfinding/README.md.
-export const wayfindingLayout='b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515';
-// Both exports retain the audited sign faces and wall anchors. Historical650
-// predates this registration and must not receive these fixed-position overlays.
-const registeredLayouts=new Set([wayfindingLayout]);
-export const hasStationWayfinding=layout=>registeredLayouts.has(layout);
+export const wayfindingLayout='232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8';
+// Fixed-position artwork belongs only to the matching current station export.
+export const hasStationWayfinding=layout=>layout===wayfindingLayout;
 export const wayfindingFont='"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans CJK JP", "Noto Sans JP", Arial, sans-serif';
 const font=wayfindingFont;
 // Facing is the outward normal in native coordinates (+X east, +Z north).
 // Arrows are in the reader's plane, never inferred from words in a mesh ID.
 export const wayfindingRegistrations=[
-  {id:'central-hall-central-gate-sign',face:'north',rows:[['','JR 中央口','JR Central Gate · 1F']],source:'jr',certainty:'high identity; modeled anchor'},
+  // The source title sits 8 mm in front of its backing. Clear that lettering.
+  {id:'central-hall-central-gate-sign',face:'north',offset:.02,rows:[['','JR 中央口','JR Central Gate · 1F']],source:'jr',certainty:'high identity; modeled anchor'},
   {id:'central-hall-information-board-structure',face:'north',rows:[
     ['right','西口・自由通路  2F','West Exit / Public Passage'],
     ['right','売店  2F','Convenience Store · West Exit'],
@@ -63,7 +62,7 @@ function labelTexture(registration,width,height){
 
 export function addStationDetails(scene,meta){
   const group=new THREE.Group();group.name='Atrium signs and flush floor finishes';scene.add(group);
-  // Retain verified registrations on matching current or historical geometry only.
+  // Retain verified registrations on matching current geometry only.
   if(!hasStationWayfinding(meta.sourceLayoutSha256))return {group,stats:{signFaces:0,posters:0,wayfinding:'unregistered layout'}};
   const seen=new Set(),textures=[];let signFaces=0;
   for(const registration of wayfindingRegistrations){
@@ -78,9 +77,10 @@ export function addStationDetails(scene,meta){
     const mat=new THREE.MeshStandardMaterial({map,emissiveMap:map,emissive:0xffffff,emissiveIntensity:.35,roughness:.6,metalness:.05});
     const plane=new THREE.Mesh(new THREE.PlaneGeometry(width,height),mat);
     plane.position.set((b[0][0]+b[0][1])/2,(b[1][0]+b[1][1])/2,-(b[2][0]+b[2][1])/2);
-    if(xFace){plane.position.x=b[0][0]-.008;plane.rotation.y=-Math.PI/2;}
-    else if(registration.face==='south'){plane.position.z=-b[2][0]+.008;}
-    else{plane.position.z=-b[2][1]-.008;plane.rotation.y=Math.PI;}
+    const offset=registration.offset??.008;
+    if(xFace){plane.position.x=b[0][0]-offset;plane.rotation.y=-Math.PI/2;}
+    else if(registration.face==='south'){plane.position.z=-b[2][0]+offset;}
+    else{plane.position.z=-b[2][1]-offset;plane.rotation.y=Math.PI;}
     plane.name=registration.id+' readable face';plane.userData.wayfinding=registration;group.add(plane);signFaces++;
   }
   // Redraw once after optional web fonts settle; no frame loop or new texture allocation.

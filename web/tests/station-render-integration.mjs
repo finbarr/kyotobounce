@@ -18,6 +18,10 @@ for(const[m,before]of materials)assert.deepEqual(snapshot(m),before,m.name);
 for(const hash of ['650fed69aa6ab63af523f8f8aa8819858672ffd3994a1be6c2e9ea1aaa7731d2','unknown']){const result=addStationDetails(new THREE.Scene(),{sourceLayoutSha256:hash});assert.equal(result.group.children.length,0);assert.equal(result.stats.signFaces,0);}
 assert.equal(stationMaterialFamily('Atrium | honed granite floor | Browser'),'floor');
 assert.equal(stationMaterialFamily('Garden guard glazing | Browser'),'guard');
+// The exported suffix must not silently disable the new authored finishes.
+for(const [name,family]of [['garden-paving','paving'],['oak','wood'],['ivory','wall'],['mirror','stainless']]){
+ assert.equal(stationMaterialFamily('station-additions-'+name+' | Browser'),family);
+}
 look.dispose?.();
 console.log(`PASS ${materials.length} authored material names preserve color/emission/maps; retained station families and unregistered-layout exclusion`);
 

@@ -14,6 +14,7 @@ SOURCE=args.source.resolve();LAYOUT=args.layout.resolve()
 OUT=(args.output or ROOT/'web/public/assets').resolve();OUT.mkdir(parents=True,exist_ok=True)
 REPORT=OUT/'atrium-export.json' if args.output else ROOT/'artifacts/phase3/art/export.json'
 bpy.ops.wm.open_mainfile(filepath=str(SOURCE));source_scene=bpy.context.scene
+assert bpy.data.texts['Kyoto runtime seed.json'].as_string()==LAYOUT.read_text(), 'Embedded layout seed differs from requested collision export'
 layout=json.loads(LAYOUT.read_text());records={m['label']:m for m in layout['authoredMaterials']}
 def enable(layer):
  layer.exclude=False;layer.hide_viewport=False;layer.collection.hide_viewport=False
@@ -84,13 +85,19 @@ for obj in list(source_scene.objects):
  if obj.hide_get():obj.hide_set(False)
  e=obj.evaluated_get(deps);mesh=e.to_mesh();mesh.calc_loop_triangles()
  matrix=e.matrix_world;nm=matrix.to_3x3().inverted_safe().transposed();uv_layer=mesh.uv_layers.active
- center=matrix.translation;cell=(math.floor(center.x/20),math.floor(center.y/20),math.floor(center.z/15))
+ center=matrix.translation
+ # The new fixture layer has many small meshes sharing a few materials.
+ # Coarser batches reduce submissions in long station views without changing
+ # any vertices, normals, UVs or physical geometry. Keep its bins separate.
+ fine_cell=(math.floor(center.x/20),math.floor(center.y/20),math.floor(center.z/15))
+ cell=(('additions',math.floor(center.x/60),math.floor(center.y/60),math.floor(center.z/20))
+       if obj.name.startswith('add-') else (math.floor(center.x/20),math.floor(center.y/20),math.floor(center.z/15)))
  flipped=matrix.determinant()<0
  counts['sourceObjects']+=1
  for tri in mesh.loop_triangles:
   original=mesh.materials[tri.material_index] if tri.material_index<len(mesh.materials) else None
   label=original.name if original else 'Default stone'
-  key=(label,cell)
+  key=(label,fine_cell if records.get(label,{}).get('alpha',1)<1 else cell)
   g=groups.setdefault(key,{'positions':[],'normals':[],'uv':[],'faces':[]})
   vertices=[];span=float(records.get(label,{}).get('worldTextureSpan',0))
   for li in (reversed(tri.loops) if flipped else tri.loops):
@@ -125,6 +132,10 @@ def material(label):
  p.inputs['Base Color'].default_value=(*(color.get(k,.4) for k in 'rgb'),alpha)
  p.inputs['Metallic'].default_value=rec.get('metallic',0);p.inputs['Roughness'].default_value=rec.get('roughness',.5);p.inputs['Alpha'].default_value=alpha
  if alpha<1:m.surface_render_method='DITHERED'
+ if rec.get('emission',0):
+  ec=rec.get('emissionColor',color)
+  p.inputs['Emission Color'].default_value=(*(ec.get(k,.4) for k in 'rgb'),1)
+  p.inputs['Emission Strength'].default_value=rec['emission']
  for key in ['albedo','normal']:
   image_ref=rec.get(key)
   if not image_ref:continue
@@ -149,6 +160,8 @@ for (label,cell),g in groups.items():
 bpy.ops.export_scene.gltf(filepath=str(OUT/'atrium.glb'),export_format='GLB',use_active_scene=True,export_yup=True,export_animations=False,export_cameras=False,export_lights=False,export_extras=True,export_materials='EXPORT')
 public={k:layout[k] for k in ['spawn','escalators','authoredLights','authoredMaterials']}
 if 'concourseDetails' in layout:public['concourseDetails']=layout['concourseDetails']
+for key in ['stationInstallations','stationAdditions']:
+ if key in layout:public[key]=layout[key]
 public.update(layoutSha256=hashlib.sha256(LAYOUT.read_bytes()).hexdigest(),coordinateMapping='Unity (x,y,z) -> Three (x,y,-z)')
 (OUT/'station.json').write_text(json.dumps(public,separators=(',',':')))
 counts.update(batches=len(groups),materials=len(mats),glbBytes=(OUT/'atrium.glb').stat().st_size,sourceSha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),layoutSha256=public['layoutSha256'])

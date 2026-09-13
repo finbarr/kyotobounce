@@ -1,186 +1,847 @@
 {
   "date": "2026-09-13",
-  "source": "efe3144",
-  "assets": "assets-v5",
-  "layoutSha256": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+  "assets": "assets-v6",
+  "layoutSha256": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
   "coordinateSystem": "Three.js world coordinates: native x and y, negated native z",
   "width": 1280,
   "height": 720,
-  "note": "Diagnostic views, not matched photographic registration. Renderer uses current station appearance; player and HUD omitted. The avatar contact-shadow helper is not architectural evidence.",
+  "note": "Visually checked diagnostic views with named anchors. Floor/wing registration is schematic, not a metric photographic fit. The inspector moves the reverse retail camera clear of the escalator casing.",
   "views": [
     {
-      "name": "garden-current",
+      "name": "add-heart1f-hall",
+      "position": [
+        14.5,
+        1.7,
+        -5.4
+      ],
+      "target": [
+        25.5,
+        1.4,
+        -14.4
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "north lattice column row z=12.428",
+        "central entrance axis x=0",
+        "east escalator approach x=32"
+      ]
+    },
+    {
+      "name": "add-heart1f-forecourt",
+      "position": [
+        34.5,
+        1.7,
+        -23.4
+      ],
+      "target": [
+        25.5,
+        1.4,
+        -16.4
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "north shop rear glazing",
+        "east return",
+        "entry fascia seen obliquely"
+      ]
+    },
+    {
+      "name": "add-yojiya1f-retail-order",
+      "position": [
+        -0.25,
+        1.7,
+        -7.4
+      ],
+      "target": [
+        14.75,
+        1.6,
+        -14.4
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "Yojiya west of travel exchange",
+        "Heart-in eastern anchor",
+        "retained lattice column row"
+      ]
+    },
+    {
+      "name": "add-yojiya1f-retail-return",
+      "position": [
+        17.75,
+        1.7,
+        -8.4
+      ],
+      "target": [
+        7.75,
+        1.5,
+        -14.4
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "three distinct northern frontages",
+        "original counters",
+        "central arrival axis"
+      ]
+    },
+    {
+      "name": "add-porta-mouth",
+      "position": [
+        -34,
+        1.7,
+        -15.5
+      ],
+      "target": [
+        -34,
+        -1,
+        -25
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "west forecourt",
+        "north-facing descent",
+        "hall link outside west escalator"
+      ]
+    },
+    {
+      "name": "add-porta-landing",
+      "position": [
+        -26,
+        -2.5,
+        -31
+      ],
+      "target": [
+        -34,
+        -2,
+        -25
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "lower public landing",
+        "stair return",
+        "Porta signage"
+      ]
+    },
+    {
+      "name": "add-isetan1f-arrival",
+      "position": [
+        -68.2,
+        1.7,
+        11
+      ],
+      "target": [
+        -74.2,
+        1.6,
+        7
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "western hall edge",
+        "department store portal",
+        "inner glazed doors"
+      ]
+    },
+    {
+      "name": "add-isetan1f-inside",
+      "position": [
+        -75.60000000000001,
+        1.7,
+        6
+      ],
+      "target": [
+        -70.2,
+        1.6,
+        7
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "public hall threshold",
+        "entry display cases",
+        "retained western building"
+      ]
+    },
+    {
+      "name": "add-central-gate-arrival",
+      "position": [
+        8.5,
+        1.7,
+        17
+      ],
+      "target": [
+        8.5,
+        2.7,
+        35
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "gate line z=-27.4",
+        "two service offices",
+        "retained curved balcony"
+      ]
+    },
+    {
+      "name": "add-central-gate-oblique",
+      "position": [
+        -6,
+        1.7,
+        19
+      ],
+      "target": [
+        12,
+        2,
+        34
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "ticket flaps",
+        "columns behind gate",
+        "ticket-office east frontage"
+      ]
+    },
+    {
+      "name": "add-hall-soffit-approach",
+      "position": [
+        -40,
+        1.7,
+        2
+      ],
+      "target": [
+        -39,
+        3.8,
+        10
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "covered western hall",
+        "banded columns",
+        "round lamps and longitudinal grilles"
+      ]
+    },
+    {
+      "name": "add-hall-soffit-reverse",
+      "position": [
+        -39,
+        1.7,
+        13
+      ],
+      "target": [
+        -40,
+        4,
+        5
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "same soffit bay reverse",
+        "column capitals",
+        "bounded ceiling lighting"
+      ]
+    },
+    {
+      "name": "add-east1f-retail",
+      "position": [
+        35,
+        1.7,
+        -2.5
+      ],
+      "target": [
+        43,
+        1.6,
+        3
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "east-frontage bay mullions",
+        "Osake western end",
+        "7 Taps contiguous frontage"
+      ]
+    },
+    {
+      "name": "add-east1f-retail-return",
+      "position": [
+        48,
+        1.7,
+        -0.1
+      ],
+      "target": [
+        37,
+        1.6,
+        2.5
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "contiguous restaurant glazing",
+        "western Osake frontage",
+        "public east passage"
+      ]
+    },
+    {
+      "name": "add-east1f-hotel",
+      "position": [
+        42,
+        1.7,
+        -16
+      ],
+      "target": [
+        59,
+        2,
+        -9
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_1f.svg",
+      "anchors": [
+        "hotel drop-off edge",
+        "east passage",
+        "separate lift and police frontage"
+      ]
+    },
+    {
+      "name": "add-passage2f-north-arrival",
+      "position": [
+        -63,
+        9,
+        22
+      ],
+      "target": [
+        -63,
+        9,
+        48
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_pedestrianwalkway_01.jpg",
+      "anchors": [
+        "retained 2F west landing",
+        "West Gate east branch",
+        "banded columns and lamp axis"
+      ]
+    },
+    {
+      "name": "add-passage2f-return",
+      "position": [
+        -62,
+        9,
+        62
+      ],
+      "target": [
+        -63,
+        9.35,
+        30
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_pedestrianwalkway_01.jpg",
+      "anchors": [
+        "north route",
+        "west retail edge",
+        "yellow column panels"
+      ]
+    },
+    {
+      "name": "add-westsquare-approach",
+      "position": [
+        -62,
+        9.049999999999999,
+        40
+      ],
+      "target": [
+        -50,
+        10.35,
+        30
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_westsquare_01.jpg",
+      "anchors": [
+        "north south passage west opening",
+        "curved balcony",
+        "three cylindrical columns"
+      ]
+    },
+    {
+      "name": "add-westsquare-reverse",
+      "position": [
+        -43,
+        9.049999999999999,
+        29
+      ],
+      "target": [
+        -58,
+        10.35,
+        41
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_westsquare_01.jpg",
+      "anchors": [
+        "shutter frontage",
+        "balcony return",
+        "slatted ceiling"
+      ]
+    },
+    {
+      "name": "add-theater2f-foyer",
+      "position": [
+        58,
+        9.049999999999999,
+        4
+      ],
+      "target": [
+        66,
+        9.35,
+        16
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_2f.svg",
+      "anchors": [
+        "east staircase arrival",
+        "theater entrance doors",
+        "restaurant branch east"
+      ]
+    },
+    {
+      "name": "add-theater2f-reverse",
+      "position": [
+        70,
+        9.049999999999999,
+        13
+      ],
+      "target": [
+        60,
+        9.35,
+        6
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_2f.svg",
+      "anchors": [
+        "box office",
+        "arrival stair",
+        "open foyer"
+      ]
+    },
+    {
+      "name": "add-promenade3f-west",
+      "position": [
+        -64,
+        17.15,
+        42.3
+      ],
+      "target": [
+        25,
+        17.15,
+        42.3
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_southpromenade_01.jpg",
+      "anchors": [
+        "south building edge",
+        "4F stair branch",
+        "pier and aperture parapet"
+      ]
+    },
+    {
+      "name": "add-promenade3f-east",
+      "position": [
+        62,
+        17.15,
+        42.3
+      ],
+      "target": [
+        -40,
+        17.15,
+        42.3
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_southpromenade_01.jpg",
+      "anchors": [
+        "east 3F link",
+        "continuous drain",
+        "south-facing rail view"
+      ]
+    },
+    {
+      "name": "add-wood4f-turf",
+      "position": [
+        -17,
+        21.285964912280704,
+        25
+      ],
+      "target": [
+        15,
+        20.585964912280705,
+        32
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_southsquare_01.jpg",
+      "anchors": [
+        "south atrium edge 4F",
+        "turf and timber forms",
+        "dome at eastern turf edge"
+      ]
+    },
+    {
+      "name": "add-wood4f-work",
+      "position": [
+        52,
+        21.285964912280704,
+        28
+      ],
+      "target": [
+        25,
+        20.785964912280704,
+        34
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_southsquare_02.jpg",
+      "anchors": [
+        "south-facing work counters",
+        "power outlets",
+        "open circulation north of furniture"
+      ]
+    },
+    {
+      "name": "add-facade-long-west",
+      "position": [
+        -68,
+        21.3,
+        0
+      ],
+      "target": [
+        30,
+        35,
+        21
+      ],
+      "reference": "https://www.kanebako-se.co.jp/media/5/9/0/590_800x600.jpg",
+      "anchors": [
+        "retained south bays",
+        "upper small square arrays",
+        "projecting band below"
+      ]
+    },
+    {
+      "name": "add-facade-long-east",
+      "position": [
+        59,
+        21.3,
+        0
+      ],
+      "target": [
+        -43,
+        35,
+        21
+      ],
+      "reference": "https://www.kanebako-se.co.jp/media/5/9/0/590_800x600.jpg",
+      "anchors": [
+        "east end transition",
+        "same facade family reverse",
+        "canopy connection unchanged"
+      ]
+    },
+    {
+      "name": "add-garden-arrival",
       "position": [
         -156,
-        56.2,
+        56.1982456,
         20.4
       ],
       "target": [
         -146,
-        55.3,
+        55.4982456,
         18
       ],
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_oozorahiroba_01.jpg",
+      "anchors": [
+        "retained bamboo beds",
+        "yellow lamp shelters",
+        "garden stair gap"
+      ]
     },
     {
-      "name": "02-great-stair",
+      "name": "add-garden-edge",
       "position": [
-        -72.3475413656327,
-        21.17136180701084,
-        -4.446848357668717
+        -159,
+        56.1982456,
+        30
       ],
       "target": [
-        -113.1161574717448,
-        33.117228624532814,
-        21.920104571528174
-      ],
-      "fov": 66.20629060243228,
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
-    },
-    {
-      "name": "03-along-atrium",
-      "position": [
-        -70.921275,
-        21.235965,
-        1
-      ],
-      "target": [
-        52,
-        28,
-        1
-      ],
-      "fov": 65,
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
-    },
-    {
-      "name": "06-skyway",
-      "position": [
-        -61.616039,
-        46.85,
-        -2.326107
-      ],
-      "target": [
-        67.074397,
-        46.85,
-        -2.326107
-      ],
-      "fov": 65,
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
-    },
-    {
-      "name": "heart-in-current",
-      "position": [
-        -57,
-        9,
-        18
-      ],
-      "target": [
-        -50,
-        9,
-        18
-      ],
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
-    },
-    {
-      "name": "central-hall",
-      "position": [
-        0,
-        2,
-        -20
-      ],
-      "target": [
-        0,
-        7,
+        -164,
+        55.4982456,
         17
       ],
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_oozorahiroba_01.jpg",
+      "anchors": [
+        "west screen and bed",
+        "walkable paving",
+        "south stair approach"
+      ]
     },
     {
-      "name": "east-shops",
+      "name": "add-eastsquare-gazebo",
       "position": [
-        8,
+        96,
+        36.32,
+        9
+      ],
+      "target": [
+        103,
+        36.419999999999995,
+        2
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_eastsquare_01.jpg",
+      "anchors": [
+        "existing globe gazebo",
+        "existing staked tree",
+        "yellow perforated volume behind gazebo"
+      ]
+    },
+    {
+      "name": "add-eastsquare-reverse",
+      "position": [
+        110,
+        36.32,
+        2
+      ],
+      "target": [
+        100,
+        35.62,
+        10
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_eastsquare_03.jpg",
+      "anchors": [
+        "seating and floor lights",
+        "open middle of square",
+        "retained ramp connection"
+      ]
+    },
+    {
+      "name": "add-niwa-arrival",
+      "position": [
+        106,
+        36.32,
+        12.030000000000001
+      ],
+      "target": [
+        108.1,
+        36.12,
+        19.03
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/restaurant_cafe/004/",
+      "anchors": [
+        "south opening of East Square",
+        "retained curved canopy",
+        "separate eastern hotel glazing"
+      ]
+    },
+    {
+      "name": "add-niwa-interior",
+      "position": [
+        106.1,
+        36.32,
+        21.03
+      ],
+      "target": [
+        109.1,
+        36.12,
+        15.030000000000001
+      ],
+      "reference": "https://niwa.naked.works/kyoto/jp/",
+      "anchors": [
+        "terrace-facing entry",
+        "tea counter",
+        "timber lattice"
+      ]
+    },
+    {
+      "name": "add-fukunaga-entry",
+      "position": [
+        -115.98767981168075,
+        38.4789473684,
+        21.76544310354651
+      ],
+      "target": [
+        -117.48844880511332,
+        38.2789473684,
+        28.303615052061737
+      ],
+      "reference": "https://www.fukunaga294.jp/location.html",
+      "anchors": [
+        "8F south Grand Staircase landing",
+        "existing doorway frame",
+        "interior counter"
+      ]
+    },
+    {
+      "name": "add-fukunaga-reverse",
+      "position": [
+        -119.1962882597317,
+        38.4789473684,
+        29.74697377297928
+      ],
+      "target": [
+        -118.66732679233002,
+        38.4789473684,
+        23.444577421907393
+      ],
+      "reference": "https://www.fukunaga294.jp/location.html",
+      "anchors": [
+        "open threshold",
+        "south wing floor",
+        "retained stair approach"
+      ]
+    },
+    {
+      "name": "add-kato-entry",
+      "position": [
+        -127.26267981168077,
+        42.6894736842,
+        24.50544310354651
+      ],
+      "target": [
+        -128.76344880511334,
+        42.4894736842,
+        31.04361505206174
+      ],
+      "reference": "https://www.katomodels-kyoto.com/storeinfo",
+      "anchors": [
+        "9F south Grand Staircase landing",
+        "existing doorway frame",
+        "interior counter"
+      ]
+    },
+    {
+      "name": "add-kato-reverse",
+      "position": [
+        -130.47128825973175,
+        42.6894736842,
+        32.48697377297928
+      ],
+      "target": [
+        -129.94232679233002,
+        42.6894736842,
+        26.184577421907395
+      ],
+      "reference": "https://www.katomodels-kyoto.com/storeinfo",
+      "anchors": [
+        "open threshold",
+        "south wing floor",
+        "retained stair approach"
+      ]
+    },
+    {
+      "name": "add-ramen10f-arrival",
+      "position": [
+        -108,
+        46.900000000000006,
+        19.8
+      ],
+      "target": [
+        -105,
+        47.2,
+        28.8
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/floorguide/",
+      "anchors": [
+        "10F Grand Staircase south arrival",
+        "Ramen Koji portal",
+        "noren and directory"
+      ]
+    },
+    {
+      "name": "add-ramen10f-inside",
+      "position": [
+        -112,
+        46.900000000000006,
+        31.8
+      ],
+      "target": [
+        -105,
+        47.2,
+        24.8
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/floorguide/",
+      "anchors": [
+        "south wing dining floor",
+        "counter silhouettes",
+        "portal reverse"
+      ]
+    },
+    {
+      "name": "add-skyway-long",
+      "position": [
+        -60,
+        46.85,
+        -2.326
+      ],
+      "target": [
+        55,
+        46.85,
+        -2.326
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_skyway_01.jpg",
+      "anchors": [
+        "existing 45.2m walkway",
+        "south frosted base",
+        "roof tie rhythm"
+      ]
+    },
+    {
+      "name": "add-skyway-outward",
+      "position": [
+        -15,
+        46.85,
+        -2.326
+      ],
+      "target": [
+        -6,
+        46.85,
+        -12
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_skyway_02.jpg",
+      "anchors": [
+        "clear north windows",
+        "rail brackets",
+        "city-facing view"
+      ]
+    },
+    {
+      "name": "add-skyway-portal",
+      "position": [
+        58,
+        46.85,
+        -2.326
+      ],
+      "target": [
+        66,
+        47,
+        -2.326
+      ],
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_skyway_01.jpg",
+      "anchors": [
+        "east Skyway portal",
+        "retained walkway termination",
+        "frosted base and roof ties"
+      ]
+    },
+    {
+      "name": "add-stonemuseum-inside",
+      "position": [
+        -12,
         1.7,
-        -5
+        -24
       ],
       "target": [
-        25,
+        -13,
         1.7,
-        3
+        -35
       ],
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_stonemuseum_01.jpg",
+      "anchors": [
+        "north station boundary",
+        "shelter column sample arrays",
+        "paved apron"
+      ]
     },
     {
-      "name": "west-concourse",
+      "name": "add-stonemuseum-outside",
       "position": [
-        -34,
-        9,
-        13
+        -21,
+        1.7,
+        -39
       ],
       "target": [
-        -50,
-        8.9,
-        24
+        -13,
+        1.7,
+        -34
       ],
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
-    },
-    {
-      "name": "south-hall",
-      "position": [
-        0,
-        2,
-        14
-      ],
-      "target": [
-        0,
-        2,
-        38
-      ],
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
-    },
-    {
-      "name": "inspect-east-court-descent",
-      "position": [
-        77.593644,
-        41.585,
-        -1.526107
-      ],
-      "target": [
-        105.139391,
-        34.62,
-        4.673893
-      ],
-      "fov": 65,
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
-    },
-    {
-      "name": "inspect-roof-photo-2021",
-      "position": [
-        -199.700845,
-        56.10612537629057,
-        19.773344
-      ],
-      "target": [
-        -182.636918,
-        53.00889846182478,
-        29.734748
-      ],
-      "fov": 41.44638830246452,
-      "status": "Unusable for current garden comparison; observed building edge instead of garden."
-    },
-    {
-      "name": "inspect-east-square-operator",
-      "position": [
-        99.139391,
-        36.27,
-        7.673893
-      ],
-      "target": [
-        77.074397,
-        45.2,
-        -2.326107
-      ],
-      "fov": 65,
-      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+      "reference": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_stonemuseum_01.jpg",
+      "anchors": [
+        "same shelter reverse",
+        "stone insets",
+        "station entrance behind"
+      ]
     }
   ]
 }

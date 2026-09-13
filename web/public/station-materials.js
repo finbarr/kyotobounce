@@ -56,7 +56,12 @@ export const isAuthoredStationFixture=name=>/^k02[5789][- ]/i.test(name);
 
 // Ordered, explicit recognition covers current exports AND retained old names.
 export function stationMaterialFamily(name){
+  if(/^station-additions-garden-paving(?: \| Browser)?$/.test(name))return 'paving';
   if(isAuthoredStationFixture(name))return null;
+  if(/^station-additions-(ivory|stone|dark-stone|rose)/i.test(name))return 'wall';
+  if(/^station-additions-(steel|mirror)/i.test(name))return 'stainless';
+  if(/^station-additions-glass/i.test(name))return 'guard';
+  if(/^station-additions-oak/i.test(name))return 'wood';
   if(/tactile|nosing.*yellow|lettering|sign|indicator|diffuser|lens|lamp|poster|information/i.test(name))return null;
   if(/Garden guard glazing|Shop window glazing|Glass -/i.test(name))return 'guard';
   if(/Reflective facade glazing|North courtyard coated glazing/i.test(name))return 'facade';
@@ -89,9 +94,10 @@ export function prepareGraniteMaps(material){
   return resized;
 }
 
-const roughness={floor:.32,wall:.56,stone:.4,paving:.65,stair:.6,stainless:.28,paint:.43,guard:.09,facade:.14};
+const roughness={floor:.32,wall:.56,stone:.4,paving:.65,stair:.6,stainless:.28,paint:.43,guard:.09,facade:.14,wood:.58};
 export function applyStationMaterial(material,family,textures,reflections){
   const m=material; m.userData.stationFamily=family;
+  const authored=/^station-additions-/.test(m.name),authoredColor=authored?m.color.clone():null,authoredRoughness=m.roughness;
   // K032: only the bare exported stone cladding needs new slab courses.
   // The 9.6m floor atlas already contains its 1.2 x .6m tile joints; stairs,
   // polished frontage maps, relief/coffers and authored fixtures retain theirs.
@@ -103,7 +109,7 @@ export function applyStationMaterial(material,family,textures,reflections){
   // Preserve the original color/normal maps, especially the UV-authored nosing.
   if(family==='floor')m.color.set(m.map?0xc8cbc7:0x747b78);
   if(family==='wall')m.color.set(/Rose/.test(m.name)?0x98877c:/coffers/.test(m.name)?0xb5b8b1:0xb7b9b0);
-  if(family==='stone')m.color.set(m.map?0xb7bab5:0x555c59);
+  if(family==='stone')m.color.set(m.map?0xb7bab5:0x666d67);
   if(family==='stair')m.color.set(0xc5cac3);
   if(family==='stainless')m.color.set(0xbfc5c6);
   if(family==='paint'&&/Canopy/.test(m.name))m.color.set(0x8e9b9d);
@@ -114,6 +120,7 @@ export function applyStationMaterial(material,family,textures,reflections){
     // Single-pass thin glass: Fresnel coverage below preserves reflections at
     // grazing angles without a screen-space transmission render of the station.
   }
+  if(authored){m.color.copy(authoredColor);m.roughness=authoredRoughness;}
   m.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,{stationGrain:{value:textures.stoneColor},stationSurface:{value:family==='stainless'?textures.steelSurface:textures.stoneSurface},...reflections.uniforms});
     shader.vertexShader=shader.vertexShader.replace('#include <common>',`#include <common>
@@ -160,6 +167,8 @@ ${slabCourses?`
 // Restrict to vertical cladding; broad horizontal soffits are not tile floors.
 float slabJoint=stationSlabJoint(metric)*(1.0-smoothstep(.10,.25,sn.y));
 diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*1.28,slabJoint);
+`:family==='paving'?`
+float pavingJoint=stationSlabJoint(metric);diffuseColor.rgb*=1.0-pavingJoint*.28;
 `:family==='wall'?`
 vec2 edge=abs(fract(metric/vec2(1.44,.72)+.5)-.5)*vec2(1.44,.72);
 vec2 aa=max(fwidth(metric),vec2(.001));
@@ -169,6 +178,10 @@ float joint=max(seam.x,seam.y);diffuseColor.rgb*=1.0-joint*.22;`:''}
 vec2 guv=metric/.12;
 vec4 micro=texture2D(stationSurface,guv);
 diffuseColor.rgb*=.96+.04*micro.a;
+`:family==='wood'?`
+vec2 timberUV=metric*vec2(.18,3.2);
+float timber=texture2D(stationGrain,timberUV).r;
+diffuseColor.rgb*=.82+.28*timber;
 `:''}`);
     if(mineral||family==='stainless'){
       shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>

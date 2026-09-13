@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {wayfindingFont} from './station-details.js';
 // Original vector artwork packed into one filtered atlas. Metadata is part of
-// the selected station bundle, so historical replays never acquire new fixtures.
+// the current station bundle; repeated artwork shares atlas space.
 export function paintConcourse(ctx,w,h,r){
  const bg=r.kind==='poster'?'#e7deca':r.kind==='locker'?'#a4ada9':'#182324';
  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);ctx.strokeStyle='#78908b';ctx.lineWidth=2;ctx.strokeRect(2,2,w-4,h-4);
@@ -10,6 +10,21 @@ export function paintConcourse(ctx,w,h,r){
  const line=(x,y,a,b,color,width=1)=>{ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x*w,y*h);ctx.lineTo(a*w,b*h);ctx.stroke();};
  const circle=(x,y,rad,color)=>{ctx.fillStyle=color;ctx.beginPath();ctx.arc(x*w,y*h,rad*Math.min(w,h),0,Math.PI*2);ctx.fill();};
  const head=()=>{rect(0,0,1,.055,r.accent||'#c5a362');text(r.ja,.5,.29,.28);if(r.en)text(r.en,.5,.73,.20,r.accent);};
+ if(r.kind==='brand'){rect(0,0,1,.055,r.accent||'#c5a362');text(r.ja,.5,.39,.50);text(r.en,.5,.83,.15,r.accent);return;}
+ if(r.kind==='heartin'){
+  rect(0,0,1,1,'#f4f0de');rect(0,.04,1,.08,'#e87827');rect(0,.13,1,.08,'#258345');rect(0,.22,1,.07,'#bd3223');
+  text(r.ja,.5,.55,.31,'#215b39');text(r.en,.5,.85,.19,'#4d6150');return;
+ }
+ if(r.kind==='diamond'){
+  rect(0,0,1,1,'#e9e2cf');ctx.fillStyle='#c8ac75';
+  for(let i=-2;i<4;i++){ctx.beginPath();ctx.moveTo((i*.5)*w,0);ctx.lineTo((i*.5+.5)*w,.5*h);ctx.lineTo((i*.5)*w,h);ctx.lineTo((i*.5-.5)*w,.5*h);ctx.fill();}
+  for(let i=0;i<32;i++)line(i/32,0,i/32,1,'#dfd6bd',.55);return;
+ }
+ if(r.kind==='departures'){
+  rect(0,0,1,.20,'#2d7667');text(r.ja,.5,.10,.095);const i=r.index||0;
+  const rows=[['12:08','快速','大阪'],['12:16','普通','嵯峨嵐山'],['12:24','新快速','神戸']];
+  for(let j=0;j<3;j++){const y=.34+j*.23;text(rows[j][0],.05,y,.12,'#eee2c7','left');text(rows[(j+i)%3][1],.43,y,.12,'#d6ba68');text(rows[(j+i)%3][2],.81,y,.12,'#ecdfb5');line(.04,y+.12,.96,y+.12,'#3a5551');}return;
+ }
  if(['shop','service','hours'].includes(r.kind)){head();return;}
  if(r.kind==='vending'){
   rect(.02,.02,.96,.96,r.accent);rect(.04,.1,.73,.61,'#e8edf0');rect(.80,.12,.16,.32,'#192125');text(r.ja,.40,.06,.037,'white');
@@ -69,23 +84,42 @@ export function paintConcourse(ctx,w,h,r){
 }
 export function addConcourseDetails(scene,meta,maxAnisotropy=8){
  const records=meta.concourseDetails?.version===1?meta.concourseDetails.labels:[];
- if(!records.length)return {faces:0};
- const canvas=document.createElement('canvas');canvas.width=4096;let x=4,y=4,row=0;
- const sizes=records.map(r=>{const w=Math.min(1536,Math.max(256,Math.round(r.width*260))),h=Math.max(96,Math.min(768,Math.round(w*r.height/r.width)));return {r,w,h};}).sort((a,b)=>b.h-a.h);
- const slots=sizes.map(({r,w,h})=>{if(x+w+4>4096){x=4;y+=row+8;row=0;}const p={r,x,y,w,h};x+=w+8;row=Math.max(row,h);return p;});
- canvas.height=2**Math.ceil(Math.log2(y+row+4));if(canvas.height>2048)throw Error('Concourse atlas exceeds budget');
- const ctx=canvas.getContext('2d');function paint(){ctx.fillStyle='#243032';ctx.fillRect(0,0,canvas.width,canvas.height);for(const s of slots){ctx.save();ctx.translate(s.x,s.y);paintConcourse(ctx,s.w,s.h,s.r);ctx.restore();}}
- paint();const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=Math.min(8,maxAnisotropy);
- const positions=[],uv=[],indices=[];
- for(const {r,x,y,w,h}of slots){
-  const center=new THREE.Vector3(r.center[0],r.center[1],-r.center[2]),right=r.face==='west'?new THREE.Vector3(0,0,1):r.face==='east'?new THREE.Vector3(0,0,-1):r.face==='north'?new THREE.Vector3(-1,0,0):new THREE.Vector3(1,0,0);
-  const base=positions.length/3;
-  for(const [dx,dy]of [[-1,-1],[1,-1],[1,1],[-1,1]]){const p=center.clone().addScaledVector(right,dx*r.width/2);p.y+=dy*r.height/2;positions.push(...p.toArray());uv.push((x+(dx+1)*w/2)/canvas.width,1-(y+(1-dy)*h/2)/canvas.height);}
-  indices.push(base,base+1,base+2,base,base+2,base+3);
+ if(!records.length)return {faces:0,drawCalls:0};
+ // Bounded 4096×2048 pages. Deduplicate repeated prices and balcony pattern
+ // tiles rather than stretching a growing single canvas beyond GPU limits.
+ const pages=[],unique=new Map(),assignments=[];
+ for(const r of records){
+  const {id,center,face,yaw,...art}=r,key=JSON.stringify(art);
+  let tile=unique.get(key);
+  if(!tile){const w=Math.min(1536,Math.max(256,Math.round(r.width*260))),h=Math.max(96,Math.min(768,Math.round(w*r.height/r.width)));tile={r,w,h};unique.set(key,tile);}
+  assignments.push({r,tile});
  }
- const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geometry.setIndex(indices);geometry.computeVertexNormals();geometry.computeBoundingSphere();
- const material=new THREE.MeshStandardMaterial({map:texture,emissiveMap:texture,emissive:0xffffff,emissiveIntensity:.25,roughness:.63,metalness:.05});
- const mesh=new THREE.Mesh(geometry,material);mesh.name='Ground floor registered signs and machine artwork';scene.add(mesh);
- document.fonts?.ready.then(()=>{paint();texture.needsUpdate=true;});
- return {faces:records.length,atlas:[canvas.width,canvas.height],drawCalls:1};
+ for(const tile of [...unique.values()].sort((a,b)=>b.h-a.h)){
+  let page=pages.at(-1);
+  if(!page){page={tiles:[],x:4,y:4,row:0};pages.push(page);}
+  if(page.x+tile.w+4>4096){page.x=4;page.y+=page.row+8;page.row=0;}
+  if(page.y+tile.h+4>2048){page={tiles:[],x:4,y:4,row:0};pages.push(page);}
+  Object.assign(tile,{x:page.x,y:page.y,page});page.tiles.push(tile);page.x+=tile.w+8;page.row=Math.max(page.row,tile.h);
+ }
+ if(pages.length>8)throw Error('Station artwork exceeds eight-page atlas budget');
+ const stats={faces:records.length,uniqueArt:unique.size,atlases:[],drawCalls:pages.length};
+ for(const [pageIndex,page]of pages.entries()){
+  const canvas=document.createElement('canvas');canvas.width=4096;canvas.height=2**Math.ceil(Math.log2(page.y+page.row+4));stats.atlases.push([canvas.width,canvas.height]);
+  const ctx=canvas.getContext('2d');function paint(){ctx.fillStyle='#243032';ctx.fillRect(0,0,canvas.width,canvas.height);for(const s of page.tiles){ctx.save();ctx.translate(s.x,s.y);paintConcourse(ctx,s.w,s.h,s.r);ctx.restore();}}
+  paint();const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=Math.min(8,maxAnisotropy);
+  const positions=[],uv=[],indices=[];
+  for(const {r,tile:{x,y,w,h}}of assignments.filter(a=>a.tile.page===page)){
+   const center=new THREE.Vector3(r.center[0],r.center[1],-r.center[2]),right=r.face==='west'?new THREE.Vector3(0,0,1):r.face==='east'?new THREE.Vector3(0,0,-1):r.face==='north'?new THREE.Vector3(-1,0,0):new THREE.Vector3(1,0,0);
+   right.applyAxisAngle(new THREE.Vector3(0,1,0),-(r.yaw||0)*Math.PI/180);
+   const base=positions.length/3;
+   for(const [dx,dy]of [[-1,-1],[1,-1],[1,1],[-1,1]]){const p=center.clone().addScaledVector(right,dx*r.width/2);p.y+=dy*r.height/2;positions.push(...p.toArray());uv.push((x+(dx+1)*w/2)/canvas.width,1-(y+(1-dy)*h/2)/canvas.height);}
+   indices.push(base,base+1,base+2,base,base+2,base+3);
+  }
+  const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geometry.setIndex(indices);geometry.computeVertexNormals();geometry.computeBoundingSphere();
+  const material=new THREE.MeshStandardMaterial({map:texture,emissiveMap:texture,emissive:0xffffff,emissiveIntensity:.25,roughness:.63,metalness:.05});
+  const mesh=new THREE.Mesh(geometry,material);mesh.name='Registered station artwork '+pageIndex;scene.add(mesh);
+  document.fonts?.ready.then(()=>{paint();texture.needsUpdate=true;});
+ }
+ if(pages.length===1)stats.atlas=stats.atlases[0];
+ return stats;
 }

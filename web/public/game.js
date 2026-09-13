@@ -321,6 +321,11 @@ async function load(){
     stationLook=dressStation(renderer,scene,sun,station,data);
     stationLook.updateLights(camera.position,0);
     stationLook.captureEnvironment();
+    if(data.stationInstallations){
+      const lights=document.createElement('button');lights.id='station-light-mode';lights.textContent='Station lights: Day';lights.setAttribute('aria-pressed','false');
+      let night=false;lights.onclick=()=>{night=!night;stationLook.setNight(night);lights.textContent=night?'Station lights: Evening':'Station lights: Day';lights.setAttribute('aria-pressed',String(night));};
+      document.querySelector('#course-view .actions')?.append(lights);
+    }
     for(const root of [station,hardwareScene,details.group])freezeStaticTransforms(root);
     robotShadow=contactShadow(scene,station);ballShadow=contactShadow(scene,station);
     if(guestId)createAvatar(guestId);

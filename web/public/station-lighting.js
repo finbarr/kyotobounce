@@ -30,10 +30,10 @@ export function stationDaylightTexture(){
 export function configureStationDaylight(renderer,scene,sun){
   renderer.toneMappingExposure=1.0;
   scene.background=stationDaylightTexture();scene.fog=new THREE.Fog(0xc1d0d7,195,440);
-  for(const light of scene.children)if(light.isHemisphereLight){light.color.set(0xcbddeb);light.groundColor.set(0x6e7065);light.intensity=.58;}
+  for(const light of scene.children)if(light.isHemisphereLight){light.color.set(0xcbddeb);light.groundColor.set(0x8b8b7e);light.intensity=.78;}
   // Keep the accepted fixed sun direction/footprint; deepen shelter by reducing
   // uniform fill, while localized station irradiance restores its readable bounce.
-  sun.color.set(0xfff1df);sun.intensity=2.65;sun.position.set(-55,110,-65);sun.target.position.set(-20,0,0);scene.add(sun.target);
+  sun.color.set(0xfff1df);sun.intensity=2.15;sun.position.set(-55,110,-65);sun.target.position.set(-20,0,0);scene.add(sun.target);
 }
 
 export function createStationReflections(renderer,scene,architecture){

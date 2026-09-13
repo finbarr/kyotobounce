@@ -5,6 +5,10 @@ import {createHash} from 'node:crypto';
 const bytes=await readFile('runtime/station-layout.json'),layout=JSON.parse(bytes),meta=JSON.parse(await readFile('web/public/assets/atrium-detail.json'));
 assert.equal(createHash('sha256').update(bytes).digest('hex'),wayfindingLayout);
 assert.equal(meta.sourceLayoutSha256,wayfindingLayout);
+const gate=rows.find(r=>r.id==='central-hall-central-gate-sign');
+const title=layout.panels.find(p=>p.id==='central-hall-gate-title');
+const backing=meta.signs.find(s=>s.id===gate.id);
+assert.ok(backing.bounds[2][1]+gate.offset>Math.max(...title.vertices.map(p=>p.z))+.005,'Replacement gate artwork must clear the source lettering, not z-fight with it');
 assert.equal(new Set(rows.map(r=>r.id)).size,rows.length);
 for(const sign of meta.signs)assert.ok(rows.some(r=>r.id===sign.id),`Explicit decision for ${sign.id}`);
 for(const r of rows){

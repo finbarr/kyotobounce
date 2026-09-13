@@ -46,6 +46,13 @@
     <button id="run" disabled>Run benchmark</button
     ><span id="status">Loading…</span
     ><canvas id="game" width="1280" height="720"></canvas>
+    <fieldset id="inspection" hidden><legend>Station inspection</legend>
+      <label>View <select id="station-view"></select></label>
+      <button id="save-view">Save view</button><button id="save-views">Save all views</button><button id="evening" aria-pressed="false">Evening lights</button>
+      <label>Position <input id="view-position" aria-label="Camera position" size="28"></label>
+      <label>Target <input id="view-target" aria-label="Camera target" size="28"></label><button id="apply-view">Apply camera</button>
+      <p id="view-evidence"></p>
+    </fieldset>
     <pre id="result"></pre>
     <script type="module" src="/bench/render.js"></script>
   </body>

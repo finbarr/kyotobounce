@@ -4,7 +4,7 @@
     "revision": 2,
     "name": "Snack Run",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -110,7 +110,7 @@
     "revision": 1,
     "name": "Corner Store",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -203,7 +203,7 @@
     "revision": 1,
     "name": "Ceiling Service",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -311,7 +311,7 @@
     "revision": 2,
     "name": "Ticket Trick",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -404,7 +404,7 @@
     "revision": 1,
     "name": "Garden Switchback",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -512,7 +512,7 @@
     "revision": 2,
     "name": "Terrace Turnaround",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -639,10 +639,10 @@
         "y": 1,
         "z": 0
       },
-      "radius": 1.25,
+      "radius": 0.65,
       "surface": "concourse"
     },
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "hint": {
       "yaw": 90,
@@ -687,7 +687,7 @@
     "revision": 2,
     "name": "Platform Drift",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -808,7 +808,7 @@
     "revision": 2,
     "name": "Lost and Found",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -847,9 +847,9 @@
     },
     "goal": {
       "center": {
-        "x": -25.01055908203125,
+        "x": -25.634035110473633,
         "y": 0,
-        "z": 1.0811935663223267
+        "z": -16.134912490844727
       },
       "normal": {
         "x": 0,
@@ -929,7 +929,7 @@
     "revision": 2,
     "name": "Sky Garden Shuffle",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -1065,7 +1065,7 @@
     "revision": 2,
     "name": "Exact Change",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -1104,16 +1104,16 @@
     },
     "goal": {
       "center": {
-        "x": -47.524078369140625,
+        "x": -44.9,
         "y": 0,
-        "z": 14.573257446289062
+        "z": -11.8
       },
       "normal": {
         "x": 0,
         "y": 1,
         "z": 0
       },
-      "radius": 1.5,
+      "radius": 1,
       "surface": "concourse"
     },
     "waypoints": [
@@ -1171,7 +1171,7 @@
     "revision": 1,
     "name": "Fascia Flip",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -1294,7 +1294,7 @@
     "revision": 2,
     "name": "Glass Pinball",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -1382,7 +1382,7 @@
         "center": {
           "x": -41.58086395263672,
           "y": 45.69490432739258,
-          "z": 1.063607096672058
+          "z": 1.084107
         },
         "normal": {
           "x": 0,
@@ -1390,7 +1390,7 @@
           "z": 1
         },
         "radius": 0.15,
-        "surface": "skyway-glass--1-part-0",
+        "surface": "add-skyway-opaque-base-14",
         "id": "bank-4"
       }
     ],
@@ -1417,7 +1417,7 @@
     "revision": 2,
     "name": "Locker Loop",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -1553,7 +1553,7 @@
     "revision": 2,
     "name": "Café Delivery",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -1704,7 +1704,7 @@
     "revision": 1,
     "name": "Pillar Carom",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -1777,14 +1777,14 @@
         "center": {
           "x": 4.734579086303711,
           "y": 0,
-          "z": 9.794681549072266
+          "z": 9.2
         },
         "normal": {
           "x": 0,
           "y": 1,
           "z": 0
         },
-        "radius": 0.6,
+        "radius": 0.45,
         "surface": "concourse",
         "id": "bank-3"
       }
@@ -1812,7 +1812,7 @@
     "revision": 2,
     "name": "Three Flights Down",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -1978,7 +1978,7 @@
     "revision": 1,
     "name": "Café Carom",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -2086,7 +2086,7 @@
     "revision": 1,
     "name": "Underpass Uppercut",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -2126,10 +2126,26 @@
     "goal": null,
     "waypoints": [
       {
+        "id": "bank-1",
         "center": {
-          "x": -50.5859260559082,
-          "y": 6.84999942779541,
-          "z": -9.045015335083008
+          "x": -53.02000045776367,
+          "y": 3.659369468688965,
+          "z": -9.70338249206543
+        },
+        "normal": {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.14,
+        "surface": "add-hall-soffit-bay--48-column--4.5-5"
+      },
+      {
+        "id": "bank-2",
+        "center": {
+          "x": -55.838993072509766,
+          "y": 6.849999904632568,
+          "z": -8.975663185119629
         },
         "normal": {
           "x": 0,
@@ -2137,14 +2153,14 @@
           "z": 0
         },
         "radius": 0.6,
-        "surface": "west-2f-landing",
-        "id": "bank-1"
+        "surface": "west-2f-landing"
       },
       {
+        "id": "bank-3",
         "center": {
-          "x": -46.33277893066406,
+          "x": -63.04747772216797,
           "y": 0,
-          "z": -7.905392169952393
+          "z": -7.9173126220703125
         },
         "normal": {
           "x": 0,
@@ -2152,23 +2168,7 @@
           "z": 0
         },
         "radius": 0.6,
-        "surface": "concourse",
-        "id": "bank-2"
-      },
-      {
-        "center": {
-          "x": -44.875,
-          "y": 6.715316295623779,
-          "z": -7.520949363708496
-        },
-        "normal": {
-          "x": -1,
-          "y": 0,
-          "z": 0
-        },
-        "radius": 0.1,
-        "surface": "concourse-cafe-underfloor-girder-west",
-        "id": "bank-3"
+        "surface": "concourse"
       }
     ],
     "hint": {
@@ -2178,7 +2178,7 @@
       "kick": 0,
       "holdMs": 605.0251256281407,
       "powerRange": "full",
-      "note": "22.00 m/s · H sets the bank angle. Fire into the underside of the gallery, rebound off the concourse, then rise into the vertical girder face. A ceiling-floor-wall uppercut."
+      "note": "22.00 m/s · H sets the bank angle. Strike the banded column, rebound upward into the gallery underside, then touch down on the floor patch."
     },
     "order": 18,
     "campaign": {
@@ -2194,7 +2194,7 @@
     "revision": 2,
     "name": "Concourse Cruiser",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -2233,9 +2233,9 @@
     },
     "goal": {
       "center": {
-        "x": 59.522918701171875,
+        "x": 8.110772132873535,
         "y": 0,
-        "z": 19.780000686645508
+        "z": 19.789634704589844
       },
       "normal": {
         "x": 0,
@@ -2330,7 +2330,7 @@
     "revision": 2,
     "name": "Balcony Express",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -2481,7 +2481,7 @@
     "revision": 2,
     "name": "Grand Stair Fever",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -2632,7 +2632,7 @@
     "revision": 2,
     "name": "Last Order",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -2738,7 +2738,7 @@
     "revision": 2,
     "name": "Escalator Relay",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -2906,7 +2906,7 @@
     "revision": 2,
     "name": "East-to-West Ricochet",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -3102,7 +3102,7 @@
     "revision": 2,
     "name": "Sculpture Square Slingshot",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -3268,7 +3268,7 @@
     "revision": 2,
     "name": "Roof-to-Terrace Special",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -3389,7 +3389,7 @@
     "revision": 1,
     "name": "Skyway Trapdoor",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -3527,7 +3527,7 @@
     "revision": 1,
     "name": "Roof Bank Cascade",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",
@@ -3635,7 +3635,7 @@
     "revision": 2,
     "name": "The Kyoto Grand Slam",
     "creator": "station",
-    "layout": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
     "physics": "kyoto-p3-3",
     "throwModel": "robot-v4",
     "scoring": "waypoint-v3",

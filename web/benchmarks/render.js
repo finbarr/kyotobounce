@@ -151,6 +151,19 @@ const views = [
   { name: "sky-garden", position: [-156, 58, 24], target: [-142, 57, 18] },
   { name: "east-concourse", position: [32, 2.5, 0], target: [26, 3, 14] },
 ];
+const inspecting=params.has('inspect');
+if(inspecting&&data.stationAdditions?.views){
+  const point=p=>[p.x,p.y,-p.z];
+  views.push(...data.stationAdditions.views.map(v=>({...v,name:v.id,position:point(v.position),target:point(v.target)})));
+  // Keep the reverse retail inspection outside the retained escalator casing.
+  const retailReturn=views.find(v=>v.name==='add-yojiya1f-retail-return');
+  if(retailReturn)retailReturn.position=[17.75,1.7,-8.4];
+  views.push(
+    {name:'installation-grand-stair',position:[-72.35,21.17,-4.45],target:[-113.12,33.12,21.92],fov:66,anchors:['Grand Staircase lower plaza','existing staircase riser contours','west upper landings']},
+    {name:'installation-east-wall',position:[98,36.4,10],target:[112.46,43.5,5.4],fov:65,anchors:['East Square floor','east wall installation face','retained tree and gazebo']},
+    {name:'installation-skyway',position:[-60,46.85,-2.326],target:[55,46.85,-2.326],fov:65,anchors:['retained Skyway floor','continuous ceiling ribbons','frosted south panels']},
+  );
+}
 let running = false,
   view = views[0];
 const gl = renderer.getContext(),
@@ -161,6 +174,7 @@ const gl = renderer.getContext(),
 let gpu = [];
 function render(time = 12, move = 0) {
   camera.position.fromArray(view.position);
+  camera.fov=view.fov||55;camera.updateProjectionMatrix();
   camera.position.x += move;
   camera.lookAt(new THREE.Vector3().fromArray(view.target));
   camera.updateMatrixWorld();
@@ -171,7 +185,8 @@ function render(time = 12, move = 0) {
     .clone()
     .addScaledVector(camera.getWorldDirection(new THREE.Vector3()), 3.8);
   avatar.group.position.copy(anchor).add(new THREE.Vector3(0, -1.3, 0));
-  shadow(avatar.group.position, 1.15, true);
+  avatar.group.visible=!inspecting;
+  shadow(avatar.group.position, 1.15, !inspecting);
   obstacles.clearance(anchor, camera.position, 0.16);
   renderer.render(scene, camera);
 }
@@ -181,9 +196,9 @@ for (let i = 0; i < 20; i++) render(10 + i * 0.1);
 await document.fonts.ready;
 render();
 const startupMs = performance.now() - started;
-let last = performance.now();
+let last = performance.now(),inspectionTime=12;
 function idle(now) {
-  if (!running) render(12);
+  if (!running) render(inspecting?(inspectionTime+=Math.min(.1,(now-last)/1000)):12);
   last = now;
   requestAnimationFrame(idle);
 }
@@ -213,6 +228,31 @@ function pollGPU() {
 $("run").disabled = false;
 $("status").textContent =
   "Ready · " + variant + " · " + Math.round(startupMs) + " ms startup";
+if(inspecting){
+  $('inspection').hidden=false;
+  let evening=false;
+  const fields=()=>{
+    $('view-position').value=view.position.join(', ');$('view-target').value=view.target.join(', ');
+    $('view-evidence').textContent=JSON.stringify({name:view.name,anchors:view.anchors,reference:view.reference,layout:data.layoutSha256,artwork:scene.children.filter(o=>o.name.startsWith('Registered station artwork')).length,triangles:renderer.info.render.triangles,drawCalls:renderer.info.render.calls});
+  };
+  for(const [i,v]of views.entries()){const option=document.createElement('option');option.value=String(i);option.textContent=v.name;$('station-view').append(option);}
+  $('station-view').onchange=()=>{view=views[Number($('station-view').value)];render();fields();};
+  $('apply-view').onclick=()=>{const read=id=>$(id).value.split(',').map(Number);const position=read('view-position'),target=read('view-target');if([...position,...target].length!==6||![...position,...target].every(Number.isFinite))return;view={...view,position,target};render();fields();};
+  $('evening').onclick=()=>{evening=!evening;look.setNight(evening);$('evening').setAttribute('aria-pressed',String(evening));render();};
+  const saveView=async()=>{
+    const name=view.name,suffix=evening?'-evening':'';
+    for(let i=0;i<20;i++)render(inspectionTime+=.1);
+    const pixels=new Uint8Array(width*height*4);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+    await fetch('/bench/capture/'+variant+'/'+name+suffix,{method:'POST',body:pixels});$('status').textContent='Saved '+name+(suffix?' · evening':'');fields();
+  };
+  $('save-view').onclick=saveView;
+  $('save-views').onclick=async()=>{
+    if(running)return;running=true;$('save-views').disabled=true;
+    try{for(const v of views){view=v;$('station-view').value=String(views.indexOf(v));await saveView();}$('status').textContent='Saved all '+views.length+' views';}
+    finally{running=false;$('save-views').disabled=false;}
+  };
+  fields();
+}
 $("run").onclick = async () => {
   if (running) return;
   running = true;

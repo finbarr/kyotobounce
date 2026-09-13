@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture } from './station-materials.js';
 import { configureStationDaylight, createStationReflections } from './station-lighting.js';
+import {createStationInstallations} from './station-installations.js';
 
 // Filter in shadow-map space so camera motion never rotates a noisy kernel.
 // The old four taps all fell within .3 texels of the center: effectively a hard
@@ -152,12 +153,22 @@ export function dressStation(renderer,scene,sun,station,data){
   });
 
   const fixtureLighting=createStationLightPool(scene,data.authoredLights);
-  const updateLights=fixtureLighting.update;
+  const installations=createStationInstallations(scene,data);
+  const updateLights=(position,time)=>{fixtureLighting.update(position,time);installations.update(time);};
 
   return {updateLights,captureEnvironment:reflections.capture,
-    dispose(){textures.dispose();reflections.dispose();scene.background?.dispose();},
+    setNight(enabled){
+      installations.setNight(enabled);
+      sun.intensity=enabled?.32:2.15;
+      for(const light of scene.children)if(light.isHemisphereLight)light.intensity=enabled?.36:.78;
+      renderer.toneMappingExposure=enabled?.88:1;
+      if(scene.background?.isTexture)scene.background.dispose();
+      if(enabled){scene.background=new THREE.Color(0x101d32);scene.fog.color.set(0x28374a);}
+      else configureStationDaylight(renderer,scene,sun);
+    },
+    dispose(){textures.dispose();reflections.dispose();installations.dispose();scene.background?.dispose?.();},
     stats:{finishedMaterials:done.size,families,preservedMaps,resampledMaps,generatedTextureBytes:textures.bytesWithMipmaps,
-      reflection:reflections.stats,shadowMap:4096,reflectionProbe:256,shadowCoverage,shadowFilterTaps:9,fixtureLighting:fixtureLighting.stats}};
+      reflection:reflections.stats,shadowMap:4096,reflectionProbe:256,shadowCoverage,shadowFilterTaps:9,fixtureLighting:fixtureLighting.stats,installations:installations.stats}};
 }
 
 export function contactShadow(scene,station){
