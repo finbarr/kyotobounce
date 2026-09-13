@@ -11,7 +11,7 @@ KYOTO_WORKER_EXECUTABLE=/absolute/path/to/compatible/worker \
   npm run test:campaign -- .local/campaign-proof-fresh
 ```
 
-The runner uses four isolated native sessions, two repeated hints and one neighboring aim per stage. Ricochet courses also require their wall/ceiling target count and a sharp direction change at a collected non-floor target. It requires every hint target to be collected, a positive neighboring completion, and zero movement/spin at full rest. Optional destination outcomes are recorded separately. A timeout or cancellation fails. The output includes the exact tested catalog, its hash and per-shot results.
+The runner uses four isolated native sessions, two repeated hints and neighboring aim/power variations per stage. Ricochet courses also require their wall/ceiling target count and a sharp direction change at a collected non-floor target. It requires every waypoint and any retained destination on both authored hints, with zero movement/spin at full rest. Nearby full clears are reported separately as sensitivity diagnostics; a partial neighbor is never labeled a pass. Set `KYOTO_PROOF_REQUIRE_NEIGHBORS=1` to require every neighboring shot to full-clear as well. `KYOTO_PROOF_HINTS_ONLY=1` runs one hint per course for initial triage. The proof asserts that the tested launch matches the displayed hint. A timeout or cancellation fails. The output includes the exact tested catalog, its hash and per-shot results.
 
 To recheck only a changed route, provide a comma-separated list of current IDs:
 

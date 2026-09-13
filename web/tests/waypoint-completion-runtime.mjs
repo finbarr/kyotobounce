@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {Client,delay} from './api-client.mjs';
+const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173';
+assert.ok(['localhost','127.0.0.1','[::1]'].includes(new URL(origin).hostname),'Use an isolated local service');
+const client=new Client(origin.replace(/^http/,'ws'));
+try{
+ await client.join();
+ const source=client.messages.findLast(m=>m.type==='catalog').challenges.find(c=>c.id==='kyoto-konbinidirect');
+ const extra=await client.place({x:0,y:0,z:20},.5,'waypoint');
+ const draft={name:'Full route qualification check',start:source.start,goal:source.goal,scoring:source.scoring,waypoints:[...source.waypoints,{...extra,id:'missing-target'}]};
+ const {challenge}=await client.request('save-challenge',draft,'saved-challenge');
+ await client.request('select-challenge',{challengeId:challenge.id,revision:challenge.revision},'selected');
+ const partial=await client.throw(source.hint.holdMs,source.hint);
+ assert.equal(partial.result.breakdown.waypointCount,2);assert.equal(partial.result.destinationReached,true,'The missed waypoint cannot be bypassed by landing in the destination');
+ assert.equal(partial.result.success,false);assert.equal(partial.result.saved,false);assert.equal(partial.result.score,0);assert.equal(partial.result.breakdown.outcome,'incomplete');
+ assert.ok(partial.result.breakdown.potential>0);assert.equal(partial.state.diagnostics.sleeping,true);
+ assert.ok(client.messages.some(m=>m.type==='state'&&m.liveScore?.waypointCount===2&&m.liveScore.total>0),'Partial points accumulate during flight');
+ assert.equal(partial.result.standings.rank,null);assert.deepEqual(partial.result.standings.after,[]);
+ await assert.rejects(client.request('replay',{attempt:partial.result.attempt},'replay'),/not found/i);
+ await delay(1100);
+ const completeDraft={...draft,editId:challenge.id,waypoints:source.waypoints,goal:null};
+ const updated=await client.request('save-challenge',completeDraft,'saved-challenge');
+ await client.request('select-challenge',{challengeId:updated.challenge.id,revision:updated.challenge.revision},'selected');
+ const complete=await client.throw(source.hint.holdMs,source.hint);
+ assert.equal(complete.result.breakdown.waypointCount,2);assert.equal(complete.result.destinationReached,false);
+ assert.equal(complete.result.success,true);assert.equal(complete.result.saved,true);assert.ok(complete.result.score>0);assert.equal(complete.result.standings.rank,1);
+ const replay=(await client.request('replay',{attempt:complete.result.attempt},'replay')).replay;assert.deepEqual(replay.breakdown,complete.result.breakdown);
+ await mkdir('.local',{recursive:true});await writeFile('.local/waypoint-completion-runtime.json',JSON.stringify({partial:partial.result,complete:complete.result},null,2));
+ console.log('PASS native partial route plus destination stays unranked; full waypoint route without destination passes, ranks and shares');
+}finally{client.close();}

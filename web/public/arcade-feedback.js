@@ -101,10 +101,10 @@ export function arcadeFeedback(sound){
    $('special-fill').style.transform=`scaleX(${progress})`;
    $('combo-banks').textContent=`×${current.comboMultiplier.toLocaleString(undefined,{maximumFractionDigits:2})} COMBO`;
    $('combo-targets').textContent=`×${format(current.waypointMultiplier||1)} ${waypoint?'TARGETS':'BASE'} + ${current.bankBonus.toFixed(2)}× BANKS${allClear?' · 100%':''}`;
-   $('combo-accuracy').textContent=waypoint?(tagged?'DESTINATION BONUS':'DESTINATION OPTIONAL'):`${Math.round((current.landingMultiplier||0)*100)}% LANDING`;
-   $('combo-motion').textContent=`+${format(current.movementPoints||0)} MOVEMENT · 100 PTS / SEC${current.total>0?'':' · HIT A TARGET TO BANK'}`;
-   $('combo-cash').textContent=`${format(current.total)} ${waypoint?'PTS BANKED':'PTS IF IT STOPS HERE'}`;
-   $('combo-status').textContent=allClear?'100% · ALL WAYPOINTS':tagged?'LAND THE FINISH':waypointCount?'CHAIN EARNED':bankCount>=3?'KEEP LINKING':'FIND YOUR LINE';
+   $('combo-accuracy').textContent=waypoint?(tagged?'DESTINATION BONUS':!currentCourse?.goal?'NO DESTINATION':currentCourse?.waypoints?.length?'DESTINATION OPTIONAL':'LAND IN THE DESTINATION'):`${Math.round((current.landingMultiplier||0)*100)}% LANDING`;
+   $('combo-motion').textContent=`+${format(current.movementPoints||0)} MOVEMENT · 100 PTS / SEC${waypoint&&!allClear?' · COMPLETE THE ROUTE TO BANK':current.total>0?'':' · HIT A TARGET TO BANK'}`;
+   $('combo-cash').textContent=`${format(current.total)} ${waypoint?(phase==='Result'?'PTS BANKED':'PTS IN PLAY'):'PTS IF IT STOPS HERE'}`;
+   $('combo-status').textContent=allClear?'100% · ALL WAYPOINTS':tagged?'LAND THE FINISH':waypointCount?'KEEP COLLECTING':bankCount>=3?'KEEP LINKING':'FIND YOUR LINE';
    hud.classList.toggle('on-target',!!tagged);flash=Math.max(0,flash-elapsed);trickTime=Math.max(0,trickTime-elapsed);if(!flash)hud.dataset.cue='';$('combo-trick').style.opacity=trickTime?1:0;
    // DOM diagnostics make cue/particle behavior inspectable without private state.
    hud.dataset.events=String(bankCount+waypointCount);hud.dataset.particles=String(particles.active);

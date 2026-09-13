@@ -12,7 +12,7 @@ Supported rest inside the target keeps 100%. Outside, accuracy falls linearly wi
 
 ## Waypoint courses (`waypoint-v3`)
 
-Courses have up to 32 optional waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; two collected waypoints produce ×4, or 40,000 target points before bank credit. The outer edge of each drawn ring matches its scoring radius.
+Courses have up to 32 required waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; two collected waypoints produce ×4, or 40,000 target points before bank credit. The outer edge of each drawn ring matches its scoring radius.
 
 The combined multiplier is **`2^W + 0.5 × B`**, where `W` is collected waypoints and `B` is qualifying distinct banks. With at least one waypoint, target points are **`10,000 × combined multiplier`**. This replaces the cumulative 10k/20k/40k award sum. Each waypoint doubles only the waypoint component; bank credit is always additive and never gets doubled by later waypoints. Order does not affect the final multiplier.
 
@@ -20,11 +20,11 @@ Example: waypoint → bank → waypoint → bank → bank → waypoint gives **2
 
 Banks can continue throughout waypoint shots, including after destination entry. `waypointMultiplier` is the current `2^W` component, `bankBonus` is `0.5 × B`, and `comboMultiplier` is their sum. `waypointBase` contains target points before bank credit; `bankMultiplier` is the surface-only `1 + bankBonus`, never a factor applied to waypoint points.
 
-Supported rest in the destination adds a bonus equal to the target score, or `10,000 × (1 + 0.5 × B)` if no waypoint was collected. Missing it preserves waypoint points. A positive target score completes the course. Recall, leaving the station and missing a required route forfeit. Only JavaScript's safe-integer storage limit caps the score.
+Supported rest in the destination adds a bonus equal to the target score, or `10,000 × (1 + 0.5 × B)` if no waypoint was collected. Missing it preserves waypoint points. Every waypoint must be collected to pass and enter the leaderboard. Live points remain provisional until the complete route is confirmed at full rest. An incomplete route finishes with zero ranked points and an `incomplete` outcome; its collected count and provisional `potential` remain available for feedback. With zero waypoints, the destination is required. Recall, leaving the station and missing a required route forfeit. Only JavaScript's safe-integer storage limit caps the score.
 
 Movement time is measured from consecutive authoritative 180 Hz positions, excluding numerical drift below 0.001 m/s. Fractional seconds accrue individual points (`floor(movingSeconds × 100)`). The bonus continues while the ball translates after a target hit, is added after landing accuracy and the destination bonus, and is forfeited on recall or a missed required route.
 
-The server calculates live frames and final results from the same native records. Clients cannot submit a score. The game is pre-launch: this scoring change clears existing scores and replays. Courses keep their current IDs and revisions; no legacy scoring implementation or migration is retained.
+The server calculates live frames and final results from the same native records. Clients cannot submit a score. The game is pre-launch: incomplete-route records are discarded; complete records remain valid. Courses keep their current IDs and revisions; no legacy scoring implementation or migration is retained.
 
 ## Presentation
 

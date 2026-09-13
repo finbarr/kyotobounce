@@ -368,8 +368,8 @@
       {
         "id": "patch-2",
         "center": {
-          "x": 20.68,
-          "y": 0.37,
+          "x": 20.7,
+          "y": 0.32,
           "z": -27.779998779296875
         },
         "normal": {
@@ -377,7 +377,7 @@
           "y": 0,
           "z": -1
         },
-        "radius": 0.17,
+        "radius": 0.19,
         "surface": "concourse-ticket-machine-1"
       }
     ],
@@ -396,7 +396,7 @@
       "chapterTitle": "First Departures",
       "difficulty": "WARM UP",
       "distance": 15.3,
-      "brief": "Skip across the ticket hall, then catch the back of a ticket machine for the harder bonus patch."
+      "brief": "Skip across the ticket hall, then catch the back of a ticket machine for the final wall patch."
     }
   },
   {
@@ -726,9 +726,9 @@
     },
     "goal": {
       "center": {
-        "x": 12.102253913879395,
+        "x": 19.061614990234375,
         "y": 0,
-        "z": 25.014812469482422
+        "z": 26.879379272460938
       },
       "normal": {
         "x": 0,
@@ -790,16 +790,16 @@
       "pitch": 10,
       "top": 0,
       "kick": 0,
-      "holdMs": 389.5652173913044,
+      "holdMs": 316.5217391304348,
       "powerRange": "precision",
-      "note": "2.10 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+      "note": "1.80 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
     },
     "order": 7,
     "campaign": {
       "chapter": 2,
       "chapterTitle": "Angles and Returns",
       "difficulty": "GET CREATIVE",
-      "distance": 30.9,
+      "distance": 27.3,
       "brief": "Send a gentle diagonal shot across the open concourse. Pick up the chain before the final landing."
     }
   },
@@ -847,9 +847,9 @@
     },
     "goal": {
       "center": {
-        "x": -36.37855529785156,
+        "x": -25.01055908203125,
         "y": 0,
-        "z": -14.728452682495117
+        "z": 1.0811935663223267
       },
       "normal": {
         "x": 0,
@@ -1456,9 +1456,9 @@
     },
     "goal": {
       "center": {
-        "x": -26.057279586791992,
+        "x": -15.158114433288574,
         "y": 0,
-        "z": -10.253406524658203
+        "z": 0.6578094959259033
       },
       "normal": {
         "x": 0,

@@ -19,7 +19,7 @@ The distance label is the measured length of the suggested native trajectory, in
 | 05 | First Departures | Garden Switchback | 18 m | 3 |
 | 06 | Angles and Returns | Terrace Turnaround | 18.3 m | 2 |
 | 07 | Angles and Returns | First Bank | 24.4 m | 0 |
-| 08 | Angles and Returns | Platform Drift | 30.9 m | 3 |
+| 08 | Angles and Returns | Platform Drift | 27.3 m | 3 |
 | 09 | Angles and Returns | Lost and Found | 36.4 m | 3 |
 | 10 | Angles and Returns | Sky Garden Shuffle | 37.3 m | 4 |
 | 11 | Banking on Kyoto | Exact Change | 43.4 m | 2 |
@@ -45,23 +45,23 @@ The distance label is the measured length of the suggested native trajectory, in
 
 ## Targets and physics
 
-Twenty-nine stages use optional waypoint chains. Eleven stages include non-floor targets, and three of the new routes include overhead contacts. Each waypoint scores once, in any order. Destinations are optional bonuses; a destination miss keeps earned waypoint points. First Bank retains the classic landing-accuracy introduction. The later stages reward longer chains, narrower surfaces, multi-level routes and precise delivery through the shop doorway. The new lines place targets on actual collision faces at changes of direction, with intermediate floor patches only where a bounce connects the route. There are no long strings of new floor targets after the final bank. Nearby aiming variations can still bank a partial score.
+Twenty-nine stages require a complete waypoint chain to pass and rank. Eleven stages include non-floor targets, and three of the new routes include overhead contacts. Each waypoint scores once, in any order. Destinations are optional bonuses; a destination miss keeps earned waypoint points. First Bank retains the classic landing-accuracy introduction. The later stages reward longer chains, narrower surfaces, multi-level routes and precise delivery through the shop doorway. The new lines place targets on actual collision faces at changes of direction, with intermediate floor patches only where a bounce connects the route. There are no long strings of new floor targets after the final bank. Partial routes show provisional points during flight, then finish unranked.
 
 All starts and targets are checked against the native collision model. A level changes only the start, targets and suggested input. It does not add catch planes, magnetic targets, special friction, forced stops or level-specific physics. A shot must stop translating and spinning before its score locks; recall forfeits.
 
 The store delivery uses the existing modeled 2F convenience store at the west gallery, not a new storefront. Its doorway, shelves, ceiling and collision stay intact. Station source registration remains in `web/levels/konbini-registration.json` and the canonical layout.
 
-The overview cuts just above the targets' upper edges so low shop ceilings do not cover wall patches. Numbered purple guides keep distant and overhead patches legible through station geometry. Connecting dashes indicate the target sequence, not a predicted flight path; waypoints remain optional and unordered.
+The overview cuts just above the targets' upper edges so low shop ceilings do not cover wall patches. Numbered purple guides keep distant and overhead patches legible through station geometry. Connecting dashes indicate the target sequence, not a predicted flight path; every waypoint is required, in any order.
 
 ## Verification
 
 The campaign uses collision `b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515`, physics `kyoto-p3-3`, throw model `robot-v4` and capability `waypoint-v3`. Station geometry is unchanged; floor contact uses the moderate grip described in [FLIGHT-CONTACT-FIXES.md](FLIGHT-CONTACT-FIXES.md). Targets, route lengths and stage ordering have been recalibrated for that response.
 
-`web/levels/proof-inputs.json` pairs every current course with two repeated suggested shots and one nearby aim. The native proof requires all suggested waypoints, positive completion for neighboring shots, and full physical rest. Each of the ten redesigned routes also proves a turn of at least 45 degrees at a collected wall or ceiling target, measured from the native positions before and after impact. Optional destination results are reported separately. A timeout or a ball leaving the station fails the proof.
+`web/levels/proof-inputs.json` pairs every current course with two repeated suggested shots and one nearby aim. The native proof requires every waypoint and any retained destination on each repeated suggested shot, plus full physical rest. Neighboring inputs report their full-clear result separately; partial routes are not passes. Each of the ten redesigned routes also proves a turn of at least 45 degrees at a collected wall or ceiling target, measured from the native positions before and after impact. A missed destination fails the authored solution even though it is an optional gameplay bonus. A timeout or a ball leaving the station fails the proof.
 
 `npm test` checks campaign completeness, progression, hints, target data and replacement of the previous catalog. `npm run test:runtime` checks authoritative scores and saved replay parity on an isolated local service, including shop, garden, Skyway and finale routes. Browser verification covers the real chapter selector, stage overviews, visible hints and custom-course access. See `web/levels/README.md` for reproduction.
 
-The ten changed routes are verified with repeated suggested shots and nearby positive completions. The isolated service checks classic scoring plus shop, garden, Skyway and finale score/replay parity. Browser checks cover course selection, overviews and the live movement counter; they do not establish a manual playthrough of every stage.
+All 30 courses have repeated native solution checks; nearby inputs additionally measure sensitivity. See [COURSE-AUDIT.md](COURSE-AUDIT.md) for the current results and limits. The isolated service checks classic scoring plus shop, garden, Skyway and finale score/replay parity. Browser checks cover course selection, overviews and the live movement counter; they do not establish a manual playthrough of every stage.
 
 ## Scouting and creating courses
 
@@ -80,7 +80,7 @@ it. Separate buttons fly to the start and finish.
 
 The designer has two modes:
 
-- **Place by hand:** arrange the start, optional waypoint chain and destination.
+- **Place by hand:** arrange the start, required waypoint chain and optional destination bonus.
 - **Design ball:** use a placed start or walk to a launch position, then throw
   the cyan ball. It plays the normal authoritative physics and earns no ranked
   score. Hold Space during flight for 2×. At full physical rest, its real surface

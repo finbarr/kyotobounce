@@ -40,8 +40,13 @@ assert.equal(reordered.comboMultiplier,9.5,'Identical targets and banks produce 
 assert.equal(reordered.total-reordered.movementPoints,sequence.value().total-sequence.value().movementPoints);
 const one=scoreAttempt(result({waypointHits:[hits[0]],contacts:[postGoalBank]}));
 const two=scoreAttempt(result({waypointHits:hits.slice(0,2),contacts:[postGoalBank]}));
-assert.equal(one.total-one.movementPoints,25000);assert.equal(two.total-two.movementPoints,45000);
-assert.equal(two.total-one.total,20000,'The next waypoint doubles only the 20000 target component, never the 5000 bank credit');
+assert.equal(one.potential-one.movementPoints,25000);assert.equal(two.potential-two.movementPoints,45000);
+assert.equal(two.potential-one.potential,20000,'The next waypoint doubles only the 20000 target component, never the 5000 bank credit');
+for(const partial of [one,two]){assert.equal(partial.total,0);assert.equal(partial.outcome,'incomplete');}
+const partialLanding=scoreAttempt(result({challenge:{...c,goal},success:true,destinationReached:true,waypointHits:hits.slice(0,2)}));
+assert.equal(partialLanding.total,0,'A destination cannot bypass a missing waypoint');assert.equal(partialLanding.destinationBonus,0);assert.equal(partialLanding.outcome,'incomplete');
+assert.equal(scoreAttempt(result({waypointHits:[hits[0],hits[0],hits[1]]})).total,0,'Duplicate hits cannot stand in for the missing target');
+const inPlay=new ComboTracker(c);inPlay.waypoint(hits[0]);inPlay.poses(result().poses);assert.ok(inPlay.value().total>0,'Live partial routes still show points in play');assert.equal(inPlay.value({final:true}).total,0);
 assert.equal(scoreAttempt(result({waypointHits:[],contacts:sequence.contacts})).total,0,'A high-speed surface-only shot still needs a target');
 assert.equal(scoreAttempt(result({contacts:[...sequence.contacts,...sequence.contacts]})).comboMultiplier,9.5,'Repeated surfaces never farm bank credit');
 assert.equal(scoreAttempt(result({contacts:sequence.contacts.map(h=>({...h,speed:1}))})).comboMultiplier,9.5,'Speed above qualification does not increase bank value');
@@ -58,6 +63,14 @@ const store=new Store(':memory:');try{
  const saved=await game.command(member,save);assert.equal(saved.challenge.goal,null);assert.equal(saved.challenge.waypoints.length,3);
  store.saveChallenge({...c,id:'required-route',requiredSurface:'wall'});const revised=await game.command(member,{...save,editId:'required-route'});assert.equal(revised.challenge.requiredSurface,'wall','Editing a course retains its required route');
  const guest=store.guest();member.guest=guest;member.selected=c;game.members.set(member.id,member);
+ for(const destinationReached of [false,true]){
+  const course={...c,goal};store.db.prepare('UPDATE challenges SET body=? WHERE id=?').run(JSON.stringify(course),c.id);
+  const attempt=`partial-${destinationReached}`;member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:course});
+  game.result({...result({challenge:course,waypointHits:hits.slice(0,2),destinationReached,success:destinationReached,score:destinationReached?1000:0}),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
+  assert.equal(member.lastResult.success,false);assert.equal(member.lastResult.saved,false);assert.equal(member.lastResult.score,0);assert.equal(member.lastResult.breakdown.outcome,'incomplete');assert.equal(store.replay(attempt),null);assert.equal(store.attemptRank(c,attempt),null);assert.equal(store.leaderboard(c).length,0);
+ }
+ store.db.prepare('UPDATE challenges SET body=? WHERE id=?').run(JSON.stringify(c),c.id);
+ assert.throws(()=>store.saveResult({...result({waypointHits:hits.slice(0,2)}),id:guest.id,attempt:'invalid-ranking',score:900000,duration:12},'animation'),/Incomplete waypoint/);
  for(const [attempt,expected]of [['record-one',true],['record-tie',false]]){
   member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:c});
   game.result({...result(),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
@@ -70,5 +83,9 @@ const store=new Store(':memory:');try{
   game.result({...result(),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
   const replay=store.replay(attempt);assert.ok(replay.standings.rank>10,'Off-board scores retain their overall placement');assert.deepEqual(replay.records,{personalBest,courseBest:false},'Off-board players retain accurate personal records');
  }
+ const retired=store.replay('record-one');retired.waypointHits=[hits[0],hits[0],hits[1]];
+ store.db.prepare('UPDATE attempts SET replay=? WHERE id=?').run(JSON.stringify(retired),'record-one');
+ store.discardRetired(c.layout,c.physics);
+ assert.equal(store.replay('record-one'),null,'Old incomplete routes leave the board and replay cache');assert.equal(store.attemptRank(c,'record-one'),null);assert.ok(store.replay('record-tie'),'Complete development records remain valid');
 }finally{store.close();}
-console.log('PASS waypoint chain, destination bonus/miss, once-only contacts, anti-spoof, capability gating and safe integers');
+console.log('PASS full-route ranking/pass requirement, partial live points, destination bonus, old partial cleanup, once-only contacts, anti-spoof and safe integers');

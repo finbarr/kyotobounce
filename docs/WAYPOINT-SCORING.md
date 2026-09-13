@@ -1,13 +1,14 @@
 # Waypoint chains and jackpot presentation
 
-User direction accepted 2026-09-07: collect as many optional waypoints as possible;
-optionally finish in one destination. **Missing the destination keeps waypoint
-points.** This is a new scoring family alongside existing destination courses.
+Collect every waypoint to pass and enter the leaderboard. A destination is an
+optional bonus on waypoint courses. **Missing a waypoint leaves the shot unranked;
+missing only the destination keeps the full waypoint score.** Classic destination
+courses remain available.
 
 ## First playable scope
 
 - A course has its existing start area, zero or one destination, and up to 32
-  waypoints, with at least one scoring target overall. Every waypoint is optional,
+  waypoints, with at least one scoring target overall. Every placed waypoint is required,
   can be collected once per shot, and can be taken in any order. No streak timer
   expires while the player waits for an escalator ride or another bank.
 - Waypoints can lie on fixed station floors, walls, ceilings and other supported
@@ -18,7 +19,7 @@ points.** This is a new scoring family alongside existing destination courses.
   is credited by native ball contact, including slow rolling, on its actual face;
   flying nearby or touching the opposite side of a wall does not count.
 - First slice includes authoring, saving, playing and replaying a waypoint-only
-  course and a mixed course. Current classic and waypoint courses remain playable. Pre-launch scoring changes clear existing scores and replays; no historical rules are retained.
+  course and a mixed course. Current classic and waypoint courses remain playable. Pre-launch updates discard incomplete-route records; complete current records remain valid. No historical rules are retained.
 
 ## Current tuning
 
@@ -29,16 +30,19 @@ banks never compound. Five waypoints earn 320,000 before additive bank credit.
 A new bank adds 5,000 target points regardless of collection order or impact speed.
 
 Translating flight and rolling add 100 points per second after all multipliers and
-the destination bonus. Stationary time and spin alone add nothing. At least one
-target must score to bank movement points. Banks continue throughout the shot;
+the destination bonus. Stationary time and spin alone add nothing. The complete
+route must qualify to bank movement points. Banks continue throughout the shot;
 repeated waypoints and repeated surfaces never earn again.
 
 At full supported rest inside the destination, add `10,000 × multiplier` as a bonus.
 Missing it preserves all waypoint points. Without a waypoint or destination, the
 shot scores zero. Recall and missing a required route forfeit the shot.
 
-A new-mode shot counts as completed when it earns any target and comes to true
-rest; its result separately identifies whether the destination was reached.
+A waypoint shot completes only after every actual target ID is collected and the
+ball comes to true rest. With zero waypoints, the destination must be reached.
+A destination cannot substitute for a missing waypoint. Live partial scores are
+provisional; a final incomplete route has zero `total`, `outcome: incomplete`,
+and retains its provisional points in `potential`.
 Existing required-surface route rules still apply. No timed finish, freeze,
 magnet, fabricated contact or client-submitted result is introduced.
 
@@ -87,7 +91,8 @@ Celebrations use verified score/record events and end cleanly before the next sh
 
 Verify floor/wall/ceiling and slow contact; reject backside/near-miss/forged hits;
 verify once-only awards, destination miss preserving waypoint points, destination
-bonus, all targets optional, full rest, recall forfeiture and current saved replay parity.
+bonus, all targets required for ranking/progression, full rest, recall forfeiture,
+partial-record cleanup and current saved replay parity.
 Prove both new course forms through an isolated rebuilt native worker and real
 browser create/play/replay controls. Test score/FX reset on recall, retry, stage
 change and replay scrub. Capture actual escalation and character dance evidence,

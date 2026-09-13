@@ -1,7 +1,7 @@
 import {WAYPOINT_SCORING} from './types.ts';
 import type { NativeResult,Vector,WaypointHit } from './types.ts';
 export const ARCADE_SCORING='combo-v7';
-export type ScoreBreakdown={version:string;movingSeconds:number;movementPoints:number;outcome:'perfect'|'tagged'|'near'|'miss'|'forfeit'|'route-missed';waypointCount?:number;waypointIds?:string[];waypointHits?:WaypointHit[];waypointBase?:number;waypointMultiplier?:number;destinationReached?:boolean;destinationBonus?:number;accuracy:number;style:number;styleBanks:number;stylePercent:number;goalVisited:boolean;distance:number;proximityRange:number;endPosition:Vector;total:number;base?:number;bankMultiplier?:number;bankBonus?:number;comboMultiplier?:number;landingMultiplier?:number;potential?:number;firstVisit?:number|null;lastBank?:string};
+export type ScoreBreakdown={version:string;movingSeconds:number;movementPoints:number;outcome:'perfect'|'tagged'|'near'|'miss'|'forfeit'|'route-missed'|'incomplete';waypointCount?:number;waypointIds?:string[];waypointHits?:WaypointHit[];waypointBase?:number;waypointMultiplier?:number;destinationReached?:boolean;destinationBonus?:number;accuracy:number;style:number;styleBanks:number;stylePercent:number;goalVisited:boolean;distance:number;proximityRange:number;endPosition:Vector;total:number;base?:number;bankMultiplier?:number;bankBonus?:number;comboMultiplier?:number;landingMultiplier?:number;potential?:number;firstVisit?:number|null;lastBank?:string};
 const distance=(a:Vector,b:Vector)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
 const clamp=(x:number,a=0,b=1)=>Math.min(b,Math.max(a,x));
 // A finite cylinder at floor height, swept between authoritative 180 Hz poses.
@@ -17,6 +17,12 @@ function entersGoal(a:Vector,b:Vector,g:Vector,r:number,ballRadius:number){
 type Pose=NativeResult['poses'][number];
 type Contact=NativeResult['contacts'][number];
 type Challenge=NonNullable<NativeResult['challenge']>;
+// Use actual target IDs, never a client count. Destination-only courses still
+// need a landing; on waypoint courses it is a bonus after the complete route.
+export function waypointRouteComplete(c:Challenge,hits:WaypointHit[],destinationReached:boolean){
+ const targets=c.waypoints||[],ids=new Set(hits.map(h=>h.waypointId));
+ return targets.length>0?targets.every(w=>ids.has(w.id)):!!c.goal&&destinationReached;
+}
 export const BASE_POINTS=10000,BANK_BONUS=.5,WAYPOINT_FACTOR=2,MOVEMENT_POINTS_PER_SECOND=100;
 // Ignore only sub-millimetre drift; rolling and flight earn the same flat rate.
 const MIN_MOVEMENT_SPEED=.001;
@@ -49,7 +55,7 @@ export class ComboTracker {
    this.last=pose;
   }
  }
- value(options:{success?:boolean;destinationReached?:boolean;reason?:string}={}):ScoreBreakdown{
+ value(options:{success?:boolean;destinationReached?:boolean;reason?:string;final?:boolean}={}):ScoreBreakdown{
   if(this.c.scoring===WAYPOINT_SCORING)return this.waypointValue(options);
   const g=this.c.goal!.center,endPosition=this.last?.p||this.c.start.center;
   const gap=Math.hypot(Math.max(0,Math.hypot(endPosition.x-g.x,endPosition.z-g.z)-(this.c.goal!.radius-.023)),Math.max(0,Math.abs(endPosition.y-(g.y+.023))-.015));
@@ -71,7 +77,7 @@ export class ComboTracker {
   const total=targetPoints?Math.min(Number.MAX_SAFE_INTEGER,targetPoints+movementPoints):0,potential=Math.min(Number.MAX_SAFE_INTEGER,bankPoints+movementPoints);
   return {version:ARCADE_SCORING,movingSeconds:this.movingSeconds,movementPoints,outcome:forfeit?'forfeit':!routeOK?'route-missed':options.success?'perfect':goalVisited?'tagged':total?'near':'miss',accuracy,style:targetPoints-accuracy,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,bankBonus,comboMultiplier,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
  }
- waypointValue(options:{destinationReached?:boolean;reason?:string}):ScoreBreakdown{
+ waypointValue(options:{destinationReached?:boolean;reason?:string;final?:boolean}):ScoreBreakdown{
   const hits=this.waypointHits.filter(h=>h.time<=(this.last?.t??0));
   const seen=new Set<string>();let banks=0,lastTime=-Infinity,lastPoint:Vector|null=null,lastBank='';
   for(const hit of this.contacts){
@@ -90,9 +96,10 @@ export class ComboTracker {
   const destinationBonus=destinationReached?safe(BASE_POINTS*comboMultiplier):0;
   const movementPoints=forfeit||!routeOK?0:Math.min(Number.MAX_SAFE_INTEGER,Math.floor(this.movingSeconds*MOVEMENT_POINTS_PER_SECOND+1e-6));
   // Movement is additive, outside every multiplier and destination bonus.
-  // A target is still required to bank a shot; time alone cannot clear a course.
-  const total=forfeit||!routeOK||!(earned+destinationBonus)?0:safe(earned+destinationBonus+movementPoints);
-  return {version:WAYPOINT_SCORING,movingSeconds:this.movingSeconds,movementPoints,outcome:forfeit?'forfeit':!routeOK?'route-missed':destinationReached?'perfect':waypointCount?'tagged':'miss',accuracy:total,style:0,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited:Number.isFinite(this.firstVisit)||destinationReached,distance:0,proximityRange:0,endPosition:this.last?.p||this.c.start.center,total,base:BASE_POINTS,bankMultiplier,bankBonus,comboMultiplier,landingMultiplier:total?1:0,potential:total,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank,waypointCount,waypointIds:hits.map(h=>h.waypointId),waypointHits:hits,waypointBase,waypointMultiplier,destinationReached,destinationBonus:forfeit||!routeOK?0:destinationBonus};
+  // Live points remain in play. Only the complete route can bank them at rest.
+  const incomplete=!!options.final&&!waypointRouteComplete(this.c,hits,destinationReached);
+  const potential=forfeit||!routeOK||!(earned+destinationBonus)?0:safe(earned+destinationBonus+movementPoints),total=incomplete?0:potential;
+  return {version:WAYPOINT_SCORING,movingSeconds:this.movingSeconds,movementPoints,outcome:forfeit?'forfeit':!routeOK?'route-missed':incomplete?'incomplete':destinationReached?'perfect':waypointCount?'tagged':'miss',accuracy:total,style:0,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited:Number.isFinite(this.firstVisit)||destinationReached,distance:0,proximityRange:0,endPosition:this.last?.p||this.c.start.center,total,base:BASE_POINTS,bankMultiplier,bankBonus,comboMultiplier,landingMultiplier:total?1:0,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank,waypointCount,waypointIds:hits.map(h=>h.waypointId),waypointHits:hits,waypointBase,waypointMultiplier,destinationReached,destinationBonus:forfeit||!routeOK||incomplete?0:destinationBonus};
  }
 
 }
@@ -103,5 +110,5 @@ export function scoreAttempt(result:NativeResult):ScoreBreakdown{
  for(const hit of result.contacts)tracker.contact(hit);
  for(const hit of result.waypointHits||[])tracker.waypoint(hit);
  tracker.poses(result.poses);
- return tracker.value(result);
+ return tracker.value({...result,final:true});
 }

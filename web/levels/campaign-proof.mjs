@@ -9,7 +9,7 @@ import {PhysicsWorker} from '../worker.ts';
 const out=resolve(process.argv[2]||`.local/campaign-proof-${Date.now()}`);
 if(!out.startsWith(resolve('.local')+'/'))throw Error('Proof output must be under this worktree .local/');
 if(!process.env.KYOTO_WORKER_EXECUTABLE)throw Error('Select a compatible KYOTO_WORKER_EXECUTABLE explicitly');
-await mkdir(out,{recursive:false});process.env.KYOTO_WORKER_LOG=resolve(out,'worker.log');
+await mkdir(resolve('.local'),{recursive:true});await mkdir(out,{recursive:false});process.env.KYOTO_WORKER_LOG=resolve(out,'worker.log');
 const bytes=await readFile('runtime/station-layout.json'),layout=createHash('sha256').update(bytes).digest('hex');
 const campaignBytes=await readFile('web/starter-challenges.json'),courses=JSON.parse(campaignBytes);
 const selectedIds=process.argv[3]?.split(',');
@@ -18,11 +18,16 @@ await writeFile(resolve(out,'catalog.json'),campaignBytes);
 const fixture=JSON.parse(await readFile('web/levels/proof-inputs.json'));
 assert.equal(fixture.layout,layout);
 const worker=new PhysicsWorker(),states=new Map(),events=new Map();let ready;
-worker.on('message',m=>{if(m.type==='ready')ready=m;if(m.type==='state')states.set(m.id,m);if(['result','notice'].includes(m.type))events.set(m.id,m);});
+const accelerated=new Set();
+worker.on('message',m=>{if(m.type==='ready')ready=m;if(['state','shot-frame'].includes(m.type))states.set(m.id,m);if(m.type==='shot-frame'&&!accelerated.has(m.attempt)){accelerated.add(m.attempt);worker.send({type:'playback-rate',id:m.id,request:m.attempt,rate:2});}if(['result','notice'].includes(m.type))events.set(m.id,m);});
 const until=async(f,ms=15000)=>{const end=performance.now()+ms;while(!f()){if(performance.now()>end)throw Error('Observation timed out before rest');await delay(10);}};
 const jobs=fixture.courses.filter(p=>!selectedIds||selectedIds.includes(p.id)).flatMap(proof=>{
  const challenge=courses.find(c=>c.id===proof.id&&c.revision===proof.revision);assert.ok(challenge,`Current course ${proof.id}`);
- return [...Array.from({length:proof.repeat},()=>({kind:'hint',shot:proof.shot})),...proof.neighbors.map(shot=>({kind:'neighbor',shot}))].map(job=>({...job,challenge,features:proof.features}));
+ const holdMs=proof.shot.holdMs??(proof.shot.speed-.5)/(proof.shot.range==='precision'?11.5:99.5)*2800;
+ assert.ok(Math.abs(challenge.hint.holdMs-holdMs)<.0001,`${challenge.id}: proof must use the displayed charge`);
+ for(const key of ['yaw','pitch','top','kick'])assert.equal(proof.shot.input[key],challenge.hint[key],`${challenge.id}: displayed ${key}`);
+ assert.equal(proof.shot.range,challenge.hint.powerRange);
+ return [...Array.from({length:process.env.KYOTO_PROOF_HINTS_ONLY?1:proof.repeat},()=>({kind:'hint',shot:proof.shot})),...(process.env.KYOTO_PROOF_HINTS_ONLY?[]:proof.neighbors.map(shot=>({kind:'neighbor',shot})))].map(job=>({...job,challenge,features:proof.features}));
 });
 let next=0;const receipts=[];
 async function run(slot){
@@ -41,9 +46,12 @@ async function run(slot){
    await until(()=>events.has(id),Math.min(120,shot.observeSeconds||80)*1000);
    const result=events.get(id);assert.equal(result.type,'result',result.message);
    await until(()=>states.get(id)?.phase==='Result');
-   const state=states.get(id);assert.equal(state.diagnostics.sleeping,true);assert.ok(Math.hypot(...Object.values(state.velocity))<1e-5);assert.ok(Math.hypot(...Object.values(state.spin))<1e-5);
+   const state=states.get(id);assert.equal(state.diagnostics.sleeping,true);assert.ok(Math.hypot(...Object.values(state.velocity))<1e-5);assert.ok(Math.hypot(...Object.values(state.spin))<1e-5);receipt.rest=true;
    const hitIds=new Set(result.waypointHits.map(h=>h.waypointId));
    receipt.duration=result.duration;receipt.hits=[...hitIds];receipt.destinationReached=result.destinationReached;receipt.final=result.poses.at(-1).p;
+   receipt.allWaypoints=challenge.waypoints?.every(w=>hitIds.has(w.id))??true;
+   receipt.fullClear=receipt.allWaypoints&&(!challenge.goal||result.destinationReached===true);
+   await writeFile(resolve(out,`${index}-${challenge.id}.json`),JSON.stringify(result));
    if(features&&kind==='hint'){
     const nonFloor=result.waypointHits.filter(h=>h.normal.y<.5);
     receipt.nonFloorTargets=nonFloor.length;receipt.sharpTurns=0;
@@ -59,8 +67,8 @@ async function run(slot){
     assert.ok(receipt.sharpTurns>=features.minSharpTurns,'The route must make a sharp turn at a wall/ceiling target');
    }
    if(challenge.scoring==='waypoint-v3'){
-    assert.ok(hitIds.size>0||result.destinationReached,'A completed shot must earn points');
-    if(kind==='hint')for(const target of challenge.waypoints)assert.ok(hitIds.has(target.id),`Suggested shot misses ${target.id}`);
+    for(const target of challenge.waypoints)assert.ok(hitIds.has(target.id),`Shot misses waypoint ${target.id}`);
+    if(challenge.goal)assert.equal(result.destinationReached,true,'Shot must settle inside the destination after every waypoint');
    }else assert.ok(result.success,'Suggested classic shot must reach its destination');
    receipt.pass=true;
   }catch(error){receipt.pass=false;receipt.error=error.message;}
@@ -71,5 +79,10 @@ async function run(slot){
 for(const sig of ['SIGINT','SIGTERM'])process.on(sig,()=>{worker.stop();process.exit(130);});
 try{await worker.start();await until(()=>worker.ready,65000);assert.ok(worker.capabilities.includes('waypoint-v3'));await Promise.all(Array.from({length:4},(_,i)=>run(i)));}
 finally{worker.stop();await writeFile(resolve(out,'summary.json'),JSON.stringify({layout,physics:ready?.physics,executable:process.env.KYOTO_WORKER_EXECUTABLE,campaignHash:createHash('sha256').update(campaignBytes).digest('hex'),receipts:receipts.sort((a,b)=>a.index-b.index)},null,2));}
-assert.equal(receipts.length,jobs.length);assert.ok(receipts.every(r=>r.pass),'Campaign proof failed; inspect summary.json');
-console.log(`PASS ${new Set(jobs.map(j=>j.challenge.id)).size} stages, ${receipts.length} shots at full native rest`);
+assert.equal(receipts.length,jobs.length);
+// Exact authored solutions prove feasibility. Nearby shots separately expose
+// sensitivity; a partial neighbor is never presented as a completed route.
+const hints=receipts.filter(r=>r.kind==='hint'),neighbors=receipts.filter(r=>r.kind==='neighbor');
+assert.ok(hints.every(r=>r.pass)&&neighbors.every(r=>r.rest),'Campaign proof failed; inspect summary.json');
+if(process.env.KYOTO_PROOF_REQUIRE_NEIGHBORS)assert.ok(neighbors.every(r=>r.pass),'Nearby full-clear tolerance failed');
+console.log(`PASS ${new Set(jobs.map(j=>j.challenge.id)).size} stages: ${hints.length} authored shots collect every waypoint and destination at full native rest. Nearby full clears: ${neighbors.filter(r=>r.pass).length}/${neighbors.length}.`);

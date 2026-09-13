@@ -2,7 +2,7 @@
 // The server supplies both snapshots, including deterministic tie breakers.
 export function resultBoard({host,watch,sound}){
  const panel=document.createElement('section');panel.id='result-leaderboard';panel.hidden=true;
- panel.innerHTML='<div class="board-heading"><span class="eyebrow">LEVEL TOP 10 / ランキング</span><b id="ranking-announcement" role="status"></b></div><ol aria-label="Level high scores"></ol><div class="own-placement" hidden><p>YOUR SHOT</p><ol aria-label="Your placement"></ol></div><p class="board-footnote">Every shot can rank · select a score to watch</p>';
+ panel.innerHTML='<div class="board-heading"><span class="eyebrow">LEVEL TOP 10 / ランキング</span><b id="ranking-announcement" role="status"></b></div><ol aria-label="Level high scores"></ol><div class="own-placement" hidden><p>YOUR SHOT</p><ol aria-label="Your placement"></ol></div><p class="board-footnote">Every complete waypoint route can rank · select a score to watch</p>';
  host.append(panel);const list=panel.querySelector('ol'),announcement=panel.querySelector('[role=status]'),placement=panel.querySelector('.own-placement'),ownList=placement.querySelector('ol');let timers=[],animations=[],generation=0;
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
  function clear(){generation++;timers.forEach(clearTimeout);timers=[];animations.forEach(a=>a.cancel());animations=[];panel.hidden=true;list.replaceChildren();placement.hidden=true;ownList.replaceChildren();}

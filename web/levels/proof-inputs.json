@@ -221,7 +221,7 @@
       "revision": 2,
       "repeat": 2,
       "shot": {
-        "speed": 2.1,
+        "speed": 1.8,
         "range": "precision",
         "input": {
           "yaw": 75,
@@ -233,10 +233,32 @@
       },
       "neighbors": [
         {
-          "speed": 2.1,
+          "speed": 1.8,
           "range": "precision",
           "input": {
             "yaw": 75.2,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "speed": 1.7,
+          "range": "precision",
+          "input": {
+            "yaw": 75,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "speed": 1.9,
+          "range": "precision",
+          "input": {
+            "yaw": 75,
             "pitch": 10,
             "top": 0,
             "kick": 0

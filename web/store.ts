@@ -1,8 +1,9 @@
 import { DatabaseSync } from 'node:sqlite';
 import {ReplayCache,type ReplayCacheOptions} from './replay-cache.ts';
+import {waypointRouteComplete} from './scoring.ts';
 import { randomUUID } from 'node:crypto';
 import type { Challenge,Guest,NativeResult,LeaderboardEntry } from './types.ts';
-import { withChallengeRules,SCORING_VERSION,ACTIVE_SCORING,THROW_MODEL,PHYSICS_VERSION } from './types.ts';
+import { withChallengeRules,SCORING_VERSION,ACTIVE_SCORING,THROW_MODEL,PHYSICS_VERSION,WAYPOINT_SCORING } from './types.ts';
 export class Store {
  db:DatabaseSync;
  replayCache:ReplayCache;
@@ -70,6 +71,15 @@ export class Store {
    const latest=new Map<string,number>();for(const row of rows)latest.set(String(row.id),Math.max(latest.get(String(row.id))||0,Number(row.revision)));
    for(const row of rows){const c=JSON.parse(String(row.body));
     if(c.layout!==layout||c.physics!==physics||c.throwModel!==THROW_MODEL||!ACTIVE_SCORING.includes(c.scoring)||c.revision!==latest.get(c.id)){invalidated.add(String(row.id));this.db.prepare('DELETE FROM challenges WHERE id=? AND revision=?').run(String(row.id),Number(row.revision));}
+    else if(c.scoring===WAYPOINT_SCORING){
+     // Retire partial-route development records under the current rules. Keep
+     // only compact target attestations in memory, not entire trajectories.
+     for(const attempt of this.db.prepare("SELECT id,json_extract(replay,'$.waypointHits') AS hits,json_extract(replay,'$.destinationReached') AS destination FROM attempts WHERE challenge=? AND revision=? AND score>0").all(c.id,c.revision)){
+      if(!waypointRouteComplete(c,JSON.parse(String(attempt.hits||'[]')),attempt.destination===1)){
+       this.db.prepare('DELETE FROM attempts WHERE id=?').run(String(attempt.id));invalidated.add(c.id);
+      }
+     }
+    }
    }
    this.db.exec('DELETE FROM attempts WHERE NOT EXISTS (SELECT 1 FROM challenges c WHERE c.id=attempts.challenge AND c.revision=attempts.revision); DROP TABLE IF EXISTS layout_migrations; COMMIT;');for(const id of invalidated)this.replayCache.invalidateChallenge(id);
   }catch(error){this.db.exec('ROLLBACK');throw error;}
@@ -79,6 +89,7 @@ export class Store {
  saveResult(result:NativeResult,animation:string):boolean{
   const c=result.challenge;
   if(!c||!this.challenge(c.id,c.revision))return false;
+  if(c.scoring===WAYPOINT_SCORING&&result.score>0&&!waypointRouteComplete(c,result.waypointHits||[],!!result.destinationReached))throw new Error('Incomplete waypoint score cannot rank');
   // The replay and ranking row are one SQLite commit; a leaderboard entry can
   // never point to a half-written replay. Attempt IDs make delivery idempotent.
   let replayJson:string|undefined,inserted=false;
