@@ -13,6 +13,7 @@ export class Store {
   CREATE TABLE IF NOT EXISTS challenges (id TEXT NOT NULL,revision INTEGER NOT NULL,creator TEXT NOT NULL,body TEXT NOT NULL,created INTEGER NOT NULL,PRIMARY KEY(id,revision));
   CREATE TABLE IF NOT EXISTS attempts (id TEXT PRIMARY KEY,guest TEXT NOT NULL,challenge TEXT,revision INTEGER,success INTEGER NOT NULL,score INTEGER NOT NULL,surfaces INTEGER NOT NULL,duration REAL NOT NULL,accepted INTEGER NOT NULL,replay TEXT);
   CREATE INDEX IF NOT EXISTS attempts_course_player ON attempts(challenge,revision,guest,score DESC,duration,accepted,id);
+  CREATE INDEX IF NOT EXISTS attempts_course_ranking ON attempts(challenge,revision,score DESC,duration,accepted,id) WHERE score>0;
   CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY,value TEXT NOT NULL);`);
 
  }
@@ -86,8 +87,8 @@ export class Store {
    const before=this.leaderboard(c);
    const insert=this.db.prepare('INSERT OR IGNORE INTO attempts VALUES (?,?,?,?,?,?,?,?,?,?)').run(result.attempt,result.id,c.id,c.revision,result.success?1:0,result.score,result.surfaces,result.duration,Date.now(),null);
    if(insert.changes===1){
-    const after=this.leaderboard(c),rank=after.findIndex(row=>row.attempt===result.attempt),previousRank=before.findIndex(row=>row.guest===result.id);
-    result.standings={before:before.slice(0,10),after:after.slice(0,10),rank:rank<0?null:rank+1,previousRank:previousRank<0?null:previousRank+1,improved:rank>=0};
+    const after=this.leaderboard(c),rank=after.findIndex(row=>row.attempt===result.attempt);
+    result.standings={before,after,rank:rank<0?null:rank+1};
     if(result.score>0){replayJson=JSON.stringify({...result,challenge:withChallengeRules(c),animation,scoring:c.scoring||SCORING_VERSION});this.db.prepare('UPDATE attempts SET replay=? WHERE id=?').run(replayJson,result.attempt);}
    }
    this.db.exec('COMMIT');inserted=insert.changes===1;
@@ -97,10 +98,12 @@ export class Store {
   return inserted;
  }
  leaderboard(c:Challenge):LeaderboardEntry[]{
-  return this.db.prepare(`SELECT id AS attempt,guest,name,score,surfaces,duration,accepted FROM (
-    SELECT a.id,a.guest,a.score,a.surfaces,a.duration,a.accepted,g.name,ROW_NUMBER() OVER(PARTITION BY a.guest ORDER BY a.score DESC,a.duration ASC,a.accepted ASC,a.id ASC) AS rank
+  return this.db.prepare(`SELECT a.id AS attempt,a.guest,g.name,a.score,a.surfaces,a.duration,a.accepted
     FROM attempts a JOIN guests g ON a.guest=g.id WHERE a.challenge=? AND a.revision=? AND a.score>0
-  ) WHERE rank=1 ORDER BY score DESC,duration ASC,accepted ASC,id ASC`).all(c.id,c.revision) as LeaderboardEntry[];
+    ORDER BY a.score DESC,a.duration ASC,a.accepted ASC,a.id ASC LIMIT 10`).all(c.id,c.revision) as LeaderboardEntry[];
+ }
+ personalBest(c:Challenge,guest:string):number{
+  return Number(this.db.prepare('SELECT score FROM attempts WHERE challenge=? AND revision=? AND guest=? ORDER BY score DESC LIMIT 1').get(c.id,c.revision,guest)?.score||0);
  }
  replayResponse(id:string){
   const cached=this.replayCache.get(id);if(cached)return {entry:cached,status:'HIT'};

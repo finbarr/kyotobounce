@@ -27,6 +27,13 @@ try{
  const cacheAfter=await cacheStats();assert.equal(cacheAfter.misses,cacheBefore.misses);assert.equal(cacheAfter.compressions,cacheBefore.compressions);assert.equal(await sessions(),before);
  console.log(`PASS 64 concurrent native replay reads in ${Math.round(performance.now()-burstStart)} ms with no cache misses, recompression or extra physics sessions`);
  const fromSocket=await client.request('replay',{attempt:result.attempt},'replay');assert.deepEqual(replay,fromSocket.replay);
+ await client.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');
+ const {result:second}=await client.throw((8-.5)/11.5*2800,{yaw:-170.75955,pitch:0,top:0,kick:0,powerRange:'precision',character:'don'},180000);
+ assert.ok(second.saved&&second.score>0);assert.equal(second.standings.rank>0,true);
+ const board=await client.request('leaderboard',{challengeId:course.id,revision:course.revision},'leaderboard');
+ for(const attempt of [result.attempt,second.attempt])assert.ok(board.entries.some(row=>row.attempt===attempt&&row.guest===client.guestId),'Both shots by one player appear in the published leaderboard');
+ assert.equal(second.records.personalBest,second.score>result.score,'Ranking another shot does not automatically make it a personal best');
+ assert.equal(hash(Buffer.from(await(await fetch(`${origin}/api/replay/${result.attempt}`)).arrayBuffer())),hash(bytes),'A second ranked shot cannot rewrite the first replay');
  await mkdir('.local',{recursive:true});await writeFile('.local/shared-replay.json',JSON.stringify(replay));
- console.log(`PASS named native shot, saved robot identity, atomic ranks, public HTTP playback without a new session; replay ${result.attempt}`);
+ console.log(`PASS two ranked native shots by one player, saved robot identity, atomic ranks, public HTTP playback without a new session; replay ${result.attempt}`);
 }finally{client.close();}

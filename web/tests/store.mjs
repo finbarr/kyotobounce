@@ -11,12 +11,12 @@ try{
  assert.equal(s.saveResult(result('a1',a.id,999900,1),'animation'),false);
  assert.equal(s.replay('a1').score,1100,'Duplicate attempt cannot replace its score or replay');
  s.saveResult(result('a2',a.id,1200,4),'animation');s.saveResult(result('b1',b.id,1200,3),'animation');
- assert.deepEqual(s.leaderboard(c).map(r=>r.attempt),['b1','a2'],'One best per guest, duration breaks equal scores');
- const miss={...result('miss',b.id,0,30),success:false,surfaces:0};s.saveResult(miss,'animation');assert.equal(s.replay('miss'),null);assert.equal(s.leaderboard(c).length,2);
+ assert.deepEqual(s.leaderboard(c).map(r=>r.attempt),['b1','a2','a1'],'Every shot ranks, and duration breaks equal scores');
+ const miss={...result('miss',b.id,0,30),success:false,surfaces:0};s.saveResult(miss,'animation');assert.equal(s.replay('miss'),null);assert.equal(s.leaderboard(c).length,3);
  assert.equal(s.guest(a.token).id,a.id,'Guest token restores identity');
  s.saveChallenge({...c,revision:2,throwModel:THROW_MODEL,goal:{...c.goal,radius:.5}});s.saveResult(result('a3',a.id,1400,2,2),'animation');
  assert.equal(s.challenge(c.id,1),null);assert.equal(s.replay('a1'),null);assert.equal(s.leaderboard(c).length,0);
  assert.deepEqual(s.leaderboard({...c,revision:2}).map(r=>r.attempt),['a3']);
  assert.equal(s.saveResult(result('late-old-shot',a.id,1500,2),'animation'),false,'A late old shot cannot resurrect retired scores');
- console.log('PASS atomic scores/replays, duplicate protection, best-per-guest, ties, current revision replacement, misses and guest identity');
+ console.log('PASS atomic scores/replays, duplicate protection, per-attempt ranking, ties, current revision replacement, misses and guest identity');
 }finally{s.close();}

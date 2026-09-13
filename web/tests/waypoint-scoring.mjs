@@ -40,5 +40,12 @@ const store=new Store(':memory:');try{
   game.result({...result(),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
   assert.deepEqual(store.replay(attempt).records,{personalBest:expected,courseBest:expected},'Only strict improvements are record events');
  }
+ const champion=store.guest();
+ for(let i=0;i<10;i++)store.saveResult({...result(),id:champion.id,attempt:`champion-${i}`,score:1_000_000_000+i,duration:12},'animation');
+ for(const [attempt,player,personalBest]of [['off-board-tie',guest,false],['off-board-first',store.guest(),true]]){
+  member.guest=player;member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:c});
+  game.result({...result(),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});
+  const replay=store.replay(attempt);assert.equal(replay.standings.rank,null);assert.deepEqual(replay.records,{personalBest,courseBest:false},'Off-board players retain accurate personal records');
+ }
 }finally{store.close();}
 console.log('PASS waypoint chain, destination bonus/miss, once-only contacts, anti-spoof, capability gating and safe integers');

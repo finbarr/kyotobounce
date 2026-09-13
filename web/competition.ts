@@ -16,7 +16,7 @@ export class Competition {
  sync(m:Member){this.publish(this.session(m),m.id);}
  playable(c:Challenge){return c.layout===this.layout&&c.physics===this.physics&&c.throwModel===THROW_MODEL&&ACTIVE_SCORING.includes(c.scoring||'')&&this.store.challenge(c.id)?.revision===c.revision;}
  catalog(){return {type:'catalog',challenges:this.store.list().filter(c=>this.playable(c))};}
- board(m:Member){if(m.selected)this.publish({type:'leaderboard',challenge:m.selected,entries:this.store.leaderboard(m.selected).slice(0,10)},m.id);}
+ board(m:Member){if(m.selected)this.publish({type:'leaderboard',challenge:m.selected,entries:this.store.leaderboard(m.selected)},m.id);}
  remember(m:Member){this.store.setSetting(`selected:${m.guest.id}`,m.selected?{id:m.selected.id,revision:m.selected.revision}:{id:null});}
  async add(guest:Guest,id:string){
   const saved=this.store.setting(`selected:${guest.id}`)??this.store.setting('selected');
@@ -85,12 +85,12 @@ export class Competition {
    if(ACTIVE_SCORING.includes(c.scoring||'')){result.breakdown=scoreAttempt(result);result.score=result.breakdown.total;if(c.scoring===WAYPOINT_SCORING){if(result.destinationReached!==result.success)throw new Error('Invalid native destination attestation');result.success=result.score>0;}result.scoreFrames=[...(scoreFrames||[]),{t:result.duration,score:result.breakdown}];}
    // Session IDs route live physics; persistent guest IDs own scores and levels.
    const previous=this.store.leaderboard(c);
-   result.records={personalBest:result.score>previous.reduce((best,row)=>row.guest===member.guest.id?Math.max(best,Number(row.score)):best,0),courseBest:result.score>previous.reduce((best,row)=>Math.max(best,Number(row.score)),0)};
+   result.records={personalBest:result.score>this.store.personalBest(c,member.guest.id),courseBest:result.score>(previous[0]?.score||0)};
    Object.assign(result,member.attemptPresentation);
    const stored={...result,id:member.guest.id};this.store.saveResult(stored,this.animation);result.standings=stored.standings;
   }
   const {poses,contacts,scoreFrames:recordedFrames,...summary}=result;member.lastResult={...summary,type:'result',saved:!!c&&result.score>0};this.publish(member.lastResult,member.id);
-  if(c)this.publish({type:'leaderboard',challenge:c,entries:this.store.leaderboard(c).slice(0,10)});
+  if(c)this.publish({type:'leaderboard',challenge:c,entries:this.store.leaderboard(c)});
   this.sync(member);
  }
  async command(member:Member,m:any):Promise<unknown>{
@@ -128,7 +128,7 @@ export class Competition {
    member.lastResult=undefined;member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
   }
   if(m.type==='leaderboard'){
-   const c=this.store.challenge(String(m.challengeId),Number(m.revision));if(!c)throw new Error('Level not found');return {type:'leaderboard',challenge:c,entries:this.store.leaderboard(c).slice(0,10)};
+   const c=this.store.challenge(String(m.challengeId),Number(m.revision));if(!c)throw new Error('Level not found');return {type:'leaderboard',challenge:c,entries:this.store.leaderboard(c)};
   }
   if(m.type==='replay'){
    const replay=this.store.replay(String(m.attempt));if(!replay)throw new Error('Replay not found');
