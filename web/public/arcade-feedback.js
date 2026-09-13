@@ -54,8 +54,9 @@ export function arcadeFeedback(sound){
    if(!current||!(current.total>0)||['forfeit','route-missed'].includes(current.outcome)){burstTime=0;cancelAnimations();particles.reset();spectacle.hidden=true;return;}
    celebrate({kind:'result',multiplier:current.bankMultiplier},false);
   },
-  update(dt,phase,mode){
-   const now=performance.now(),elapsed=Math.max(0,(now-lastUpdate)/1000);lastUpdate=now;
+  update(dt,phase,mode,rate=1){
+   const now=performance.now(),elapsed=Math.max(0,(now-lastUpdate)/1000)*rate;lastUpdate=now;
+   for(const animation of [...animations,...$('combo-total').getAnimations()])if(animation.playbackRate!==rate)animation.updatePlaybackRate(rate);
    const visible=['play','replay'].includes(mode)&&!!current;
    hud.hidden=!visible||phase!=='Flight';cooldown=Math.max(0,cooldown-elapsed);burstTime=Math.max(0,burstTime-elapsed);
    if(pending&&!cooldown&&visible&&phase==='Flight'){const event=pending;pending=null;celebrate(event);}

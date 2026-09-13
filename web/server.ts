@@ -142,12 +142,13 @@ wss.on('connection',socket=>{
         if(!resumed&&competition.members.size>=16){socket.close(1013,'All 16 play slots are occupied. Please try again shortly.');return;}
         const guest=resumed?.guest||store.guest(typeof m.token==='string'?m.token:undefined);
         if(resumed){
+          shots.get(resumed.id)?.setRate(1);
           competition.disconnect(resumed.id);
           c.id=resumed.id;clearTimeout(detached.get(c.id));detached.delete(c.id);
           for(const [old,connection]of connections)if(old!==socket&&connection.id===c.id){connection.replaced=true;connection.queue.close();old.close(4009,'Session resumed on a new connection');}
         }
         c.guest=guest;clearTimeout(authTimer);send(socket,{type:'welcome',...guest,nameChosen:store.setting(`named:${guest.id}`)===true,sessionId:c.id,worker:worker.ready,resumed:!!resumed});
-        if(m.protocol!=='shot-stream-v3'){c.requiresReload=true;send(socket,{type:'worker-status',status:'failed',message:'The game has been updated. Reload this page to load the new scoring and effects.'});return;}
+        if(m.protocol!=='shot-stream-v4'){c.requiresReload=true;send(socket,{type:'worker-status',status:'failed',message:'The game has been updated. Reload this page to load the new scoring and effects.'});return;}
         send(socket,worker.lifecycle());send(socket,competition.catalog());
         if(resumed){
           competition.sync(resumed);competition.board(resumed);
@@ -177,7 +178,9 @@ wss.on('connection',socket=>{
         worker.send({type:'input',id,x:m.x,z:m.z,yaw:m.yaw,pitch:m.pitch,top:m.top,kick:m.kick,fast:m.fast===true});
       }else {
         const member=competition.members.get(id);if(!member)throw new Error('Rejoin the session');
-        const result=await competition.command(member,m);if(result)send(socket,result);
+        const result=await competition.command(member,m);
+        if(m.type==='playback-rate'&&result&&shots.get(id)?.attempt===m.attempt)shots.get(id)!.setRate(m.rate);
+        if(result)send(socket,result);
       }
     }catch(error){send(socket,{type:'error',message:error instanceof Error?error.message:'Invalid message'});}
   }
@@ -186,6 +189,7 @@ wss.on('connection',socket=>{
     if(c.guest&&!c.replaced){
       if(c.intentional||stopping){shots.delete(c.id);competition.remove(c.id);}
       else{
+        shots.get(c.id)?.setRate(1);
         competition.disconnect(c.id);
         const timer=setTimeout(()=>{detached.delete(c.id);shots.delete(c.id);competition.remove(c.id);},30000);
         timer.unref();detached.set(c.id,timer);

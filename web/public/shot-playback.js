@@ -1,8 +1,9 @@
 // A shot is a small local movie of authoritative physics, not a live snapshot
 // clock. Network delivery may run far ahead; effects fire only at playback time.
 export class ShotPlayback {
- shot=null;discarded=new Set();resumeAt=null;
- clear(discard=false){if(discard&&this.shot){this.discarded.add(this.shot.attempt);if(this.discarded.size>8)this.discarded.delete(this.discarded.values().next().value);}this.shot=null;this.resumeAt=null;}
+ shot=null;discarded=new Set();resumeAt=null;rate=1;
+ clear(discard=false){if(discard&&this.shot){this.discarded.add(this.shot.attempt);if(this.discarded.size>8)this.discarded.delete(this.discarded.values().next().value);}this.shot=null;this.resumeAt=null;this.rate=1;}
+ setRate(rate,now){if(rate!==1&&rate!==2)throw new Error('Invalid playback rate');this.advance(now);this.rate=rate;}
  resume(message){if(this.shot?.attempt!==message.attempt)this.resumeAt=message;}
  accept(chunk,now){
   if(this.discarded.has(chunk.attempt))return;
@@ -20,7 +21,7 @@ export class ShotPlayback {
  }
  result(message){if(this.shot?.attempt!==message.attempt)return false;this.shot.result=message;return true;}
  get active(){return !!this.shot;}
- sample(now){
+ advance(now){
   const s=this.shot;if(!s)return null;
   const elapsed=Math.max(0,(now-s.now)/1000);s.now=now;
   const last=s.frames.at(-1);
@@ -29,8 +30,15 @@ export class ShotPlayback {
   if(!s.complete&&last.stationTime<s.clock)return null;
   // Only an incomplete buffer can run dry. Once complete, station animation
   // continues locally forever and the resting ball stays at its final pose.
-  if(!s.complete)s.underrunMs+=Math.max(0,s.clock+elapsed-last.stationTime)*1000;
-  s.clock=s.complete?s.clock+elapsed:Math.min(s.clock+elapsed,last.stationTime);
+  const step=elapsed*this.rate;
+  if(!s.complete)s.underrunMs+=Math.max(0,s.clock+step-last.stationTime)*1000;
+  // Return the station to normal speed as soon as the ball reaches full rest.
+  s.clock=s.complete?s.clock+elapsed+Math.min(elapsed,Math.max(0,last.stationTime-s.clock)/this.rate)*(this.rate-1):Math.min(s.clock+step,last.stationTime);
+  return s;
+ }
+ sample(now){
+  const s=this.advance(now);if(!s)return null;
+  const last=s.frames.at(-1);
   const messages=[];
   while(s.frames.length>2&&s.frames[1].stationTime<=s.clock)s.frames.shift();
   const before=s.frames[0],after=s.frames[1]||before;

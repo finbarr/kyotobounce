@@ -19,10 +19,22 @@ sounds are withheld until their playback time. Reconnecting does not discard
 the current buffer; the server can also resend retained chunks for that session.
 
 Native results require physical rest in both translation and rotation. A result
-is held until its flight duration has elapsed in wall time before authoritative
+is held until its flight duration has elapsed on the presentation clock before authoritative
 scoring and persistence, so recalling during playback still forfeits even if
 the complete successful trajectory has already been calculated. The browser
 never supplies a score or trajectory. A reconnect never replays a release.
+
+During a live flight, hold Space for 2× playout and release it for normal speed.
+The prominent fast-forward button can also toggle the speed. Ball and station
+animation, score effects, music tempo, pitch and sound envelopes speed up together.
+Camera input remains responsive at normal speed. Replays retain Space-to-pause.
+
+The authenticated `playback-rate` command accepts only 1 or 2 and the current
+attempt ID. Native result delivery and reconnect retention follow the same
+piecewise clock as the browser. Neither the 180 Hz solver nor scoring duration
+changes: movement still earns 100 points per simulated moving second. Focus loss,
+menus, recall, disconnection and completion return to 1×. A buffer underrun waits
+for authoritative frames instead of extrapolating through a collision.
 
 Diagnostics log `shot-computed` duration, computation time and transfer size,
 server event-loop and native timing, disconnect causes, and browser frame cost,
@@ -35,7 +47,8 @@ After rebuilding the native worker, use an isolated local service for
 `web/tests/network-stall-runtime.mjs` and `web/tests/connection-runtime.mjs`.
 Use `KYOTO_TEST_ORIGIN` for its URL. Never create test scores on production.
 
-Browser/service protocol: `shot-stream-v3` (action multipliers with linear movement points). The native stream capability remains `shot-stream-v1`. Old open pages receive a reload
+Browser/service protocol: `shot-stream-v4` (live 2× playout). The native stream
+capability remains `shot-stream-v1`, with `shot-speed-v1` for rate control. Old open pages receive a reload
 message rather than silently waiting for snapshots that no longer arrive.
 
 ## Sharing and results

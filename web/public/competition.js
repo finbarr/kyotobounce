@@ -220,7 +220,7 @@ export function competitionUI({scene,send,cancel,notice,getGuestId,getLiveTime,g
    else notice('Choose a placement button, then click a supported station surface.');
    return true;
   },
-  update(dt){
+  update(dt,rate=1){
    const score=state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore;targetMarkers.update(collectedIds(score));
    const course=state.mode==='replay'?state.replay?.challenge:state.selected;waypointHud.hidden=course?.scoring!=='waypoint-v3'||state.mode==='editor';
    if(!waypointHud.hidden)waypointHud.textContent=`${Math.round(score?.total||0).toLocaleString()} PTS · ${score?.waypointCount||0} / ${course.waypoints?.length||0} WAYPOINTS · ${score?.destinationReached?'DESTINATION BONUS':course.goal?'GOLD = OPTIONAL BONUS':'NO DESTINATION NEEDED'}${score?' · NEXT ×'+(score.waypointMultiplier||1).toLocaleString():''}`;
@@ -231,7 +231,7 @@ export function competitionUI({scene,send,cancel,notice,getGuestId,getLiveTime,g
     if(frames[lo]?.t<=state.replayTime)feedback.accept(frames[lo].score,state.replay.attempt+'-replay');
     replayFeedbackTime=state.replayTime;
    }
-   feedback.update(dt,state.mode==='replay'?(state.replayTime>=0?'Flight':'Charging'):getPhase(),state.mode);
+   feedback.update(dt*rate,state.mode==='replay'?(state.replayTime>=0?'Flight':'Charging'):getPhase(),state.mode,rate);
    const f=feedback.goalFlash,green=new THREE.Color(0x65ff9e);
    for(const o of markers.children){
     const u=o.userData;if(u.key!=='goal'||u.label)continue;

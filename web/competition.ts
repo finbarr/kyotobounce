@@ -29,6 +29,7 @@ export class Competition {
  remove(id:string){const m=this.members.get(id);if(!m)return;this.clearAttempt(m);this.members.delete(id);this.worker.send({type:'leave',id});}
  disconnect(id:string){
   const m=this.members.get(id);if(!m)return;
+  if(m.attempt)this.worker.send({type:'playback-rate',id,request:m.attempt,rate:1});
   // Movement already expires after 300 ms in the native worker. Cancel an
   // unreleased wind-up, but let an authoritative ball in flight finish normally.
   if(m.chargeAt!==undefined){this.clearAttempt(m);this.worker.send({type:'cancel',id});this.sync(m);}
@@ -96,6 +97,13 @@ export class Competition {
  async command(member:Member,m:any):Promise<unknown>{
   const id=member.id;
   if(member.restoring)throw new Error('Your attempt is being restored. Try again in a moment.');
+  if(m.type==='playback-rate'){
+   if(Object.keys(m).some(key=>!['type','attempt','rate'].includes(key))||![1,2].includes(m.rate)||typeof m.attempt!=='string')throw new Error('Choose normal or 2x shot playback');
+   if(!member.attempt||member.attempt!==m.attempt||member.chargeAt!==undefined)return;
+   if(!this.worker.capabilities.includes('shot-speed-v1'))throw new Error('The physics worker needs an update for fast-forward');
+   this.worker.send({type:'playback-rate',id,request:member.attempt,rate:m.rate});
+   return {type:'playback-rate',attempt:member.attempt,rate:m.rate};
+  }
   if(m.type==='charge'||m.type==='release'){
    const allowed=m.type==='charge'?['type','challengeId','revision','layout','physics','powerRange','character']:['type'];
    if(Object.keys(m).some(key=>!allowed.includes(key)))throw new Error('Send throw intent only. Launch position, power, timing and results are authoritative.');

@@ -32,3 +32,15 @@ const resumed=new ShotPlayback();resumed.resume({attempt:'a',time:15});for(const
 const delayed=new ShotPlayback();delayed.resume({attempt:'a',time:21});delayed.accept(chunks[0],30000);assert.equal(delayed.sample(30010),null,'Resume waits for the requested part of the trajectory');
 for(const c of chunks.slice(1))delayed.accept(c,30020);delayed.result({type:'result',attempt:'a'});const restored=delayed.sample(30020);assert.ok(restored.time>=21);assert.equal(restored.phase,'Result');assert.ok(restored.messages.some(m=>m.type==='result'),'A completed shot is not replayed from the beginning after reconnect');
 console.log('PASS autonomous shot playback, timed effects/results, resume, recall, chunk metadata and input/control flood separation');
+
+const fast=new ShotPlayback();for(const c of chunks)fast.accept(c,0);
+fast.result({type:'result',attempt:'a',score:300});fast.sample(120);
+fast.setRate(2,1120);assert.equal(fast.sample(2120).time,13,'One second at 1x plus one at 2x');
+fast.setRate(1,2620);assert.equal(fast.sample(3120).time,14.5,'Rate changes preserve elapsed time');
+fast.setRate(2,3120);frame=fast.sample(5920);assert.equal(frame.phase,'Result');assert.equal(frame.messages.filter(m=>m.type==='result').length,1);
+assert.ok(Math.abs(frame.time-20.05)<.00001,'Any time after rest advances the station at 1x');
+assert.equal(fast.sample(6920).time,21.05);fast.clear();assert.equal(fast.rate,1);
+assert.throws(()=>fast.setRate(0,7000),/Invalid/);
+const sparse=new ShotPlayback();sparse.accept(chunks[0],0);sparse.setRate(2,0);frame=sparse.sample(1000);assert.equal(frame.time,chunks[0].frames.at(-1).stationTime,'Fast-forward never invents unavailable physics');
+const clock=new ShotStream('clock');clock.started=0;clock.releaseTime=10;clock.setRate(2,1000);assert.equal(clock.elapsed(2000),3);clock.setRate(1,2500);assert.equal(clock.elapsed(3000),4.5,'Resume and native presentation keep the same piecewise clock');
+console.log('PASS 2x clocks, rate switching, full-rest completion, bounded buffers and unchanged result payload');
