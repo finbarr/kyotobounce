@@ -1,4 +1,5 @@
 import {FlyCamera,flyTargets} from './fly-camera.js';
+import {CameraObstacles,easeCameraClearance} from './camera-obstacles.js';
 import {replayIdFromPath} from './replay-links.js';
 import {playerName} from './player-name.js';
 import {gameConnection} from './connection.js';
@@ -68,7 +69,7 @@ camera.position.set(-3.8,2.3,-20);camera.lookAt(cameraTarget);
 let noticeUntil=0,lastImpact=null,startupMs=0;
 let workerStatus='starting',connectionStatus='connecting',lastResultAttempt='',loadedLayout='',layoutReloading=false;
 let stationLook,robotShadow,ballShadow;
-let cameraClearance=3.8;
+let cameraClearance=3.8,cameraObstacles;
 function notice(text,duration=4500){$('notice').textContent=text;$('notice').classList.remove('quiet');noticeUntil=performance.now()+duration;}
 function send(type,extra={}){return connection?.send(type,extra);}
 const sharedReplayId=replayIdFromPath(location.pathname);let requestedLevel=new URLSearchParams(location.search).get('level');
@@ -311,6 +312,7 @@ async function load(){
     addConcourseDetails(scene,data,renderer.capabilities.getMaxAnisotropy());
     window.kyotoArt={...details.stats,sourceLayout:detailData.sourceLayoutSha256};
     station.traverse(object=>{if(object.isMesh){object.geometry.computeBoundsTree();object.matrixAutoUpdate=false;object.updateMatrix();}});station.updateMatrixWorld(true);scene.add(station);
+    cameraObstacles=new CameraObstacles(station);
     motion=createEscalators(scene,data.escalators);motion(0);
     $('loading-message').textContent='Lighting the glass, stone and steel…';
     stationLook=dressStation(renderer,scene,sun,station,data);
@@ -424,7 +426,8 @@ function animate(now){
         trailGeometry.setDrawRange(0,trailCount);trailGeometry.attributes.position.needsUpdate=true;
       }
     }else if(p){
-      ball.position.copy(avatars.get(p.id)?.held||toThree(p.release));ball.quaternion.copy(avatars.get(p.id)?.hand.getWorldQuaternion(new THREE.Quaternion())||new THREE.Quaternion());followTarget.copy(toThree(p.feet)).add(new THREE.Vector3(0,.90,0));
+      ball.position.copy(avatars.get(p.id)?.held||toThree(p.release));ball.quaternion.copy(avatars.get(p.id)?.hand.getWorldQuaternion(new THREE.Quaternion())||new THREE.Quaternion());
+      followTarget.copy(avatars.get(p.id)?.group.position||toThree(p.feet)).add(new THREE.Vector3(0,.90,0));
       const aimYaw=snapshot.owner&&snapshot.owner!==guestId?p.yaw:yaw,aimPitch=snapshot.owner&&snapshot.owner!==guestId?p.pitch:pitch;
       const aim=launchDirection(aimYaw,aimPitch);
       const release=aimOrigin(p,aimYaw);guide.geometry.setFromPoints([release,release.clone().addScaledVector(aim,2)]);
@@ -505,22 +508,26 @@ function animate(now){
   if(narrowResult)camera.setViewOffset(innerWidth,innerHeight,0,innerHeight*.18,innerWidth,innerHeight);
   else if(camera.view?.enabled)camera.clearViewOffset();
   if(showRobotResult)cameraTarget.copy(resultAvatar.group.position).add(new THREE.Vector3(0,1.05,0));
-  else if(inFlight)cameraTarget.copy(followTarget);
-  else cameraTarget.lerp(followTarget,1-Math.exp(-dt*12));
+  // Both subjects already interpolate on the render timeline. Another lagged
+  // target can cut through a corner that the robot has already walked around.
+  else cameraTarget.copy(followTarget);
   desired.set(Math.sin(azimuth)*Math.cos(elevation),Math.sin(elevation),Math.cos(azimuth)*Math.cos(elevation)).multiplyScalar(distance).add(cameraTarget);
   if(!inFlight&&!manualCamera)desired.add(new THREE.Vector3(Math.cos(azimuth),0,-Math.sin(azimuth)).multiplyScalar(.55));
-  const offset=desired.clone().sub(cameraTarget);caster.set(cameraTarget,offset.clone().normalize());caster.near=0;caster.far=offset.length();
-  const obstruction=caster.intersectObject(station,true)[0];
-  const clearance=obstruction?Math.max(.18,obstruction.distance-.16):offset.length();
+  const offset=desired.clone().sub(cameraTarget);
+  // The robot camera needs room for its near plane around obstacle edges. The
+  // small ball can rest against a floor: preserve its point anchor and padding.
+  const ballView=inFlight&&!showRobotResult;
+  const clearance=cameraObstacles.clearance(cameraTarget,desired,ballView?0:.16,ballView?.16:.01);
   // Pull in immediately to avoid crossing a wall; ease only the return distance.
   // Orbit angles and the ball target still respond in the current frame.
-  cameraClearance=clearance<cameraClearance?clearance:THREE.MathUtils.lerp(cameraClearance,clearance,1-Math.exp(-dt*10));
+  cameraClearance=easeCameraClearance(cameraClearance,clearance,dt);
   desired.copy(cameraTarget).addScaledVector(offset.normalize(),cameraClearance);
   // Orbit is direct input: smoothing the world-space position makes the view
   // chase its requested angle and drift after the mouse has stopped.
-  caster.far=Infinity;camera.position.copy(desired);camera.up.set(0,1,0);
+  camera.position.copy(desired);camera.up.set(0,1,0);
   const aim=launchDirection(yaw,pitch),release=p?aimOrigin(p,yaw):null;
   lookTarget.copy(cameraTarget);
+  if(cameraClearance<1e-4)lookTarget.addScaledVector(offset,-1);
   if(p&&!inFlight&&!manualCamera&&['play','design'].includes(ui.state.mode))lookTarget.copy(release).addScaledVector(aim,30);
   camera.lookAt(lookTarget);
   camera.updateMatrixWorld();
