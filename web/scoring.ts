@@ -1,7 +1,7 @@
 import {WAYPOINT_SCORING} from './types.ts';
 import type { NativeResult,Vector,WaypointHit } from './types.ts';
-export const ARCADE_SCORING='combo-v5';
-export type ScoreBreakdown={version:string;outcome:'perfect'|'tagged'|'near'|'miss'|'forfeit'|'route-missed';waypointCount?:number;waypointIds?:string[];waypointHits?:WaypointHit[];waypointBase?:number;waypointMultiplier?:number;destinationReached?:boolean;destinationBonus?:number;accuracy:number;style:number;styleBanks:number;stylePercent:number;goalVisited:boolean;distance:number;proximityRange:number;endPosition:Vector;total:number;base?:number;bankMultiplier?:number;timeMultiplier?:number;activeSeconds?:number;landingMultiplier?:number;potential?:number;firstVisit?:number|null;lastBank?:string};
+export const ARCADE_SCORING='combo-v6';
+export type ScoreBreakdown={version:string;outcome:'perfect'|'tagged'|'near'|'miss'|'forfeit'|'route-missed';waypointCount?:number;waypointIds?:string[];waypointHits?:WaypointHit[];waypointBase?:number;waypointMultiplier?:number;destinationReached?:boolean;destinationBonus?:number;accuracy:number;style:number;styleBanks:number;stylePercent:number;goalVisited:boolean;distance:number;proximityRange:number;endPosition:Vector;total:number;base?:number;bankMultiplier?:number;landingMultiplier?:number;potential?:number;firstVisit?:number|null;lastBank?:string};
 const distance=(a:Vector,b:Vector)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
 const clamp=(x:number,a=0,b=1)=>Math.min(b,Math.max(a,x));
 // A finite cylinder at floor height, swept between authoritative 180 Hz poses.
@@ -15,15 +15,6 @@ function entersGoal(a:Vector,b:Vector,g:Vector,r:number,ballRadius:number){
  return Math.hypot(a.x+dx*t-g.x,a.z+dz*t-g.z)<=Math.max(0,r-ballRadius);
 }
 type Pose=NativeResult['poses'][number];
-// Quaternion signs are interchangeable: q and -q describe the same rotation.
-function rotates(a:Pose['q'],b:Pose['q']){
- const an=Math.hypot(a.x,a.y,a.z,a.w),bn=Math.hypot(b.x,b.y,b.z,b.w);
- if(!Number.isFinite(an)||!Number.isFinite(bn)||!an||!bn)throw new Error('Invalid recorded rotation');
- const direct=Math.hypot(a.x/an-b.x/bn,a.y/an-b.y/bn,a.z/an-b.z/bn,a.w/an-b.w/bn);
- const flipped=Math.hypot(a.x/an+b.x/bn,a.y/an+b.y/bn,a.z/an+b.z/bn,a.w/an+b.w/bn);
- // Ignore normalization roundoff far below native float precision.
- return Math.min(direct,flipped)>1e-10;
-}
 type Contact=NativeResult['contacts'][number];
 type Challenge=NonNullable<NativeResult['challenge']>;
 export const BASE_POINTS=10000,BANK_FACTOR=1.75,WAYPOINT_FACTOR=2;
@@ -31,7 +22,7 @@ export const proximityRange=(c:Challenge)=>clamp(distance(c.start.center,c.goal!
 // A tracker consumes every native physics pose, including between network frames.
 // The identical calculation drives the live HUD and the immutable final replay.
 export class ComboTracker {
- c:Challenge;last:Pose|null=null;firstVisit=Infinity;activeSeconds=0;contacts:Contact[]=[];waypointHits:WaypointHit[]=[];
+ c:Challenge;last:Pose|null=null;firstVisit=Infinity;contacts:Contact[]=[];waypointHits:WaypointHit[]=[];
  constructor(challenge:Challenge){this.c=challenge;}
  waypoint(hit:WaypointHit){
   if(this.c.scoring!==WAYPOINT_SCORING)return;
@@ -49,10 +40,6 @@ export class ComboTracker {
    const a=this.last;
    if(a&&pose.t<a.t)throw new Error('Trajectory time moved backwards');
    if(a&&pose.t>a.t){
-    const dt=pose.t-a.t;
-    // Time follows every native translation and rotation until true rest.
-    const moving=distance(a.p,pose.p)>0||rotates(a.q,pose.q);
-    if(moving)this.activeSeconds+=dt;
     if(this.c.goal&&this.firstVisit===Infinity&&entersGoal(a.p,pose.p,this.c.goal!.center,this.c.goal!.radius,.023))this.firstVisit=pose.t;
    }
    if(this.c.goal&&entersGoal(pose.p,pose.p,this.c.goal!.center,this.c.goal!.radius,.023))this.firstVisit=Math.min(this.firstVisit,pose.t);
@@ -70,14 +57,14 @@ export class ComboTracker {
    if(!hit.qualifying||hit.speed<1||hit.time>this.firstVisit||hit.time>(this.last?.t??0)||seen.has(family)||hit.time-lastTime<.18||(lastPoint&&distance(hit.point,lastPoint)<.6))continue;
    seen.add(family);banks++;lastTime=hit.time;lastPoint=hit.point;lastBank=hit.label;
   }
-  const bankMultiplier=BANK_FACTOR**banks,timeMultiplier=1+Math.min(this.activeSeconds,60)/12;
+  const bankMultiplier=BANK_FACTOR**banks;
   // No gameplay ceiling: only guard the integer storage/transport precision.
-  const potential=Math.min(Number.MAX_SAFE_INTEGER,Math.round(BASE_POINTS*bankMultiplier*timeMultiplier));
+  const potential=Math.min(Number.MAX_SAFE_INTEGER,Math.round(BASE_POINTS*bankMultiplier));
   const forfeit=['Recalled','Player left'].includes(options.reason||'');
   const routeOK=!this.c.requiredSurface||this.contacts.some(h=>h.qualifying&&h.surface===this.c.requiredSurface);
   const landingMultiplier=forfeit||!routeOK?0:options.success?1:Math.max(goalVisited?.25:0,clamp(1-gap/range));
   const total=Math.round(potential*landingMultiplier),accuracy=Math.round(BASE_POINTS*landingMultiplier);
-  return {version:ARCADE_SCORING,outcome:forfeit?'forfeit':!routeOK?'route-missed':options.success?'perfect':goalVisited?'tagged':total?'near':'miss',accuracy,style:total-accuracy,styleBanks:banks,stylePercent:bankMultiplier*timeMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,timeMultiplier,activeSeconds:this.activeSeconds,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
+  return {version:ARCADE_SCORING,outcome:forfeit?'forfeit':!routeOK?'route-missed':options.success?'perfect':goalVisited?'tagged':total?'near':'miss',accuracy,style:total-accuracy,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited,distance:gap,proximityRange:range,endPosition,total,base:BASE_POINTS,bankMultiplier,landingMultiplier,potential,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank};
  }
  waypointValue(options:{destinationReached?:boolean;reason?:string}):ScoreBreakdown{
   const hits=this.waypointHits.filter(h=>h.time<=(this.last?.t??0));
@@ -88,13 +75,13 @@ export class ComboTracker {
    seen.add(family);banks++;lastTime=hit.time;lastPoint=hit.point;lastBank=hit.label;
   }
   const safe=(n:number)=>Math.min(Number.MAX_SAFE_INTEGER,Math.max(0,Math.round(n)));
-  const waypointCount=hits.length,waypointBase=BASE_POINTS*(WAYPOINT_FACTOR**waypointCount-1),bankMultiplier=Math.min(Number.MAX_SAFE_INTEGER,BANK_FACTOR**banks),timeMultiplier=1+Math.min(this.activeSeconds,60)/12;
+  const waypointCount=hits.length,waypointBase=BASE_POINTS*(WAYPOINT_FACTOR**waypointCount-1),bankMultiplier=Math.min(Number.MAX_SAFE_INTEGER,BANK_FACTOR**banks);
   const forfeit=['Recalled','Player left'].includes(options.reason||''),routeOK=!this.c.requiredSurface||this.contacts.some(h=>h.qualifying&&h.surface===this.c.requiredSurface);
   const destinationReached=!!this.c.goal&&!!options.destinationReached;
-  const earned=waypointBase?safe(waypointBase*bankMultiplier*timeMultiplier):0;
-  const destinationBonus=destinationReached?safe(Math.max(BASE_POINTS,waypointBase)*bankMultiplier*timeMultiplier):0;
+  const earned=waypointBase?safe(waypointBase*bankMultiplier):0;
+  const destinationBonus=destinationReached?safe(Math.max(BASE_POINTS,waypointBase)*bankMultiplier):0;
   const total=forfeit||!routeOK?0:safe(earned+destinationBonus);
-  return {version:WAYPOINT_SCORING,outcome:forfeit?'forfeit':!routeOK?'route-missed':destinationReached?'perfect':waypointCount?'tagged':'miss',accuracy:total,style:0,styleBanks:banks,stylePercent:bankMultiplier*timeMultiplier-1,goalVisited:Number.isFinite(this.firstVisit)||destinationReached,distance:0,proximityRange:0,endPosition:this.last?.p||this.c.start.center,total,base:BASE_POINTS,bankMultiplier,timeMultiplier,activeSeconds:this.activeSeconds,landingMultiplier:total?1:0,potential:total,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank,waypointCount,waypointIds:hits.map(h=>h.waypointId),waypointHits:hits,waypointBase,waypointMultiplier:WAYPOINT_FACTOR**waypointCount,destinationReached,destinationBonus:forfeit||!routeOK?0:destinationBonus};
+  return {version:WAYPOINT_SCORING,outcome:forfeit?'forfeit':!routeOK?'route-missed':destinationReached?'perfect':waypointCount?'tagged':'miss',accuracy:total,style:0,styleBanks:banks,stylePercent:bankMultiplier-1,goalVisited:Number.isFinite(this.firstVisit)||destinationReached,distance:0,proximityRange:0,endPosition:this.last?.p||this.c.start.center,total,base:BASE_POINTS,bankMultiplier,landingMultiplier:total?1:0,potential:total,firstVisit:Number.isFinite(this.firstVisit)?this.firstVisit:null,lastBank,waypointCount,waypointIds:hits.map(h=>h.waypointId),waypointHits:hits,waypointBase,waypointMultiplier:WAYPOINT_FACTOR**waypointCount,destinationReached,destinationBonus:forfeit||!routeOK?0:destinationBonus};
  }
 
 }

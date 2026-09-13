@@ -21,7 +21,7 @@ for(const [i,c] of courses.entries()){
  for(const t of targets){assert.ok(Object.values(t.center).every(Number.isFinite));assert.ok(t.radius>=.1&&t.radius<=3);assert.ok(t.surface);}
  assert.equal(new Set((c.waypoints||[]).map(w=>w.id)).size,c.waypoints?.length||0);
  for(const w of c.waypoints||[])assert.ok(Math.abs(Math.hypot(...Object.values(w.normal))-1)<.001);
- assert.ok(c.goal||c.waypoints?.length);assert.ok(['waypoint-v1','combo-v5'].includes(c.scoring));
+ assert.ok(c.goal||c.waypoints?.length);assert.ok(['waypoint-v2','combo-v6'].includes(c.scoring));
  heights.add(Math.round(c.start.center.y));signatures.add(JSON.stringify([c.start.center,proof.shot.input,proof.shot.speed]));
 }
 assert.equal(signatures.size,30,'No duplicate route and throw');assert.ok(heights.size>=8,'Routes explore the station vertically');

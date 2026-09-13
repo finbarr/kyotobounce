@@ -6,7 +6,7 @@ const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4193',out=process.
 const client=new Client(origin.replace(/^http/,'ws')),checks=[];
 const p=(x,y,z)=>({x,y,z});
 async function place(slot,origin,direction,radius){return (await client.request('place',{slot,origin,direction,radius},'placement')).disk;}
-async function save(name,start,goal,waypoints){await delay(1050);return (await client.request('save-challenge',{name,start,goal,waypoints,scoring:'waypoint-v1'},'saved-challenge')).challenge;}
+async function save(name,start,goal,waypoints){await delay(1050);return (await client.request('save-challenge',{name,start,goal,waypoints,scoring:'waypoint-v2'},'saved-challenge')).challenge;}
 async function play(course,settings={}){
  await client.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');client.messages.length=0;
  const shot=await client.throw(settings.holdMs??260,{yaw:90,pitch:15,powerRange:'precision',...settings},60000),r=shot.result;
@@ -14,7 +14,7 @@ async function play(course,settings={}){
  const events=client.messages.filter(m=>m.type==='waypoint-hit');assert.equal(new Set(events.map(h=>h.waypointId)).size,events.length);
  const replay=r.score?(await client.request('replay',{attempt:r.attempt},'replay')).replay:null;
  if(replay){assert.deepEqual(scoreAttempt(replay),r.breakdown);assert.deepEqual(replay.scoreFrames.at(-1).score,r.breakdown);assert.deepEqual(replay.waypointHits,events);}
- checks.push({name:course.name,score:r.score,success:r.success,destinationReached:r.destinationReached,waypoints:r.breakdown.waypointIds,activeSeconds:r.breakdown.activeSeconds,end:shot.state.ball,stopped:true});console.log(JSON.stringify(checks.at(-1)));
+ checks.push({name:course.name,score:r.score,success:r.success,destinationReached:r.destinationReached,waypoints:r.breakdown.waypointIds,end:shot.state.ball,stopped:true});console.log(JSON.stringify(checks.at(-1)));
  client.send('recall');await delay(120);return {r,replay,events};
 }
 try{

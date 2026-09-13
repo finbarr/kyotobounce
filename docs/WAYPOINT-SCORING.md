@@ -25,16 +25,16 @@ points.** This is a new scoring family alongside existing destination courses.
 
 Successive unique waypoints award base values of 10,000, 20,000, 40,000, 80,000,
 and so on. The waypoint base is `10,000 × (2^collected − 1)`. Five targets yield
-310,000 before banks and active-time bonuses. These initial constants are tuning
+310,000 before bank multipliers. These initial constants are tuning
 choices; each further scoring change requires a new version.
 
-Apply the existing distinct-bank multiplier (`1.75^banks`) and movement/spin time
-factor (`1 + min(active seconds,60)/12`) to the waypoint base. New-mode bank awards
+Apply the distinct-bank multiplier (`1.75^banks`) to the waypoint base.
+Elapsed time, rolling and spin never grow the score. New-mode bank awards
 continue throughout the shot; hitting a waypoint or crossing the destination does
 not freeze them. Repeated contacts with the same waypoint never earn again.
 
 At full supported rest inside the destination, add a landing bonus equal to
-`max(10,000, waypoint base) × bank factor × time factor`. Thus landing doubles an
+`max(10,000, waypoint base) × bank factor`. Thus landing doubles an
 earned waypoint chain, while a destination-only course still earns a base award.
 Missing the destination earns zero landing bonus and preserves the entire
 waypoint score. A normal shot with no target earned scores zero. Recall and leaving
@@ -47,9 +47,9 @@ magnet, fabricated contact or client-submitted result is introduced.
 
 ## Shared contract
 
-`scoring: 'waypoint-v1'` runs alongside active `combo-v5`.
+`scoring: 'waypoint-v2'` runs alongside active `combo-v6`.
 `goal: Disk | null`; `waypoints: {id, center, normal, radius, surface}[]`.
-The native worker advertises `capabilities: ['waypoint-v1']`; the service refuses
+The native worker advertises `capabilities: ['waypoint-v2']`; the service refuses
 new-mode placement/save/select on an older worker.
 
 Native `waypoint-hit` records contain session `id`, `attempt`, `waypointId`,
@@ -59,7 +59,7 @@ IDs are unique within the course and are awarded at most once per attempt.
 
 The score breakdown contains `waypointCount`, `waypointIds`, `waypointHits`,
 `waypointBase`, `waypointMultiplier`, `destinationReached`, `destinationBonus`,
-bank/time fields, `total` and `potential`. **`waypointMultiplier = 2^waypointCount`
+bank fields, `total` and `potential`. **`waypointMultiplier = 2^waypointCount`
 is the NEXT award multiplier**; a hit celebration labels the award just earned,
 not the next one. The native destination-rest attestation is distinct from the
 public completion flag. Final and live scoring consume the same native records.
@@ -86,12 +86,6 @@ Cosmetic choice persists; physics, release points and replay motion stay identic
 Celebrations use verified score/record events and end cleanly before the next shot.
 
 ## Delivery and acceptance
-
-Native/backend owner: local `kyoto-waypoints` worktree on port 4193, with its own
-rebuilt worker. Browser/editor/ball-heat owner: `kyoto-waypoint-ui` worktree, port
-4194 after native/backend integration. Remote audio owns sound and score spectacle;
-remote robot owns roster and dance assets/APIs. Coordinator resolves shared hooks,
-reviews results, and integrates. The five-VM cap stays unchanged.
 
 Verify floor/wall/ceiling and slow contact; reject backside/near-miss/forged hits;
 verify once-only awards, destination miss preserving waypoint points, destination

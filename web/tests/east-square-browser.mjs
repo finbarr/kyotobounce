@@ -8,7 +8,7 @@ await mkdir(out,{recursive:true});
 const c=new Client('ws://127.0.0.1:4283');await c.join();
 const views=[{name:'wide',x:106,y:34.62,z:-14,yaw:-25},{name:'tree-close',x:105.6,y:34.62,z:-10.7,yaw:-30},{name:'globe-close',x:101.2,y:34.62,z:-7,yaw:0}];
 const courses=[];
-for(const v of views){await delay(1050);const start=await c.place(v,.5,'start');courses.push((await c.request('save-challenge',{name:`K027 ${stage} ${v.name}`,start,goal:await c.place({x:106,y:34.62,z:-12},.6,'goal'),waypoints:[],scoring:'waypoint-v1'},'saved-challenge')).challenge);}
+for(const v of views){await delay(1050);const start=await c.place(v,.5,'start');courses.push((await c.request('save-challenge',{name:`K027 ${stage} ${v.name}`,start,goal:await c.place({x:106,y:34.62,z:-12},.6,'goal'),waypoints:[],scoring:'waypoint-v2'},'saved-challenge')).challenge);}
 const token=c.token,layout=c.state.layout;c.close();
 const browser=await chromium.launch({executablePath:'/opt/google/chrome/chrome',headless:true,args:['--no-sandbox','--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader']});
 const context=await browser.newContext({reducedMotion:'reduce',viewport:{width:960,height:640},recordVideo:{dir:out,size:{width:960,height:640}}});

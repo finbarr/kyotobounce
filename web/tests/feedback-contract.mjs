@@ -8,18 +8,18 @@ try{
  await page.evaluate(async()=>{
   const Original=AudioContext;window.probe={active:0,max:0,created:0,gains:[]};window.AudioContext=class extends Original{constructor(){super();probe.ctx=this;for(const name of ['createOscillator','createBufferSource']){const f=this[name].bind(this);this[name]=()=>{const n=f();probe.active++;probe.created++;probe.max=Math.max(probe.max,probe.active);n.addEventListener('ended',()=>probe.active--);return n;};}const gain=this.createGain.bind(this);this.createGain=()=>{const g=gain();probe.gains.push(g);return g;};}};
   window.sound=(await import('/arcade-audio.js')).arcadeAudio();window.feedback=(await import('/arcade-feedback.js')).arcadeFeedback({cue(...args){window.feedbackCues=(window.feedbackCues||0)+1;if(!window.stress)sound.cue(...args);}});
-  window.fixture=(mult=1,version='combo-v5')=>({version,potential:10000*mult,total:2500*mult,bankMultiplier:mult,timeMultiplier:1,styleBanks:Math.floor(mult),goalVisited:false,landingMultiplier:.25,lastBank:'STEEL BANK'});
+  window.fixture=(mult=1,version='combo-v6')=>({version,potential:10000*mult,total:2500*mult,bankMultiplier:mult,styleBanks:Math.floor(mult),goalVisited:false,landingMultiplier:.25,lastBank:'STEEL BANK'});
  });
  assert.equal(await page.evaluate(()=>sound.state.initialized),false);await page.locator('#sound-toggle').click();await page.locator('#sound-toggle').click();await page.waitForTimeout(200);
  const checks=await page.evaluate(()=>{
   feedback.accept(fixture(2),'five');feedback.update(.016,'Flight','play');const five=document.getElementById('combo-mult').textContent;
-  feedback.reset();feedback.accept(fixture(3,'combo-v4'),'four');feedback.update(.016,'Flight','play');const four=document.getElementById('combo-mult').textContent;
-  const nodes=document.querySelectorAll('#combo-spectacle *').length;let maxAnimations=0;
+  feedback.reset();feedback.accept(fixture(3),'four');feedback.update(.016,'Flight','play');const four=document.getElementById('combo-mult').textContent;
+  const cuesBefore=window.feedbackCues;const nodes=document.querySelectorAll('#combo-spectacle *').length;let maxAnimations=0;
   const realNow=performance.now.bind(performance);let virtualNow=realNow();performance.now=()=>virtualNow;window.stress=true;for(let i=0;i<10000;i++){virtualNow+=1000/60;feedback.accept({...fixture(3+i*.003),styleBanks:3},'four');feedback.update(1/60,'Flight','play');maxAnimations=Math.max(maxAnimations,document.getAnimations().length);}
   performance.now=realNow;window.stress=false;const bounded=nodes===document.querySelectorAll('#combo-spectacle *').length;
-  feedback.reset();return {five,four,bounded,maxAnimations,cues:window.feedbackCues};
+  feedback.reset();return {five,four,bounded,maxAnimations,cues:window.feedbackCues,idleCues:window.feedbackCues-cuesBefore};
  });
- assert.equal(checks.five,'×2.00');assert.equal(checks.four,'×3.00');assert.ok(checks.bounded);assert.ok(checks.cues>3&&checks.cues<100);assert.ok(checks.maxAnimations<=26);
+ assert.equal(checks.five,'×2');assert.equal(checks.four,'×3');assert.ok(checks.bounded);assert.equal(checks.idleCues,0);assert.ok(checks.maxAnimations<=26);
  await page.emulateMedia({reducedMotion:'reduce'});await page.evaluate(()=>{feedback.accept(fixture(32),'reduced');feedback.update(.016,'Flight','play');});assert.equal(await page.evaluate(()=>document.getAnimations().length),0);
  await page.screenshot({path:`${out}/reduced-motion.png`});await page.evaluate(()=>feedback.reset());await page.emulateMedia({reducedMotion:'no-preference'});
  // Real-time WebAudio endurance, with music and bounded cues for over two minutes.

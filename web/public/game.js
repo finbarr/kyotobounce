@@ -480,7 +480,7 @@ function animate(now){
   if(ui.state.mode!=='play'){$('throw-panel').hidden=true;$('flight-panel').hidden=true;$('reticle').style.display='none';}
   if(briefing.blocked){guide.visible=false;$('reticle').style.display='none';}
   $('arcade-hud').hidden=!ui.state.selected||ui.state.mode!=='play';
-  if(ui.state.selected){$('hud-course').textContent=ui.state.selected.name;$('hud-best').textContent=(ui.state.board[0]?.score||0).toLocaleString();const c=ui.state.selected,g=c.goal?toThree(c.goal.center):null,gap=g?Math.max(0,ball.position.distanceTo(g)-c.goal.radius):0;$('hud-target').textContent=c.scoring==='waypoint-v1'?`${ui.scorePresentation().score?.waypointCount||0}/${c.waypoints?.length||0} WAYPOINTS${g?' · GOLD BONUS':''}`:inFlight?`${gap.toFixed(1)} m TO TARGET`:'ACCURACY × STYLE';}
+  if(ui.state.selected){$('hud-course').textContent=ui.state.selected.name;$('hud-best').textContent=(ui.state.board[0]?.score||0).toLocaleString();const c=ui.state.selected,g=c.goal?toThree(c.goal.center):null,gap=g?Math.max(0,ball.position.distanceTo(g)-c.goal.radius):0;$('hud-target').textContent=c.scoring==='waypoint-v2'?`${ui.scorePresentation().score?.waypointCount||0}/${c.waypoints?.length||0} WAYPOINTS${g?' · GOLD BONUS':''}`:inFlight?`${gap.toFixed(1)} m TO TARGET`:'ACCURACY × STYLE';}
   $('power-control').hidden=!snapshot||inFlight||ui.state.mode!=='play'||briefing.blocked;
   sound.motion(snapshot?Math.hypot(snapshot.velocity.x,snapshot.velocity.y,snapshot.velocity.z):0,snapshot?.diagnostics?.supported,phase==='Flight'&&ui.state.mode==='play');
   const cameraDone=performance.now();

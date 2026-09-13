@@ -24,17 +24,18 @@ try{
   assert.ok(replay.scoreFrames.length>20);assert.deepEqual(replay.scoreFrames.at(-1).score,r.breakdown);assert.deepEqual(scoreAttempt(replay),r.breakdown);assert.equal(replay.score,r.score);
   assert.equal(replay.thrower.powerRange,'precision');assert.ok(Math.abs(Math.hypot(...Object.values(replay.velocity))-(.5+11.5*replay.thrower.power))<.00001,'The displayed linear speed is the actual native launch speed');
   assert.ok(Math.abs(live.at(-1).potential-r.breakdown.potential)<=1,'Live multiplier exactly agrees with final replay');
-  if(name==='perfect'){assert.equal(r.breakdown.landingMultiplier,1);assert.ok(live.some(m=>m.goalVisited),'The goal must light before the result');assert.ok(r.score>17500);}
+  if(name==='perfect'){assert.equal(r.breakdown.landingMultiplier,1);assert.ok(live.some(m=>m.goalVisited),'The goal must light before the result');assert.ok(r.score>=17500);}
   if(name==='tagged'){assert.equal(r.breakdown.goalVisited,true);assert.ok(r.breakdown.landingMultiplier>=.25);}
-  let timerRegression;
+  let settlingRegression;
   if(name==='perfect'){
    const entered=replay.scoreFrames.find(f=>f.score.goalVisited);
-   assert.ok(entered&&r.breakdown.activeSeconds>entered.score.activeSeconds+.05,'Native timer continues after target entry until rest');
+   assert.ok(entered&&replay.duration>entered.t+.05,'Native completion still waits after target entry for physical rest');
+   assert.equal(r.breakdown.potential,entered.score.potential,'Settling does not inflate the combo');
    const atRest=replay.poses.at(-1),extraRest={...replay,poses:[...replay.poses,{...atRest,t:atRest.t+10}]};
-   assert.deepEqual(scoreAttempt(extraRest),r.breakdown,'Rest does not keep accruing time');
-   timerRegression={entryActiveSeconds:entered.score.activeSeconds,finalActiveSeconds:r.breakdown.activeSeconds,extraRestSeconds:10};
+   assert.deepEqual(scoreAttempt(extraRest),r.breakdown,'Rest adds no points');
+   settlingRegression={entry:entered.t,finish:replay.duration,potential:entered.score.potential};
   }
-  checks.push({name,timerRegression,score:r.score,breakdown:r.breakdown,liveFrames:live.length,poses:replay.poses.length,stopped:true});console.log(JSON.stringify({name,score:r.score,banks:r.breakdown.styleBanks,time:r.breakdown.timeMultiplier,landing:r.breakdown.landingMultiplier}));
+  checks.push({name,settlingRegression,score:r.score,breakdown:r.breakdown,liveFrames:live.length,poses:replay.poses.length,stopped:true});console.log(JSON.stringify({name,score:r.score,banks:r.breakdown.styleBanks,landing:r.breakdown.landingMultiplier}));
   c.send('recall');await delay(150);
  }
  const bad=c.next(m=>m.type==='error');c.send('release',{score:999999999,power:1});assert.match((await bad).message,/intent only/);

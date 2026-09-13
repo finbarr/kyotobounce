@@ -11,26 +11,20 @@ const repeated=scoreAttempt(result({contacts:hits.map(h=>({...h,surface:'wall'})
 const treads=scoreAttempt(result({contacts:hits.map((h,i)=>({...h,surface:`west-escalator-step-${i}`}))}));assert.equal(treads.styleBanks,1,'One escalator is one bank family');
 const chatter=scoreAttempt(result({contacts:hits.map(h=>({...h,point:p(1,0)}))}));assert.equal(chatter.styleBanks,1);
 const slow=scoreAttempt(result({contacts:hits.map(h=>({...h,speed:.5}))}));assert.equal(slow.styleBanks,0);
-const stationary=scoreAttempt(result({poses:[pose(0,20),pose(240,20)],contacts:[]}));assert.equal(stationary.timeMultiplier,1,'Stationary rest adds no time');
-const creep=scoreAttempt(result({poses:[pose(0,17),pose(240,20)],contacts:[]}));assert.equal(creep.timeMultiplier,6,'Slow creep earns time up to the existing 60-second bonus cap');
+const stationary=scoreAttempt(result({poses:[pose(0,20),pose(240,20)],contacts:[]}));assert.equal(stationary.total,10000,'Waiting adds no points');
+const creep=scoreAttempt(result({poses:[pose(0,17),pose(240,20)],contacts:[]}));assert.equal(creep.total,10000,'Slow rolling adds no points');
+const spinning=scoreAttempt(result({poses:[pose(0,20),{...pose(240,20),q:{x:0,y:1,z:0,w:0}}],contacts:[]}));assert.equal(spinning.total,10000,'Spinning adds no points');
+assert.equal('timeMultiplier' in spinning,false,'Retired time factor is removed from the score contract');
 const tagPoses=[pose(0,17),pose(.03,23),pose(3,40)];
 const tag=scoreAttempt(result({poses:tagPoses,contacts:[],success:false}));assert.equal(tag.goalVisited,true,'Swept native poses catch high-speed crossings');assert.equal(tag.landingMultiplier,.25,'Touching the goal banks 25% even when it escapes');
-const farm=scoreAttempt(result({poses:[...tagPoses,pose(50,80)],contacts:hits,success:false}));assert.equal(farm.styleBanks,0,'No banks after the first target entry');assert.equal(farm.activeSeconds,50,'Movement after a tag keeps earning time');
-// Entry, slow translation, pure spin, equivalent quaternion sign, then rest.
-const settlePoses=[pose(0,18),pose(1,19.5),pose(2,19.6),{...pose(3,19.6),q:{x:0,y:1,z:0,w:0}},{...pose(4,19.6),q:{x:0,y:-1,z:0,w:0}},{...pose(5,19.6),q:{x:0,y:-1,z:0,w:0}}];
-const settling=new ComboTracker(c);settling.poses(settlePoses.slice(0,2));assert.equal(settling.value().firstVisit,1);assert.equal(settling.value().activeSeconds,1);
-settling.poses(settlePoses.slice(2,3));assert.equal(settling.value().activeSeconds,2,'Post-entry movement below 0.35 m/s still earns time');
-settling.poses(settlePoses.slice(3,4));assert.equal(settling.value().activeSeconds,3,'Pure spin earns time until rotation stops');
-settling.poses(settlePoses.slice(4));assert.equal(settling.value().activeSeconds,3,'Quaternion sign changes and rest do not earn time');
-settling.poses([{...pose(6,19.6),q:{x:1e-12,y:-1.0000001,z:0,w:0}}]);assert.equal(settling.value().activeSeconds,3,'Equivalent quaternion normalization and roundoff do not manufacture time');
-assert.deepEqual(settling.value({success:true}),scoreAttempt(result({poses:settlePoses,contacts:[]})));
+const farm=scoreAttempt(result({poses:[...tagPoses,pose(50,80)],contacts:hits,success:false}));assert.equal(farm.styleBanks,0,'No banks after the first target entry');assert.equal(farm.potential,10000,'Post-tag movement cannot farm a combo');
 for(const height of [-1,3]){const miss=scoreAttempt(result({poses:tagPoses.map(a=>({...a,p:{...a.p,y:height}})),contacts:hits,success:false}));assert.equal(miss.goalVisited,false,'Other floors are not target hits');assert.equal(miss.total,0,'Even a large combo earns zero on a distant untagged miss');}
 const rings=[0,.25,.5,.75,1].map(f=>scoreAttempt(result({success:false,poses:[pose(0,21-.023+7*f)],contacts:[]})).landingMultiplier);
 assert.deepEqual(rings.map(x=>Math.round(x*100)),[100,75,50,25,0],'Bullseye percentages match the actual landing formula');
 assert.equal(scoreAttempt(result({reason:'Recalled'})).total,0);
 assert.equal(scoreAttempt(result({challenge:{...c,requiredSurface:'missing'}})).total,0);
-const tracker=new ComboTracker(c);const r=result();for(const h of hits)tracker.contact(h);tracker.poses(r.poses.slice(0,2));const before=tracker.value();tracker.poses(r.poses.slice(2));assert.ok(before.potential<monster.potential);assert.deepEqual(tracker.value({success:true}),monster,'Chunked live telemetry and final replay calculate exactly the same score');
+const tracker=new ComboTracker(c);const r=result();for(const h of hits)tracker.contact(h);tracker.poses(r.poses.slice(0,2));const before=tracker.value();tracker.poses(r.poses.slice(2));assert.equal(before.potential,monster.potential,'Moving without new banks cannot increase the combo');assert.deepEqual(tracker.value({success:true}),monster,'Chunked live telemetry and final replay calculate exactly the same score');
 assert.throws(()=>tracker.poses([pose(-1,0)]),/backwards/);
-console.log('PASS million-point combos, repeated surfaces, chatter, swept tags, ring accuracy, post-entry movement/spin timer, rest and live/final parity');
+console.log('PASS million-point combos, repeated surfaces, chatter, swept tags, ring accuracy, no time/rolling/spin bonuses, rest and live/final parity');
 
 await import('./waypoint-scoring.mjs');

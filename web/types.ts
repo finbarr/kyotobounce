@@ -2,15 +2,15 @@ export type Vector = {x:number;y:number;z:number};
 export type Disk = {center:Vector;radius:number;surface:string};
 export type Waypoint = Disk & {id:string;normal:Vector};
 export type WaypointHit = {waypointId:string;time:number;point:Vector;normal:Vector;surface:string};
-export const WAYPOINT_SCORING='waypoint-v1';
-export const ACTIVE_SCORING=['combo-v5',WAYPOINT_SCORING];
+export const WAYPOINT_SCORING='waypoint-v2';
+export const ACTIVE_SCORING=['combo-v6',WAYPOINT_SCORING];
 export type Hint = {yaw:number;pitch:number;top:number;kick:number;holdMs:number;powerRange?:'precision'|'full';note:string;period?:number;releasePhase?:number};
 export type CampaignStage = {chapter:number;chapterTitle:string;difficulty:string;distance:number;brief:string};
 export type Challenge = {id:string;revision:number;name:string;creator:string;layout:string;physics:string;throwModel?:string;scoring?:string;allowedInputs?:{chargeSeconds:number;power:[number,number];pitch:[number,number];top:[number,number];kick:[number,number]};start:Disk;goal:Disk|null;waypoints?:Waypoint[];hint?:Hint;order?:number;requiredSurface?:string;campaign?:CampaignStage};
 export const PHYSICS_VERSION='kyoto-p3-3';
 import { THROW_MODEL } from './public/throw-power.js';
 export { THROW_MODEL };
-export const SCORING_VERSION='combo-v5';
+export const SCORING_VERSION='combo-v6';
 export const CHARGE_SECONDS=2.8;
 export const SUPPORTED_SCORING=ACTIVE_SCORING;
 export function withChallengeRules(challenge:Challenge):Challenge{

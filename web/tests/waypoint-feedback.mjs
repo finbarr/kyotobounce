@@ -1,4 +1,4 @@
-// Isolated proposed waypoint-v1 payloads. This is NOT native waypoint verification.
+// Browser fixtures for action-only waypoint feedback; native checks run separately.
 import {chromium} from 'playwright';
 import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
@@ -10,25 +10,25 @@ try{
  await page.route('**/waypoint-fixture',r=>r.fulfill({contentType:'text/html; charset=utf-8',body:'<link rel="stylesheet" href="/arcade.css"><body style="background:#101c2c"><p style="color:white;margin:30px">ISOLATED WAYPOINT CONTRACT FIXTURE · NOT NATIVE GAMEPLAY</p><button id="sound-toggle">Sound</button><button id="music-toggle">Music</button></body>'}));await page.goto((process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173')+'/waypoint-fixture');
  await page.evaluate(async()=>{
   window.calls=[];window.sound=(await import('/arcade-audio.js')).arcadeAudio();window.feedback=(await import('/arcade-feedback.js')).arcadeFeedback({cue(...args){calls.push(args);sound.cue(...args);}});
-  window.score=n=>({version:'waypoint-v1',waypointCount:n,waypointIds:Array.from({length:n},(_,i)=>`target-${i+1}`),waypointHits:Array.from({length:n},(_,i)=>({waypointId:`target-${i+1}`,time:i,point:{x:i,y:1,z:0},normal:{x:0,y:1,z:0},surface:'floor'})),waypointBase:10000*(2**n-1),waypointMultiplier:2**n,destinationReached:false,destinationBonus:0,bankMultiplier:1,timeMultiplier:1,activeSeconds:n,total:10000*(2**n-1),potential:10000*(2**n-1),styleBanks:0,landingMultiplier:0});
+  window.score=n=>({version:'waypoint-v2',waypointCount:n,waypointIds:Array.from({length:n},(_,i)=>`target-${i+1}`),waypointHits:Array.from({length:n},(_,i)=>({waypointId:`target-${i+1}`,time:i,point:{x:i,y:1,z:0},normal:{x:0,y:1,z:0},surface:'floor'})),waypointBase:10000*(2**n-1),waypointMultiplier:2**n,destinationReached:false,destinationBonus:0,bankMultiplier:1,total:10000*(2**n-1),potential:10000*(2**n-1),styleBanks:0,landingMultiplier:0});
   window.tick=setInterval(()=>feedback.update(.016,'Flight','play'),16);
  });
  await page.locator('#music-toggle').click();await page.evaluate(()=>sound.unlock());
  const shown=[];
  for(let n=1;n<=5;n++){
-  await page.evaluate(n=>feedback.accept(score(n),'fixture-shot'),n);await page.waitForTimeout(1400);
-  shown.push(await page.locator('#combo-mult').textContent());assert.equal(shown.at(-1),`×${2**(n-1)}`);
+  await page.evaluate(n=>feedback.accept(score(n),'fixture-shot'),n);await page.waitForTimeout(400);
+  shown.push(await page.locator('#combo-mult').textContent());assert.equal(shown.at(-1),({2:'SPARK',4:'GOLD RUSH'})[n]||`×${2**(n-1)}`);
   await page.screenshot({path:`${out}/chain-${n}.png`});
  }
- assert.equal(await page.evaluate(()=>calls.filter(c=>c[0]==='waypoint').length),5);
- await page.evaluate(()=>{for(let i=0;i<500;i++)feedback.accept(score(5),'fixture-shot');});await page.waitForTimeout(1500);assert.equal(await page.evaluate(()=>calls.filter(c=>c[0]==='waypoint').length),5);
+ assert.equal(await page.evaluate(()=>calls.filter(c=>['waypoint','special'].includes(c[0])).length),5);
+ await page.evaluate(()=>{for(let i=0;i<500;i++)feedback.accept(score(5),'fixture-shot');});await page.waitForTimeout(1500);assert.equal(await page.evaluate(()=>calls.filter(c=>['waypoint','special'].includes(c[0])).length),5);
  // Queue a future hit, scrub backwards before the next rendered frame, and wait beyond the cooldown.
  await page.evaluate(()=>{clearInterval(tick);feedback.accept(score(6),'fixture-shot');feedback.accept(score(2),'fixture-shot');feedback.update(.016,'Flight','replay');});await page.waitForTimeout(1500);await page.evaluate(()=>feedback.update(.016,'Flight','replay'));
- assert.equal(await page.locator('#combo-spectacle').isVisible(),false);assert.equal(await page.locator('#combo-total').textContent(),'30,000');assert.equal(await page.evaluate(()=>calls.filter(c=>c[0]==='waypoint').length),5);
- await page.evaluate(()=>{feedback.accept(score(6),'fixture-shot');feedback.update(.016,'Flight','replay');});assert.equal(await page.evaluate(()=>calls.filter(c=>c[0]==='waypoint').length),5,'Already seen IDs remain quiet after rewind');
- await page.evaluate(()=>feedback.result({attempt:'fixture-shot',breakdown:{...score(6),outcome:'miss'}}));assert.equal(await page.locator('#combo-mult').textContent(),'630,000');assert.match(await page.locator('#combo-sub').textContent(),/POINTS KEPT/);assert.ok(await page.evaluate(()=>{frequencies.length=0;sound.cue('result','miss');return frequencies.includes(440);}), 'Earned waypoint miss uses positive result phrase');await page.screenshot({path:`${out}/destination-missed-points-kept.png`});
- await page.evaluate(()=>{feedback.reset();feedback.accept(score(0),'destination');feedback.accept({...score(2),destinationReached:true,destinationBonus:50000,total:80000},'destination');feedback.update(.016,'Flight','play');});assert.equal(await page.locator('#combo-mult').textContent(),'+50,000');assert.equal(await page.locator('#combo-call').textContent(),'DESTINATION BONUS');await page.waitForTimeout(500);await page.screenshot({path:`${out}/destination-bonus.png`});
- await page.emulateMedia({reducedMotion:'reduce'});await page.evaluate(()=>{feedback.reset();feedback.accept(score(4),'reduced');feedback.update(.016,'Flight','play');});assert.equal(await page.evaluate(()=>document.getAnimations().length),0);assert.equal(await page.locator('#combo-mult').textContent(),'×8');
+ assert.equal(await page.locator('#combo-spectacle').isVisible(),false);assert.equal(await page.locator('#combo-total').textContent(),'30,000');assert.equal(await page.evaluate(()=>calls.filter(c=>['waypoint','special'].includes(c[0])).length),5);
+ await page.evaluate(()=>{feedback.accept(score(6),'fixture-shot');feedback.update(.016,'Flight','replay');});assert.equal(await page.evaluate(()=>calls.filter(c=>['waypoint','special'].includes(c[0])).length),6,'Replaying a chain can celebrate it again');
+ await page.evaluate(()=>feedback.result({attempt:'fixture-shot',breakdown:{...score(6),outcome:'miss'}}));assert.equal(await page.locator('#combo-mult').textContent(),'630,000');assert.match(await page.locator('#combo-sub').textContent(),/POINTS BANKED/);assert.ok(await page.evaluate(()=>{frequencies.length=0;sound.cue('result','miss');return frequencies.includes(440);}), 'Earned waypoint miss uses positive result phrase');await page.screenshot({path:`${out}/destination-missed-points-kept.png`});
+ await page.evaluate(()=>{feedback.reset();feedback.accept(score(0),'destination');feedback.accept({...score(2),destinationReached:true,destinationBonus:50000,total:80000},'destination');feedback.update(.016,'Flight','play');});assert.equal(await page.locator('#combo-mult').textContent(),'SPARK');assert.equal(await page.locator('#combo-call').textContent(),'SPARK');await page.waitForTimeout(500);await page.screenshot({path:`${out}/destination-bonus.png`});
+ await page.emulateMedia({reducedMotion:'reduce'});await page.evaluate(()=>{feedback.reset();feedback.accept(score(4),'reduced');feedback.update(.016,'Flight','play');});assert.equal(await page.evaluate(()=>document.getAnimations().length),0);assert.equal(await page.locator('#combo-mult').textContent(),'GOLD RUSH');
  await page.evaluate(()=>feedback.result({attempt:'reduced',breakdown:{...score(4),outcome:'forfeit',total:0}}));assert.equal(await page.locator('#combo-spectacle').isVisible(),false,'Recall does not celebrate forfeited points');
  await page.evaluate(()=>{feedback.reset();feedback.accept(score(4),'route-miss');feedback.update(.016,'Flight','play');feedback.result({attempt:'route-miss',breakdown:{...score(4),outcome:'route-missed',total:0}});frequencies.length=0;sound.cue('result','route-missed');});
  assert.equal(await page.locator('#combo-spectacle').isVisible(),false,'Missing a required route does not celebrate zero points');assert.equal(await page.evaluate(()=>frequencies.includes(440)),false,'Required-route miss retains the unsuccessful result phrase');

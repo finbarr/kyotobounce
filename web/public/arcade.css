@@ -112,3 +112,24 @@ body.is-briefing #waypoint-progress{display:none}
 #briefing-route{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}#briefing-route .route-guide-line{fill:none;stroke:#c7b7ff;stroke-width:1.5;stroke-dasharray:4 6;opacity:.7}#briefing-route circle{fill:#24163e;stroke:#d1c2ff;stroke-width:1.5}#briefing-route text{fill:#fff;text-anchor:middle;dominant-baseline:central;font:700 11px monospace}#briefing-route line{stroke:#c7b7ff;stroke-width:1;opacity:.8}
 
 .goal-label{transform:none;margin-top:24px}.goal-label::after{top:auto;bottom:100%}.waypoint-briefing .map-key i:nth-of-type(2){border-color:#c7b7ff}.waypoint-briefing .map-key i:nth-of-type(3){border-color:var(--gold)}
+
+/* Action combos: a skater's trick ledger and a medal machine's payout. */
+#combo-hud{--combo-tint:#ffd34d;background:linear-gradient(110deg,#111727e8,#16243adb);border-left:3px solid var(--combo-tint);width:min(380px,calc(100vw - 48px));box-shadow:5px 5px 0 #070a1470}
+#combo-total{color:var(--combo-tint);font-style:italic;transform:rotate(-2deg);font-size:clamp(32px,3.8vw,52px);text-shadow:2px 3px #111,0 0 16px color-mix(in srgb,var(--combo-tint) 25%,transparent)}
+.special-label{display:flex;justify-content:space-between;align-items:center;font:900 10px/1.5 system-ui;letter-spacing:1px;margin-top:9px;color:var(--combo-tint)}.special-label span{font:8px ui-monospace,monospace;color:#b6c4d7}
+#special-track{height:8px;overflow:hidden;background:#080e1d;border:1px solid #ffffff35;transform:skewX(-15deg);margin:3px 0 9px}
+#special-fill{display:block;height:100%;width:100%;background:linear-gradient(90deg,#66ffc2,#ffdb62,#ff74c2);transform:scaleX(0);transform-origin:left;transition:transform .22s ease-out}
+#combo-factors{flex-wrap:wrap;gap:4px 12px}#combo-targets{color:#b8caff!important;font-size:8px}
+#combo-spectacle{--combo-tint:#ffdb62;position:fixed;inset:0;pointer-events:none;z-index:12;contain:layout style;color:var(--combo-tint)}
+#combo-spectacle[hidden],#combo-confetti[hidden],#combo-burst[hidden],#combo-line[hidden]{display:none}
+#combo-confetti{position:absolute;inset:0;width:100%;height:100%}
+#combo-burst{position:absolute;top:18%;right:3%;width:min(420px,43vw);text-align:center;transform:rotate(-3deg);filter:drop-shadow(4px 6px 0 #101728)}
+#combo-burst::before{content:'';position:absolute;inset:12% -2%;z-index:-1;opacity:.8;background:linear-gradient(120deg,#0c1730e0,#14284480);clip-path:polygon(5% 15%,100% 0,93% 88%,0 100%);border-block:3px solid var(--combo-tint)}
+#combo-burst strong{display:block;font:1000 italic clamp(46px,6vw,100px)/1 Impact,'Arial Black',sans-serif;letter-spacing:-.025em;-webkit-text-stroke:1px #101728;text-shadow:3px 3px #101728;overflow-wrap:anywhere}
+#combo-burst strong.word-burst{font-size:clamp(36px,4.7vw,74px);line-height:.94;padding:9px 4px}
+#combo-burst small{display:block;margin:13px 5px;font:900 clamp(9px,1vw,13px)/1.2 system-ui;letter-spacing:.12em;color:#fff8df;text-shadow:1px 2px #101728}
+#combo-line{position:absolute;left:29%;right:4%;bottom:9%;text-align:center;font:900 italic clamp(12px,1.5vw,23px)/1.3 'Arial Black',system-ui;color:#fff4c8;text-shadow:2px 3px #101728,0 0 10px #121629;padding:10px 16px;transform:rotate(-2deg)}
+.combo-led{position:absolute;width:7px;height:24px;border-radius:2px;background:var(--combo-tint);opacity:0;box-shadow:0 0 10px var(--combo-tint)}
+@media(max-width:800px){#combo-hud{width:310px}#combo-total{font-size:36px}#combo-burst{top:21%;width:51vw;right:2%}#combo-line{left:12%;right:10%;bottom:36%;font-size:13px}#combo-burst small{font-size:8px;letter-spacing:.06em}}
+@media(max-height:520px){.special-label{margin-top:0;font-size:8px}#special-track{height:5px;margin-bottom:5px}#combo-total{font-size:30px}#combo-line{bottom:6%;left:44%;font-size:13px}#combo-burst{top:17%;width:36vw}}
+@media(prefers-reduced-motion:reduce){#special-fill{transition:none}#combo-total,#combo-burst,#combo-line{transform:none!important}.combo-led,#combo-confetti{display:none!important}#combo-burst{filter:none}}
