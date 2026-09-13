@@ -5,7 +5,7 @@ import { PhysicsWorker } from './worker.ts';
 import type { Guest,Challenge,Disk,Waypoint,NativeResult } from './types.ts';
 import { SCORING_VERSION,WAYPOINT_SCORING,ACTIVE_SCORING,SUPPORTED_SCORING,THROW_MODEL,CHARGE_SECONDS } from './types.ts';
 
-export type Member={id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>;lastResult?:any};
+export type Member={id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>;lastResult?:any;attemptPresentation?:{playerName:string;character:NonNullable<NativeResult['character']>}};
 export class Competition {
  store:Store;worker:PhysicsWorker;publish:(message:unknown,sessionId?:string)=>void;
  members=new Map<string,Member>();
@@ -16,7 +16,7 @@ export class Competition {
  sync(m:Member){this.publish(this.session(m),m.id);}
  playable(c:Challenge){return c.layout===this.layout&&c.physics===this.physics&&c.throwModel===THROW_MODEL&&ACTIVE_SCORING.includes(c.scoring||'')&&this.store.challenge(c.id)?.revision===c.revision;}
  catalog(){return {type:'catalog',challenges:this.store.list().filter(c=>this.playable(c))};}
- board(m:Member){if(m.selected)this.publish({type:'leaderboard',challenge:m.selected,entries:this.store.leaderboard(m.selected)},m.id);}
+ board(m:Member){if(m.selected)this.publish({type:'leaderboard',challenge:m.selected,entries:this.store.leaderboard(m.selected).slice(0,10)},m.id);}
  remember(m:Member){this.store.setSetting(`selected:${m.guest.id}`,m.selected?{id:m.selected.id,revision:m.selected.revision}:{id:null});}
  async add(guest:Guest,id:string){
   const saved=this.store.setting(`selected:${guest.id}`)??this.store.setting('selected');
@@ -86,17 +86,18 @@ export class Competition {
    // Session IDs route live physics; persistent guest IDs own scores and levels.
    const previous=this.store.leaderboard(c);
    result.records={personalBest:result.score>previous.reduce((best,row)=>row.guest===member.guest.id?Math.max(best,Number(row.score)):best,0),courseBest:result.score>previous.reduce((best,row)=>Math.max(best,Number(row.score)),0)};
-   this.store.saveResult({...result,id:member.guest.id},this.animation);
+   Object.assign(result,member.attemptPresentation);
+   const stored={...result,id:member.guest.id};this.store.saveResult(stored,this.animation);result.standings=stored.standings;
   }
   const {poses,contacts,scoreFrames:recordedFrames,...summary}=result;member.lastResult={...summary,type:'result',saved:!!c&&result.score>0};this.publish(member.lastResult,member.id);
-  if(c)this.publish({type:'leaderboard',challenge:c,entries:this.store.leaderboard(c)});
+  if(c)this.publish({type:'leaderboard',challenge:c,entries:this.store.leaderboard(c).slice(0,10)});
   this.sync(member);
  }
  async command(member:Member,m:any):Promise<unknown>{
   const id=member.id;
   if(member.restoring)throw new Error('Your attempt is being restored. Try again in a moment.');
   if(m.type==='charge'||m.type==='release'){
-   const allowed=m.type==='charge'?['type','challengeId','revision','layout','physics','powerRange']:['type'];
+   const allowed=m.type==='charge'?['type','challengeId','revision','layout','physics','powerRange','character']:['type'];
    if(Object.keys(m).some(key=>!allowed.includes(key)))throw new Error('Send throw intent only. Launch position, power, timing and results are authoritative.');
   }
   if(m.type==='place'){
@@ -127,7 +128,7 @@ export class Competition {
    member.lastResult=undefined;member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
   }
   if(m.type==='leaderboard'){
-   const c=this.store.challenge(String(m.challengeId),Number(m.revision));if(!c)throw new Error('Level not found');return {type:'leaderboard',challenge:c,entries:this.store.leaderboard(c)};
+   const c=this.store.challenge(String(m.challengeId),Number(m.revision));if(!c)throw new Error('Level not found');return {type:'leaderboard',challenge:c,entries:this.store.leaderboard(c).slice(0,10)};
   }
   if(m.type==='replay'){
    const replay=this.store.replay(String(m.attempt));if(!replay)throw new Error('Replay not found');
@@ -135,10 +136,12 @@ export class Competition {
    return {type:'replay',replay};
   }
   if(m.type==='charge'){
+   if(m.character!==undefined&&!['ori','koma','don'].includes(m.character))throw new Error('Unknown robot character');
    if(m.powerRange!==undefined&&!['precision','full'].includes(m.powerRange))throw new Error('Choose precision or full power');
    if(member.attempt||member.selecting)throw new Error('Your attempt or level change is already active');
    if(member.selected?.scoring===WAYPOINT_SCORING)this.requireWaypoints();
    if((m.challengeId||null)!==(member.selected?.id||null)||(m.revision||null)!==(member.selected?.revision||null)||m.layout!==this.layout||m.physics!==this.physics)throw new Error('Refresh the current level: its version changed');
+   member.attemptPresentation={playerName:member.guest.name,character:m.character||'ori'};
    member.lastResult=undefined;member.combo=member.selected?new ComboTracker(member.selected):undefined;member.scoreFrames=[];
    member.chargeAt=performance.now();member.attempt=randomUUID();this.pending.set(member.attempt,{id,challenge:member.selected});
    this.worker.send({type:'charge',id,request:member.attempt,powerRange:m.powerRange||'full'});this.sync(member);return;

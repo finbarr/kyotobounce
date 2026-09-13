@@ -129,6 +129,11 @@ export function arcadeAudio(){
    [60,67,72,76].forEach(n=>tone(notes(n),t+.48,.8,.055,'triangle'));
    [0,1,2].forEach(i=>burst(t+.48+i*.12,.07,.045,4800));
   }
+  if(name==='ranking'){
+   duck();tone(92,t,.3,.16,'sine',sfxBus,35);burst(t,.16,.08,2600);
+   const line=value===1?[60,67,72,76,79,84]:value<=3?[60,64,67,72]:[60,67,72];
+   line.forEach((n,i)=>{tone(notes(n),t+i*.055,.25,.045,'square');tone(notes(n+12),t+i*.055,.4,.03,'triangle');});
+  }
   if(name==='result'){
    // A missed optional destination does not negate an earned waypoint chain.
    if(value==='chain'||(waypointRun&&!['perfect','forfeit','route-missed'].includes(value)))value='tagged';waypointRun=false;

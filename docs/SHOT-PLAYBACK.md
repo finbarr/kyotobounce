@@ -37,3 +37,13 @@ Use `KYOTO_TEST_ORIGIN` for its URL. Never create test scores on production.
 
 Browser/service protocol: `shot-stream-v2` (action-only scoring). The native stream capability remains `shot-stream-v1`. Old open pages receive a reload
 message rather than silently waiting for snapshots that no longer arrive.
+
+## Sharing and results
+
+Saved scoring shots have a public `/replay/<attempt UUID>` URL. `GET /api/replay/<id>` loads the saved authoritative record; neither route requires a guest token or allocates a native physics session. The viewer supports orbit, zoom, pause, scrubbing, quarter/half speed and a link to play the same level. Copy-link controls appear on the result and replay panels. Entering a result releases the mouse so these controls are immediately usable.
+
+The record includes the native thrower's feet, yaw/pitch, power and spin settings, launch position/velocity/spin, charge/release times, station/rule versions and recorded poses and score frames. The moving station follows the recorded clock. We play the original authoritative trajectory instead of re-simulating on each view: this preserves the exact collisions and score while avoiding native-worker load or dependence on future physics determinism. The player's name and cosmetic robot choice are captured with the throw.
+
+A score commit also captures the level's top ten before and after insertion. Each player occupies one slot, ordered by score descending, duration ascending, acceptance time and attempt ID. The reveal starts after the score count-up, cascades through rows, then moves the player's improved score into its server-ranked slot and ejects the displaced tenth entry. A lower attempt never displaces that player's best. Names can be entered on first connection and edited from the header; replay presentation remains the name used for that shot.
+
+Five cosmetic celebration tiers range from a proud gesture through fist pumps, character-specific victory dances, podium poses and a jackpot routine. Earned score, personal best and leaderboard position select the tier. Poses still wait for authoritative translation and spin to stop; retries blend them away. Shared replays retain the same character and achievement. Reduced motion removes row movement and uses a shorter, still robot pose.

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {celebrationProfile} from './celebration.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 const unitX=new THREE.Vector3(1,0,0),unitY=new THREE.Vector3(0,1,0),unitZ=new THREE.Vector3(0,0,1);
@@ -285,7 +286,7 @@ function animateFace(a,mode,time){
   const blink=((time%4.8)+4.8)%4.8;
   const opening=blink<.14?.12+.88*Math.abs(blink-.07)/.07:1;
   for(const [i,eye]of a.face.eyes.entries()){
-    eye.scale.y=opening*(mode==='Charging'?.65:mode==='Result'?.65:1);
+    eye.scale.x=1;eye.scale.y=opening*(mode==='Charging'?.65:mode==='Result'?.65:1);
     eye.rotation.z=(eye.userData.tilt||0)+(i===0?1:-1)*(mode==='Result'?.18:mode==='Charging'?-.12:0);
   }
 }
@@ -344,12 +345,12 @@ function styleFestival(a,{attach,box,cream,red,indigo,gold,glow}){
   for(const sign of [-1,1])box('chest',[.025,.25,.028],gold,[sign*.028,1.27,-.151],new THREE.Quaternion().setFromAxisAngle(unitZ,sign*.4));
 }
 
-// Call only from live authoritative result handling for this attempt.
+// Call only with a live authoritative result or its stored replay.
 // Cosmetic eligibility never contributes to the stored score. The pose gate
 // independently waits for native rest; Result alone is insufficient.
 export function celebrateAvatar(a,result,{reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false}={}){
-  if(!a||result?.type!=='result'||!result.saved||!(result.score>0)||!result.attempt||!(result.records?.personalBest===true||result.records?.courseBest===true)||result.breakdown?.outcome==='forfeit'||a.lastCelebratedAttempt===result.attempt)return false;
-  a.celebration={attempt:result.attempt,reducedMotion,start:null,stoppingAt:null};return true;
+  if(!a||result?.type!=='result'||!result.saved||!(result.score>0)||!result.attempt||result.breakdown?.outcome==='forfeit'||a.lastCelebratedAttempt===result.attempt)return false;
+  a.celebration={...celebrationProfile(result),attempt:result.attempt,reducedMotion,start:null,stoppingAt:null};return true;
 }
 export function isAvatarCelebrating(a){return !!a?.celebration&&a.celebration.start!==null;}
 export function avatarWantsResultView(a){return !!a?.resultView;}
@@ -370,13 +371,36 @@ function applyCelebration(a,player,mode,state,time){
   if(state.attempt!==c.attempt){a.celebration=null;return;}
   if(!state.diagnostics?.sleeping||!still(state.velocity)||!still(state.spin)){if(c.start!==null)a.celebration=null;return;}
   if(c.start===null){c.start=time;a.lastCelebratedAttempt=c.attempt;a.resultView=true;}
-  const t=time-c.start,duration=c.reducedMotion?1.4:2.6;
+  const t=time-c.start,duration=c.reducedMotion?1.8:c.duration;
   if(t<0||t>=duration||(c.stoppingAt!==null&&time-c.stoppingAt>=.18)){a.celebration=null;return;}
   const smooth=x=>{x=THREE.MathUtils.clamp(x,0,1);return x*x*(3-2*x);};
   const weight=smooth(t/.28)*smooth((duration-t)/.4)*(c.stoppingAt===null?1:1-smooth((time-c.stoppingAt)/.18));
   const beat=c.reducedMotion?0:Math.sin(t*Math.PI*4);
   a.group.updateWorldMatrix(true,true);
-  const targets=a.character==='koma'?{L:[.35,1.63,.15+.035*beat]}:a.character==='don'?{L:[.17,1.37+.055*beat,.28],R:[-.17,1.37-.055*beat,.28]}:{R:[-.20,1.66,.12],L:[.35,1.30+.07*beat,.20]};
+  let targets=a.character==='koma'?{L:[.35,1.63,.15+.035*beat]}:a.character==='don'?{L:[.17,1.37+.055*beat,.28],R:[-.17,1.37-.055*beat,.28]}:{R:[-.20,1.66,.12],L:[.35,1.30+.07*beat,.20]};
+  const tier=c.tier,energy=c.reducedMotion?0:weight,groove=Math.sin(t*Math.PI*3.2);
+  // Plant each foot through the knee bend; only deliberate dance steps lift it.
+  const feet=['L','R'].map(side=>({side,point:worldPosition(a.bones[`foot.${side}`]),rotation:a.bones[`foot.${side}`].getWorldQuaternion(new THREE.Quaternion())}));
+  a.bones.hips.position.y-=(tier>=3?.055+.035*groove:.02)*energy;
+  a.bones.hips.position.x+=(tier>=3?.06:.015)*groove*energy;
+  a.bones.chest.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitZ,(tier>=3?.14:.035)*groove*energy));
+  a.bones.chest.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitY,(tier>=4?.22:.06)*Math.sin(t*5)*energy));
+  a.group.updateWorldMatrix(true,true);
+  const pole=new THREE.Vector3(0,0,1).applyQuaternion(a.group.quaternion);
+  for(const foot of feet){
+   if(tier>=3){const step=Math.max(0,Math.sin(t*Math.PI*3.2+(foot.side==='L'?0:Math.PI)));foot.point.y+=(tier>=5?.16:.07)*step*energy;}
+   plantLeg(a,foot.side,foot.point,pole,foot.rotation);
+  }
+  a.group.updateWorldMatrix(true,true);
+  if(tier===1)targets={R:[-.26,1.45,.25]};
+  else if(tier===2&&a.character==='ori')targets={R:[-.28,1.70+.09*beat,.1],L:[.26,1.16,.21]};
+  else if(tier>=3){
+   const pump=(1+beat)/2;
+   targets=a.character==='don'?{L:[.22,1.40+.26*pump,.29],R:[-.22,1.40+.26*(1-pump),.29]}:a.character==='koma'?{L:[.32,1.64+.14*pump,.19],R:[-.32,1.64+.14*(1-pump),.19]}:{L:[.33,1.62+.23*pump,.11],R:[-.33,1.62+.23*(1-pump),.11]};
+   if(tier>=4&&t>duration*.58)targets={L:[.27,1.93,.03],R:[-.27,1.93,.03]};
+   if(tier>=5&&t>duration*.35&&t<duration*.58)targets={L:[.48,1.46,.15],R:[-.48,1.46,.15]};
+  }
+  if(a.face)for(const [i,eye]of a.face.eyes.entries()){eye.scale.y=1-weight*.7;eye.scale.x=1+weight*.25;eye.rotation.z=(i?1:-1)*weight*.38;}
   for(const [side,position]of Object.entries(targets)){
     const hand=a.bones[`hand.${side}`],target=worldPosition(hand).lerp(a.group.localToWorld(new THREE.Vector3(...position)),weight);
     celebrateArm(a,side,target);
@@ -385,7 +409,7 @@ function applyCelebration(a,player,mode,state,time){
       if(side==='L'){for(const digit of ['index','middle','ring','little'])for(let i=1;i<=3;i++)a.bones[`${digit}${i}.L`].quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,-weight));}
     }
   }
-  const nod=(a.character==='koma'?.10:a.character==='don'?.045:.07)*beat;
+  const nod=(tier>=3?.17:a.character==='koma'?.10:a.character==='don'?.045:.07)*beat;
   const head=a.baseRotations.get(a.head).clone().multiply(new THREE.Quaternion().setFromAxisAngle(a.character==='koma'?unitZ:unitX,nod));
   a.head.quaternion.slerp(head,weight);
   for(const stick of a.drumSticks||[])stick.visible=weight>.15;

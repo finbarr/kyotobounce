@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import {Store} from '../store.ts';
+import {Competition} from '../competition.ts';
+import {celebrationProfile} from '../public/celebration.js';
+import {replayIdFromPath,replayURL} from '../public/replay-links.js';
+const s=new Store(':memory:');
+try{
+ const c={id:'ranking-test',revision:1,creator:'station',name:'Ranking test',layout:'layout',physics:'physics',start:{center:{x:0,y:0,z:0},radius:1,surface:'floor'},goal:{center:{x:2,y:0,z:0},radius:1,surface:'floor'}};s.saveChallenge(c);
+ const players=Array.from({length:11},(_,i)=>{const guest=s.guest();s.rename(guest.id,`Player ${i+1}`);return guest;});
+ const result=(attempt,guest,score,duration=10)=>({type:'result',attempt,id:guest.id,challenge:c,score,success:true,surfaces:1,duration,poses:[],playerName:guest.name,character:'don'});
+ players.slice(0,10).forEach((p,i)=>s.saveResult(result(`old-${i}`,p,10000-i*500),'animation'));
+ const shot=result('new',players[10],9600);s.saveResult(shot,'animation');
+ assert.equal(shot.standings.rank,2);assert.equal(shot.standings.previousRank,null);assert.equal(shot.standings.improved,true);
+ assert.equal(shot.standings.before.length,10);assert.equal(shot.standings.after.length,10);
+ assert.equal(shot.standings.before[9].guest,players[9].id);assert.ok(!shot.standings.after.some(r=>r.guest===players[9].id));
+ assert.deepEqual(s.replay('new').standings,JSON.parse(JSON.stringify(shot.standings)),'Rank movement is saved atomically with the replay');
+ const ownBest=result('better',players[5],11000);s.saveResult(ownBest,'animation');assert.equal(ownBest.standings.previousRank,7);assert.equal(ownBest.standings.rank,1);assert.equal(ownBest.standings.after.filter(r=>r.guest===players[5].id).length,1);
+ const worse=result('worse',players[5],8000);s.saveResult(worse,'animation');assert.equal(worse.standings.rank,null);assert.equal(worse.standings.improved,false);
+ const faster=result('faster-tie',players[5],11000,9);s.saveResult(faster,'animation');assert.equal(faster.standings.rank,1,'A faster equal score replaces the old best');
+ const same=result('same-tie',players[5],11000,9);s.saveResult(same,'animation');assert.equal(same.standings.rank,null,'Equal score and duration keeps the earlier attempt');
+ const last=result('outside-ten',players[9],1);s.saveResult(last,'animation');assert.equal(last.standings.rank,null);
+ const miss=result('zero',players[9],0);s.saveResult(miss,'animation');assert.equal(miss.standings.after.length,10);assert.equal(miss.standings.rank,null);
+ const competition=new Competition(s,{send(){}},()=>{});competition.layout='layout';competition.physics='physics';const member={id:'session',guest:players[0],selected:null,restoring:false,selecting:false};
+ await competition.command(member,{type:'charge',layout:'layout',physics:'physics',character:'koma'});
+ await assert.rejects(competition.command(member,{type:'charge',layout:'layout',physics:'physics',character:'don'}),/already active/);assert.equal(member.attemptPresentation.character,'koma','A rejected duplicate charge cannot change the saved robot');
+ const snapshot=s.replay('new');s.rename(players[10].id,'New name');assert.deepEqual(s.replay('new'),snapshot,'Renaming does not mutate an original replay');
+ assert.ok(!JSON.stringify(snapshot).includes(players[10].token));assert.equal(snapshot.character,'don');
+ const duplicate={...shot,score:999999};assert.equal(s.saveResult(duplicate,'animation'),false);assert.equal(s.replay('new').score,9600);
+ assert.equal(replayIdFromPath('/replay/abc-123_'), 'abc-123_');assert.equal(replayIdFromPath('/replay/%2f'),null);assert.equal(replayIdFromPath('/replay/abc/nested'),null);assert.equal(replayURL('abc-123','https://kyotobounce.com'),'https://kyotobounce.com/replay/abc-123');
+ const profiles=[1,100000,1000000,5000000,20000000].map(score=>celebrationProfile({score,saved:true}));assert.deepEqual(profiles.map(p=>p.tier),[1,2,3,4,5]);
+ assert.equal(celebrationProfile({saved:true,score:1,standings:{rank:1,before:[1,2,3]}}).tier,5);
+ assert.equal(celebrationProfile({saved:true,score:20000000,breakdown:{outcome:'forfeit'}}).tier,0);
+ console.log('PASS top-ten insertion/ejection, own best, ties, immutable replay presentation, public URLs and five celebration tiers');
+}finally{s.close();}

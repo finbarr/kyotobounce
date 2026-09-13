@@ -1,6 +1,6 @@
 import { DatabaseSync } from 'node:sqlite';
 import { randomUUID } from 'node:crypto';
-import type { Challenge,Guest,NativeResult } from './types.ts';
+import type { Challenge,Guest,NativeResult,LeaderboardEntry } from './types.ts';
 import { withChallengeRules,SCORING_VERSION,ACTIVE_SCORING,THROW_MODEL,PHYSICS_VERSION } from './types.ts';
 export class Store {
  db:DatabaseSync;
@@ -9,6 +9,7 @@ export class Store {
   CREATE TABLE IF NOT EXISTS guests (id TEXT PRIMARY KEY,token TEXT UNIQUE NOT NULL,name TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS challenges (id TEXT NOT NULL,revision INTEGER NOT NULL,creator TEXT NOT NULL,body TEXT NOT NULL,created INTEGER NOT NULL,PRIMARY KEY(id,revision));
   CREATE TABLE IF NOT EXISTS attempts (id TEXT PRIMARY KEY,guest TEXT NOT NULL,challenge TEXT,revision INTEGER,success INTEGER NOT NULL,score INTEGER NOT NULL,surfaces INTEGER NOT NULL,duration REAL NOT NULL,accepted INTEGER NOT NULL,replay TEXT);
+  CREATE INDEX IF NOT EXISTS attempts_course_player ON attempts(challenge,revision,guest,score DESC,duration,accepted,id);
   CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY,value TEXT NOT NULL);`);
 
  }
@@ -75,16 +76,21 @@ export class Store {
   // never point to a half-written replay. Attempt IDs make delivery idempotent.
   this.db.exec('BEGIN IMMEDIATE');
   try{
-   const replay=result.score>0?JSON.stringify({...result,challenge:withChallengeRules(c),animation,scoring:c.scoring||SCORING_VERSION}):null;
-   const insert=this.db.prepare('INSERT OR IGNORE INTO attempts VALUES (?,?,?,?,?,?,?,?,?,?)').run(result.attempt,result.id,c.id,c.revision,result.success?1:0,result.score,result.surfaces,result.duration,Date.now(),replay);
+   const before=this.leaderboard(c);
+   const insert=this.db.prepare('INSERT OR IGNORE INTO attempts VALUES (?,?,?,?,?,?,?,?,?,?)').run(result.attempt,result.id,c.id,c.revision,result.success?1:0,result.score,result.surfaces,result.duration,Date.now(),null);
+   if(insert.changes===1){
+    const after=this.leaderboard(c),rank=after.findIndex(row=>row.attempt===result.attempt),previousRank=before.findIndex(row=>row.guest===result.id);
+    result.standings={before:before.slice(0,10),after:after.slice(0,10),rank:rank<0?null:rank+1,previousRank:previousRank<0?null:previousRank+1,improved:rank>=0};
+    if(result.score>0)this.db.prepare('UPDATE attempts SET replay=? WHERE id=?').run(JSON.stringify({...result,challenge:withChallengeRules(c),animation,scoring:c.scoring||SCORING_VERSION}),result.attempt);
+   }
    this.db.exec('COMMIT');return insert.changes===1;
   }catch(error){this.db.exec('ROLLBACK');throw error;}
  }
- leaderboard(c:Challenge){
+ leaderboard(c:Challenge):LeaderboardEntry[]{
   return this.db.prepare(`SELECT id AS attempt,guest,name,score,surfaces,duration,accepted FROM (
-    SELECT a.*,g.name,ROW_NUMBER() OVER(PARTITION BY a.guest ORDER BY a.score DESC,a.duration ASC,a.accepted ASC,a.id ASC) AS rank
+    SELECT a.id,a.guest,a.score,a.surfaces,a.duration,a.accepted,g.name,ROW_NUMBER() OVER(PARTITION BY a.guest ORDER BY a.score DESC,a.duration ASC,a.accepted ASC,a.id ASC) AS rank
     FROM attempts a JOIN guests g ON a.guest=g.id WHERE a.challenge=? AND a.revision=? AND a.score>0
-  ) WHERE rank=1 ORDER BY score DESC,duration ASC,accepted ASC,id ASC`).all(c.id,c.revision);
+  ) WHERE rank=1 ORDER BY score DESC,duration ASC,accepted ASC,id ASC`).all(c.id,c.revision) as LeaderboardEntry[];
  }
  replay(id:string){const r=this.db.prepare('SELECT replay FROM attempts WHERE id=? AND score>0').get(id);return r?.replay?JSON.parse(r.replay as string):null;}
  close(){this.db.close();}

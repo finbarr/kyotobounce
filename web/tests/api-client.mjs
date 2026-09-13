@@ -22,7 +22,7 @@ export class Client{
  input(extra={}){this.send('input',{x:0,z:0,yaw:90,pitch:15,top:0,kick:0,fast:false,...extra});}
  async throw(holdMs,settings={},timeout=40000){
   this.input(settings);await delay(120);const result=this.next(m=>m.type==='result'||m.type==='error'||m.type==='notice',timeout);
-  this.send('charge',{challengeId:this.state.challenge?.id||null,revision:this.state.challenge?.revision||null,layout:this.state.layout,physics:this.state.physics,powerRange:settings.powerRange||'full'});await delay(holdMs);this.send('release');
+  this.send('charge',{challengeId:this.state.challenge?.id||null,revision:this.state.challenge?.revision||null,layout:this.state.layout,physics:this.state.physics,powerRange:settings.powerRange||'full',...(settings.character?{character:settings.character}:{})});await delay(holdMs);this.send('release');
   const end=await result;if(end.type!=='result')throw new Error(end.message);await delay(80);return {result:end,final:this.state.ball,contacts:this.messages.filter(m=>m.type==='impact'),state:this.state};
  }
  async place(center,radius,slot='goal'){return (await this.request('place',{slot,radius,origin:{x:center.x,y:center.y+3,z:center.z},direction:{x:0,y:-1,z:0}},'placement')).disk;}

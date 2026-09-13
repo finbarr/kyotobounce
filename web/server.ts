@@ -54,6 +54,21 @@ const server = createServer(async (request,response) => {
       response.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
       response.end(JSON.stringify({capturedAt:new Date().toISOString(),worker:worker.status,sessions:[...competition.members.values()].map(m=>({id:m.id,snapshotAgeMs:m.snapshotAt===undefined?null:Date.now()-m.snapshotAt,snapshot:m.snapshot}))}));return;
     }
+    const replayRoute=url.pathname.match(/^\/(api\/)?replay\/([a-zA-Z0-9_-]{1,64})\/?$/);
+    if(replayRoute?.[1]){
+      const replay=store.replay(replayRoute[2]!);
+      response.writeHead(replay?200:404,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+      response.end(request.method==='HEAD'?undefined:JSON.stringify(replay?{replay}:{error:'Replay not found. This shot may no longer be available.'}));return;
+    }
+    if(replayRoute){
+      const replay=store.replay(replayRoute[2]!);
+      const title=replay?`${replay.playerName||'Player'} · ${replay.score.toLocaleString('en-US')} PTS — Kyoto Bounce`:'Replay unavailable — Kyoto Bounce';
+      const description=replay?`Watch this shot on ${replay.challenge.name}. Orbit the station, slow it down, then try to beat it.`:'This replay could not be found.';
+      const escape=(text:string)=>text.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!));
+      const html=(await readFile(resolve(root,'index.html'),'utf8')).replace('<title>Kyoto Bounce — Station Arcade</title>',`<title>${escape(title)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">`);
+      response.writeHead(replay?200:404,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+      response.end(request.method==='HEAD'?undefined:html);return;
+    }
     let base=root, relative=decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
     for (const [prefix,path] of vendors) if (url.pathname.startsWith(prefix!)) {base=path!;relative=decodeURIComponent(url.pathname.slice(prefix!.length));break;}
     const path=resolve(base,relative);
@@ -142,7 +157,7 @@ wss.on('connection',socket=>{
           c.id=resumed.id;clearTimeout(detached.get(c.id));detached.delete(c.id);
           for(const [old,connection]of connections)if(old!==socket&&connection.id===c.id){connection.replaced=true;connection.queue.close();old.close(4009,'Session resumed on a new connection');}
         }
-        c.guest=guest;clearTimeout(authTimer);send(socket,{type:'welcome',...guest,sessionId:c.id,worker:worker.ready,resumed:!!resumed});
+        c.guest=guest;clearTimeout(authTimer);send(socket,{type:'welcome',...guest,nameChosen:store.setting(`named:${guest.id}`)===true,sessionId:c.id,worker:worker.ready,resumed:!!resumed});
         if(m.protocol!=='shot-stream-v2'){c.requiresReload=true;send(socket,{type:'worker-status',status:'failed',message:'The game has been updated. Reload this page to load the new scoring and effects.'});return;}
         send(socket,worker.lifecycle());send(socket,competition.catalog());
         if(resumed){
@@ -163,8 +178,8 @@ wss.on('connection',socket=>{
         const time=performance.now();if(c.lastReplay&&time-c.lastReplay<1000)throw new Error('Please wait a moment before loading another replay');c.lastReplay=time;
       }
       if(m.type==='name'){
-        if(typeof m.name!=='string'||m.name.trim().length<1||m.name.length>32)throw new Error('Use a name of 1–32 characters');
-        c.guest.name=m.name.trim();store.rename(c.guest.id,c.guest.name);competition.nameChanged(c.guest);return;
+        if(typeof m.name!=='string'||m.name.trim().length<1||m.name.length>32||/[\u0000-\u001f\u007f]/.test(m.name))throw new Error('Use a name of 1–32 characters');
+        c.guest.name=m.name.trim();store.rename(c.guest.id,c.guest.name);store.setSetting(`named:${c.guest.id}`,true);send(socket,{type:'named',name:c.guest.name});competition.nameChanged(c.guest);return;
       }
       if(!worker.ready)throw new Error(workerFailure||'The physics worker is starting');
       if(m.type==='input'){

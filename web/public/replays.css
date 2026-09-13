@@ -1,0 +1,35 @@
+/* Replays and score reveals keep the robot in the open middle of the stage. */
+#results-screen{position:absolute;inset:112px 24px 54px;z-index:6;display:grid;grid-template-columns:minmax(245px,340px) 1fr minmax(280px,340px);align-items:end;gap:18px;pointer-events:none}
+#results-screen #result-card{position:relative;inset:auto;transform:none;width:100%;max-height:100%;overflow:auto;margin:0;grid-column:1;pointer-events:auto;padding:20px}
+#results-screen #result-card h2{font-size:clamp(30px,3.7vw,51px)}
+#result-leaderboard{grid-column:3;align-self:end;pointer-events:auto;min-width:0;background:linear-gradient(150deg,#202b49f5,#0e152afa);border:1px solid #9ba8d65e;border-top:3px solid #b99aff;box-shadow:6px 6px 0 #070f22a0;padding:15px;overflow:hidden}
+.board-heading{display:grid;gap:10px;margin-bottom:14px}.board-heading .eyebrow{font-size:9px;color:#b9a8ec}.board-heading>b{font:900 24px/1 Impact,'Arial Narrow',sans-serif;letter-spacing:.7px;color:#f6d57f;min-height:24px}
+#result-leaderboard ol{list-style:none;padding:0;margin:0;position:relative;display:grid;gap:4px}
+#result-leaderboard li{height:31px;min-width:0;position:relative;transform-origin:center right}
+#result-leaderboard li>button{width:100%;height:100%;display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:7px;background:#f1f2ff07;border:1px solid #ffffff0e;border-radius:0;text-align:left;padding:4px 8px;font-size:10px;color:#cdd6ed}
+#result-leaderboard .rank-name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}#result-leaderboard strong{font-variant-numeric:tabular-nums;font-size:11px}
+#result-leaderboard [data-rank="1"],#result-leaderboard [data-rank="2"],#result-leaderboard [data-rank="3"]{height:40px}
+#result-leaderboard [data-rank="1"]>button{background:linear-gradient(110deg,#ffdb83,#dda644);border-color:#fff0b0;color:#282015;box-shadow:0 0 18px #e3b64c22}
+#result-leaderboard [data-rank="2"]>button{background:linear-gradient(110deg,#d6e7f2,#7f9aad);color:#152634;border-color:#cceaf0}
+#result-leaderboard [data-rank="3"]>button{background:linear-gradient(110deg,#e8b398,#a5654e);color:#31180e;border-color:#e0aa8d}
+#result-leaderboard [data-rank="1"] strong{font-size:14px}.rank-place{font-weight:800;letter-spacing:.5px}
+#result-leaderboard li.own-score>button{outline:2px solid #92ffe0;outline-offset:-2px}.own-score .rank-name::after{content:' YOU';font-size:7px;font-weight:800;margin-left:5px}
+#result-leaderboard li.new-rank{z-index:2;filter:drop-shadow(0 0 10px #85ffe47a)}
+#result-leaderboard li.rank-ejected{position:absolute;left:0;right:0;z-index:1;pointer-events:none}
+.board-footnote{font-size:8px;line-height:1.5;color:#99a7c4;margin:12px 0 0}.is-results #competition,.is-results #shot-details{visibility:hidden}
+#share-result,#share-replay{border-color:#86e7d5;color:#b4ffec}#result-card .actions #share-result{flex-basis:100%;min-height:32px}
+.replay-share{margin:18px 0 12px;flex-direction:column}.replay-share a{color:#ffd260;text-decoration:none;font-size:12px;padding:10px 0}
+.is-replay #throw-panel,.is-replay #power-control,.is-replay #flight-panel,.is-replay #nickname,.is-replay #edit-player-name,.is-replay #shot-details{display:none!important}
+.is-replay #competition{visibility:visible;max-height:calc(100dvh - 170px)}.is-replay #replay-title{overflow-wrap:anywhere}
+#edit-player-name{max-width:130px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:9px}.session #nickname{display:none}
+#player-name-dialog,.share-link-dialog{color:#f8eed6;background:linear-gradient(140deg,#253555,#10182b);border:1px solid #a5b2cb;border-top:5px solid #ffd260;padding:30px;width:min(440px,calc(100vw - 32px));box-shadow:10px 10px 0 #050b1988}
+#player-name-dialog::backdrop,.share-link-dialog::backdrop{background:#061022b8;backdrop-filter:blur(6px)}
+#player-name-dialog h2{font:900 42px/.98 Impact,'Arial Narrow',sans-serif;letter-spacing:.3px;margin:17px 0;color:#ffd260}
+#player-name-dialog p{font-size:12px;line-height:1.7;color:#c6d4eb}#player-name-dialog label{display:block;font-size:10px;letter-spacing:1px;margin-top:25px}
+#player-name-dialog input,.share-link-dialog input{box-sizing:border-box;display:block;width:100%;margin:10px 0;padding:14px;background:#0c152a;color:#fff5dd;border:1px solid #9ba8c6;font:18px ui-monospace,monospace;border-radius:0}
+#player-name-dialog button{width:100%;padding:15px;background:#ffd260;color:#151e32;font-weight:800;letter-spacing:1px}#player-name-dialog .name-status{min-height:18px;font-size:10px;color:#9fffe2}
+@media(max-height:740px) and (min-width:901px){#results-screen{top:95px;bottom:35px}#result-leaderboard{padding:10px}#result-leaderboard li{height:26px}#result-leaderboard [data-rank="1"],#result-leaderboard [data-rank="2"],#result-leaderboard [data-rank="3"]{height:33px}.board-heading{gap:6px;margin-bottom:8px}.board-heading>b{font-size:20px}#results-screen #result-card{padding:14px}#results-screen #result-breakdown{margin-bottom:6px}}
+@media(max-width:900px){#results-screen{inset:auto 14px 48px;display:block;max-height:54dvh;overflow:auto;scrollbar-width:thin;pointer-events:auto}#results-screen:not(:has(#result-card:not([hidden]))){pointer-events:none}#results-screen #result-card{width:100%;max-height:none;padding:14px}#results-screen #result-card h2{font-size:36px}#results-screen #result-card .result-rank{font-size:21px;margin:7px 0}#results-screen #result-math{display:none}#results-screen #result-breakdown{min-height:0;font-size:10px}#results-screen #result-tip{display:none}#result-leaderboard{margin-top:12px}#results-screen #result-card .actions{position:static}#edit-player-name{max-width:92px;font-size:8px;padding:7px}.is-replay #competition{top:auto;bottom:45px;left:14px;right:14px;width:auto;max-height:38dvh}.is-replay #competition h2{font-size:18px;margin:7px 0}.is-replay #replay-score{margin:8px 0}.is-replay .replay-share{flex-direction:row;align-items:center;margin:8px 0}.is-replay #replay-status{margin:4px 0}}
+@media(prefers-reduced-motion:reduce){#result-leaderboard li.new-rank{filter:none}}
+
+.is-replay footer>span{display:none}.is-replay footer::before{content:'SPACE Pause · ARROWS / RIGHT DRAG Orbit · SCROLL Zoom';font-size:9px}
