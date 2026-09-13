@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><title>Lossless texture verification</title>
+  <body>
+    <h1>Browser texture verification</h1>
+    <pre id="result">Comparing original PNGs and delivered WebP images…</pre>
+    <script type="module">
+      const result = document.getElementById("result"),
+        rows = [];
+      function images(buffer) {
+        const view = new DataView(buffer),
+          length = view.getUint32(12, true);
+        const json = JSON.parse(
+          new TextDecoder().decode(new Uint8Array(buffer, 20, length)),
+        );
+        return (json.images || []).map((image) => {
+          const v = json.bufferViews[image.bufferView];
+          return new Blob(
+            [
+              new Uint8Array(
+                buffer,
+                28 + length + (v.byteOffset || 0),
+                v.byteLength,
+              ),
+            ],
+            { type: image.mimeType },
+          );
+        });
+      }
+      async function pixels(blob) {
+        // Match Three's ImageBitmapLoader decoding options.
+        const image = await createImageBitmap(blob, {
+          premultiplyAlpha: "none",
+          colorSpaceConversion: "none",
+        });
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        context.drawImage(image, 0, 0);
+        const data = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        ).data;
+        image.close();
+        return { data, width: canvas.width, height: canvas.height };
+      }
+      try {
+        for (const name of ["atrium.glb", "atrium-detail.glb", "ori.glb"]) {
+          const [before, after] = await Promise.all(
+            ["source", "runtime"].map((folder) =>
+              fetch("/assets/" + folder + "/" + name)
+                .then((r) => r.arrayBuffer())
+                .then(images),
+            ),
+          );
+          if (before.length !== after.length)
+            throw Error("Image count changed");
+          for (let i = 0; i < before.length; i++) {
+            const a = await pixels(before[i]),
+              b = await pixels(after[i]);
+            let changed = 0,
+              max = 0;
+            if (a.width !== b.width || a.height !== b.height)
+              throw Error("Image dimensions changed");
+            for (let j = 0; j < a.data.length; j++) {
+              const difference = Math.abs(a.data[j] - b.data[j]);
+              if (difference) changed++;
+              max = Math.max(max, difference);
+            }
+            rows.push({
+              asset: name,
+              image: i,
+              width: a.width,
+              height: a.height,
+              changedChannels: changed,
+              maxDifference: max,
+            });
+            result.textContent = JSON.stringify(rows, null, 2);
+            if (changed) throw Error("Browser decoded texture pixels differ");
+          }
+        }
+        result.textContent =
+          "PASS: all browser-decoded texture pixels are identical.\n" +
+          JSON.stringify(rows, null, 2);
+      } catch (error) {
+        result.textContent =
+          "FAIL: " + error.message + "\n" + JSON.stringify(rows, null, 2);
+        console.error(error);
+      }
+    </script>
+  </body>
+</html>

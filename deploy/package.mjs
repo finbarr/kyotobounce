@@ -4,10 +4,18 @@ import { brotliCompressSync, gzipSync, constants } from 'node:zlib';
 import { resolve, join } from 'node:path';
 const stamp=new Date().toISOString().replace(/[:.]/g,'-');
 const output=resolve(`artifacts/online/releases/${stamp}`);
+// Do not silently package a source-only checkout after switching to delivery GLBs.
+const browserBuild=JSON.parse(await readFile('web/public/browser-build.json','utf8'));
+for(const name of ['atrium.glb','atrium-detail.glb','ori.glb','optimization.json']){
+ const file='web/public/assets/runtime/'+name;
+ const checksum=createHash('sha256').update(await readFile(file)).digest('hex');
+ if(browserBuild.files[file]?.sha256!==checksum)throw Error('Run npm run build:web before packaging: '+file);
+}
 await mkdir(output,{recursive:true});
 // Explicit runtime allowlist: no local database, guest tokens, logs, tests, or editor project.
 const files=['package.json','package-lock.json','web/public','web/server.ts','web/connection-queue.ts','web/performance.ts','web/shot-stream.ts','web/store.ts','web/replay-cache.ts','web/replay-http.ts','web/competition.ts','web/types.ts','web/scoring.ts','web/worker.ts','web/starter-challenges.json','Builds/PhysicsWorkerLinux','deploy'];
-for(const name of files)await cp(name,join(output,name),{recursive:true,filter:path=>!path.includes('web/public/assets/layouts')&&!path.split('/').some(part=>part.endsWith('_DoNotShip'))});
+const authoringGLBs=new Set(['atrium.glb','atrium-detail.glb','ori.glb'].map(name=>resolve('web/public/assets',name)));
+for(const name of files)await cp(name,join(output,name),{recursive:true,filter:path=>!authoringGLBs.has(resolve(path).replace(/\.(br|gz)$/,''))&&!path.includes('web/public/assets/layouts')&&!path.split('/').some(part=>part.endsWith('_DoNotShip'))});
 await mkdir(join(output,'runtime'),{recursive:true});
 await cp('runtime/station-layout.json',join(output,'runtime/station-layout.json'));
 await chmod(join(output,'Builds/PhysicsWorkerLinux/KyotoPhysicsWorker.x86_64'),0o755);

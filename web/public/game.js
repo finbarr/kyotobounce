@@ -1,3 +1,4 @@
+import {freezeStaticTransforms} from './static-transforms.js';
 import {FlyCamera,flyTargets} from './fly-camera.js';
 import {CameraObstacles,easeCameraClearance} from './camera-obstacles.js';
 import {replayIdFromPath} from './replay-links.js';
@@ -11,6 +12,7 @@ import {launchDirection,aimOrigin,projectAimReticle} from './aim-reticle.js';
 import {BallRotationBuffer,rotationBetween,rotationSpeed,spinMarkOpacity} from './ball-rotation.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { createAvatar as makeAvatar, poseAvatar, setAvatarCharacter, celebrateAvatar, cancelAvatarCelebration, isAvatarCelebrating, avatarWantsResultView } from './avatar.js';
 import { createCharacterPicker, readCharacterChoice } from './character-picker.js';
@@ -296,11 +298,11 @@ function createAvatar(id){
 
 async function load(){
   try{
-    const loader=new GLTFLoader();const data=await fetch('/assets/station.json').then(r=>r.json());loadedLayout=data.layoutSha256;if(checkStationVersion(snapshot?.layout))return;
+    const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);const data=await fetch('/assets/station.json').then(r=>r.json());loadedLayout=data.layoutSha256;if(checkStationVersion(snapshot?.layout))return;
     const [atrium,robot,hardware,detailData]=await Promise.all([
-      loader.loadAsync('/assets/atrium.glb',e=>{$('load-progress').style.width=`${e.total?Math.min(75,e.loaded/e.total*75):15}%`;$('loading-message').textContent=`Opening the atrium · ${Math.round(e.loaded/1024/1024)} MB`; }),
-      loader.loadAsync('/assets/ori.glb'),
-      loader.loadAsync('/assets/atrium-detail.glb'),
+      loader.loadAsync('/assets/runtime/atrium.glb',e=>{$('load-progress').style.width=`${e.total?Math.min(75,e.loaded/e.total*75):15}%`;$('loading-message').textContent=`Opening the atrium · ${Math.round(e.loaded/1024/1024)} MB`; }),
+      loader.loadAsync('/assets/runtime/ori.glb'),
+      loader.loadAsync('/assets/runtime/atrium-detail.glb'),
       fetch('/assets/atrium-detail.json').then(r=>r.json())
     ]);
     station=atrium.scene;robotAsset=robot;$('loading-message').textContent='Preparing surfaces and camera…';
@@ -318,6 +320,7 @@ async function load(){
     stationLook=dressStation(renderer,scene,sun,station,data);
     stationLook.updateLights(camera.position,0);
     stationLook.captureEnvironment();
+    for(const root of [station,hardwareScene,details.group])freezeStaticTransforms(root);
     robotShadow=contactShadow(scene,station);ballShadow=contactShadow(scene,station);
     if(guestId)createAvatar(guestId);
     await renderer.compileAsync(scene,camera);

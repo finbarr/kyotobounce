@@ -1,0 +1,1189 @@
+{
+  "baselineCommit": "433bc597401637d43ec28ab3bd445f14effa724f",
+  "assetPack": "assets-v5",
+  "scope": "Rendering benchmark in Chrome on Apple M2, 1920x1080, DPR 1. Three runs per variant, four views, two-second warmup and four measured seconds per view. Other desktop workloads remained running; the large run-to-run variation limits confidence in the FPS difference.",
+  "transfer": {
+    "before": 49425908,
+    "after": 38439540,
+    "files": [
+      {
+        "name": "atrium.glb",
+        "before": 48313989,
+        "after": 37424742,
+        "rawBefore": 178936588,
+        "rawAfter": 64388532
+      },
+      {
+        "name": "atrium-detail.glb",
+        "before": 779603,
+        "after": 692922,
+        "rawBefore": 5568348,
+        "rawAfter": 2345820
+      },
+      {
+        "name": "ori.glb",
+        "before": 150735,
+        "after": 140295,
+        "rawBefore": 885204,
+        "rawAfter": 518308
+      },
+      {
+        "name": "station.json",
+        "before": 178155,
+        "after": 178155,
+        "rawBefore": 1274168,
+        "rawAfter": 1274168
+      },
+      {
+        "name": "atrium-detail.json",
+        "before": 3426,
+        "after": 3426,
+        "rawBefore": 27455,
+        "rawAfter": 27455
+      }
+    ],
+    "additionalDecoderGzip": 7812,
+    "additionalDecoderRaw": 29256
+  },
+  "quality": {
+    "format": 1,
+    "lossless": true,
+    "fingerprint": "374ca04ff2b48b963813d05471f702a133ce10891da0f97cc738ac574d8cd121",
+    "assets": {
+      "atrium.glb": {
+        "sourceBytes": 178936588,
+        "verticesBefore": 4353771,
+        "verticesAfter": 2804519,
+        "triangles": 1451257,
+        "primitivesBefore": 647,
+        "primitivesAfter": 647,
+        "images": [
+          {
+            "name": "f90c6a709644fb0809f0cee3",
+            "before": 20066785,
+            "after": 9488926,
+            "width": 4096,
+            "height": 4096,
+            "pixelSha256": "aa375c4acbe3f27e8496c3c65e8272bc8f95e89b5ff3185a27719dfb186bae37"
+          },
+          {
+            "name": "174d2dd1ba175c20fde33781",
+            "before": 234110,
+            "after": 6270,
+            "width": 4096,
+            "height": 4096,
+            "pixelSha256": "a052087c25a480d5074c2ddd408994daba9384e39efbb4c9a778df084cf16504"
+          },
+          {
+            "name": "bd55eee417aefa59dfadb4ef",
+            "before": 1064528,
+            "after": 751468,
+            "width": 1024,
+            "height": 1024,
+            "pixelSha256": "f93e64af722f55c1fb75caf7268ebcf3f0b224e9002a67612359aa29a6ff5fe6"
+          },
+          {
+            "name": "d625591f1625d333747e06dc",
+            "before": 1349158,
+            "after": 835148,
+            "width": 1024,
+            "height": 1024,
+            "pixelSha256": "2a6f4265e32f78840de7885a4f4cd4e465738251884f3323f61d05559bba04c6"
+          },
+          {
+            "name": "c36557ce27295231bf916cae",
+            "before": 1482775,
+            "after": 813930,
+            "width": 1024,
+            "height": 1024,
+            "pixelSha256": "2d95452ef69cf7a87e924093e2c489e45b7fda57e2cdfb05facc6c404582b456"
+          },
+          {
+            "name": "32764c949989e03d690d63b3",
+            "before": 1483372,
+            "after": 833608,
+            "width": 1024,
+            "height": 1024,
+            "pixelSha256": "c4cd86e337b57f0f185741d71802c6f11c57fe1b5c34c7d1bb58223e11812f63"
+          },
+          {
+            "name": "k028-seasons",
+            "before": 25842,
+            "after": 8444,
+            "width": 1024,
+            "height": 256,
+            "pixelSha256": "a4ae838cd046669f5d27849092e15a698628ec28c501b7a5d32add3986c322f6"
+          },
+          {
+            "name": "1fd95771b6b554b4ac50fbe9",
+            "before": 1349666,
+            "after": 861138,
+            "width": 1024,
+            "height": 1024,
+            "pixelSha256": "b2ae056561a8d8ed29a3ed0c2efa28903ccc0826f4487dff788ad7766c5c9740"
+          }
+        ],
+        "decodedBytes": 102138082,
+        "outputBytes": 64388532,
+        "sourceSha256": "7b306288c2b220dd9ebb71d3d20ed16da40e128f4d3e9cac429f65596ae2ccd6",
+        "outputSha256": "167d074a0cdba1169a962824821eb763170610c52a23ff3390fd62998a06d56f"
+      },
+      "atrium-detail.glb": {
+        "sourceBytes": 5568348,
+        "verticesBefore": 211616,
+        "verticesAfter": 210335,
+        "triangles": 92864,
+        "primitivesBefore": 150,
+        "primitivesAfter": 150,
+        "images": [],
+        "decodedBytes": 5605224,
+        "outputBytes": 2345820,
+        "sourceSha256": "a4825e5adcadaeffd50c04642c7673b74780a6ac3115a455b5e7f0dc42c2a1a6",
+        "outputSha256": "ed36524959fa11a5d9a8dc6bfe8c8cdc4b7dd25d6312c2caa3bffa04f6a433be"
+      },
+      "ori.glb": {
+        "sourceBytes": 885204,
+        "verticesBefore": 12739,
+        "verticesAfter": 12739,
+        "triangles": 19784,
+        "primitivesBefore": 5,
+        "primitivesAfter": 5,
+        "images": [],
+        "decodedBytes": 796668,
+        "outputBytes": 518308,
+        "sourceSha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4",
+        "outputSha256": "1264e32bc21495f25cd5f9a1bf915afef02ca06c3d77beb4b2e0b244d5581b5c"
+      }
+    }
+  },
+  "summary": [
+    {
+      "variant": "baseline",
+      "scenes": [
+        {
+          "scene": "central-hall",
+          "fps": [
+            48.59423811176673,
+            33.93247928397556,
+            23.94647838645172
+          ],
+          "meanFPS": 35.49106526073133
+        },
+        {
+          "scene": "west-escalators",
+          "fps": [
+            34.180888211282166,
+            46.30205869906144,
+            55.27874866760855
+          ],
+          "meanFPS": 45.25389852598405
+        },
+        {
+          "scene": "sky-garden",
+          "fps": [
+            18.612396835892525,
+            33.58273452354486,
+            36.48562613252367
+          ],
+          "meanFPS": 29.560252497320352
+        },
+        {
+          "scene": "east-concourse",
+          "fps": [
+            26.910922378036727,
+            46.397512510323985,
+            59.50462400515713
+          ],
+          "meanFPS": 44.271019631172614
+        }
+      ],
+      "meanFPS": 38.644058978802086
+    },
+    {
+      "variant": "optimized",
+      "scenes": [
+        {
+          "scene": "central-hall",
+          "fps": [
+            49.83388704318937,
+            39.82477100756672,
+            55.7388522295541
+          ],
+          "meanFPS": 48.4658367601034
+        },
+        {
+          "scene": "west-escalators",
+          "fps": [
+            52.05622071837586,
+            42.56908140403286,
+            19.77317666310597
+          ],
+          "meanFPS": 38.13282626183823
+        },
+        {
+          "scene": "sky-garden",
+          "fps": [
+            41.320256882560884,
+            35.45571754438159,
+            40.07367582636402
+          ],
+          "meanFPS": 38.94988341776883
+        },
+        {
+          "scene": "east-concourse",
+          "fps": [
+            60.00793493354489,
+            39.589661869428845,
+            49.295423990439694
+          ],
+          "meanFPS": 49.63100693113781
+        }
+      ],
+      "meanFPS": 43.79488834271206
+    }
+  ],
+  "runs": [
+    {
+      "file": "report-baseline-1789281119003.json",
+      "variant": "baseline",
+      "benchmarkVersion": 3,
+      "gpuProfiling": false,
+      "startupMs": 3844.3000000715256,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "pixelRatio": 1,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4350/assets/source/station.json",
+          "transferBytes": 178455,
+          "encodedBytes": 178155,
+          "decodedBytes": 1274168,
+          "duration": 20.5
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.json",
+          "transferBytes": 3726,
+          "encodedBytes": 3426,
+          "decodedBytes": 27455,
+          "duration": 12.600000023841858
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium.glb",
+          "transferBytes": 48314289,
+          "encodedBytes": 48313989,
+          "decodedBytes": 178936588,
+          "duration": 1173.3999999761581
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/ori.glb",
+          "transferBytes": 151035,
+          "encodedBytes": 150735,
+          "decodedBytes": 885204,
+          "duration": 25.600000023841858
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.glb",
+          "transferBytes": 779903,
+          "encodedBytes": 779603,
+          "decodedBytes": 5568348,
+          "duration": 52.60000002384186
+        }
+      ],
+      "rows": [
+        {
+          "scene": "central-hall",
+          "frames": 196,
+          "fps": 48.59423811176673,
+          "frameMs": {
+            "p50": 16.700000000000728,
+            "p95": 33.899999999999636,
+            "mean": 20.578571428571436
+          },
+          "cpuMs": {
+            "p50": 3.899999976158142,
+            "p95": 5.5,
+            "mean": 4.021428572888277
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 311,
+            "p95": 312,
+            "mean": 310.515306122449
+          },
+          "triangles": {
+            "p50": 1058533,
+            "p95": 1060573,
+            "mean": 1058718.0204081633
+          }
+        },
+        {
+          "scene": "west-escalators",
+          "frames": 139,
+          "fps": 34.180888211282166,
+          "frameMs": {
+            "p50": 17.399999999997817,
+            "p95": 66.5,
+            "mean": 29.256115107913658
+          },
+          "cpuMs": {
+            "p50": 4.199999928474426,
+            "p95": 9.799999952316284,
+            "mean": 5.282014385401774
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 384,
+            "p95": 385,
+            "mean": 381.59712230215825
+          },
+          "triangles": {
+            "p50": 952404,
+            "p95": 952620,
+            "mean": 951618.690647482
+          }
+        },
+        {
+          "scene": "sky-garden",
+          "frames": 76,
+          "fps": 18.612396835892525,
+          "frameMs": {
+            "p50": 50.099999999998545,
+            "p95": 67.59999999999854,
+            "mean": 53.72763157894741
+          },
+          "cpuMs": {
+            "p50": 10.399999976158142,
+            "p95": 13.100000023841858,
+            "mean": 10.493421044788862
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 835,
+            "p95": 836,
+            "mean": 835.0921052631579
+          },
+          "triangles": {
+            "p50": 1608029,
+            "p95": 1608077,
+            "mean": 1608033.105263158
+          }
+        },
+        {
+          "scene": "east-concourse",
+          "frames": 109,
+          "fps": 26.910922378036727,
+          "frameMs": {
+            "p50": 33.400000000001455,
+            "p95": 50.799999999995634,
+            "mean": 37.15963302752295
+          },
+          "cpuMs": {
+            "p50": 6.400000095367432,
+            "p95": 9.299999952316284,
+            "mean": 6.641284394701686
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 236,
+            "p95": 248,
+            "mean": 234.29357798165137
+          },
+          "triangles": {
+            "p50": 883277,
+            "p95": 887341,
+            "mean": 883498.4678899082
+          }
+        }
+      ]
+    },
+    {
+      "file": "report-baseline-1789281173847.json",
+      "variant": "baseline",
+      "benchmarkVersion": 3,
+      "gpuProfiling": false,
+      "startupMs": 3844.3000000715256,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "pixelRatio": 1,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4350/assets/source/station.json",
+          "transferBytes": 178455,
+          "encodedBytes": 178155,
+          "decodedBytes": 1274168,
+          "duration": 20.5
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.json",
+          "transferBytes": 3726,
+          "encodedBytes": 3426,
+          "decodedBytes": 27455,
+          "duration": 12.600000023841858
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium.glb",
+          "transferBytes": 48314289,
+          "encodedBytes": 48313989,
+          "decodedBytes": 178936588,
+          "duration": 1173.3999999761581
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/ori.glb",
+          "transferBytes": 151035,
+          "encodedBytes": 150735,
+          "decodedBytes": 885204,
+          "duration": 25.600000023841858
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.glb",
+          "transferBytes": 779903,
+          "encodedBytes": 779603,
+          "decodedBytes": 5568348,
+          "duration": 52.60000002384186
+        }
+      ],
+      "rows": [
+        {
+          "scene": "central-hall",
+          "frames": 138,
+          "fps": 33.93247928397556,
+          "frameMs": {
+            "p50": 16.90000000000873,
+            "p95": 99.5,
+            "mean": 29.470289855072423
+          },
+          "cpuMs": {
+            "p50": 13.899999976158142,
+            "p95": 74.80000007152557,
+            "mean": 21.702898556771487
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 310,
+            "p95": 312,
+            "mean": 310.4347826086956
+          },
+          "triangles": {
+            "p50": 1057957,
+            "p95": 1060573,
+            "mean": 1058364.3043478262
+          }
+        },
+        {
+          "scene": "west-escalators",
+          "frames": 186,
+          "fps": 46.30205869906144,
+          "frameMs": {
+            "p50": 16.89999999999418,
+            "p95": 33.80000000000291,
+            "mean": 21.59731182795702
+          },
+          "cpuMs": {
+            "p50": 10.200000047683716,
+            "p95": 18.5,
+            "mean": 11.273655911286673
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 380,
+            "p95": 385,
+            "mean": 379.4193548387097
+          },
+          "triangles": {
+            "p50": 951900,
+            "p95": 952620,
+            "mean": 950831.9032258064
+          }
+        },
+        {
+          "scene": "sky-garden",
+          "frames": 136,
+          "fps": 33.58273452354486,
+          "frameMs": {
+            "p50": 33.10000000000582,
+            "p95": 50.29999999998836,
+            "mean": 29.777205882353027
+          },
+          "cpuMs": {
+            "p50": 15.300000071525574,
+            "p95": 36.200000047683716,
+            "mean": 18.27279411694583
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 835,
+            "p95": 836,
+            "mean": 835.0882352941177
+          },
+          "triangles": {
+            "p50": 1608029,
+            "p95": 1608077,
+            "mean": 1608033.0588235294
+          }
+        },
+        {
+          "scene": "east-concourse",
+          "frames": 191,
+          "fps": 46.397512510323985,
+          "frameMs": {
+            "p50": 16.69999999999709,
+            "p95": 33.89999999999418,
+            "mean": 21.552879581151863
+          },
+          "cpuMs": {
+            "p50": 9.899999976158142,
+            "p95": 33.5,
+            "mean": 15.119371728747304
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 243,
+            "p95": 248,
+            "mean": 238.13089005235602
+          },
+          "triangles": {
+            "p50": 885541,
+            "p95": 887341,
+            "mean": 884505.4764397906
+          }
+        }
+      ]
+    },
+    {
+      "file": "report-baseline-1789282066293.json",
+      "variant": "baseline",
+      "benchmarkVersion": 3,
+      "gpuProfiling": false,
+      "startupMs": 13894.5,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "pixelRatio": 1,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4350/assets/source/station.json",
+          "transferBytes": 178455,
+          "encodedBytes": 178155,
+          "decodedBytes": 1274168,
+          "duration": 44.200000047683716
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.json",
+          "transferBytes": 3726,
+          "encodedBytes": 3426,
+          "decodedBytes": 27455,
+          "duration": 36.39999997615814
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium.glb",
+          "transferBytes": 48314289,
+          "encodedBytes": 48313989,
+          "decodedBytes": 178936588,
+          "duration": 11028.800000071526
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/ori.glb",
+          "transferBytes": 151035,
+          "encodedBytes": 150735,
+          "decodedBytes": 885204,
+          "duration": 109.30000007152557
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.glb",
+          "transferBytes": 779903,
+          "encodedBytes": 779603,
+          "decodedBytes": 5568348,
+          "duration": 1535.2000000476837
+        }
+      ],
+      "rows": [
+        {
+          "scene": "central-hall",
+          "frames": 97,
+          "fps": 23.94647838645172,
+          "frameMs": {
+            "p50": 33.79999999999927,
+            "p95": 66.59999999999854,
+            "mean": 41.759793814432996
+          },
+          "cpuMs": {
+            "p50": 10.799999952316284,
+            "p95": 19.59999990463257,
+            "mean": 11.785567014487748
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 311,
+            "p95": 312,
+            "mean": 310.50515463917526
+          },
+          "triangles": {
+            "p50": 1058533,
+            "p95": 1060573,
+            "mean": 1058689.8659793814
+          }
+        },
+        {
+          "scene": "west-escalators",
+          "frames": 223,
+          "fps": 55.27874866760855,
+          "frameMs": {
+            "p50": 16.69999999999709,
+            "p95": 32.400000000001455,
+            "mean": 18.09013452914801
+          },
+          "cpuMs": {
+            "p50": 9.5,
+            "p95": 17.600000023841858,
+            "mean": 11.376681612211492
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 381,
+            "p95": 385,
+            "mean": 380.15695067264573
+          },
+          "triangles": {
+            "p50": 952152,
+            "p95": 952620,
+            "mean": 951149.0313901345
+          }
+        },
+        {
+          "scene": "sky-garden",
+          "frames": 149,
+          "fps": 36.48562613252367,
+          "frameMs": {
+            "p50": 17.60000000000582,
+            "p95": 50,
+            "mean": 27.40805369127514
+          },
+          "cpuMs": {
+            "p50": 16.399999976158142,
+            "p95": 42.89999997615814,
+            "mean": 19.526174496484284
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 835,
+            "p95": 836,
+            "mean": 835.0604026845638
+          },
+          "triangles": {
+            "p50": 1608029,
+            "p95": 1608077,
+            "mean": 1608031.7382550335
+          }
+        },
+        {
+          "scene": "east-concourse",
+          "frames": 240,
+          "fps": 59.50462400515713,
+          "frameMs": {
+            "p50": 16.69999999999709,
+            "p95": 17.599999999998545,
+            "mean": 16.80541666666665
+          },
+          "cpuMs": {
+            "p50": 8.899999976158142,
+            "p95": 13.600000023841858,
+            "mean": 9.379583329955738
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 236,
+            "p95": 248,
+            "mean": 234.41666666666666
+          },
+          "triangles": {
+            "p50": 883277,
+            "p95": 887341,
+            "mean": 883526.7958333333
+          }
+        }
+      ]
+    },
+    {
+      "file": "report-optimized-1789281062730.json",
+      "variant": "optimized",
+      "benchmarkVersion": 3,
+      "gpuProfiling": false,
+      "startupMs": 3473.2999999523163,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "pixelRatio": 1,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4350/assets/source/station.json",
+          "transferBytes": 178455,
+          "encodedBytes": 178155,
+          "decodedBytes": 1274168,
+          "duration": 24
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.json",
+          "transferBytes": 3726,
+          "encodedBytes": 3426,
+          "decodedBytes": 27455,
+          "duration": 10.600000023841858
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/ori.glb",
+          "transferBytes": 140565,
+          "encodedBytes": 140265,
+          "decodedBytes": 524968,
+          "duration": 17.299999952316284
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/atrium-detail.glb",
+          "transferBytes": 693222,
+          "encodedBytes": 692922,
+          "decodedBytes": 2345820,
+          "duration": 57.700000047683716
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/atrium.glb",
+          "transferBytes": 37425042,
+          "encodedBytes": 37424742,
+          "decodedBytes": 64388532,
+          "duration": 691.1000000238419
+        }
+      ],
+      "rows": [
+        {
+          "scene": "central-hall",
+          "frames": 201,
+          "fps": 49.83388704318937,
+          "frameMs": {
+            "p50": 16.700000000000728,
+            "p95": 33.60000000000218,
+            "mean": 20.066666666666666
+          },
+          "cpuMs": {
+            "p50": 4.299999952316284,
+            "p95": 7.599999904632568,
+            "mean": 4.739800993482865
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 311,
+            "p95": 312,
+            "mean": 310.5323383084577
+          },
+          "triangles": {
+            "p50": 1058533,
+            "p95": 1060573,
+            "mean": 1058725.5970149254
+          }
+        },
+        {
+          "scene": "west-escalators",
+          "frames": 210,
+          "fps": 52.05622071837586,
+          "frameMs": {
+            "p50": 16.700000000000728,
+            "p95": 33.39999999999782,
+            "mean": 19.209999999999994
+          },
+          "cpuMs": {
+            "p50": 3.899999976158142,
+            "p95": 4.799999952316284,
+            "mean": 3.9176190512520925
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 380,
+            "p95": 385,
+            "mean": 379.72857142857146
+          },
+          "triangles": {
+            "p50": 951900,
+            "p95": 952620,
+            "mean": 950978.5857142857
+          }
+        },
+        {
+          "scene": "sky-garden",
+          "frames": 166,
+          "fps": 41.320256882560884,
+          "frameMs": {
+            "p50": 17.5,
+            "p95": 34.099999999998545,
+            "mean": 24.201204819277095
+          },
+          "cpuMs": {
+            "p50": 6,
+            "p95": 7.699999928474426,
+            "mean": 6.212650600686131
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 835,
+            "p95": 836,
+            "mean": 835.0602409638554
+          },
+          "triangles": {
+            "p50": 1608029,
+            "p95": 1608077,
+            "mean": 1608031.8915662651
+          }
+        },
+        {
+          "scene": "east-concourse",
+          "frames": 242,
+          "fps": 60.00793493354489,
+          "frameMs": {
+            "p50": 16.69999999999709,
+            "p95": 17.599999999998545,
+            "mean": 16.664462809917367
+          },
+          "cpuMs": {
+            "p50": 3.600000023841858,
+            "p95": 4.600000023841858,
+            "mean": 3.723966943331001
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 236,
+            "p95": 248,
+            "mean": 234.5082644628099
+          },
+          "triangles": {
+            "p50": 883277,
+            "p95": 887341,
+            "mean": 883556.7066115702
+          }
+        }
+      ]
+    },
+    {
+      "file": "report-optimized-1789281246444.json",
+      "variant": "optimized",
+      "benchmarkVersion": 3,
+      "gpuProfiling": false,
+      "startupMs": 4314.399999976158,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "pixelRatio": 1,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4350/assets/source/station.json",
+          "transferBytes": 178455,
+          "encodedBytes": 178155,
+          "decodedBytes": 1274168,
+          "duration": 33.39999997615814
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.json",
+          "transferBytes": 3726,
+          "encodedBytes": 3426,
+          "decodedBytes": 27455,
+          "duration": 24.200000047683716
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/ori.glb",
+          "transferBytes": 140565,
+          "encodedBytes": 140265,
+          "decodedBytes": 524968,
+          "duration": 37.89999997615814
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/atrium.glb",
+          "transferBytes": 37425042,
+          "encodedBytes": 37424742,
+          "decodedBytes": 64388532,
+          "duration": 760.1999999284744
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/atrium-detail.glb",
+          "transferBytes": 693222,
+          "encodedBytes": 692922,
+          "decodedBytes": 2345820,
+          "duration": 110
+        }
+      ],
+      "rows": [
+        {
+          "scene": "central-hall",
+          "frames": 160,
+          "fps": 39.82477100756672,
+          "frameMs": {
+            "p50": 16.700000000000728,
+            "p95": 51.099999999998545,
+            "mean": 25.109999999999992
+          },
+          "cpuMs": {
+            "p50": 15.700000047683716,
+            "p95": 49.10000002384186,
+            "mean": 20.42999999895692
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 311,
+            "p95": 312,
+            "mean": 310.65625
+          },
+          "triangles": {
+            "p50": 1059469,
+            "p95": 1060597,
+            "mean": 1058882.95
+          }
+        },
+        {
+          "scene": "west-escalators",
+          "frames": 171,
+          "fps": 42.56908140403286,
+          "frameMs": {
+            "p50": 16.700000000000728,
+            "p95": 51,
+            "mean": 23.49122807017544
+          },
+          "cpuMs": {
+            "p50": 12.399999976158142,
+            "p95": 47,
+            "mean": 18.760233923705698
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 379,
+            "p95": 385,
+            "mean": 378.16959064327483
+          },
+          "triangles": {
+            "p50": 951744,
+            "p95": 952620,
+            "mean": 950462.5964912281
+          }
+        },
+        {
+          "scene": "sky-garden",
+          "frames": 143,
+          "fps": 35.45571754438159,
+          "frameMs": {
+            "p50": 32.80000000000291,
+            "p95": 49.799999999995634,
+            "mean": 28.204195804195834
+          },
+          "cpuMs": {
+            "p50": 18.399999976158142,
+            "p95": 41.39999997615814,
+            "mean": 20.929370625869378
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 835,
+            "p95": 836,
+            "mean": 835.0629370629371
+          },
+          "triangles": {
+            "p50": 1608029,
+            "p95": 1608077,
+            "mean": 1608031.8531468532
+          }
+        },
+        {
+          "scene": "east-concourse",
+          "frames": 159,
+          "fps": 39.589661869428845,
+          "frameMs": {
+            "p50": 16.900000000001455,
+            "p95": 50.80000000000291,
+            "mean": 25.259119496855327
+          },
+          "cpuMs": {
+            "p50": 14.199999928474426,
+            "p95": 46,
+            "mean": 19.650943401474624
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 236,
+            "p95": 248,
+            "mean": 233.64779874213838
+          },
+          "triangles": {
+            "p50": 883277,
+            "p95": 887341,
+            "mean": 883376.1761006289
+          }
+        }
+      ]
+    },
+    {
+      "file": "report-optimized-1789281974033.json",
+      "variant": "optimized",
+      "benchmarkVersion": 3,
+      "gpuProfiling": false,
+      "startupMs": 7152.5,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "pixelRatio": 1,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+      "resources": [
+        {
+          "name": "http://127.0.0.1:4350/assets/source/atrium-detail.json",
+          "transferBytes": 3726,
+          "encodedBytes": 3426,
+          "decodedBytes": 27455,
+          "duration": 13
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/source/station.json",
+          "transferBytes": 178455,
+          "encodedBytes": 178155,
+          "decodedBytes": 1274168,
+          "duration": 81.80000007152557
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/atrium.glb",
+          "transferBytes": 37425042,
+          "encodedBytes": 37424742,
+          "decodedBytes": 64388532,
+          "duration": 3535.399999976158
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/ori.glb",
+          "transferBytes": 140595,
+          "encodedBytes": 140295,
+          "decodedBytes": 518308,
+          "duration": 30.799999952316284
+        },
+        {
+          "name": "http://127.0.0.1:4350/assets/runtime/atrium-detail.glb",
+          "transferBytes": 693222,
+          "encodedBytes": 692922,
+          "decodedBytes": 2345820,
+          "duration": 181.10000002384186
+        }
+      ],
+      "rows": [
+        {
+          "scene": "central-hall",
+          "frames": 223,
+          "fps": 55.7388522295541,
+          "frameMs": {
+            "p50": 16.700000000000728,
+            "p95": 33.29999999999927,
+            "mean": 17.94080717488789
+          },
+          "cpuMs": {
+            "p50": 11.300000071525574,
+            "p95": 23.799999952316284,
+            "mean": 13.203587440097278
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 311,
+            "p95": 311,
+            "mean": 310.5067264573991
+          },
+          "triangles": {
+            "p50": 1058533,
+            "p95": 1060573,
+            "mean": 1058709.3946188341
+          }
+        },
+        {
+          "scene": "west-escalators",
+          "frames": 87,
+          "fps": 19.77317666310597,
+          "frameMs": {
+            "p50": 32.400000000001455,
+            "p95": 200.1999999999971,
+            "mean": 50.573563218390824
+          },
+          "cpuMs": {
+            "p50": 21.100000023841858,
+            "p95": 160.89999997615814,
+            "mean": 40.595402303783374
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 384,
+            "p95": 385,
+            "mean": 381.82758620689657
+          },
+          "triangles": {
+            "p50": 952404,
+            "p95": 952620,
+            "mean": 951842.6896551724
+          }
+        },
+        {
+          "scene": "sky-garden",
+          "frames": 161,
+          "fps": 40.07367582636402,
+          "frameMs": {
+            "p50": 16.799999999995634,
+            "p95": 50.599999999998545,
+            "mean": 24.954037267080736
+          },
+          "cpuMs": {
+            "p50": 16.799999952316284,
+            "p95": 41.89999997615814,
+            "mean": 21.757763978117
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 835,
+            "p95": 836,
+            "mean": 835.0621118012423
+          },
+          "triangles": {
+            "p50": 1608029,
+            "p95": 1608077,
+            "mean": 1608031.8322981365
+          }
+        },
+        {
+          "scene": "east-concourse",
+          "frames": 198,
+          "fps": 49.295423990439694,
+          "frameMs": {
+            "p50": 16.69999999999709,
+            "p95": 33.900000000001455,
+            "mean": 20.285858585858577
+          },
+          "cpuMs": {
+            "p50": 11.100000023841858,
+            "p95": 40.699999928474426,
+            "mean": 14.888888885276486
+          },
+          "gpuMs": null,
+          "drawCalls": {
+            "p50": 235,
+            "p95": 248,
+            "mean": 233.67676767676767
+          },
+          "triangles": {
+            "p50": 883253,
+            "p95": 887341,
+            "mean": 883294.6666666666
+          }
+        }
+      ]
+    }
+  ]
+}

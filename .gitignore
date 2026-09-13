@@ -52,6 +52,7 @@ tools/*
 !tools/export_atrium_layout.py
 !tools/build_atrium_detail.py
 !tools/build_stair_materials.py
+!tools/optimize-browser-assets.mjs
 art-source/*
 !art-source/physics/
 !art-source/phase3/

@@ -17,6 +17,12 @@ The pack includes:
 
 The game is pre-launch. Only the current station bundle ships; old geometry, rules and course revisions are discarded. Current high scores and same-version replays remain supported.
 
+## Browser delivery build
+
+`npm run build:web` derives `web/public/assets/runtime/` from the original three GLBs. It removes exact duplicate vertex records, encodes geometry with lossless meshopt, and uses lossless WebP for eligible PNG textures when smaller. It preserves triangle order, normals, UV seams, material definitions, rigs and texture dimensions. Profiled textures and unsupported source depths/formats remain in their original encoding. No geometry quantization, simplification or texture downscaling is performed by this build.
+
+The browser loads these generated delivery GLBs. The release packager checks their build-manifest hashes and excludes the duplicate authoring GLBs. Keep the originals in the asset pack for editing and reproducible builds; generated delivery files and `.local/texture-cache/` are ignored. Source, tool and dependency changes invalidate the build cache. `node web/tests/lossless-assets.mjs --full` checks the decoded output against every original triangle. See [the rendering benchmark](../web/benchmarks/README.md) for browser texture checks and measured download/frame-rate results.
+
 ## Rebuild art
 
 Use Blender 5.2.1 LTS. Replace `blender` with your executable path if necessary.
