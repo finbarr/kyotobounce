@@ -20,7 +20,7 @@ export function shotDetails(cancel){
     const d=s?.diagnostics,active=['Flight','Result'].includes(s?.phase);
     if(active)lastFlight=report;
     // Inspect through the DOM without an executable browser debugging backdoor.
-    output.dataset.report=JSON.stringify({phase:s?.phase,aim:{yaw:render?.yaw,pitch:render?.pitch},thrower:s?.players?.find(p=>p.id===s.id),camera:render?.camera,reticle:render?.reticle,power:render?.power,rotationSamples:render?.rotationSampleCount,renderedSpin:render?.renderedSpin,spinMarkOpacity:render?.spinMarkOpacity,spin:s?.spin,ball:s?.ball,renderBall:render?.renderBall,diagnostics:d,lastShot:lastFlight?{phase:lastFlight.snapshot?.phase,ball:lastFlight.snapshot?.ball,diagnostics:lastFlight.snapshot?.diagnostics}:null});
+    output.dataset.report=JSON.stringify({phase:s?.phase,aim:{yaw:render?.yaw,pitch:render?.pitch},thrower:s?.players?.find(p=>p.id===s.id),camera:render?.camera,reticle:render?.reticle,power:render?.power,speedBlur:render?.speedBlur,throwStance:render?.throwStance,rotationSamples:render?.rotationSampleCount,renderedSpin:render?.renderedSpin,spinMarkOpacity:render?.spinMarkOpacity,spin:s?.spin,ball:s?.ball,renderBall:render?.renderBall,diagnostics:d,lastShot:lastFlight?{phase:lastFlight.snapshot?.phase,ball:lastFlight.snapshot?.ball,diagnostics:lastFlight.snapshot?.diagnostics}:null});
     output.textContent=s?[
       `Session: ${s.id}`,
       `View: ${render?.mode||'play'} · Worker: ${worker}`,

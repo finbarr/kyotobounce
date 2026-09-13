@@ -43,3 +43,16 @@ for(const distance of [1,3,12,30,120]){
 const empty=new THREE.Group();assert.equal(projectAimReticle(origin,direction,camera,empty).distance,300,'Open space uses a distant direction marker');
 camera.lookAt(camera.position.clone().sub(direction));camera.updateMatrixWorld();assert.equal(projectAimReticle(origin,direction,camera,empty).visible,false,'Hide the marker when orbiting away from the throw');
 console.log('PASS released meter stability, cancel/retry, native aim convention, hand offset, near/far reticle convergence and manual orbit');
+
+const {speedBlurAmount,presentationSpeed}=await import('../public/speed-blur.js');
+assert.equal(speedBlurAmount(12),0,'Precision speed stays crisp');
+assert.equal(speedBlurAmount(45),0);assert.equal(speedBlurAmount(90),1);assert.equal(speedBlurAmount(100),1);
+let lastAmount=0;
+for(let speed=0;speed<=100;speed+=.25){const amount=speedBlurAmount(speed);assert.ok(amount>=lastAmount&&amount<=1);assert.ok(amount-lastAmount<.01,'No threshold pop');lastAmount=amount;}
+for(const phase of ['Aim','Charging','Release','Result'])assert.equal(presentationSpeed({x:100,y:0,z:0},phase),0);
+assert.equal(presentationSpeed({x:54,y:72,z:0},'Flight'),90,'Actual velocity includes every axis');
+assert.equal(speedBlurAmount(presentationSpeed({x:100,y:0,z:0},'Flight',.25)),0,'Slow motion stays readable');
+assert.equal(presentationSpeed({x:100,y:0,z:0},'Flight',0),0,'Paused replays have no speed blur');
+for(const bad of [null,{}, {x:NaN,y:0,z:0}])assert.equal(presentationSpeed(bad,'Flight'),0);
+assert.equal(speedBlurAmount(NaN),0);
+console.log('PASS speed blur threshold continuity, saturation, slowing, replay speed and non-flight guards');

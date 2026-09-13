@@ -41,6 +41,10 @@ Open **http://127.0.0.1:4173/**. The first Unity import/build can take several m
 | R | Recall the ball and forfeit the current attempt |
 | Escape | Release the mouse / cancel the windup |
 
+Precision throws use a compact arm motion. Robot power uses a wider staggered stance, a deeper wind-up and a forceful follow-through. Both release from the same authoritative launch point.
+
+Fast ball flight adds peripheral motion blur above 45 m/s, reaching full strength at 90 m/s and fading as the ball slows. The ball and interface stay readable; reduced-motion settings disable the effect, and replay playback speed scales it.
+
 ## Source and assets
 
 | Location | Responsibility |
@@ -60,6 +64,8 @@ Large `.blend` and `.glb` files live in a **versioned GitHub release**, not Git 
 npm run typecheck
 npm test
 npm run build:web
+# With the pinned art pack fetched (no browser or worker required):
+npm run test:avatar
 # With an isolated local server running:
 KYOTO_TEST_ORIGIN=http://127.0.0.1:4173 npm run test:runtime
 ```

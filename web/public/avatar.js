@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {celebrationProfile} from './celebration.js';
+import {throwStyle} from './throw-style.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 const unitX=new THREE.Vector3(1,0,0),unitY=new THREE.Vector3(0,1,0),unitZ=new THREE.Vector3(0,0,1);
@@ -13,7 +14,7 @@ function pointBone(bone,child,target){
   const delta=new THREE.Quaternion().setFromUnitVectors(from,to);setWorldRotation(bone,delta.multiply(bone.getWorldQuaternion(new THREE.Quaternion())));
 }
 // Two rigid limb lengths, an outward elbow pole and preserved wrist orientation.
-// The solver only adjusts the visible release pose; it never moves the physics ball.
+// The solver adjusts the visible arm pose; it never moves the physics ball.
 function alignGrip(a,target){
   a.group.updateWorldMatrix(true,true);
   const shoulder=worldPosition(a.upper),elbow=worldPosition(a.forearm),wrist=worldPosition(a.hand);
@@ -41,6 +42,12 @@ export function createAvatar(asset,{character='ori'}={}){
   avatar.originalMaterials=new Map();model.traverse(o=>{if(o.isMesh)avatar.originalMaterials.set(o,o.material);});
   group.updateWorldMatrix(true,true);avatar.bindFrames=new Map();
   for(const bone of new Set(Object.values(bones)))avatar.bindFrames.set(bone,{inverse:bone.matrixWorld.clone().invert(),rotation:bone.getWorldQuaternion(new THREE.Quaternion()).invert()});
+  // Record the authored idle grip once; both wind-ups begin at that same hold.
+  for(const [name,action]of Object.entries(actions)){action.setEffectiveWeight(name==='Idle'?1:0);action.time=0;}
+  mixer.update(0);
+  for(const [bone,rotation]of baseRotations)rotation.copy(bone.quaternion);
+  for(const [bone,position]of basePositions)position.copy(bone.position);
+  group.updateWorldMatrix(true,true);avatar.restGrip=group.worldToLocal(bones['hand.R'].localToWorld(grip.clone()));
   setAvatarCharacter(avatar,character);return avatar;
 }
 export function poseAvatar(a,player,phase,state,stationTime){
@@ -53,6 +60,9 @@ export function poseAvatar(a,player,phase,state,stationTime){
   }else if(mode==='Flight'){
     throwWeight=1;throwTime=7/60+Math.max(0,stationTime-state.releaseTime);
   }else idle=1;
+  // Precision uses a steady wrist and a compact arm path; the authored large
+  // overhead clip remains the basis for the power throw.
+  if(player.powerRange==='precision'){idle=1;wind=0;throwWeight=0;}
   for(const [name,action]of Object.entries(a.actions)){
     action.setEffectiveWeight(name==='Idle'?idle:name==='Windup'?wind:throwWeight);
     action.time=name==='Windup'?Math.min(1,player.power)*action.getClip().duration:name==='Throw'?Math.min(throwTime,action.getClip().duration):0;
@@ -64,7 +74,9 @@ export function poseAvatar(a,player,phase,state,stationTime){
   a.mixer.update(0);
   for(const [bone,rotation]of a.baseRotations)rotation.copy(bone.quaternion);
   for(const [bone,position]of a.basePositions)position.copy(bone.position);
+  a.throwGrip=null;a.throwGripWeight=1;
   applyWalk(a,player,mode,stationTime);
+  applyThrowStyle(a,player,mode,state,stationTime,releaseProgress);
   const top=player.top/200,kick=player.kick/200,pronation=THREE.MathUtils.clamp(top*Math.PI*.52+kick*Math.PI*.30,-1.55,1.55);
   a.forearm.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitY,pronation*.65));
   a.hand.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitY,pronation*.35));
@@ -80,15 +92,67 @@ export function poseAvatar(a,player,phase,state,stationTime){
   applyGaze(a,player,mode,state,stationTime);
   animateFace(a,mode,stationTime);
   applyCelebration(a,player,mode,state,stationTime);
+  if(a.throwGrip){
+    const natural=a.hand.localToWorld(grip.clone());
+    alignGrip(a,natural.lerp(a.throwGrip,a.throwGripWeight));
+  }
   a.group.updateWorldMatrix(true,true);
   a.held.copy(grip);a.hand.localToWorld(a.held);
   if(mode==='Release'){
     const target=new THREE.Vector3(player.release.x,player.release.y,-player.release.z);
-    const blend=a.held.clone().lerp(target,releaseProgress*releaseProgress);
-    alignGrip(a,blend);a.held.copy(grip);a.hand.localToWorld(a.held);a.releaseError=a.held.distanceTo(target);
+    a.releaseError=a.held.distanceTo(target);
   }
   // Fade a robot that would otherwise fill the follow camera and hide the bounce.
   return a.held;
+}
+
+function applyThrowStyle(a,player,mode,state,time,releaseProgress){
+  const flight=Math.max(0,time-state.releaseTime),style=throwStyle(player.powerRange||'full',mode,player.power,releaseProgress,flight);
+  const stamp=time-(a.styleTime??time);a.styleTime=time;
+  const walking=mode==='Aim'&&a.walkBlend>.01;
+  const wanted=style.stance*(walking?0:1);
+  if(mode!=='Aim'||a.stanceBlend===undefined||stamp<0||stamp>.5)a.stanceBlend=wanted;
+  else a.stanceBlend=THREE.MathUtils.damp(a.stanceBlend,wanted,14,Math.max(0,stamp));
+  const stance=a.stanceBlend;
+  if(!['Aim','Charging','Release','Flight'].includes(mode))return;
+  a.group.updateWorldMatrix(true,true);
+  const feet=['L','R'].map(side=>({side,point:worldPosition(a.bones[`foot.${side}`]),rotation:a.bones[`foot.${side}`].getWorldQuaternion(new THREE.Quaternion())}));
+  const rootRotation=a.group.getWorldQuaternion(new THREE.Quaternion());
+  a.bones.hips.position.y-=(.045*stance+Math.max(0,style.crouch-.045*style.stance));
+  a.bones.hips.position.z+=style.shift;
+  a.bones.chest.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitY,mode==='Aim'?-.12*stance:style.twist));
+  a.bones.chest.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(unitX,style.lean));
+  a.group.updateWorldMatrix(true,true);
+  const pole=new THREE.Vector3(0,0,1).applyQuaternion(rootRotation);
+  for(const foot of feet){
+    const sign=foot.side==='L'?1:-1;
+    foot.point.add(new THREE.Vector3(sign*.10*stance,0,sign*.12*stance).applyQuaternion(rootRotation));
+    plantLeg(a,foot.side,foot.point,pole,foot.rotation);
+  }
+  a.group.updateWorldMatrix(true,true);
+  if(mode==='Aim'){a.throwGrip=a.group.localToWorld(a.restGrip.clone());a.throwGripWeight=1-a.walkBlend;return;}
+  const launch=new THREE.Vector3(player.release.x,player.release.y,-player.release.z);
+  const wind=a.restGrip.clone().lerp(new THREE.Vector3(style.full?-.36:-.25,style.full?1.69:1.31,style.full?-.26:.22),THREE.MathUtils.smoothstep(player.power,0,1));
+  let target;
+  if(mode==='Charging')target=a.group.localToWorld(wind.clone());
+  else if(mode==='Release'){
+    target=a.group.localToWorld(wind.clone());
+    // A fast, continuous forward drive that lands exactly at the native release.
+    const drive=releaseProgress*releaseProgress*(3-2*releaseProgress);
+    target.lerp(launch,drive);
+  }else if(flight<1.1){
+    const follow=a.group.localToWorld(new THREE.Vector3(style.full?-.12:-.24,style.full?1.02:1.32,style.full?.49:.39));
+    target=launch.clone().lerp(follow,Math.min(1,flight/(style.full?.22:.16)));
+    const recover=THREE.MathUtils.smoothstep(flight,style.full?.35:.20,1.1);
+    a.throwGripWeight=1-recover;
+  }
+  if(target){
+    // Spin is applied after this pose. Re-solve the grip after those rotations
+    // below so even maximum spin cannot move the ball away from this path.
+    a.throwGrip=target;
+    const left=style.full?new THREE.Vector3(.30,1.15+.17*style.winding,.19+.20*style.winding):new THREE.Vector3(.27,1.10,.17);
+    celebrateArm(a,'L',worldPosition(a.bones['hand.L']).lerp(a.group.localToWorld(left),(style.full?.85:.35)*Math.min(1,style.winding+style.throwing)));
+  }
 }
 
 // Work in the sampled head frame, including the model, avatar heading and neck.

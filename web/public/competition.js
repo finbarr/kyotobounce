@@ -171,6 +171,7 @@ export function competitionUI({scene,send,cancel,notice,getGuestId,getLiveTime,g
  $('next-challenge').onclick=advanceCompleted;
  return {
   state,advanceCompleted,openReplay,
+  playbackRate(){return state.mode==='replay'?(state.replayPlaying?Number($('replay-speed').value):0):1;},
   scorePresentation(){return {score:state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore,attempt:state.mode==='replay'?state.replay?.attempt:scoreAttempt,time:state.mode==='replay'?state.replayTime:getLiveTime(),mode:state.mode,epoch:scoreEpoch};},
   dismissResult(){$('result-card').hidden=true;ranking.clear();feedback.reset();liveScore=null;scoreEpoch++;},
   message(m){
