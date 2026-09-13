@@ -8,6 +8,17 @@ integrated and verified. A launched agent is not a completed task. The coordinat
 reviews diffs and runtime evidence before integration. Feature machines never
 deploy to production.
 
+## Station audit — 2026-09-13
+
+The assets-v5 comparison identified **22 open station work packages**: existing
+K033, K035 and K036, plus K038–K056. See the current
+[reference audit](STATION-REFERENCE-AUDIT.md),
+[prioritized implementation queue](STATION-DETAIL-BACKLOG.md), and
+[12 inspected camera views](STATION-AUDIT-VIEWS.json).
+The queue leads with the separate 1F Central Gate Heart-in, mapped ground-floor
+frontages and entrances, then public routes and facade corrections. These are
+pending model changes. No machines were launched by this audit.
+
 ## Current state — 2026-09-12
 
 The current ground-floor and connection pass is deployed with `assets-v4`, release

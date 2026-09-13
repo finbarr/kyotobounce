@@ -68,7 +68,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
  }
  function updateSession(){
   const session=state.session;if(!session)return;if(session.busy)$('result-card').hidden=true;
-  $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?'SOLO SHOTS · SHARED HIGH SCORES':'Explore the station freely';
+  $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?'READY TO THROW · SHARED SCORES':'Explore the station freely';
   const changed=state.selected?.id!==session.challenge?.id||state.selected?.revision!==session.challenge?.revision;
   state.selected=session.challenge;
   if(changed){state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];renderBoard();$('result-card').hidden=true;}

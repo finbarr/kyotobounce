@@ -44,6 +44,7 @@ docs/*
 !docs/SHOT-PLAYBACK.md
 !docs/STATION-DETAIL-BACKLOG.md
 !docs/STATION-REFERENCE-AUDIT.md
+!docs/STATION-AUDIT-VIEWS.json
 tools/*
 !tools/assets.mjs
 !tools/asset-paths.mjs

@@ -1,0 +1,186 @@
+{
+  "date": "2026-09-13",
+  "source": "efe3144",
+  "assets": "assets-v5",
+  "layoutSha256": "b304c84aa1292e9e401c4abde9d305f754548d3b815fba8137802c9a2a385515",
+  "coordinateSystem": "Three.js world coordinates: native x and y, negated native z",
+  "width": 1280,
+  "height": 720,
+  "note": "Diagnostic views, not matched photographic registration. Renderer uses current station appearance; player and HUD omitted. The avatar contact-shadow helper is not architectural evidence.",
+  "views": [
+    {
+      "name": "garden-current",
+      "position": [
+        -156,
+        56.2,
+        20.4
+      ],
+      "target": [
+        -146,
+        55.3,
+        18
+      ],
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "02-great-stair",
+      "position": [
+        -72.3475413656327,
+        21.17136180701084,
+        -4.446848357668717
+      ],
+      "target": [
+        -113.1161574717448,
+        33.117228624532814,
+        21.920104571528174
+      ],
+      "fov": 66.20629060243228,
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "03-along-atrium",
+      "position": [
+        -70.921275,
+        21.235965,
+        1
+      ],
+      "target": [
+        52,
+        28,
+        1
+      ],
+      "fov": 65,
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "06-skyway",
+      "position": [
+        -61.616039,
+        46.85,
+        -2.326107
+      ],
+      "target": [
+        67.074397,
+        46.85,
+        -2.326107
+      ],
+      "fov": 65,
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "heart-in-current",
+      "position": [
+        -57,
+        9,
+        18
+      ],
+      "target": [
+        -50,
+        9,
+        18
+      ],
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "central-hall",
+      "position": [
+        0,
+        2,
+        -20
+      ],
+      "target": [
+        0,
+        7,
+        17
+      ],
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "east-shops",
+      "position": [
+        8,
+        1.7,
+        -5
+      ],
+      "target": [
+        25,
+        1.7,
+        3
+      ],
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "west-concourse",
+      "position": [
+        -34,
+        9,
+        13
+      ],
+      "target": [
+        -50,
+        8.9,
+        24
+      ],
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "south-hall",
+      "position": [
+        0,
+        2,
+        14
+      ],
+      "target": [
+        0,
+        2,
+        38
+      ],
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "inspect-east-court-descent",
+      "position": [
+        77.593644,
+        41.585,
+        -1.526107
+      ],
+      "target": [
+        105.139391,
+        34.62,
+        4.673893
+      ],
+      "fov": 65,
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    },
+    {
+      "name": "inspect-roof-photo-2021",
+      "position": [
+        -199.700845,
+        56.10612537629057,
+        19.773344
+      ],
+      "target": [
+        -182.636918,
+        53.00889846182478,
+        29.734748
+      ],
+      "fov": 41.44638830246452,
+      "status": "Unusable for current garden comparison; observed building edge instead of garden."
+    },
+    {
+      "name": "inspect-east-square-operator",
+      "position": [
+        99.139391,
+        36.27,
+        7.673893
+      ],
+      "target": [
+        77.074397,
+        45.2,
+        -2.326107
+      ],
+      "fov": 65,
+      "status": "Visually inspected diagnostic viewpoint; no metric registration claimed."
+    }
+  ]
+}
