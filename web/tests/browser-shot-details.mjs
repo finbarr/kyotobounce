@@ -52,7 +52,7 @@ try{
   await page.waitForTimeout(500);assert.ok((await state()).replayTime>replayStart+.25,'Scored shot replays with the detailed station');
   await page.getByRole('button',{name:'Pause',exact:true}).click();await page.waitForTimeout(100);const paused=(await state()).replayTime;
   await page.waitForTimeout(250);assert.equal((await state()).replayTime,paused,'Replay pause');
-  await page.locator('#replay-speed').selectOption('0.5');
+  assert.equal(await page.locator('#replay-speed').count(),0);
   await page.locator('#replay-scrub').focus();await page.keyboard.press('End');await page.waitForTimeout(100);
   assert.ok((await state()).replayTime>paused,'Replay scrubbing');
   await page.screenshot({path:`${out}/replay.png`});

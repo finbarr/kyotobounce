@@ -13,6 +13,14 @@ assert.ok(Math.abs(fly.camera.position.distanceTo(source.position)-18)<1e-6,'Dia
 fly.look(250,-140);const direction=fly.camera.getWorldDirection(new Vector3()),before=fly.camera.position.clone();fly.move(new Set(['KeyW']),.1);
 assert.ok(fly.camera.position.clone().sub(before).normalize().dot(direction)>.9999,'Forward follows the mouse view, including pitch');
 assert.deepEqual(source.position,saved.position);assert.deepEqual(source.quaternion.toArray(),saved.quaternion.toArray(),'Scouting cannot alter the robot camera');
+fly.enter(source);fly.move(new Set(['Space']),.1,{spaceAscends:false});
+assert.deepEqual(fly.camera.position,source.position,'Replay fast-forward must not also move the camera upward');
+fly.move(new Set(['KeyE','Space']),.1,{spaceAscends:false});
+assert.ok(Math.abs(fly.camera.position.y-source.position.y-1.8)<1e-6,'Replay ascent uses E even while holding fast-forward');
+fly.move(new Set(['KeyQ']),.1,{spaceAscends:false});
+assert.ok(fly.camera.position.distanceTo(source.position)<1e-6,'Replay descent uses Q');
+fly.move(new Set(['Space']),.1);
+assert.ok(Math.abs(fly.camera.position.y-source.position.y-1.8)<1e-6,'Space still ascends in the scout and designer');
 fly.leave();const stopped=fly.camera.position.clone();fly.move(new Set(['KeyW']),.1);assert.deepEqual(stopped,fly.camera.position);
 const disk={center:{x:0,y:0,z:0},radius:.5,surface:'floor'},course={start:disk,goal:disk,waypoints:[],scoring:'waypoint-v3'};
 assert.equal(designGeometry(course),designGeometry({...course,start:{...disk,normal:{x:0,y:1,z:0}}}));

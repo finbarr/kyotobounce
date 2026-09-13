@@ -5,11 +5,11 @@ export class FlyCamera {
  enter(source){this.camera.position.copy(source.position);this.camera.quaternion.copy(source.quaternion);this.camera.rotation.order='YXZ';this.camera.rotation.z=0;this.active=true;}
  leave(){this.active=false;}
  look(dx,dy){this.camera.rotation.y-=dx*.0025;this.camera.rotation.x=THREE.MathUtils.clamp(this.camera.rotation.x-dy*.0025,-Math.PI*.49,Math.PI*.49);}
- move(keys,dt){
+ move(keys,dt,{spaceAscends=true}={}){
   if(!this.active)return;
   const forward=new THREE.Vector3(0,0,-1).applyQuaternion(this.camera.quaternion),right=new THREE.Vector3(1,0,0).applyQuaternion(this.camera.quaternion);
   const direction=forward.multiplyScalar(Number(keys.has('KeyW'))-Number(keys.has('KeyS'))).addScaledVector(right,Number(keys.has('KeyD'))-Number(keys.has('KeyA')));
-  direction.y+=Number(keys.has('KeyE')||keys.has('Space'))-Number(keys.has('KeyQ')||keys.has('ControlLeft')||keys.has('ControlRight'));
+  direction.y+=Number(keys.has('KeyE')||(spaceAscends&&keys.has('Space')))-Number(keys.has('KeyQ')||keys.has('ControlLeft')||keys.has('ControlRight'));
   this.speed=keys.has('ShiftLeft')||keys.has('ShiftRight')?60:keys.has('AltLeft')||keys.has('AltRight')?4:18;
   this.camera.position.addScaledVector(direction.normalize(),this.speed*Math.min(.1,Math.max(0,dt)));
   this.camera.position.clamp(new THREE.Vector3(-240,-8,-240),new THREE.Vector3(240,150,240));this.camera.updateMatrixWorld();

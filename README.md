@@ -43,6 +43,8 @@ Open **http://127.0.0.1:4173/**. The first Unity import/build can take several m
 
 Precision throws use a compact arm motion. Robot power uses a wider staggered stance, a deeper wind-up and a forceful follow-through. Both release from the same authoritative launch point.
 
+Replays open in free camera: WASD flies, Q/E moves down/up, and Shift boosts speed. Click to capture the mouse or right-drag to look. Hold Space for 2× playback, including faster music and effects; release it to return to normal speed. Pause/Play and the timeline remain in the replay panel, and Recenter returns the camera to the shot. The camera also moves while playback is paused. Escape releases the mouse for the controls.
+
 Fast ball flight adds peripheral motion blur above 45 m/s, reaching full strength at 90 m/s and fading as the ball slows. The ball and interface stay readable; reduced-motion settings disable the effect, and replay playback speed scales it.
 
 ## Source and assets
