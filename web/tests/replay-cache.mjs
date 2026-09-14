@@ -1,3 +1,4 @@
+import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {createServer,get} from 'node:http';
 import {once} from 'node:events';
@@ -31,7 +32,8 @@ store.saveChallenge(course);const guest=store.guest();
 const poses=Array.from({length:3600},(_,i)=>({t:i/180,p:{x:Math.sin(i)*10,y:Math.cos(i)+2,z:i/40},q:{x:0,y:Math.sin(i),z:0,w:Math.cos(i)}}));
 const shot={type:'result',attempt:'viral',id:guest.id,challenge:course,playerName:'<script>name</script>',score:1000,success:true,surfaces:1,duration:20,poses,scoreFrames:[],thrower:{feet:{x:0,y:0,z:0},power:1},releaseTime:3,chargeTime:0};
 let reads=0;const prepare=store.db.prepare.bind(store.db);store.db.prepare=sql=>{if(sql.startsWith('SELECT replay FROM attempts'))reads++;return prepare(sql);};
-const server=createServer(async(req,res)=>{try{if(!await serveReplay(req,res,new URL(req.url,'http://localhost').pathname,store,'<title>Kyoto Bounce — Station Arcade</title><main>Viewer</main>')){res.writeHead(404);res.end();}}catch(error){res.writeHead(500);res.end(error.message);}});
+const shell=await readFile(new URL('../public/index.html',import.meta.url),'utf8');
+const server=createServer(async(req,res)=>{try{if(!await serveReplay(req,res,new URL(req.url,'http://localhost').pathname,store,shell)){res.writeHead(404);res.end();}}catch(error){res.writeHead(500);res.end(error.message);}});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const port=server.address().port;
 const request=(path,headers={},method='GET')=>new Promise((resolve,reject)=>{const req=get({hostname:'127.0.0.1',port,path,headers,method},res=>{const parts=[];res.on('data',p=>parts.push(p));res.on('end',()=>resolve({status:res.statusCode,headers:res.headers,body:Buffer.concat(parts)}));});req.on('error',reject);});
 try{

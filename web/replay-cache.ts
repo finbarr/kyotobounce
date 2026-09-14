@@ -32,7 +32,7 @@ export class ReplayCache{
   this.prune();this.remove(id);const replay=info??JSON.parse(json) as ReplayInfo;
   const body=Buffer.from('{"replay":'+json+'}');
   const title=`${replay.playerName||'Player'} · ${replay.score.toLocaleString('en-US')} PTS — Kyoto Bounce`;
-  const description=`Watch this shot on ${replay.challenge.name}. Orbit the station, slow it down, then try to beat it.`;
+  const description=`Watch this shot on ${replay.challenge.name}. Follow the ball, explore every angle, then try to beat it.`;
   const etag=`W/"${createHash('sha256').update(body).digest('hex')}"`;
   const entry:CachedReplay={body,challengeId:replay.challenge.id,etag,title,description,bytes:body.byteLength+2*(title.length+description.length+etag.length+id.length+replay.challenge.id.length),expiresAt:this.clock()+this.ttlMs,ready:Promise.resolve(),cached:false};
   if(entry.bytes>this.maxBytes||entry.bytes>this.maxEntryBytes){this.counters.bypasses++;return entry;}

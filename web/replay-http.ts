@@ -1,3 +1,4 @@
+import {socialPage} from './social-metadata.ts';
 import type {IncomingMessage,ServerResponse} from 'node:http';
 import type {Store} from './store.ts';
 
@@ -6,7 +7,6 @@ function acceptsEncoding(value:string|undefined,name:string){
  return (encodings.get(name)??(name==='identity'?(encodings.get('*')===0?0:1):encodings.get('*')??0))>0;
 }
 function matchesETag(header:string|undefined,etag:string){return (header||'').split(',').some(tag=>tag.trim()==='*'||tag.trim().replace(/^W\//,'')===etag.replace(/^W\//,''));}
-const escape=(text:string)=>text.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!));
 
 // Public replay routes deliberately have no worker/session dependency.
 export async function serveReplay(request:IncomingMessage,response:ServerResponse,path:string,store:Store,htmlShell:string):Promise<boolean>{
@@ -26,6 +26,6 @@ export async function serveReplay(request:IncomingMessage,response:ServerRespons
   headers['Content-Length']=String(body.byteLength);response.writeHead(200,headers);response.end(request.method==='HEAD'?undefined:body);return true;
  }
  const title=entry?.title||'Replay unavailable — Kyoto Bounce',description=entry?.description||'This replay could not be found.';
- const html=htmlShell.replace('<title>Kyoto Bounce — Station Arcade</title>',`<title>${escape(title)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">`);
+ const html=socialPage(htmlShell,{title,description,path:`/replay/${route[2]}`,unavailable:!entry});
  response.writeHead(entry?200:404,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Replay-Cache':status});response.end(request.method==='HEAD'?undefined:html);return true;
 }

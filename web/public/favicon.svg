@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Kyoto Bounce robot</title>
+  <rect width="64" height="64" rx="14" fill="#111a31"/>
+  <path d="M32 11v7" stroke="#ffd260" stroke-width="4" stroke-linecap="round"/>
+  <rect x="6" y="26" width="12" height="20" rx="5" fill="#e75439"/>
+  <rect x="46" y="26" width="12" height="20" rx="5" fill="#e75439"/>
+  <rect x="13" y="17" width="38" height="37" rx="10" fill="#f4e8ca"/>
+  <path d="M20 21h24" stroke="#e75439" stroke-width="4" stroke-linecap="round"/>
+  <rect x="19" y="29" width="26" height="18" rx="5" fill="#102d3b"/>
+  <path d="M24 35h3m10 0h3M28 41q4 3 8 0" fill="none" stroke="#a1efdb" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="52" cy="12" r="7" fill="#ffd260"/>
+  <path d="M48 9q4-2 6 1" fill="none" stroke="#fff4d1" stroke-width="2" stroke-linecap="round"/>
+</svg>

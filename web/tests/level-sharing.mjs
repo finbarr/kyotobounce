@@ -1,10 +1,12 @@
+import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {Store} from '../store.ts';
 import {serveLevel} from '../level-http.ts';
 import {levelIdFromPath,levelURL} from '../public/level-links.js';
+const shell=await readFile(new URL('../public/index.html',import.meta.url),'utf8');
 const store=new Store(':memory:');
-const server=createServer((req,res)=>{if(!serveLevel(req,res,new URL(req.url,'http://localhost').pathname,store,'<title>Kyoto Bounce — Station Arcade</title><script src="/game.js"></script>')){res.writeHead(404);res.end();}});
+const server=createServer((req,res)=>{if(!serveLevel(req,res,new URL(req.url,'http://localhost').pathname,store,shell)){res.writeHead(404);res.end();}});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin=`http://127.0.0.1:${server.address().port}`;
 try{
  const guest=store.guest(),disk={center:{x:0,y:0,z:0},radius:1,surface:'floor'};
