@@ -94,7 +94,7 @@ function setFly(active,capture=false){
  if(active!==fly.active){cancel();if(active)fly.enter(camera);else fly.leave();keys.clear();if(ui?.state.mode!=='replay')send('input',{x:0,z:0,yaw,pitch,top,kick,fast:false});}
  if(ui?.state.mode==='replay'){
   $('replay-recenter').setAttribute('aria-pressed',String(!fly.active));$('replay-free').setAttribute('aria-pressed',String(fly.active));
-  $('replay-status').textContent=fly.active?'Free camera · WASD fly · Q/E height · Shift boost · Right-drag to look · F to follow':'Following the ball · Right-drag to orbit · Scroll to zoom · Hold Space for 2×';
+  $('replay-status').textContent=fly.active?'Free camera · WASD fly · Q/E height · Shift boost · Right-drag to look · F to follow':'Mouse over scene to orbit · Click to capture · Esc for controls · Scroll to zoom · Hold Space for 2×';
  }
  document.body.classList.toggle('is-flying',fly.active);$('toggle-fly').setAttribute('aria-pressed',String(fly.active));$('toggle-fly').textContent=fly.active?'F · RETURN TO ROBOT':'F · SCOUT COURSE';$('fly-help').hidden=!fly.active;
  if(active&&capture)captureMouse();canvas.focus();
@@ -211,11 +211,11 @@ function cancel(){mobile?.reset();setFastForward(false);robotChargeQueued=false;
 function pointerLockFailed(error){
   if(error instanceof Error)console.warn('Mouse capture failed:',error.name,error.message);
   if(!lockRequested)return;
-  cancel();notice('Mouse capture was blocked. Click the game to try again, or open it in Chrome.',7000);
+  cancel();notice(ui?.state.mode==='replay'?'Mouse capture unavailable · Move over the scene to orbit':'Mouse capture was blocked. Click the game to try again, or open it in Chrome.',7000);
 }
 function captureMouse(){
   if(mobile?.active)return;
-  if(names?.active||briefing?.active||pointerLocked()||lockRequested||!loaded||(!workerReady&&ui.state.mode!=='replay')||(!fly.active&&!['play','design'].includes(ui.state.mode)))return;
+  if(names?.active||briefing?.active||pointerLocked()||lockRequested||!loaded||(!workerReady&&ui.state.mode!=='replay')||(!fly.active&&!['play','design','replay'].includes(ui.state.mode)))return;
   lockRequested=true;
   try{canvas.requestPointerLock()?.catch(pointerLockFailed);}catch{pointerLockFailed();}
 }
@@ -225,9 +225,9 @@ document.addEventListener('pointerlockchange',()=>{
   $('mouse-mode').textContent=pointerLocked()?'MOUSE':'CLICK TO AIM';
   if(pointerLocked()){
     // A menu, blur or Escape may have cancelled an asynchronous capture request.
-    if(!lockRequested||(!fly.active&&!['play','design'].includes(ui.state.mode))||(!workerReady&&ui.state.mode!=='replay')){cancel();return;}
+    if(!lockRequested||(!fly.active&&!['play','design','replay'].includes(ui.state.mode))||(!workerReady&&ui.state.mode!=='replay')){cancel();return;}
     lockRequested=false;lastPointer=null;if(!fly.active&&!flightControls())centerOnAim();canvas.focus();
-    explicitMouseRelease=false;notice('Mouse captured · L / Esc for levels',3000);
+    explicitMouseRelease=false;notice(ui.state.mode==='replay'?'Move mouse to orbit · Esc for replay controls':'Mouse captured · L / Esc for levels',3000);
   }else if(resultMouseRelease){resultMouseRelease=false;explicitMouseRelease=false;lockRequested=false;lastPointer=null;rightDrag=false;}
   else{const escaped=!explicitMouseRelease;explicitMouseRelease=false;cancel();if(escaped&&!document.hidden&&document.hasFocus()&&!briefing?.blocked&&!['Release','Flight'].includes(shotTimeline?.phase||snapshot?.phase))openLevelMenu();}
 });
@@ -248,7 +248,10 @@ canvas.addEventListener('mousedown',event=>{
     if(event.button===0)captureMouse();return;
   }
   // The first click only captures the cursor; it must never release a weak shot.
-  if(['play','design'].includes(ui.state.mode)&&!pointerLocked()){if(event.button===0)captureMouse();return;}
+  if(!pointerLocked()){
+    if(event.button===0&&['play','design','replay'].includes(ui.state.mode)){captureMouse();return;}
+    if(['play','design'].includes(ui.state.mode))return;
+  }
   if(event.button===2){rightDrag=true;lastPointer={x:event.clientX,y:event.clientY};}
   if(event.button===0)startCharge();
 });
@@ -263,7 +266,6 @@ document.addEventListener('mousemove',event=>{
   if(names?.active||briefing?.blocked)return;
   const locked=pointerLocked();
   if(fly.active){if(locked)fly.look(event.movementX,event.movementY);else if(rightDrag&&lastPointer)fly.look(event.clientX-lastPointer.x,event.clientY-lastPointer.y);lastPointer={x:event.clientX,y:event.clientY};return;}
-  if(!locked&&ui.state.mode==='replay'&&!rightDrag)return;
   if(!locked&&(['play','design'].includes(ui.state.mode)||(event.target!==canvas&&!rightDrag)))return;
   const dx=locked?event.movementX:lastPointer?event.clientX-lastPointer.x:0,dy=locked?event.movementY:lastPointer?event.clientY-lastPointer.y:0;
   lastPointer={x:event.clientX,y:event.clientY};
@@ -533,7 +535,7 @@ function animate(now){
   if(inFlight!==ballCameraActive){
     if(inFlight){
       aimOrbit={azimuth,elevation,distance,manualCamera};
-      if(!flightManual||replaying){
+      if(!flightManual){
         // Continue the outgoing view, including its launch pitch. Never flatten
         // the view on the first Flight frame.
         const heading=aimCamera.getWorldDirection(new THREE.Vector3());
