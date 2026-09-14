@@ -150,11 +150,13 @@ function handleMessage(m,playback=false){
     else if(shotPlayback.active)return;
   }
   if(m.type==='state'&&checkStationVersion(m.layout))return;
+  // A native cancellation ends the buffered shot too (including out-of-bounds design balls).
+  if(shotPlayback.cancelForNotice(m,guestId)){shotTimeline=null;flightPending=false;returnRequested=true;setFastForward(false);}
   ui?.message(m);names?.message(m);
   if(m.type==='result'){setFastForward(false);lastResultAttempt=m.attempt;keys.clear();if(pointerLocked()){resultMouseRelease=true;document.exitPointerLock();}}
   if(m.type==='result'&&ui?.state.mode==='play'&&m.saved&&m.score>0)pendingRobotResult=m;
   if(m.type==='selected'||m.type==='replay')pendingRobotResult=null;
-  if(m.type==='session'){if(requestedLevel&&!m.restoring){const level=requestedLevel;requestedLevel=null;send('select-challenge',{challengeId:level});}const level=`${m.challenge?.id||''}:${m.challenge?.revision||''}`;if(level!==powerLevel){powerLevel=level;setPowerRange(m.challenge?.hint?.powerRange||'full',true);}}
+  if(m.type==='session'){if(requestedLevel&&!m.restoring){const level=requestedLevel;requestedLevel=null;send('select-challenge',{challengeId:level});}const level=`${m.challenge?.id||''}:${m.challenge?.revision||''}`;if(level!==powerLevel){powerLevel=level;if(!m.designing)setPowerRange(m.challenge?.hint?.powerRange||'full',true);}}
   if(m.type==='welcome'){
     const returning=!!guestId;guestId=m.sessionId;identityId=m.id;localStorage.setItem('kyoto-guest-id',m.id);localStorage.setItem('kyoto-guest',m.token);$('nickname').value=m.name;
     // Input stays disabled until a fresh authoritative state arrives.
@@ -229,7 +231,7 @@ document.addEventListener('pointerlockchange',()=>{
   }else if(resultMouseRelease){resultMouseRelease=false;explicitMouseRelease=false;lockRequested=false;lastPointer=null;rightDrag=false;}
   else{const escaped=!explicitMouseRelease;explicitMouseRelease=false;cancel();if(escaped&&!document.hidden&&document.hasFocus()&&!briefing?.blocked&&!['Release','Flight'].includes(shotTimeline?.phase||snapshot?.phase))openLevelMenu();}
 });
-function recall(){setFastForward(false);const settle=cancelAvatarCelebration(avatars.get(guestId));if(settle){clearTimeout(robotRetryTimer);robotRetryTimer=setTimeout(recall,settle);return;}pendingRobotResult=null;if(ui?.state.mode==='replay'){$('close-replay').click();return;}if(!send('recall')){notice('Reconnect before recalling this shot.');return;}shotPlayback.clear(true);shotTimeline=null;stopChargeSound();ui.dismissResult();chargeMeter.reset();flightPending=false;returnRequested=true;restoreThrowAim();trailCount=0;}
+function recall(){if(ui?.state.mode==='design'){ui.retryDesign();return;}setFastForward(false);const settle=cancelAvatarCelebration(avatars.get(guestId));if(settle){clearTimeout(robotRetryTimer);robotRetryTimer=setTimeout(recall,settle);return;}pendingRobotResult=null;if(ui?.state.mode==='replay'){$('close-replay').click();return;}if(!send('recall')){notice('Reconnect before recalling this shot.');return;}shotPlayback.clear(true);shotTimeline=null;stopChargeSound();ui.dismissResult();chargeMeter.reset();flightPending=false;returnRequested=true;restoreThrowAim();trailCount=0;}
 function syncSpin(){top=Number($('top').value);kick=Number($('kick').value);$('top-value').textContent=top;$('kick-value').textContent=kick;}
 for(const id of ['top','kick'])$(id).addEventListener('input',syncSpin);
 $('clear-spin').onclick=()=>{$('top').value=0;$('kick').value=0;syncSpin();canvas.focus();};
@@ -243,16 +245,12 @@ canvas.addEventListener('mousedown',event=>{
   canvas.focus();
   if(fly.active){
     if(event.button===2){rightDrag=true;lastPointer={x:event.clientX,y:event.clientY};return;}
-    if(event.button===0&&ui.state.mode==='editor'&&ui.state.placing){
-      const point=pointerLocked()?new THREE.Vector2():new THREE.Vector2(event.clientX/innerWidth*2-1,1-event.clientY/innerHeight*2);caster.setFromCamera(point,fly.camera);
-      ui.pointer(event,{origin:{x:caster.ray.origin.x,y:caster.ray.origin.y,z:-caster.ray.origin.z},direction:{x:caster.ray.direction.x,y:caster.ray.direction.y,z:-caster.ray.direction.z}});return;
-    }
     if(event.button===0)captureMouse();return;
   }
   // The first click only captures the cursor; it must never release a weak shot.
   if(['play','design'].includes(ui.state.mode)&&!pointerLocked()){if(event.button===0)captureMouse();return;}
   if(event.button===2){rightDrag=true;lastPointer={x:event.clientX,y:event.clientY};}
-  if(event.button===0){caster.setFromCamera(new THREE.Vector2(event.clientX/innerWidth*2-1,1-event.clientY/innerHeight*2),camera);const ray={origin:{x:caster.ray.origin.x,y:caster.ray.origin.y,z:-caster.ray.origin.z},direction:{x:caster.ray.direction.x,y:caster.ray.direction.y,z:-caster.ray.direction.z}};if(!ui.pointer(event,ray))startCharge();}
+  if(event.button===0)startCharge();
 });
 document.addEventListener('mouseup',event=>{if(mobile?.active)return;if(event.button===0)release();if(event.button===2)rightDrag=false;});
 canvas.addEventListener('pointercancel',cancel);
@@ -279,7 +277,6 @@ document.addEventListener('mousemove',event=>{
   }else if(ui.state.mode==='replay'){
     azimuth-=dx*.005;elevation=THREE.MathUtils.clamp(elevation+dy*.004,-.95,1.25);manualCamera=true;
   }
-  // The designer retains a free cursor for clicking its start and goal circles.
 });
 canvas.addEventListener('wheel',e=>{e.preventDefault();if(fly.active)return;distance=THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.001),.65,12);},{passive:false});
 document.addEventListener('pointerdown',e=>{if(e.target!==canvas&&!speedIndicator.contains(e.target)&&!mobile?.owns(e.target)&&(chargeMeter.charging||pointerLocked()||lockRequested))cancel();},true);
@@ -293,6 +290,8 @@ window.addEventListener('keydown',e=>{
   if(briefing?.blocked)return;
   if(levelMenuOpen()){if(e.code==='Escape'){e.preventDefault();closeLevelMenu();}else ui.navigateLevels(e);return;}
   if(editing)return;
+  if(!modified&&['design','editor'].includes(ui.state.mode)&&e.code==='Escape'){e.preventDefault();cancel();ui.exitDesign();return;}
+  if(!modified&&ui.state.mode==='editor'&&e.code==='KeyR'){e.preventDefault();if(!e.repeat)ui.retryDesign();return;}
   if(!modified&&e.code==='KeyR'&&['play','design'].includes(ui.state.mode)){e.preventDefault();if(!e.repeat){recall();canvas.focus();}return;}
   if(!modified&&e.code==='KeyN'&&ui.state.mode==='play'){e.preventDefault();if(!e.repeat)ui.advanceCompleted();return;}
   if(!modified&&e.code==='Space'&&!e.repeat&&ui.advanceCompleted()){e.preventDefault();return;}
@@ -418,7 +417,7 @@ mobile=mobileControls({canvas,cancel,charge:startCharge,release,recall,
   else{yaw=THREE.MathUtils.euclideanModulo(yaw+dx*.22+180,360)-180;pitch=THREE.MathUtils.clamp(pitch-dy*.18,-65,80);centerOnAim();}
  },
  zoom:ratio=>{if(!fly.active)distance=THREE.MathUtils.clamp(distance*ratio,.65,12);},
- tap:(x,y)=>{if(ui.state.mode!=='editor'||!ui.state.placing)return;caster.setFromCamera(new THREE.Vector2(x/innerWidth*2-1,1-y/innerHeight*2),camera);ui.pointer({}, {origin:{x:caster.ray.origin.x,y:caster.ray.origin.y,z:-caster.ray.origin.z},direction:{x:caster.ray.direction.x,y:caster.ray.direction.y,z:-caster.ray.direction.z}});},
+
  fly:()=>{if(ui.state.mode==='replay'&&fly.active)$('replay-recenter').click();else setFly(!fly.active);},
  speed:()=>{sound.unlock();setFastForward(!fastForwardHeld);}
 });
@@ -450,7 +449,7 @@ function animate(now){
   if(heatKey!==heatPresentationKey||(heatPresentationTime!==null&&scorePresentation.time<heatPresentationTime-.0001)){trailCount=0;trailGeometry.setDrawRange(0,0);heatPresentationKey=heatKey;}heatPresentationTime=scorePresentation.time;
   const timeline=ui.timeline()||renderTimeline(now),snapshot=timeline.after,previous=timeline.before;
   const p=replaying?snapshot?.players[0]:snapshot?.players.find(p=>p.id===(snapshot?.owner||guestId)),phase=timeline.phase,alpha=timeline.alpha;
-  mobile.update({mode:ui.state.mode,placing:!!ui.state.placing,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked,charging:chargeMeter.charging,fastForward:fastForwardHeld,resultVisible:!$('result-card').hidden});
+  mobile.update({mode:ui.state.mode,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked,charging:chargeMeter.charging,fastForward:fastForwardHeld,resultVisible:!$('result-card').hidden});
   speedIndicator.hidden=(!replaying&&phase!=='Flight')||briefing.blocked;speedIndicator.disabled=replaying&&!ui.state.replayPlaying;
   speedIndicator.dataset.rate=String(presentationRate);speedIndicator.dataset.audioRate=String(sound.state.playbackRate);speedIndicator.dataset.musicBpm=String(sound.state.bpm);
   if(speedIndicator.dataset.active!==String(presentationRate===2)||speedIndicator.dataset.touch!==String(mobile.active)){speedIndicator.dataset.active=String(presentationRate===2);speedIndicator.dataset.touch=String(mobile.active);$('shot-speed-label').textContent=presentationRate===2?'⏩ 2× FAST FORWARD':mobile.active?'TAP · 2× SPEED':'HOLD SPACE · 2×';$('shot-speed-help').textContent=presentationRate===2?'RELEASE SPACE / CLICK FOR NORMAL':'OR CLICK TO FAST FORWARD';speedIndicator.setAttribute('aria-pressed',String(presentationRate===2));}
@@ -503,7 +502,7 @@ function animate(now){
     if(phase!==lastPhase){if(phase==='Flight'){trailCount=0;}if(phase==='Aim'){trailCount=0;trailGeometry.setDrawRange(0,0);}if(phase==='Result'&&!replaying&&ui.state.mode==='play')notice('Score locked · R to retry · Esc for replay and menus');lastPhase=phase;}
     $('flight-label').textContent=phase==='Result'?'BALL AT REST':snapshot.diagnostics?.supported?'STILL ROLLING':'IN FLIGHT';
     $('throw-panel').hidden=inFlight;$('flight-panel').hidden=!inFlight||!!ui.state.selected;$('surfaces').textContent=snapshot.surfaces;
-    $('phase-label').textContent=phase==='Charging'?'WINDING UP':phase==='Release'?'RELEASING':ui.state.selected?'READY TO THROW':'FREE EXPLORATION';
+    $('phase-label').textContent=phase==='Charging'?'WINDING UP':phase==='Release'?'RELEASING':ui.state.mode==='design'?'DESIGN BALL':ui.state.selected?'READY TO THROW':'FREE EXPLORATION';
     const power=chargeMeter.sample(now,phase);
     const model=ui.state.selected?.throwModel||THROW_MODEL,speed=throwSpeed(power,powerRange,model),maximum=throwSpeed(1,powerRange,model);
     $('power-fill').style.width=`${power*100}%`;

@@ -16,6 +16,13 @@ for(let i=1;i<=300;i++){
  if(c)chunks.push(c);
 }
 assert.ok(chunks.length<60);assert.ok(chunks.at(-1).complete);
+const cancelledDesign=new ShotPlayback();for(const chunk of chunks)cancelledDesign.accept(chunk,0);
+assert.equal(cancelledDesign.cancelForNotice({type:'notice',id:'other',message:'Shot recalled'},'designer'),false);
+assert.equal(cancelledDesign.active,true,'Another session cannot cancel this buffered shot');
+assert.equal(cancelledDesign.cancelForNotice({type:'notice',id:'designer',message:'Ball left the station'},'designer'),true);
+assert.equal(cancelledDesign.active,false,'A native cancellation must unfreeze the browser even without a result');
+for(const chunk of chunks)cancelledDesign.accept(chunk,100);
+assert.equal(cancelledDesign.active,false,'Late chunks cannot bring an abandoned design shot back');
 assert.equal(chunks[1].frames[0].challenge,undefined,'Repeated course metadata is shared by the chunk');
 const playback=new ShotPlayback();for(const c of chunks)playback.accept(c,0);
 playback.result({type:'result',attempt:'a',score:300});

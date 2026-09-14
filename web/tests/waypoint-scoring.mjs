@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {ComboTracker,scoreAttempt} from '../scoring.ts';
 import {Store} from '../store.ts';
 import {Competition} from '../competition.ts';
+import {designGeometry} from '../public/design-geometry.js';
 const p=(x,y=0,z=0)=>({x,y,z}),q={x:0,y:0,z:0,w:1};
 const start={center:p(0),radius:.75,surface:'floor'},goal={center:p(20),radius:1,surface:'floor'};
 const targets=Array.from({length:3},(_,i)=>({id:`w${i}`,center:p(i),normal:p(0,1),radius:.5,surface:'floor'}));
@@ -57,11 +58,13 @@ const store=new Store(':memory:');try{
  await assert.rejects(game.command(member,{type:'place',slot:'waypoint',origin:p(0),direction:p(0,-1),radius:.5}),/does not support/);
  await assert.rejects(game.command(member,{type:'release',waypointHits:hits}),/intent only/);
  worker.capabilities=['waypoint-v3'];
- const save={type:'save-challenge',name:'Targets',start,goal:null,waypoints:targets,scoring:'waypoint-v3'};
+ const save={type:'save-challenge',name:'Targets',start,goal:null,waypoints:targets,scoring:'waypoint-v3',designProof:'native-proof'};
+ await assert.rejects(game.command(member,save),/Record a design ball/);
+ member.designProof={token:'native-proof',geometry:designGeometry(save),hint:{yaw:0,pitch:15,top:0,kick:0,holdMs:100,powerRange:'precision'}};
  await assert.rejects(game.command(member,{...save,waypoints:[targets[0],targets[0]]}),/unique/);
  await assert.rejects(game.command(member,{...save,waypoints:[]}),/at least one/);
  const saved=await game.command(member,save);assert.equal(saved.challenge.goal,null);assert.equal(saved.challenge.waypoints.length,3);
- store.saveChallenge({...c,id:'required-route',requiredSurface:'wall'});const revised=await game.command(member,{...save,editId:'required-route'});assert.equal(revised.challenge.requiredSurface,'wall','Editing a course retains its required route');
+ store.saveChallenge({...c,id:'required-route',requiredSurface:'wall'});const revised=await game.command(member,{...save,editId:'required-route'});assert.equal(revised.challenge.requiredSurface,undefined,'A recorded replacement uses its captured route, without an old manual route requirement');
  const guest=store.guest();member.guest=guest;member.selected=c;game.members.set(member.id,member);
  for(const destinationReached of [false,true]){
   const course={...c,goal};store.db.prepare('UPDATE challenges SET body=? WHERE id=?').run(JSON.stringify(course),c.id);

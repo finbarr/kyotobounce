@@ -198,3 +198,14 @@ body.is-designer:not(.mobile-ui)>#fly-control{left:calc((100vw - 340px)/2);max-w
  #replay-view .board-heading{margin-bottom:6px}#replay-view .special-label,#replay-view #special-track{display:none}
  #replay-view #combo-total{margin:4px 0;font-size:28px}#replay-transport{padding:8px}
 }
+
+/* The recorder stays visible during a shot; the review has no placement tools. */
+body.is-design-shot:not(.mobile-ui)>#competition{display:block;width:260px;pointer-events:none;border-top-color:#70ebcf}
+body.is-design-shot #design-back{pointer-events:auto}
+body.is-design-shot #design-shot-view h2{font-size:23px}
+body.is-design-shot #design-shot-status{color:#c9fff1}
+#design-target-list{display:grid;gap:6px;margin:10px 0;max-height:180px;overflow:auto}
+#design-target-list button{text-align:left;color:#d2c5ff}
+#design-target-list [aria-pressed=true]{border-color:#bca3ff;background:#8870bb30}
+#launch-design-ball{margin-top:12px}
+#design-review-status{color:#bde8df!important}

@@ -80,17 +80,9 @@ button{font-family:inherit;border-radius:0;border:1px solid #e0e7ee35;background
   body:not(.is-playing) #competition{max-height:calc(100vh - 390px)}
 }
 
-/* Optional waypoint authoring and collection. */
-#destination-toggle{display:flex;align-items:center;gap:8px;margin:16px 0;color:#ffe3a2}
-#waypoint-editor{margin:14px 0;padding-top:12px;border-top:1px solid #ffffff25}
-#waypoint-list{max-height:170px;overflow-y:auto;margin:9px 0}
-.waypoint-row{display:flex;gap:5px;margin:5px 0}.waypoint-row button:first-child{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
-.waypoint-row button[aria-pressed=true]{border-color:#b599ff;background:#61508666}
-#waypoint-editor p{font-size:12px;color:#c5badf}
 #editor-view{max-height:calc(100dvh - 120px);overflow-y:auto}
 #result-card[data-rank=chain] .result-rank{color:#b59aff}
 @media(max-width:600px){#editor-view{max-height:calc(100dvh - 90px)}}
-#challenge-scoring{width:100%;padding:9px 6px;background:#263247;color:#f3eee2;border:1px solid #a58aff88;font:11px monospace}
 
 /* Leave the record winner visible beside the result breakdown. */
 .is-robot-result #result-card{left:24px;bottom:62px;transform:none;width:min(350px,calc(100vw - 48px))}

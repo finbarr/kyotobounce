@@ -125,12 +125,24 @@ export class Competition {
   }
   if(m.type==='design-start'){
    if(Object.keys(m).some(k=>!['type','start'].includes(k)))throw new Error('Send a start zone only; the route is recorded by physics');
-   if(member.attempt||member.selecting)throw new Error('Finish or recall your shot before recording a route');
+   if(member.selecting||(member.attempt&&!member.designing))throw new Error('Finish or recall your shot before recording a route');
    if(!this.worker.capabilities.includes('design-ball-v1'))throw new Error('The physics worker needs an update for the design ball');
    const start=m.start?disk(m.start):null;
-   member.selecting=true;try{await this.worker.request({type:'design-start',id,start});}finally{member.selecting=false;}
+   member.selecting=true;try{
+    if(member.designing){this.clearAttempt(member);this.worker.send({type:'recall',id});}
+    await this.worker.request({type:'design-start',id,start});
+   }finally{member.selecting=false;}
    member.selected=null;member.lastResult=undefined;member.designProof=undefined;member.designing=true;this.remember(member);this.sync(member);
    return {type:'design-ready'};
+  }
+  if(m.type==='design-cancel'){
+   if(member.selecting||(member.attempt&&!member.designing))throw new Error('Finish your active shot first');
+   member.selecting=true;try{
+    this.clearAttempt(member);this.worker.send({type:'recall',id});
+    await this.worker.request({type:'select',id,challenge:null});
+   }finally{member.selecting=false;}
+   member.designing=false;member.designProof=undefined;member.lastResult=undefined;member.selected=null;this.remember(member);this.sync(member);
+   return {type:'design-cancelled'};
   }
   if(m.type==='place'){
    if(!['start','goal','waypoint'].includes(m.slot))throw new Error('Choose start, destination or waypoint');if(m.slot==='waypoint')this.requireWaypoints();validateVector(m.origin);validateVector(m.direction);
@@ -138,6 +150,8 @@ export class Competition {
    const r=await this.worker.request({type:'place',id,slot:m.slot,origin:m.origin,direction:m.direction,radius:m.radius});return {type:'placement',slot:m.slot,disk:r.disk};
   }
   if(m.type==='save-challenge'){
+   const proof=member.designProof;
+   if(!proof||m.designProof!==proof.token)throw new Error('Record a design ball before saving a level. The recorded route changed or is unavailable.');
    if(typeof m.name!=='string'||!m.name.trim()||m.name.length>64)throw new Error('Use a level name of 1–64 characters');
    const scoring=m.scoring===WAYPOINT_SCORING?WAYPOINT_SCORING:SCORING_VERSION;
    if(m.scoring!==undefined&&!ACTIVE_SCORING.includes(m.scoring))throw new Error('Unsupported scoring rules');
@@ -147,12 +161,9 @@ export class Competition {
    await this.worker.request({type:'validate',id,start,goal,waypoints,scoring});
    const old=m.editId?this.store.challenge(String(m.editId)):null;
    if(m.editId&&(!old||old.creator!==member.guest.id))throw new Error('Only the creator can revise a level');
-   const challenge:Challenge={id:old?.id||randomUUID(),revision:(old?.revision||0)+1,name:m.name.trim(),creator:member.guest.id,start,goal,...(old?.requiredSurface?{requiredSurface:old.requiredSurface}:{}),...(waypoints?{waypoints}:{}),layout:this.layout,physics:this.physics,throwModel:THROW_MODEL,scoring};
-   if(m.designProof!==undefined){
-    const proof=member.designProof;
-    if(!proof||m.designProof!==proof.token||designGeometry(challenge)!==proof.geometry)throw new Error('The recorded route changed. Save it as a manual course or record a new design shot.');
-    challenge.hint=proof.hint;
-   }
+   const challenge:Challenge={id:old?.id||randomUUID(),revision:(old?.revision||0)+1,name:m.name.trim(),creator:member.guest.id,start,goal,...(waypoints?{waypoints}:{}),layout:this.layout,physics:this.physics,throwModel:THROW_MODEL,scoring};
+   if(designGeometry(challenge)!==proof.geometry)throw new Error('The recorded route changed. Throw another design ball to change the course.');
+   challenge.hint=proof.hint;
    this.store.saveChallenge(challenge);this.publish(this.catalog());return {type:'saved-challenge',challenge};
   }
   if(m.type==='select-challenge'){

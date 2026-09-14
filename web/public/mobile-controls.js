@@ -21,7 +21,7 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
  $('mobile-levels').onclick=()=>panel(menu==='levels'?'':'levels');$('mobile-settings').onclick=()=>panel(menu==='settings'?'':'settings');$('mobile-close').onclick=()=>panel('');
  $('mobile-scout').onclick=()=>{panel('');fly();};$('mobile-cancel').onclick=()=>{input.reset();cancel();};$('mobile-speed').onclick=speed;$('mobile-recall').onclick=recall;
  $('mobile-boost').onclick=()=>{boost=!boost;movement.fast=boost;$('mobile-boost').setAttribute('aria-pressed',String(boost));};
- for(const id of ['place-start','place-goal','add-waypoint','replace-waypoint','fly-start','fly-finish','launch-design-ball','design-back','close-editor','explore','show-overview','use-hint'])$(id)?.addEventListener('click',()=>{if(active)panel('');});
+ for(const id of ['fly-start','fly-finish','launch-design-ball','design-back','close-editor','explore','show-overview','use-hint'])$(id)?.addEventListener('click',()=>{if(active)panel('');});
  document.addEventListener('keydown',e=>{if(active&&menu&&e.code==='Escape'){e.preventDefault();panel('');}});
  return {
   get active(){return active;},get movement(){return movement;},get menu(){return menu;},viewport:()=>viewport&&state.resultVisible?{...viewport,height:Math.max(40,Math.min(viewport.height,resultTop-viewport.y-12))}:viewport,
@@ -37,7 +37,7 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
    if(state.blocked&&menu)panel('');
    document.body.classList.toggle('mobile-blocked',!!state.blocked);document.body.classList.toggle('mobile-flight',['Release','Flight'].includes(state.phase));
    const playing=['play','design'].includes(state.mode),flying=state.fly;
-   $('mobile-tools').hidden=state.mode==='replay'||state.blocked;$('mobile-levels').textContent=state.mode==='editor'?'Designer':'Levels';$('mobile-settings').disabled=!playing||['Release','Flight'].includes(state.phase)||state.phase==='Result'&&state.resultVisible;$('mobile-scout').disabled=state.mode==='editor'||['Charging','Release','Flight'].includes(state.phase);$('mobile-scout').setAttribute('aria-pressed',String(flying));$('mobile-scout').textContent=state.mode==='editor'?'Flying':flying?'Return':'Scout';
+   $('mobile-tools').hidden=state.mode==='replay'||state.blocked;$('mobile-levels').textContent=state.mode==='editor'?'Review':state.mode==='design'?'Design ball':'Levels';$('mobile-settings').disabled=!playing||['Release','Flight'].includes(state.phase)||state.phase==='Result'&&state.resultVisible;$('mobile-scout').disabled=state.mode==='editor'||['Charging','Release','Flight'].includes(state.phase);$('mobile-scout').setAttribute('aria-pressed',String(flying));$('mobile-scout').textContent=state.mode==='editor'?'Flying':flying?'Return':'Scout';
    const controls=$('mobile-controls'),parent=state.mode==='replay'?$('replay-stage'):host;if(controls.parentElement!==parent)parent.append(controls);
    controls.hidden=!!menu||state.blocked||!state.ready||state.mode==='replay'&&!flying||state.phase==='Result'&&state.resultVisible&&!flying;
    $('mobile-move').hidden=!flying&&['Release','Flight','Result'].includes(state.phase);
@@ -46,7 +46,7 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
    $('mobile-throw').setAttribute('aria-label',state.charging?'Release to throw':'Hold to charge, release to throw');$('mobile-throw').dataset.charging=String(state.charging);$('mobile-cancel').hidden=!state.charging;
    $('mobile-recall').hidden=flying||!['Release','Flight'].includes(state.phase)||!playing;$('mobile-speed').hidden=flying||state.phase!=='Flight'||!playing;$('mobile-speed').setAttribute('aria-pressed',String(state.fastForward));
    $('mobile-height').hidden=!flying;$('mobile-boost').hidden=!flying;
-   const hint=state.mode==='editor'&&state.placing?'Tap a surface to place · Drag to look':flying?'Drag to look · Stick to fly · Up / Down for height':state.phase==='Flight'?'Drag to orbit · Pinch to zoom':state.mode==='editor'?'Tap a surface to place · Drag to look':'Drag to aim · Hold THROW, release to shoot';if($('mobile-hint').textContent!==hint)$('mobile-hint').textContent=hint;
+   const hint=flying?'Drag to look · Stick to fly · Up / Down for height':state.phase==='Flight'?(state.mode==='design'?'Recording design ball · Drag to orbit · 2× for faster playback':'Drag to orbit · Pinch to zoom'):state.mode==='editor'?'Review the recorded route, name it and save':'Drag to aim · Hold THROW, release to shoot';if($('mobile-hint').textContent!==hint)$('mobile-hint').textContent=hint;
   }
  };
 }

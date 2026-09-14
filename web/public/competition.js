@@ -11,8 +11,8 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  const feedback=arcadeFeedback(sound);
  const host=document.createElement('aside');host.id='competition';host.innerHTML=`
  <div id="course-view"><div class="panel-top"><span class="eyebrow">STAGE SELECT / 選択</span><button id="new-challenge">＋ Create</button></div><h2 id="course-title">PICK YOUR LINE.</h2><div id="turn-status"></div><label class="campaign-picker" id="campaign-picker" hidden><span id="campaign-count"></span><select id="campaign-chapter" aria-label="Campaign chapter"></select></label><div id="course-list"></div><div class="actions"><button id="explore">Free exploration</button></div><div id="challenge-detail" hidden><p id="challenge-description"></p><button id="show-overview">◎ View course overview</button><button id="use-hint" hidden>Set suggested aim <kbd>H</kbd></button><p id="hint-note"></p><div id="timing-hint" hidden><span class="eyebrow">ESCALATOR RELEASE TIMING</span><div class="timing-track"><i id="timing-window"></i><b id="timing-cursor"></b></div><p id="timing-caption"></p></div><div class="actions"><button id="share-challenge">Copy level link ↗</button><button id="edit-challenge" hidden>Revise</button></div><details id="score-guide"><summary>HOW TO SCORE</summary><p><strong>10,000 base × (1 + 0.5 per distinct bank) × landing accuracy.</strong> Banks add to the multiplier; impact speed does not multiply it.</p><p>Keep 100% inside the gold bullseye. The outer rings show 75%, 50% and 25%, fading to zero at the edge. Height counts too. Tagging the target guarantees 25% even if it rolls out.</p><p>Spaced banks count once per surface; a flight of treads counts as one. Movement adds 100 points per second outside every multiplier. Waiting and spinning in place add nothing. Banks freeze at the first target hit. A far miss still banks its movement points.</p><p>The score locks only when the ball stops moving and spinning. Recall forfeits the shot.</p></details></div></div>
- <div id="editor-view" hidden><div class="panel-top"><span class="eyebrow">CREATE A CHALLENGE</span><button id="close-editor">✕</button></div><h2>BUILD A STAGE.</h2><div class="designer-modes" role="group" aria-label="Designer mode"><button id="design-manual" aria-pressed="true">1 · Place by hand</button><button id="design-record" aria-pressed="false">2 · Design ball</button></div><div id="design-ball-intro" hidden><p>Walk to your launch spot, then throw. Real banks become waypoints; a clear landing can become the finish. Your existing start is used if you placed one.</p><button id="launch-design-ball">Walk &amp; throw a design ball →</button></div><p id="design-proof" role="status" hidden></p><div class="actions"><button id="fly-start">Fly to start</button><button id="fly-finish">Fly to finish</button></div><label class="field">Scoring<select id="challenge-scoring"><option value="waypoint-v3">Waypoint chain · optional destination</option><option value="combo-v7">Classic · destination accuracy</option></select></label><label class="field">Name<input id="challenge-name" maxlength="64" placeholder="The impossible bank"></label><div class="circle-control"><button id="place-start">1 · Place start</button><label>Radius <output id="start-radius-label">0.75 m</output><input id="start-radius" type="range" min="0.25" max="3" step="0.05" value="0.75"></label></div><label id="destination-toggle"><input id="has-destination" type="checkbox" checked> Add one destination bonus</label><div class="circle-control" id="destination-controls"><button id="place-goal">Place destination</button><label>Radius <output id="goal-radius-label">0.75 m</output><input id="goal-radius" type="range" min="0.1" max="2" step="0.05" value="0.75"></label></div><div id="waypoint-editor"><div class="panel-top"><b id="waypoint-editor-count">0 / 32 waypoints</b><button id="add-waypoint">＋ Waypoint</button></div><div id="waypoint-list"></div><label class="field">Waypoint radius <output id="waypoint-radius-label">0.75 m</output><input id="waypoint-radius" type="range" min="0.1" max="2" step="0.05" value="0.75"></label><button id="replace-waypoint" disabled>Move selected waypoint</button><p>Collect every waypoint, in any order, once per shot. Click a fixed floor, wall or ceiling. Moving treads are not supported.</p></div><p id="placement-status" role="status">Fly with WASD. Right-drag to look, or click empty space to capture the mouse. Esc opens controls. Choose a target and click a fixed surface.</p><button id="save-challenge">Save challenge</button></div>
- <div id="design-shot-view" hidden><span class="eyebrow">DESIGN BALL / RECORD YOUR LINE</span><h2>THROW THE LEVEL.</h2><p id="design-shot-status">Walk to your launch spot. Hold Space or the mouse to charge, then release. F scouts without moving the robot.</p><p>The ball chooses spaced, distinct banks and a finish where one fits. Hold Space during flight for 2× playback.</p><button id="design-back">← Back to designer / cancel shot</button></div>
+ <div id="editor-view" hidden><div class="panel-top"><span class="eyebrow">DESIGN BALL / REVIEW YOUR ROUTE</span><button id="close-editor" aria-label="Discard design and return to game">✕</button></div><h2 id="design-review-title">YOUR SHOT. YOUR LEVEL.</h2><p id="design-proof" role="status" hidden></p><p id="design-review-status" role="status"></p><div class="actions"><button id="fly-start">View start</button><button id="fly-finish">View finish</button></div><div id="design-targets"><b id="design-target-count"></b><div id="design-target-list"></div></div><label class="field">Level name<input id="challenge-name" maxlength="64" placeholder="The impossible bank"></label><button id="save-challenge" disabled>Save &amp; play level →</button><button id="launch-design-ball">Throw another design ball <kbd>R</kbd></button><p>Fly along the cyan path to inspect the course. Targets come from your actual shot. Throw again to change the route.</p></div>
+ <div id="design-shot-view" hidden><span class="eyebrow">DESIGN BALL / RECORD YOUR LINE</span><h2 id="design-shot-title">THROW THE LEVEL.</h2><p id="design-shot-status" role="status">Walk to your launch spot. Hold Space or the mouse to charge, then release. F scouts without moving the robot.</p><p id="design-shot-help">Spaced banks become waypoints. A clear landing becomes an optional finish bonus.</p><button id="design-back">Exit creator <kbd>ESC</kbd></button></div>
 
  <div id="result-card" hidden><span class="eyebrow" id="result-label"></span><div class="result-rank" id="result-rank"></div><h2 id="result-title"></h2><p id="result-breakdown"></p><div id="result-math"></div><p class="result-tip" id="result-tip"></p><div class="actions"><button id="try-result">Try again <kbd>R</kbd></button><button id="watch-result">Watch replay</button><button id="share-result">Copy replay link ↗</button><button id="next-challenge">Next level <kbd>SPACE / N</kbd> →</button></div></div>`;document.body.append(host);
  const results=document.createElement('div');results.id='results-screen';document.body.append(results);results.append($('result-card'));
@@ -42,17 +42,15 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  const replayControls=['replay-play','replay-restart','replay-scrub','replay-recenter','replay-free','share-replay'];
  function replayTimeLabel(){const duration=state.replay?.duration||0,t=Math.max(0,Math.min(duration,state.replayTime));const clock=t=>{t=Math.round(t*10)/10;return `${Math.floor(t/60)}:${(t%60).toFixed(1).padStart(4,'0')}`;},label=`${clock(t)} / ${clock(duration)}`;if($('replay-time').textContent!==label){$('replay-time').textContent=label;$('replay-scrub').setAttribute('aria-valuetext',`${t.toFixed(1)} of ${duration.toFixed(1)} seconds`);}}
  const classicScoreGuide=$('score-guide').innerHTML;
- const state={chapter:null,mode:'play',session:null,challenges:[],selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v3'},selectedWaypoint:null,editId:null,placing:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
+ const state={chapter:null,mode:'play',session:null,challenges:[],selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v3'},selectedWaypoint:null,editId:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
  const designPath=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x5fffe3,transparent:true,opacity:.8,depthWrite:false}));scene.add(designPath);designPath.visible=false;
- let capturedDesign=null,designRequest=false;
+ let capturedDesign=null,designRequest=null,designSaving=false,designNotice='';
  function setMode(mode){showLevels(false);state.mode=mode;onModeChange(mode);}
  function clearDesign(){capturedDesign=null;designPath.geometry.dispose();designPath.geometry=new THREE.BufferGeometry();designPath.visible=false;$('design-proof').hidden=true;}
  function proofUnchanged(){return capturedDesign&&capturedDesign.geometry===designGeometry(state.draft);}
- function showProof(){const unchanged=proofUnchanged();$('design-proof').hidden=!capturedDesign;$('design-proof').textContent=unchanged?'✓ RECORDED ROUTE · Every generated target was reached. The cyan line shows the shot. Its aim and power will be saved.':'EDITED ROUTE · The cyan line is the original shot. Record again to verify the changed targets.';$('design-proof').dataset.verified=String(!!unchanged);}
+ function showProof(){$('design-proof').hidden=!capturedDesign;$('design-proof').textContent='✓ RECORDED ROUTE · Your shot reached every generated target. Its aim and power are saved with the level.';$('design-proof').dataset.verified=String(!!proofUnchanged());}
  const powerMarker=document.createElement('b');powerMarker.id='hint-power-marker';powerMarker.hidden=true;document.querySelector('.power-track').append(powerMarker);
- let replayFeedbackTime=-Infinity,liveScore=null,scoreAttempt='',scoreEpoch=0,pendingPlacement=null;
- // A canceled request still owns its reply slot until the server responds.
- function cancelPendingPlacement(){if(pendingPlacement)pendingPlacement.cancelled=true;}
+ let replayFeedbackTime=-Infinity,liveScore=null,scoreAttempt='',scoreEpoch=0;
  const targetMarkers=waypointTargets(scene);
  const markers=new THREE.Group();scene.add(markers);
  function drawDisks(challenge){
@@ -97,6 +95,8 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
   $('result-leaderboard').hidden=state.mode==='replay'?!state.replay:state.mode!=='play'||!state.selected;
   $('course-view').hidden=sharedReplay||state.mode!=='play';$('editor-view').hidden=state.mode!=='editor';$('replay-view').hidden=!sharedReplay&&state.mode!=='replay';
   designPath.visible=state.mode==='editor'&&!!capturedDesign;$('design-shot-view').hidden=state.mode!=='design';document.body.classList.toggle('is-designer',state.mode==='editor');
+  document.body.classList.toggle('is-design-shot',state.mode==='design');
+  if(state.mode==='design'){const phase=getPhase(),inFlight=['Release','Flight'].includes(phase);$('design-shot-title').textContent=designRequest?'GETTING READY…':inFlight?'RECORDING YOUR SHOT.':'THROW THE LEVEL.';$('design-shot-status').textContent=designNotice||(inFlight?'The route is recording. Wait for the ball to settle, or hold Space for 2× playback.':'Walk to your launch spot. Hold Space or the mouse to charge, then release. F scouts the station.');$('design-shot-help').textContent=inFlight?'R · Discard this shot and try again':'Spaced banks become waypoints. A clear landing becomes an optional finish bonus.';}
   if(!['play','design'].includes(state.mode)){$('throw-panel').hidden=true;$('flight-panel').hidden=true;$('result-card').hidden=true;}
  }
  function updateSession(){
@@ -163,46 +163,42 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  }
  function renderBoard(){if(state.mode==='play')ranking.update(state.selected,state.board,state.personal);}
  $('share-challenge').onclick=()=>{if(state.selected)copyLevel(state.selected.id,$('share-challenge'));};
+ function startDesign(start=null){
+  if(designRequest||designSaving)return;
+  if(state.session?.busy&&state.mode!=='design'){notice('Finish or recall the active shot first.');return;}
+  cancel();designRequest='start';designNotice='';renderEditor();
+  if(!send('design-start',{start})){designRequest=null;renderEditor();notice('Reconnect before starting a design ball.');}
+ }
  function openEditor(edit=false){
-  const ownWindup=state.session?.busy&&['Charging','Release'].includes(getPhase());
-  if(state.session?.busy&&!ownWindup){notice('Finish the active throw before creating a challenge.');return;}
-  cancel();clearDesign();const current=edit?state.selected:null;
-  state.editId=current?.id||null;state.draft=current?structuredClone({start:current.start,goal:current.goal,waypoints:current.waypoints||[],scoring:current.scoring==='waypoint-v3'?'waypoint-v3':'combo-v7'}):{start:null,goal:null,waypoints:[],scoring:'waypoint-v3'};state.selectedWaypoint=null;cancelPendingPlacement();
-  $('design-ball-intro').hidden=true;$('design-manual').setAttribute('aria-pressed','true');$('design-record').setAttribute('aria-pressed','false');$('challenge-scoring').value=state.draft.scoring;$('has-destination').checked=current?!!current.goal:true;
-  setMode('editor');state.placing=null;$('challenge-name').value=current?.name||'';
-  for(const key of ['start','goal']){$(`${key}-radius`).value=state.draft[key]?.radius||.75;radiusChanged(key);}
-  send('select-challenge',{challengeId:null});$('placement-status').textContent='Place a start, then waypoints and/or one destination. Every placed waypoint is required.';renderEditor();drawDisks(state.draft);presentation();
+  if(designRequest||state.session?.busy){notice('Finish or recall the active shot first.');return;}
+  const current=edit?state.selected:null;clearDesign();state.editId=current?.id||null;
+  state.draft={start:current?.start||null,goal:null,waypoints:[],scoring:'waypoint-v3'};state.selectedWaypoint=null;
+  $('challenge-name').value=current?.name||'';startDesign(state.draft.start);
+ }
+ function exitDesign(){
+  if(designRequest||designSaving)return;
+  cancel();designRequest='cancel';renderEditor();
+  if(!send('design-cancel')){designRequest=null;renderEditor();notice('Reconnect before leaving the creator.');}
  }
  $('show-overview').onclick=()=>{if(state.selected&&!state.session?.busy)overview(state.selected);};
  $('new-challenge').onclick=()=>openEditor();$('edit-challenge').onclick=()=>openEditor(true);
- $('close-editor').onclick=()=>{cancel();clearDesign();setMode('play');state.placing=null;cancelPendingPlacement();drawDisks(state.selected);presentation();};
+ $('close-editor').onclick=exitDesign;$('design-back').onclick=exitDesign;
  $('explore').onclick=()=>{cancel();send('select-challenge',{challengeId:null});};
- for(const key of ['start','goal']){
-  $(`place-${key}`).onclick=()=>{state.placing=key;cancelPendingPlacement();$('placement-status').textContent=`Click a fixed floor to place the ${key} circle.`;};
-  $(`${key}-radius`).oninput=()=>radiusChanged(key);
- }
- function radiusChanged(key){cancelPendingPlacement();const radius=Number($(`${key}-radius`).value);$(`${key}-radius-label`).textContent=`${radius.toFixed(2)} m`;if(key==='waypoint'){const w=state.draft.waypoints.find(w=>w.id===state.selectedWaypoint);if(w)w.radius=radius;}else if(state.draft[key])state.draft[key].radius=radius;drawDisks(state.draft);showProof();}
  function renderEditor(){
-  showProof();$('fly-start').disabled=!state.draft.start;$('fly-finish').disabled=!state.draft.goal;
-  const waypoint=state.draft.scoring==='waypoint-v3';$('waypoint-editor').hidden=!waypoint;$('destination-toggle').hidden=!waypoint;
-  if(!waypoint)$('has-destination').checked=true;
-  $('destination-controls').hidden=!$('has-destination').checked;
-  $('waypoint-editor-count').textContent=`${state.draft.waypoints.length} / 32 waypoints`;$('add-waypoint').disabled=state.draft.waypoints.length>=32;
-  const list=$('waypoint-list');list.replaceChildren();
-  state.draft.waypoints.forEach((w,i)=>{const row=document.createElement('div');row.className='waypoint-row';const select=document.createElement('button');select.textContent=`${String(i+1).padStart(2,'0')} · ${w.surface} · ${w.radius.toFixed(2)} m`;select.setAttribute('aria-pressed',String(w.id===state.selectedWaypoint));select.onclick=()=>{state.selectedWaypoint=w.id;focusTarget(w);$('waypoint-radius').value=w.radius;$('waypoint-radius-label').textContent=`${w.radius.toFixed(2)} m`;renderEditor();drawDisks(state.draft);};const remove=document.createElement('button');remove.textContent='Remove';remove.setAttribute('aria-label',`Remove waypoint ${i+1}`);remove.onclick=()=>{state.draft.waypoints=state.draft.waypoints.filter(x=>x.id!==w.id);if(state.selectedWaypoint===w.id)state.selectedWaypoint=null;state.placing=null;cancelPendingPlacement();renderEditor();drawDisks(state.draft);};row.append(select,remove);list.append(row);});
-  $('replace-waypoint').disabled=!state.selectedWaypoint;
+  showProof();$('fly-start').disabled=!capturedDesign;$('fly-finish').disabled=!capturedDesign||!state.draft.goal;
+  $('design-targets').hidden=!capturedDesign;
+  $('design-target-count').textContent=`${state.draft.waypoints.length} waypoint${state.draft.waypoints.length===1?'':'s'}${state.draft.goal?' · optional finish bonus':''}`;
+  const list=$('design-target-list');list.replaceChildren();
+  state.draft.waypoints.forEach((w,i)=>{const button=document.createElement('button');button.textContent=`${String(i+1).padStart(2,'0')} · ${w.normal.y>.5?'Floor':w.normal.y<-.5?'Ceiling':'Wall'} waypoint`;button.setAttribute('aria-pressed',String(w.id===state.selectedWaypoint));button.onclick=()=>{state.selectedWaypoint=w.id;focusTarget(w);renderEditor();drawDisks(state.draft);};list.append(button);});
+  $('save-challenge').disabled=!proofUnchanged()||!$('challenge-name').value.trim()||!!designRequest||designSaving;
+  $('save-challenge').textContent=designSaving?'Saving…':'Save & play level →';
+  for(const id of ['launch-design-ball','close-editor','design-back','new-challenge','edit-challenge'])$(id).disabled=!!designRequest||designSaving;
  }
- $('challenge-scoring').onchange=()=>{state.draft.scoring=$('challenge-scoring').value;if(state.draft.scoring!=='waypoint-v3'){state.draft.waypoints=[];state.selectedWaypoint=null;}state.placing=null;cancelPendingPlacement();renderEditor();drawDisks(state.draft);};
- $('has-destination').onchange=()=>{if(!$('has-destination').checked){state.draft.goal=null;if(state.placing==='goal')state.placing=null;cancelPendingPlacement();}renderEditor();drawDisks(state.draft);};
- $('add-waypoint').onclick=()=>{if(state.draft.waypoints.length>=32)return;state.selectedWaypoint=null;state.placing='waypoint';cancelPendingPlacement();$('placement-status').textContent='Click a fixed face to add a waypoint. Floors, walls and ceilings are supported.';renderEditor();};
- $('replace-waypoint').onclick=()=>{state.placing='waypoint';cancelPendingPlacement();$('placement-status').textContent='Click a fixed face to move the selected waypoint.';};
- $('waypoint-radius').oninput=()=>radiusChanged('waypoint');
- $('save-challenge').onclick=()=>{if(pendingPlacement){$('placement-status').textContent='Wait for placement validation.';return;}if($('has-destination').checked&&!state.draft.goal){$('placement-status').textContent='Place the destination, or turn off its bonus.';return;}if(!state.draft.start||(!state.draft.goal&&!state.draft.waypoints.length)){ $('placement-status').textContent='Place a start and at least one waypoint or destination.';return;}if(state.draft.scoring!=='waypoint-v3'&&!state.draft.goal){$('placement-status').textContent='Classic courses need a destination.';return;}send('save-challenge',{name:$('challenge-name').value,editId:state.editId,...state.draft,...(proofUnchanged()?{designProof:capturedDesign.proof}:{})});};
+ $('challenge-name').oninput=renderEditor;
+ $('save-challenge').onclick=()=>{if(!proofUnchanged()||designSaving||designRequest)return;designSaving=true;renderEditor();if(!send('save-challenge',{name:$('challenge-name').value,editId:state.editId,...state.draft,designProof:capturedDesign.proof})){designSaving=false;renderEditor();$('design-review-status').textContent='Reconnect before saving your level.';}};
  $('fly-start').onclick=()=>{if(state.draft.start)focusTarget(state.draft.start);};
  $('fly-finish').onclick=()=>{if(state.draft.goal)focusTarget(state.draft.goal);};
- for(const mode of ['manual','record'])$('design-'+mode).onclick=()=>{$('design-ball-intro').hidden=mode!=='record';for(const other of ['manual','record'])$('design-'+other).setAttribute('aria-pressed',String(mode===other));};
- $('launch-design-ball').onclick=()=>{if(designRequest||state.session?.busy){notice('Finish or recall the active shot first.');return;}cancel();designRequest=true;$('launch-design-ball').disabled=true;send('design-start',{start:state.draft.start});};
- $('design-back').onclick=()=>{cancel();send('recall');send('select-challenge',{challengeId:null});setMode('editor');drawDisks(state.draft);presentation();};
+ $('launch-design-ball').onclick=()=>startDesign(state.draft.start);
  $('use-hint').onclick=()=>{if(state.hint)window.dispatchEvent(new CustomEvent('kyoto:hint',{detail:state.hint}));};
  function replayStart(){return -Math.min(3.2,state.replay.releaseTime-state.replay.chargeTime);}
  let replayRequest=0;
@@ -240,26 +236,24 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  $('next-challenge').onclick=advanceCompleted;
  return {
   openLevels:()=>showLevels(true),closeLevels:()=>showLevels(false),get levelsOpen(){return levelsOpen;},focusLevel,navigateLevels,
-  state,advanceCompleted,openReplay,replayViewport:()=>replayViewport,
+  state,advanceCompleted,openReplay,exitDesign,retryDesign:()=>startDesign(state.draft.start),replayViewport:()=>replayViewport,
   playbackRate(fastForward=false){return state.mode==='replay'?(state.replayPlaying?(fastForward?2:1):0):1;},
   scorePresentation(){return {score:state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore,challenge:state.mode==='replay'?state.replay?.challenge:state.selected,attempt:state.mode==='replay'?state.replay?.attempt:scoreAttempt,time:state.mode==='replay'?state.replayTime:getLiveTime(),mode:state.mode,epoch:scoreEpoch};},
   dismissResult(){$('result-card').hidden=true;ranking.reset();feedback.reset();liveScore=null;scoreEpoch++;},
   message(m){
    if(m.type==='selected'||m.type==='error'){nextRequested=false;selectingLevel=false;renderCatalog();}
    if(m.type==='state'&&state.mode!=='replay'){if(m.liveScore){liveScore=m.liveScore;scoreAttempt=m.attempt;feedback.accept(m.liveScore,m.attempt,state.selected);}if(['Aim','Charging'].includes(m.phase)){feedback.reset();liveScore=null;}}
-   if(m.type==='worker-status'&&m.status!=='ready'){feedback.reset();liveScore=null;scoreEpoch++;if(state.mode==='design'){setMode('editor');$('placement-status').textContent='Recording interrupted. Start another design ball when physics reconnects.';}}
+   if(m.type==='worker-status'&&m.status!=='ready'){feedback.reset();liveScore=null;scoreEpoch++;if(['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='Recording interrupted. Throw another design ball after reconnecting.';renderEditor();}}
+   if(m.type==='welcome'&&!m.resumed&&['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='The recording session ended. Throw a new design ball before saving.';renderEditor();}
    if(m.type==='session'){state.session=m;if(m.designing&&state.mode==='play')setMode('design');updateSession();}
    if(m.type==='catalog'){state.challenges=m.challenges;renderCatalog();}
-   if(m.type==='placement'&&pendingPlacement?.slot===m.slot){
-    if(pendingPlacement.cancelled||state.mode!=='editor'){pendingPlacement=null;return;}
-    if(m.slot==='waypoint'){const existing=state.draft.waypoints.findIndex(w=>w.id===pendingPlacement.id);const waypoint={...m.disk,id:pendingPlacement.id||crypto.randomUUID()};if(existing>=0)state.draft.waypoints[existing]=waypoint;else if(state.draft.waypoints.length<32)state.draft.waypoints.push(waypoint);state.selectedWaypoint=waypoint.id;}
-    else state.draft[m.slot]=m.disk;
-    state.placing=null;pendingPlacement=null;$('placement-status').textContent=m.slot==='waypoint'?'Waypoint validated on its fixed surface.':`${m.slot==='start'?'Start':'Destination'} validated on a supported floor.`;renderEditor();drawDisks(state.draft);
-   }
    if(m.type==='design-ready'){
-    designRequest=false;$('launch-design-ball').disabled=false;clearDesign();state.placing=null;cancelPendingPlacement();setMode('design');drawDisks(null);presentation();notice('Design ball ready. Walk to your spot, then aim and throw.');
+    designRequest=null;clearDesign();state.draft={start:state.draft.start,goal:null,waypoints:[],scoring:'waypoint-v3'};state.selectedWaypoint=null;setMode('design');drawDisks(null);renderEditor();presentation();notice('Design ball ready · Walk, aim and throw.');
    }
-   if(m.type==='saved-challenge'){clearDesign();setMode('play');presentation();send('select-challenge',{challengeId:m.challenge.id,revision:m.challenge.revision});notice('Challenge saved. Copy its level link to share it.');}
+   if(m.type==='design-cancelled'){
+    designRequest=null;clearDesign();setMode('play');resetView('level');drawDisks(state.selected);renderEditor();presentation();resume();
+   }
+   if(m.type==='saved-challenge'){designSaving=false;clearDesign();renderEditor();setMode('play');presentation();send('select-challenge',{challengeId:m.challenge.id,revision:m.challenge.revision});notice('Level saved. Copy its level link to share it.');}
    if(m.type==='selected'){history.replaceState(null,'',m.challenge?levelURL(m.challenge.id):'/');document.title=m.challenge?`${m.challenge.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';replayRequest++;$('result-card').hidden=true;resetView('level');if(m.challenge&&state.mode==='play')overview(state.selected||m.challenge);}
    if(m.type==='leaderboard'){if(state.selected?.id===m.challenge.id&&state.selected.revision===m.challenge.revision){state.board=m.entries;state.personal=m.personal||null;renderBoard();}}
    if(m.type==='replay'){loadReplay(m.replay);}
@@ -269,10 +263,9 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
      if(m.design&&!m.design.error){
       const d=m.design;state.draft={start:d.start,goal:d.goal,waypoints:d.waypoints||[],scoring:'waypoint-v3'};state.selectedWaypoint=null;
       capturedDesign={proof:d.proof,geometry:designGeometry(state.draft)};designPath.geometry.dispose();designPath.geometry=new THREE.BufferGeometry().setFromPoints(d.path.map(v));
-      $('challenge-scoring').value='waypoint-v3';$('has-destination').checked=!!d.goal;for(const key of ['start','goal'].filter(k=>state.draft[k])){$(`${key}-radius`).value=state.draft[key].radius;$(`${key}-radius-label`).textContent=`${state.draft[key].radius.toFixed(2)} m`;}
-      $('placement-status').textContent=`Recorded ${state.draft.waypoints.length} spaced waypoints${d.goal?' and a finish zone':''}. ${d.note||'Explore the cyan path, edit targets, name and save your course.'}`;
+      $('design-review-status').textContent=`Recorded ${state.draft.waypoints.length} spaced waypoint${state.draft.waypoints.length===1?'':'s'}${d.goal?' and a finish zone':''}. ${d.note||'Explore the cyan path, name your level, then save and play.'}`;
       focusTarget(state.draft.start);sound.cue('start');
-     }else $('placement-status').textContent=m.design?.error||'This shot could not produce a valid course. Try another design ball.';
+     }else {clearDesign();$('design-review-status').textContent=m.design?.error||'This shot could not produce a valid course. Try another design ball.';}
      renderEditor();drawDisks(state.draft);presentation();return;
     }
     if(state.mode==='replay')return;
@@ -295,15 +288,14 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches){const began=performance.now(),attempt=m.attempt;function count(now){if(state.lastResult?.attempt!==attempt)return;const t=Math.min(1,(now-began)/800);$('result-title').textContent=`${Math.round(m.score*(1-(1-t)**3)).toLocaleString()} PTS`;if(t<1)requestAnimationFrame(count);}requestAnimationFrame(count);}
 
    }
-   if(m.type==='error'){designRequest=false;$('launch-design-ball').disabled=false;const cancelled=pendingPlacement?.cancelled;pendingPlacement=null;if(state.mode==='editor'&&!cancelled)$('placement-status').textContent=m.message;}
-  },
-  pointer(event,ray){
-   if(state.mode==='replay')return true;
-   if(state.mode!=='editor')return false;
-   if(state.placing&&!pendingPlacement){pendingPlacement={slot:state.placing,id:state.placing==='waypoint'?state.selectedWaypoint:null};send('place',{slot:state.placing,radius:Number($(`${state.placing}-radius`).value),...ray});}
-   else if(pendingPlacement)notice('Waiting for the previous placement to finish. Click again when it responds.');
-   else notice('Choose a placement button, then click a supported station surface.');
-   return true;
+   if(m.type==='notice'&&state.mode==='design'&&!designRequest)designNotice=m.message+' Aim and throw again, or press R to restart.';
+   if(m.type==='state'&&m.phase==='Charging')designNotice='';
+   if(m.type==='error'){
+    const pending=designRequest;designRequest=null;designSaving=false;renderEditor();
+    if(state.mode==='editor')$('design-review-status').textContent=m.message;
+    else if(state.mode==='design')designNotice=m.message;
+    if(pending)notice(m.message);
+   }
   },
   update(dt,rate=1){
    const score=state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore;targetMarkers.update(collectedIds(score));

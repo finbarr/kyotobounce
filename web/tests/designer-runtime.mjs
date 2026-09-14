@@ -20,6 +20,7 @@ try{
   assert.ok(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)>=3-1e-5,'Targets stay spatially separated');
   assert.ok(d.waypointTimes[i]-d.waypointTimes[j]>=.45-1e-5,'Rapid bounces do not each create targets');
  }
+ await assert.rejects(client.request('save-challenge',{name:'Unrecorded',start:d.start,goal:d.goal,waypoints:d.waypoints,scoring:'waypoint-v3'},'saved-challenge'),/Record a design ball/);await delay(1100);
  const draft={name:'Recorded wall-bank test',start:d.start,goal:d.goal,waypoints:d.waypoints,scoring:'waypoint-v3',designProof:d.proof};
  await assert.rejects(client.request('save-challenge',{...draft,designProof:'forged'},'saved-challenge'),/recorded route changed/);await delay(1100);
  await assert.rejects(client.request('save-challenge',{...draft,waypoints:d.waypoints.map((w,i)=>i? w:{...w,id:'edited-target'})},'saved-challenge'),/recorded route changed/);await delay(1100);
@@ -38,6 +39,18 @@ try{
   worker.send({type:'charge',id,request:'design-proof-shot',powerRange:challenge.hint.powerRange});await delay(100);worker.send({type:'release',id,power:challenge.hint.holdMs/2800});await until(()=>nativeResult);
   assert.equal(nativeResult.type,'result',nativeResult.message);assert.equal(nativeResult.waypointHits.length,challenge.waypoints.length);assert.equal(nativeResult.destinationReached,true);
  }finally{worker.stop();}
+ // A creator can restart and leave during flight without a recall/select race.
+ for(const action of ['design-start','design-cancel']){
+  await client.request('design-start',{},'design-ready');client.input({pitch:60});await delay(120);
+  client.send('charge',{challengeId:null,revision:null,layout:course.layout,physics:course.physics,powerRange:'full'});await delay(200);client.send('release');
+  await client.next(m=>m.type==='state'&&m.phase==='Flight');
+  const count=client.messages.filter(m=>m.type==='result').length;
+  await client.request(action,{},action==='design-start'?'design-ready':'design-cancelled');
+  await client.next(m=>m.type==='state'&&m.phase==='Aim');
+  assert.equal(client.messages.filter(m=>m.type==='result').length,count,'Discarding a design never creates a stale result');
+  assert.equal(client.playback.active,false,'Native cancellation drops the buffered flight');
+  const session=client.messages.findLast(m=>m.type==='session');assert.equal(session.busy,false);assert.equal(session.designing,action==='design-start');
+ }
  // A fresh design route can be abandoned without producing a course or score.
  await client.request('design-start',{},'design-ready');client.send('charge',{challengeId:null,revision:null,layout:course.layout,physics:course.physics,powerRange:'precision'});await delay(150);client.send('cancel');await delay(150);
  await client.request('select-challenge',{challengeId:course.id},'selected');
@@ -46,5 +59,5 @@ try{
  await client.request('design-start',{start:cramped.start},'design-ready');await delay(120);
  const {result:corner}=await client.throw(cramped.hint.holdMs+5,cramped.hint);
  assert.ok(corner.design&&!corner.design.error,corner.design?.error);assert.equal(corner.design.goal,null,'Cramped landing becomes a waypoint-only course');assert.ok(corner.design.waypoints.length>0);assert.match(corner.design.note,/cramped or uneven/);
- console.log(`PASS unranked native design ball, ${d.waypoints.length} validated targets including walls, saved solution, identical-shot all-target clear + destination, tampered proof rejection and cancellation`);
+ console.log(`PASS unranked native design ball, ${d.waypoints.length} validated targets including walls, saved solution, identical-shot all-target clear + destination, tampered proof rejection and cancellation/restart during flight`);
 }finally{client.close();}

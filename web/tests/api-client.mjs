@@ -7,6 +7,7 @@ export class Client{
   this.playback=new ShotPlayback();this.chunks=[];
   const deliver=m=>{this.messages.push(m);if(this.messages.length>10000)this.messages.shift();if(m.type==='welcome'){this.guestId=m.id;this.id=m.sessionId||m.id;this.token=m.token;}if(m.type==='state'){this.state=m;this.stateReceived=performance.now();}for(const w of [...this.waiters])if(w.predicate(m)){this.waiters.splice(this.waiters.indexOf(w),1);clearTimeout(w.timer);w.resolve(m);}};
   this.socket.on('message',data=>{const m=JSON.parse(data.toString());
+   this.playback.cancelForNotice(m,this.id);
    if(m.type==='shot-resume'){this.playback.resume(m);return;}
    if(m.type==='shot-chunk'){this.chunks.push({...m,received:performance.now()});this.playback.accept(m,performance.now());return;}
    if(m.type==='result'&&this.playback.result(m))return;

@@ -1,6 +1,10 @@
 // A shot is a small local movie of authoritative physics, not a live snapshot
 // clock. Network delivery may run far ahead; effects fire only at playback time.
 export class ShotPlayback {
+ cancelForNotice(message,owner){
+  if(message.type!=='notice'||!owner||message.id!==owner)return false;
+  this.clear(true);return true;
+ }
  shot=null;discarded=new Set();resumeAt=null;rate=1;
  clear(discard=false){if(discard&&this.shot){this.discarded.add(this.shot.attempt);if(this.discarded.size>8)this.discarded.delete(this.discarded.values().next().value);}this.shot=null;this.resumeAt=null;this.rate=1;}
  setRate(rate,now){if(rate!==1&&rate!==2)throw new Error('Invalid playback rate');this.advance(now);this.rate=rate;}
