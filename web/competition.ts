@@ -21,8 +21,11 @@ export class Competition {
  board(m:Member){if(m.selected)this.publish(this.standings(m.selected,m.guest.id),m.id);}
  remember(m:Member){this.store.setSetting(`selected:${m.guest.id}`,m.selected?{id:m.selected.id,revision:m.selected.revision}:{id:null});}
  async add(guest:Guest,id:string){
-  const saved=this.store.setting(`selected:${guest.id}`)??this.store.setting('selected');
+  const saved=this.store.setting(`selected:${guest.id}`);
   let selected=saved?.id?this.store.challenge(saved.id):null;
+  // New players start on the first campaign stage. An explicit free-play
+  // preference remains free play; another player's old global choice is irrelevant.
+  if(!saved||(saved.id&&!selected))selected=this.store.list().filter(c=>c.campaign).sort((a,b)=>(a.order??Infinity)-(b.order??Infinity))[0]||null;
   if(selected&&(selected.throwModel!==THROW_MODEL||!ACTIVE_SCORING.includes(selected.scoring||'')))selected=this.store.challenge(selected.id);
   const m:Member={id,guest,selected,snapshot:null,selecting:false,restoring:true};this.members.set(id,m);this.sync(m);this.board(m);
   if(this.worker.ready&&!this.initializing)await this.restore(m);
@@ -43,7 +46,7 @@ export class Competition {
   if(latest&&this.playable(latest)&&(!m.selected||!this.playable(m.selected))){m.selected=latest;this.remember(m);}
   m.restoring=true;this.sync(m);this.worker.send({type:'join',id:m.id});
   try{
-   if(m.selected){if(!this.playable(m.selected))throw new Error('This course is no longer current');if(m.selected.scoring===WAYPOINT_SCORING)this.requireWaypoints();if(!SUPPORTED_SCORING.includes(m.selected.scoring||''))throw new Error('Scoring version changed');await this.worker.request({type:'select',id:m.id,challenge:m.selected});}
+   if(m.selected){if(!this.playable(m.selected))throw new Error('This course is no longer current');if(m.selected.scoring===WAYPOINT_SCORING)this.requireWaypoints();if(!SUPPORTED_SCORING.includes(m.selected.scoring||''))throw new Error('Scoring version changed');await this.worker.request({type:'select',id:m.id,challenge:m.selected});this.remember(m);}
   }catch(error){
    if(!this.worker.ready||!this.members.has(m.id))return;
    m.selected=null;this.remember(m);this.publish({type:'notice',message:'This level could not be restored. Choose another level or explore.'},m.id);

@@ -7,27 +7,28 @@ import {arcadeFeedback} from './arcade-feedback.js';
 import {waypointTargets} from './waypoint-targets.js';
 import {scoreAt,collectedIds,allWaypointsCollected} from './waypoint-score.js';
 const $=id=>document.getElementById(id),v=p=>new THREE.Vector3(p.x,p.y,-p.z);
-export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
+export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
  const feedback=arcadeFeedback(sound);
  const host=document.createElement('aside');host.id='competition';host.innerHTML=`
  <div id="course-view"><div class="panel-top"><span class="eyebrow">STAGE SELECT / 選択</span><button id="new-challenge">＋ Create</button></div><h2 id="course-title">PICK YOUR LINE.</h2><div id="turn-status"></div><label class="campaign-picker" id="campaign-picker" hidden><span id="campaign-count"></span><select id="campaign-chapter" aria-label="Campaign chapter"></select></label><div id="course-list"></div><div class="actions"><button id="explore">Free exploration</button></div><div id="challenge-detail" hidden><p id="challenge-description"></p><button id="show-overview">◎ View course overview</button><button id="use-hint" hidden>Set suggested aim <kbd>H</kbd></button><p id="hint-note"></p><div id="timing-hint" hidden><span class="eyebrow">ESCALATOR RELEASE TIMING</span><div class="timing-track"><i id="timing-window"></i><b id="timing-cursor"></b></div><p id="timing-caption"></p></div><div class="actions"><button id="share-challenge">Copy level link ↗</button><button id="edit-challenge" hidden>Revise</button></div><details id="score-guide"><summary>HOW TO SCORE</summary><p><strong>10,000 base × (1 + 0.5 per distinct bank) × landing accuracy.</strong> Banks add to the multiplier; impact speed does not multiply it.</p><p>Keep 100% inside the gold bullseye. The outer rings show 75%, 50% and 25%, fading to zero at the edge. Height counts too. Tagging the target guarantees 25% even if it rolls out.</p><p>Spaced banks count once per surface; a flight of treads counts as one. Movement adds 100 points per second outside every multiplier. Waiting and spinning in place add nothing. Banks freeze at the first target hit. A far miss still banks its movement points.</p><p>The score locks only when the ball stops moving and spinning. Recall forfeits the shot.</p></details></div></div>
  <div id="editor-view" hidden><div class="panel-top"><span class="eyebrow">CREATE A CHALLENGE</span><button id="close-editor">✕</button></div><h2>BUILD A STAGE.</h2><div class="designer-modes" role="group" aria-label="Designer mode"><button id="design-manual" aria-pressed="true">1 · Place by hand</button><button id="design-record" aria-pressed="false">2 · Design ball</button></div><div id="design-ball-intro" hidden><p>Walk to your launch spot, then throw. Real banks become waypoints; a clear landing can become the finish. Your existing start is used if you placed one.</p><button id="launch-design-ball">Walk &amp; throw a design ball →</button></div><p id="design-proof" role="status" hidden></p><div class="actions"><button id="fly-start">Fly to start</button><button id="fly-finish">Fly to finish</button></div><label class="field">Scoring<select id="challenge-scoring"><option value="waypoint-v3">Waypoint chain · optional destination</option><option value="combo-v7">Classic · destination accuracy</option></select></label><label class="field">Name<input id="challenge-name" maxlength="64" placeholder="The impossible bank"></label><div class="circle-control"><button id="place-start">1 · Place start</button><label>Radius <output id="start-radius-label">0.75 m</output><input id="start-radius" type="range" min="0.25" max="3" step="0.05" value="0.75"></label></div><label id="destination-toggle"><input id="has-destination" type="checkbox" checked> Add one destination bonus</label><div class="circle-control" id="destination-controls"><button id="place-goal">Place destination</button><label>Radius <output id="goal-radius-label">0.75 m</output><input id="goal-radius" type="range" min="0.1" max="2" step="0.05" value="0.75"></label></div><div id="waypoint-editor"><div class="panel-top"><b id="waypoint-editor-count">0 / 32 waypoints</b><button id="add-waypoint">＋ Waypoint</button></div><div id="waypoint-list"></div><label class="field">Waypoint radius <output id="waypoint-radius-label">0.75 m</output><input id="waypoint-radius" type="range" min="0.1" max="2" step="0.05" value="0.75"></label><button id="replace-waypoint" disabled>Move selected waypoint</button><p>Collect every waypoint, in any order, once per shot. Click a fixed floor, wall or ceiling. Moving treads are not supported.</p></div><p id="placement-status" role="status">Fly with WASD. Right-drag to look, or click empty space to capture the mouse. Esc opens controls. Choose a target and click a fixed surface.</p><button id="save-challenge">Save challenge</button></div>
  <div id="design-shot-view" hidden><span class="eyebrow">DESIGN BALL / RECORD YOUR LINE</span><h2>THROW THE LEVEL.</h2><p id="design-shot-status">Walk to your launch spot. Hold Space or the mouse to charge, then release. F scouts without moving the robot.</p><p>The ball chooses spaced, distinct banks and a finish where one fits. Hold Space during flight for 2× playback.</p><button id="design-back">← Back to designer / cancel shot</button></div>
 
- <div id="result-card" hidden><span class="eyebrow" id="result-label"></span><div class="result-rank" id="result-rank"></div><h2 id="result-title"></h2><p id="result-breakdown"></p><div id="result-math"></div><p class="result-tip" id="result-tip"></p><div class="actions"><button id="try-result">Try again <kbd>R</kbd></button><button id="watch-result">Watch replay</button><button id="share-result">Copy replay link ↗</button><button id="next-challenge">Next challenge <kbd>SPACE</kbd> →</button></div></div>`;document.body.append(host);
+ <div id="result-card" hidden><span class="eyebrow" id="result-label"></span><div class="result-rank" id="result-rank"></div><h2 id="result-title"></h2><p id="result-breakdown"></p><div id="result-math"></div><p class="result-tip" id="result-tip"></p><div class="actions"><button id="try-result">Try again <kbd>R</kbd></button><button id="watch-result">Watch replay</button><button id="share-result">Copy replay link ↗</button><button id="next-challenge">Next level <kbd>SPACE / N</kbd> →</button></div></div>`;document.body.append(host);
  const results=document.createElement('div');results.id='results-screen';document.body.append(results);results.append($('result-card'));
- const levelsButton=document.createElement('button');levelsButton.id='toggle-levels';levelsButton.type='button';levelsButton.textContent='LEVELS';levelsButton.setAttribute('aria-controls','competition');levelsButton.setAttribute('aria-expanded','false');document.querySelector('.session').prepend(levelsButton);
+ const levelsButton=document.createElement('button');levelsButton.id='toggle-levels';levelsButton.type='button';levelsButton.innerHTML='LEVELS <kbd>L</kbd>';levelsButton.setAttribute('aria-keyshortcuts','L');levelsButton.setAttribute('aria-controls','competition');levelsButton.setAttribute('aria-expanded','false');document.querySelector('.session').prepend(levelsButton);
  const closeLevels=document.createElement('button');closeLevels.id='close-levels';closeLevels.type='button';closeLevels.textContent='×';closeLevels.setAttribute('aria-label','Close levels');$('course-view').querySelector('.panel-top').append(closeLevels);
- let levelsOpen=false;
+ const levelHelp=document.createElement('p');levelHelp.id='level-key-help';levelHelp.innerHTML='<kbd>↑ ↓</kbd> Stages · <kbd>← →</kbd> Chapters<br><kbd>ENTER</kbd> Choose · <kbd>L / ESC</kbd> Back to game';$('course-view').querySelector('.panel-top').after(levelHelp);
+ let levelsOpen=false,selectingLevel=false;
+ function focusLevel(index){const choices=[...$('course-list').children].filter(b=>b.matches('button'));const button=choices[index]||choices.find(b=>b.classList.contains('selected'))||choices[0];if(button){button.focus({preventScroll:true});button.scrollIntoView({block:'nearest'});}}
  function showLevels(open){
   if(levelsOpen===open)return;
   levelsOpen=open;document.body.classList.toggle('levels-open',open);levelsButton.setAttribute('aria-expanded',String(open));
-  if(open){cancel();$('result-card').hidden=true;host.scrollTop=0;}
+  if(open){cancel();$('result-card').hidden=true;host.scrollTop=0;focusLevel();}
  }
- levelsButton.onclick=()=>showLevels(!levelsOpen);
- closeLevels.onclick=()=>{showLevels(false);levelsButton.focus();};
+ levelsButton.onclick=()=>{if(levelsOpen){showLevels(false);resume();}else showLevels(true);};
+ closeLevels.onclick=()=>{showLevels(false);resume();};
  document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement)showLevels(false);});
- document.addEventListener('keydown',e=>{if(e.code==='Escape'&&levelsOpen){showLevels(false);levelsButton.focus();}});
  for(const id of ['explore','show-overview','use-hint'])$(id).addEventListener('click',()=>showLevels(false));
  const ranking=resultBoard({host:document.body,watch:openReplay,sound,getGuestId,share:copyLevel});
  // A single layout owns replay panels; the game restores these shared widgets on exit.
@@ -85,10 +86,10 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
  }
  function presentation(){
   const replaying=state.mode==='replay'||sharedReplay;
-  const throwing=['Charging','Release','Flight'].includes(getPhase());
+  const throwing=['Release','Flight'].includes(getPhase());
   if(throwing||replaying||document.body.classList.contains('is-briefing')||document.body.classList.contains('mobile-ui'))showLevels(false);
-  levelsButton.hidden=replaying||state.mode!=='play';levelsButton.disabled=throwing;
-  levelsButton.title=throwing?'Finish or recall your shot to change levels':'Choose a level or robot';
+  levelsButton.hidden=replaying||state.mode!=='play';levelsButton.disabled=throwing||!!state.session?.restoring;
+  levelsButton.title=throwing?'Finish your shot, or press R to recall it':'L · Choose a level or robot';
   document.body.classList.toggle('is-results',!replaying&&!$('result-card').hidden);document.body.classList.toggle('is-replay',replaying);
   host.hidden=replaying;
   if(host.dataset.mode!==state.mode)host.dataset.mode=state.mode;
@@ -115,8 +116,27 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
   renderCatalog();
  }
  $('campaign-chapter').onchange=()=>{state.chapter=$('campaign-chapter').value;renderCatalog();};
+ function chooseLevel(c){
+  if(selectingLevel||state.session?.restoring||['Release','Flight'].includes(getPhase()))return;
+  cancel();selectingLevel=true;renderCatalog();
+  if(!send('select-challenge',{challengeId:c.id,revision:c.revision})){selectingLevel=false;renderCatalog();notice('Reconnect before changing levels.');}
+ }
+ function navigateLevels(e){
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.target.closest('input,textarea,select,[contenteditable="true"]'))return;
+  const choices=[...$('course-list').querySelectorAll('button')];if(!choices.length)return;
+  const index=Math.max(0,choices.indexOf(document.activeElement));
+  if(['ArrowLeft','ArrowRight','PageUp','PageDown'].includes(e.code)){
+   e.preventDefault();const picker=$('campaign-chapter'),at=picker.selectedIndex+(['ArrowLeft','PageUp'].includes(e.code)?-1:1);
+   if(at>=0&&at<picker.options.length){state.chapter=picker.options[at].value;renderCatalog();focusLevel(0);}return;
+  }
+  if(['ArrowUp','ArrowDown','Home','End'].includes(e.code)){
+   e.preventDefault();focusLevel(e.code==='Home'?0:e.code==='End'?choices.length-1:Math.max(0,Math.min(choices.length-1,index+(e.code==='ArrowDown'?1:-1))));return;
+  }
+  if(['Enter','Space'].includes(e.code)&&document.activeElement?.matches('.course')){e.preventDefault();if(!e.repeat)document.activeElement.click();}
+ }
  function renderCatalog(){
-  const list=$('course-list');list.replaceChildren();
+  const list=$('course-list'),focusedId=list.contains(document.activeElement)?document.activeElement.dataset.challenge:null;list.replaceChildren();
   const ordered=[...state.challenges].sort((a,b)=>(a.order??999)-(b.order??999));
   const chapters=new Map(ordered.filter(c=>c.campaign).map(c=>[String(c.campaign.chapter),c.campaign.chapterTitle]));
   const campaignCount=ordered.filter(c=>c.campaign).length;
@@ -131,12 +151,15 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
    if(campaignCount&&(c.campaign?String(c.campaign.chapter):'community')!==state.chapter)continue;
    const button=document.createElement('button');button.className='course'+(state.selected?.id===c.id?' selected':'');
    button.dataset.stage=c.campaign?String(c.order+1).padStart(2,'0'):'＋';
+   button.dataset.challenge=c.id;
+   button.disabled=selectingLevel||!!state.session?.restoring||['Release','Flight'].includes(getPhase());
    button.setAttribute('aria-label',c.name);button.setAttribute('aria-pressed',String(state.selected?.id===c.id));
    const copy=document.createElement('span'),name=document.createElement('strong');copy.className='course-copy';name.textContent=c.name;copy.append(name);
    if(c.campaign){const meta=document.createElement('small');meta.textContent=`${c.campaign.difficulty} · ${c.campaign.distance} m route`;copy.append(meta);}
-   button.append(copy);button.addEventListener('click',()=>{cancel();send('select-challenge',{challengeId:c.id,revision:c.revision});});list.append(button);
+   button.append(copy);button.addEventListener('click',()=>chooseLevel(c));list.append(button);
   }
   if(!ordered.length){const p=document.createElement('p');p.textContent='Create a course with a start and waypoint chain or destination.';list.append(p);}
+  if(focusedId){const i=[...list.children].findIndex(b=>b.dataset.challenge===focusedId);if(i>=0)focusLevel(i);}
  }
  function renderBoard(){if(state.mode==='play')ranking.update(state.selected,state.board,state.personal);}
  $('share-challenge').onclick=()=>{if(state.selected)copyLevel(state.selected.id,$('share-challenge'));};
@@ -216,13 +239,13 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
  }
  $('next-challenge').onclick=advanceCompleted;
  return {
-  openLevels:()=>showLevels(true),
+  openLevels:()=>showLevels(true),closeLevels:()=>showLevels(false),get levelsOpen(){return levelsOpen;},focusLevel,navigateLevels,
   state,advanceCompleted,openReplay,replayViewport:()=>replayViewport,
   playbackRate(fastForward=false){return state.mode==='replay'?(state.replayPlaying?(fastForward?2:1):0):1;},
   scorePresentation(){return {score:state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore,challenge:state.mode==='replay'?state.replay?.challenge:state.selected,attempt:state.mode==='replay'?state.replay?.attempt:scoreAttempt,time:state.mode==='replay'?state.replayTime:getLiveTime(),mode:state.mode,epoch:scoreEpoch};},
   dismissResult(){$('result-card').hidden=true;ranking.reset();feedback.reset();liveScore=null;scoreEpoch++;},
   message(m){
-   if(m.type==='selected'||m.type==='error')nextRequested=false;
+   if(m.type==='selected'||m.type==='error'){nextRequested=false;selectingLevel=false;renderCatalog();}
    if(m.type==='state'&&state.mode!=='replay'){if(m.liveScore){liveScore=m.liveScore;scoreAttempt=m.attempt;feedback.accept(m.liveScore,m.attempt,state.selected);}if(['Aim','Charging'].includes(m.phase)){feedback.reset();liveScore=null;}}
    if(m.type==='worker-status'&&m.status!=='ready'){feedback.reset();liveScore=null;scoreEpoch++;if(state.mode==='design'){setMode('editor');$('placement-status').textContent='Recording interrupted. Start another design ball when physics reconnects.';}}
    if(m.type==='session'){state.session=m;if(m.designing&&state.mode==='play')setMode('design');updateSession();}

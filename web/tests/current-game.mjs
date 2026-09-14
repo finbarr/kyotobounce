@@ -50,3 +50,24 @@ try{
  assert.equal(store.challenge(station.id).name,station.name,'A failed replacement rolls back removals');
  console.log('PASS retired layout/rules/revision cleanup, current score retention, replay, guest selection and restart');
 }finally{store.close();}
+
+// A fresh identity must enter the campaign, including a cold worker start.
+const onboarding=new Store(':memory:');
+try{
+ const disk={center:{x:0,y:0,z:0},radius:1,surface:'floor'},base={revision:1,creator:'station',start:disk,goal:disk,layout:'station',physics:PHYSICS_VERSION,scoring:SCORING_VERSION,throwModel:THROW_MODEL};
+ const first={...base,id:'first',name:'First stage',order:0,campaign:{chapter:1}},later={...base,id:'later',name:'Later stage',order:8,campaign:{chapter:2}};
+ for(const c of [later,{...base,id:'custom',name:'Community',order:-1},first])onboarding.saveChallenge(c);
+ onboarding.setSetting('selected',{id:later.id});
+ const requests=[],worker={ready:false,send:m=>requests.push(m),request:async m=>{requests.push(m);return {ok:true};}},game=new Competition(onboarding,worker,()=>{}),guest=onboarding.guest();
+ const fresh=await game.add(guest,'new');assert.equal(fresh.selected.id,first.id,'A new player starts on stage 1, not an old global choice or a community level');
+ worker.ready=true;await game.ready({layout:base.layout,physics:base.physics});
+ assert.equal(requests.find(m=>m.type==='select'&&m.id==='new').challenge.id,first.id,'The native worker receives the first stage');
+ assert.deepEqual(onboarding.setting(`selected:${guest.id}`),{id:first.id,revision:first.revision});
+ const returning=onboarding.guest();onboarding.setSetting(`selected:${returning.id}`,{id:later.id});
+ assert.equal((await game.add(returning,'returning')).selected.id,later.id,'Returning players keep their own stage');
+ const explorer=onboarding.guest();onboarding.setSetting(`selected:${explorer.id}`,{id:null});
+ assert.equal((await game.add(explorer,'explorer')).selected,null,'Deliberately choosing free exploration is respected');
+ const removed=onboarding.guest();onboarding.setSetting(`selected:${removed.id}`,{id:'removed'});
+ assert.equal((await game.add(removed,'removed')).selected.id,first.id,'A removed course falls back to the campaign');
+ console.log('PASS first-stage onboarding, cold native startup, returning stage, explicit exploration and deleted-stage fallback');
+}finally{onboarding.close();}

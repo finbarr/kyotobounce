@@ -78,7 +78,15 @@ let cameraClearance=3.8,cameraObstacles;
 function notice(text,duration=4500){$('notice').textContent=text;$('notice').classList.remove('quiet');noticeUntil=performance.now()+duration;}
 function send(type,extra={}){return connection?.send(type,extra);}
 const sharedReplayId=replayIdFromPath(location.pathname);let requestedLevel=levelIdFromPath(location.pathname)||new URLSearchParams(location.search).get('level');
-let ui,briefing,names,mobile,startup;
+let ui,briefing,names,mobile,startup,explicitMouseRelease=false;
+const levelMenuOpen=()=>mobile?.active?mobile.menu==='levels':!!ui?.levelsOpen;
+function openLevelMenu(){
+ if(!ui||ui.state.mode!=='play'||names?.active||startup?.active)return;
+ if(['Release','Flight'].includes(shotTimeline?.phase||snapshot?.phase)){notice('Finish your shot, or press R to recall it, then L for levels.');return;}
+ if(briefing.active){briefing.start(false);return;}
+ if(mobile.active){cancel();ui.dismissResult();mobile.openLevels();ui.focusLevel();}else ui.openLevels();
+}
+function closeLevelMenu(){mobile?.close();ui?.closeLevels();canvas.focus();captureMouse();}
 const sound=arcadeAudio();
 const flyControl=document.createElement('div');flyControl.id='fly-control';flyControl.innerHTML='<button id="toggle-fly" aria-pressed="false">F · SCOUT COURSE</button><span id="fly-help" hidden>WASD · FLY / MOUSE · LOOK / E Q · UP DOWN / SHIFT · BOOST / F · RETURN</span>';document.body.append(flyControl);
 function setFly(active,capture=false){
@@ -197,7 +205,7 @@ for(const range of ['precision','full'])$('power-'+range).onclick=()=>{setPowerR
 setPowerRange('full');
 function release(){robotChargeQueued=false;clearTimeout(robotChargeTimer);stopChargeSound();if(chargeMeter.charging){lastThrowAim={yaw,pitch,distance};flightManual=false;sound.cue('throw');sendInput();send('release');flightPending=true;chargeMeter.release(performance.now());}}
 function pointerLocked(){return document.pointerLockElement===canvas;}
-function cancel(){mobile?.reset();setFastForward(false);robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);stopChargeSound();flightPending=false;if(ui?.state.mode!=='replay')send('cancel');chargeMeter.reset();keys.clear();rightDrag=false;lastPointer=null;lockRequested=false;if(pointerLocked())document.exitPointerLock();}
+function cancel(){mobile?.reset();setFastForward(false);robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);stopChargeSound();flightPending=false;if(ui?.state.mode!=='replay')send('cancel');chargeMeter.reset();keys.clear();rightDrag=false;lastPointer=null;lockRequested=false;if(pointerLocked()){explicitMouseRelease=true;document.exitPointerLock();}}
 function pointerLockFailed(error){
   if(error instanceof Error)console.warn('Mouse capture failed:',error.name,error.message);
   if(!lockRequested)return;
@@ -217,9 +225,9 @@ document.addEventListener('pointerlockchange',()=>{
     // A menu, blur or Escape may have cancelled an asynchronous capture request.
     if(!lockRequested||(!fly.active&&!['play','design'].includes(ui.state.mode))||(!workerReady&&ui.state.mode!=='replay')){cancel();return;}
     lockRequested=false;lastPointer=null;if(!fly.active&&!flightControls())centerOnAim();canvas.focus();
-    notice('Mouse captured · Esc for menus',3000);
-  }else if(resultMouseRelease){resultMouseRelease=false;lockRequested=false;lastPointer=null;rightDrag=false;}
-  else cancel();
+    explicitMouseRelease=false;notice('Mouse captured · L / Esc for levels',3000);
+  }else if(resultMouseRelease){resultMouseRelease=false;explicitMouseRelease=false;lockRequested=false;lastPointer=null;rightDrag=false;}
+  else{const escaped=!explicitMouseRelease;explicitMouseRelease=false;cancel();if(escaped&&!document.hidden&&document.hasFocus()&&!briefing?.blocked&&!['Release','Flight'].includes(shotTimeline?.phase||snapshot?.phase))openLevelMenu();}
 });
 function recall(){setFastForward(false);const settle=cancelAvatarCelebration(avatars.get(guestId));if(settle){clearTimeout(robotRetryTimer);robotRetryTimer=setTimeout(recall,settle);return;}pendingRobotResult=null;if(ui?.state.mode==='replay'){$('close-replay').click();return;}if(!send('recall')){notice('Reconnect before recalling this shot.');return;}shotPlayback.clear(true);shotTimeline=null;stopChargeSound();ui.dismissResult();chargeMeter.reset();flightPending=false;returnRequested=true;restoreThrowAim();trailCount=0;}
 function syncSpin(){top=Number($('top').value);kick=Number($('kick').value);$('top-value').textContent=top;$('kick-value').textContent=kick;}
@@ -278,9 +286,17 @@ document.addEventListener('pointerdown',e=>{if(e.target!==canvas&&!speedIndicato
 document.addEventListener('focusin',e=>{if(e.target!==canvas&&!speedIndicator.contains(e.target)&&!mobile?.owns(e.target)&&(chargeMeter.charging||pointerLocked()||lockRequested))cancel();});
 window.addEventListener('blur',cancel);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancel();});
 window.addEventListener('keydown',e=>{
-  if(names?.active)return;
-  if(briefing?.active){if(e.code==='Space'){e.preventDefault();if(!e.repeat)briefing.start();}if(e.code==='Escape'){e.preventDefault();briefing.start(false);}return;}
+  if(e.defaultPrevented||names?.active||startup?.active||e.isComposing)return;
+  const editing=e.target.closest('input,textarea,select,[contenteditable="true"]'),modified=e.metaKey||e.ctrlKey||e.altKey;
+  if(!editing&&!modified&&e.code==='KeyL'&&ui.state.mode==='play'){e.preventDefault();if(!e.repeat){if(levelMenuOpen())closeLevelMenu();else openLevelMenu();}return;}
+  if(briefing?.active){if(e.code==='Enter'&&e.target.closest('button')&&e.target.id!=='briefing-play')return;if(['Space','Enter'].includes(e.code)&&!modified){e.preventDefault();if(!e.repeat)briefing.start();}if(e.code==='Escape'){e.preventDefault();briefing.start(false);}return;}
   if(briefing?.blocked)return;
+  if(levelMenuOpen()){if(e.code==='Escape'){e.preventDefault();closeLevelMenu();}else ui.navigateLevels(e);return;}
+  if(editing)return;
+  if(!modified&&e.code==='KeyR'&&['play','design'].includes(ui.state.mode)){e.preventDefault();if(!e.repeat){recall();canvas.focus();}return;}
+  if(!modified&&e.code==='KeyN'&&ui.state.mode==='play'){e.preventDefault();if(!e.repeat)ui.advanceCompleted();return;}
+  if(!modified&&e.code==='Space'&&!e.repeat&&ui.advanceCompleted()){e.preventDefault();return;}
+  if(e.code==='Escape'&&ui.state.mode==='play'){e.preventDefault();openLevelMenu();return;}
   if(['INPUT','TEXTAREA','SELECT','BUTTON','SUMMARY'].includes(e.target.tagName))return;
   if(e.code==='KeyF'&&!e.repeat){e.preventDefault();if(ui.state.mode==='replay'&&fly.active)$('replay-recenter').click();else setFly(!fly.active,ui.state.mode!=='replay');return;}
   if(ui.state.mode==='replay'&&e.code==='Space'){e.preventDefault();if(!e.repeat){sound.unlock();setFastForward(true);}return;}
@@ -288,10 +304,9 @@ window.addEventListener('keydown',e=>{
   if(ui.state.mode==='replay'){if(e.code==='Escape'){cancel();return;}if(e.code.startsWith('Arrow')){e.preventDefault();keys.add(e.code);}return;}
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
   if(e.code==='Space'&&['play','design'].includes(ui.state.mode)&&shotTimeline?.phase==='Flight'){if(!e.repeat)setFastForward(true);return;}
-  if(e.code==='Space'&&!e.repeat&&ui.advanceCompleted()){e.preventDefault();return;}
   keys.add(e.code);if(e.repeat)return;
   if(e.code==='KeyH'&&ui.state.hint&&ui.state.mode==='play')$('use-hint').click();
-  if(e.code==='Space'){captureMouse();startCharge();}if(e.code==='Escape')cancel();if(e.code==='KeyR')recall();
+  if(e.code==='Space'){captureMouse();startCharge();}if(e.code==='Escape')cancel();
   if(e.code==='KeyP')setPowerRange(powerRange==='full'?'precision':'full');
   if(e.code==='KeyX')$('clear-spin').click();
   if(['KeyQ','KeyE','KeyZ','KeyC'].includes(e.code)){
@@ -300,7 +315,7 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='Space'&&(fastForwardHeld||ui.state.mode==='replay')){e.preventDefault();setFastForward(false);return;}if(fly.active){if(e.code==='Space')e.preventDefault();return;}if(e.code==='Space'&&!(e.target instanceof HTMLInputElement)){e.preventDefault();release();}});
 function self(){return snapshot?.players.find(p=>p.id===guestId);}
-function sendInput(){if(names?.active||briefing?.blocked||!workerReady||!loaded||ui.state.mode==='replay'||shotPlayback.active)return;send('input',{x:fly.active||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyD'))-Number(keys.has('KeyA'))+(mobile?.movement.x||0),-1,1),z:fly.active||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyW'))-Number(keys.has('KeyS'))+(mobile?.movement.z||0),-1,1),fast:keys.has('ShiftLeft')||keys.has('ShiftRight')||!!mobile?.movement.fast,yaw,pitch,top,kick});}
+function sendInput(){if(names?.active||briefing?.blocked||!workerReady||!loaded||ui.state.mode==='replay'||shotPlayback.active)return;send('input',{x:fly.active||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyD'))-Number(keys.has('KeyA'))+(mobile?.movement.x||0),-1,1),z:fly.active||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyW'))-Number(keys.has('KeyS'))+(mobile?.movement.z||0),-1,1),fast:keys.has('ShiftLeft')||keys.has('ShiftRight')||!!mobile?.movement.fast,yaw,pitch,top,kick});}
 setInterval(sendInput,1000/30);
 
 function createAvatar(id){
@@ -349,7 +364,7 @@ async function load(){
     if(sharedReplayId){startup.progress(99,'Opening the replay…');await ui.openReplay(sharedReplayId);}
     startup.complete();await startup.ready;frameSample=performance.now();frameSum=0;frames=0;canvas.focus();
     if(!sharedReplayId&&ui.state.selected)briefing.open(ui.state.selected);
-    if(!sharedReplayId)notice(mobile?.active?'Drag the scene to aim. Hold THROW, then release.':'Click the game to capture the mouse and aim. Esc releases it for menus.',7000);
+    if(!sharedReplayId)notice(mobile?.active?'Drag the scene to aim. Hold THROW, then release.':'Space to throw · L / Esc for levels · F to scout',7000);
   }catch(error){startup.fail(error);console.error(error);}
 }
 // Render a short buffered timeline so the release frame precedes the first
@@ -387,9 +402,9 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   const c=ui.state.selected;
   if(c){const target=c.waypoints?.[0]||c.goal||c.start;const dx=target.center.x-c.start.center.x,dz=target.center.z-c.start.center.z;yaw=Math.atan2(dx,dz)*180/Math.PI;pitch=THREE.MathUtils.clamp(12+Math.atan2(target.center.y-c.start.center.y,Math.hypot(dx,dz))*180/Math.PI,-20,55);}
   centerOnAim();
-  if(capture)captureMouse();else{ui.openLevels();canvas.focus();}
+  if(capture)captureMouse();else{briefing.dismiss();openLevelMenu();}
 }});
-ui=competitionUI({onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>{if(!startup?.active)briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>{if(!startup?.active)briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 $('replay-free').onclick=()=>setFly(true);
 for(const id of ['replay-play','replay-restart','replay-recenter','replay-free'])$(id).addEventListener('click',()=>canvas.focus());
 names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});

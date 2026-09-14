@@ -12,7 +12,9 @@ try{
  assert.equal(throwSpeed(0),.5);assert.equal(throwSpeed(1),100);assert.equal(throwSpeed(1,'precision'),12);assert.equal(throwSpeed(.5),50.25);
  assert.throws(()=>throwSpeed(.5,'full','retired-model'),/Unsupported/);
  const sent=[],worker={ready:false,send:m=>sent.push(m),request:async()=>({ok:true})};
- const competition=new Competition(store,worker,()=>{}),guest=store.guest(),member=await competition.add(guest,'power-fixture');
+ const competition=new Competition(store,worker,()=>{}),guest=store.guest();
+ store.setSetting(`selected:${guest.id}`,{id:null}); // This fixture tests free-play launch inputs.
+ const member=await competition.add(guest,'power-fixture');
  member.restoring=false;competition.layout='station';competition.physics=PHYSICS_VERSION;
  const intent={type:'charge',layout:competition.layout,physics:competition.physics};
  await assert.rejects(competition.command(member,{...intent,powerRange:'turbo'}),/Choose precision/);

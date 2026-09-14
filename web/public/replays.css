@@ -85,6 +85,11 @@ body:has(#result-leaderboard:not([hidden])) #shot-details{right:24px;bottom:43px
    Shared rail dimensions reserve space even with a full top ten or short window. */
 #toggle-levels{color:var(--cyan);border-color:#39d9ed80;font-size:9px;padding:10px 12px}
 #toggle-levels[aria-expanded=true]{background:var(--cyan);color:var(--ink)}
+#toggle-levels kbd{margin-left:8px;padding:2px 5px;border:1px solid currentColor;opacity:1}
+#competition #level-key-help{font-size:9px;line-height:1.8;color:#bedddc;margin:0 0 12px}
+#level-key-help kbd{color:var(--gold);opacity:1;margin:0}
+#course-list .course:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px;background:#294458;color:var(--paper)}
+.mobile-ui #level-key-help{display:none}
 #competition #close-levels,#competition #close-editor{font-size:22px;line-height:1;min-width:28px;min-height:28px;padding:0 4px;margin-left:8px}
 #competition #course-list{max-height:none;overflow:visible;padding-right:0}
 #competition #editor-view{max-height:none;overflow:visible}

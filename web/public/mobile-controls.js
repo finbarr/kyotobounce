@@ -26,7 +26,7 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
  return {
   get active(){return active;},get movement(){return movement;},get menu(){return menu;},viewport:()=>viewport&&state.resultVisible?{...viewport,height:Math.max(40,Math.min(viewport.height,resultTop-viewport.y-12))}:viewport,
   owns:element=>host.contains(element)||$('mobile-controls').contains(element),
-  reset(){input.reset();boost=false;movement.fast=false;$('mobile-boost').setAttribute('aria-pressed','false');},close:()=>panel(''),
+  reset(){input.reset();boost=false;movement.fast=false;$('mobile-boost').setAttribute('aria-pressed','false');},close:()=>panel(''),openLevels:()=>panel('levels'),
   update(next){
    state=next;if(!active)return;
    if(state.mode==='replay'){
