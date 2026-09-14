@@ -1,0 +1,44 @@
+/* Keep the original arcade splash, then make the wait useful. */
+#loading{position:fixed;z-index:40;overflow:auto;overscroll-behavior:contain}
+#loading-setup{width:min(760px,calc(100% - 40px));display:grid;grid-template-columns:1fr 1fr;gap:30px;text-align:left;position:relative;margin:18px auto 30px}
+#loading[data-phase=setup],#loading[data-phase=error]{justify-content:flex-start;padding:28px 0 max(20px,env(safe-area-inset-bottom));}
+#loading[data-phase=setup]>h2,#loading[data-phase=error]>h2{font-size:54px;margin:18px 0 14px;line-height:.85}
+#loading[data-phase=setup]>.eyebrow,#loading[data-phase=error]>.eyebrow{font-size:8px;letter-spacing:3px}
+#loading .loading-progress{position:relative;flex-shrink:0;max-width:calc(100% - 32px)}
+#loading-message{min-height:15px;margin:8px 0;line-height:1.5;max-width:560px}
+#loading .load-track{width:100%;min-width:260px;margin:10px 0;height:6px;overflow:hidden}
+#loading .load-track i{transition:width .18s linear}
+#loading-name form{margin:0}#loading-name form>.eyebrow{font-size:8px;letter-spacing:1.5px;color:#93e9d7}
+#loading #loading-name h2{font:900 32px/.98 Impact,'Arial Narrow',sans-serif;letter-spacing:0;transform:none;text-shadow:none;margin:10px 0;color:#ffdc85}
+#loading #loading-name p{font:12px/1.5 system-ui,sans-serif;letter-spacing:0;text-align:left;color:#c5d4e8;margin:10px 0}
+#loading-name label{display:block;font:10px ui-monospace,monospace;letter-spacing:1px;color:#c5d4e8;margin-top:18px}
+#loading-name input{display:block;box-sizing:border-box;width:100%;font:16px ui-monospace,monospace;color:#fff3d5;background:#101c33;border:1px solid #96b5b9;padding:13px;margin:8px 0;border-radius:4px}
+#loading-name button{width:100%;min-height:48px;background:#ffd260;color:#152139;font-weight:800;font-size:12px;letter-spacing:1px;border:0}
+#loading-name button:disabled{background:#25443f;color:#adf5d6;cursor:default}
+#loading #loading-name .name-status{min-height:18px;color:#a2f0dc;font-size:11px}
+#loading-robot{align-self:center;background:#0b162a80;padding:16px 18px;border:1px solid #749da449;border-top:3px solid #92e9d5;border-radius:6px}
+#loading-robot #robot-character-picker{margin:0}
+#loading #loading-tip{font:11px/1.6 system-ui,sans-serif;letter-spacing:0;color:#b9c9de;margin:15px 0 0;text-align:left}
+#loading-retry{position:relative;min-height:44px;margin:12px;background:#ffd260;color:#152139}
+.is-loading #mobile-ui,.is-loading #notice{visibility:hidden}
+@media(max-width:600px){
+ #loading[data-phase=setup],#loading[data-phase=error]{padding-top:max(14px,env(safe-area-inset-top))}
+ #loading[data-phase=setup]>h2,#loading[data-phase=error]>h2{font-size:40px;margin:12px 0}
+ #loading-setup{width:calc(100% - 32px);grid-template-columns:1fr;gap:14px;margin:12px auto 18px}
+ #loading-name form{display:flex;flex-direction:column}#loading-name form>.eyebrow,#loading #loading-name h2,#loading #loading-name form>p:not(.name-status){display:none}
+ #loading-name label{margin-top:0}#loading-name input{margin-bottom:0}
+ #loading-name .name-status{margin:8px 0!important}
+ #loading-robot{grid-row:1;padding:12px 14px}
+ #loading #loading-tip{font-size:10px;margin-top:8px}
+ #loading-message{font-size:9px;letter-spacing:0}
+}
+@media(orientation:landscape) and (max-height:600px){
+ #loading[data-phase=setup],#loading[data-phase=error]{padding:12px 0}
+ #loading[data-phase=setup]>.eyebrow,#loading[data-phase=error]>.eyebrow{display:none}
+ #loading[data-phase=setup]>h2,#loading[data-phase=error]>h2{font-size:32px;margin:0 0 6px}#loading[data-phase=setup]>h2 br,#loading[data-phase=error]>h2 br{display:none}#loading[data-phase=setup]>h2 strong,#loading[data-phase=error]>h2 strong{margin-left:.12em}
+ #loading-setup{grid-template-columns:1fr 1fr;gap:20px;margin:8px auto;width:calc(100% - 40px)}
+ #loading-name form>.eyebrow,#loading #loading-name h2,#loading #loading-name form>p:not(.name-status){display:none}
+ #loading-name label{margin:0}#loading-name input{padding:10px;margin-bottom:0}#loading #loading-name .name-status{margin:5px 0}
+ #loading-robot{grid-row:auto;padding:10px 14px}#loading #loading-tip{display:none}#loading .load-track{margin:6px 0}
+}
+@media(prefers-reduced-motion:reduce){#loading .load-track i{transition:none}}

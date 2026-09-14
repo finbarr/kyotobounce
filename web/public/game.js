@@ -24,6 +24,7 @@ import { arcadeAudio } from './arcade-audio.js';
 import { challengeBriefing } from './briefing.js';
 import { shotDetails } from './debug.js';
 import {mobileControls} from './mobile-controls.js';
+import {progressiveLoading,yieldLoadingUI} from './loading.js';
 import { dressStation, contactShadow } from './station-look.js';
 import {addConcourseDetails} from './concourse-details.js';
 // A page restored from the back/forward cache has already left its live session.
@@ -77,7 +78,7 @@ let cameraClearance=3.8,cameraObstacles;
 function notice(text,duration=4500){$('notice').textContent=text;$('notice').classList.remove('quiet');noticeUntil=performance.now()+duration;}
 function send(type,extra={}){return connection?.send(type,extra);}
 const sharedReplayId=replayIdFromPath(location.pathname);let requestedLevel=levelIdFromPath(location.pathname)||new URLSearchParams(location.search).get('level');
-let ui,briefing,names,mobile;
+let ui,briefing,names,mobile,startup;
 const sound=arcadeAudio();
 const flyControl=document.createElement('div');flyControl.id='fly-control';flyControl.innerHTML='<button id="toggle-fly" aria-pressed="false">F · SCOUT COURSE</button><span id="fly-help" hidden>WASD · FLY / MOUSE · LOOK / E Q · UP DOWN / SHIFT · BOOST / F · RETURN</span>';document.body.append(flyControl);
 function setFly(active,capture=false){
@@ -113,7 +114,7 @@ const connection=sharedReplayId?null:gameConnection({
     performanceReport.status(status,extra);
     if(status==='latency')return;connectionStatus=status;
     if(status==='connected')return;
-    workerReady=false;workerStatus=status;cancel();if(!shotPlayback.active)clearLiveMotion();
+    workerReady=false;startup?.network(false);workerStatus=status;cancel();if(!shotPlayback.active)clearLiveMotion();
     if(status==='reconnecting')notice(shotPlayback.active?'Reconnecting… Playing the buffered shot.':'Connection interrupted. Reconnecting…',1e8);
     if(status==='replaced')notice('This session was opened on another connection. Reload to start a new session.',1e8);
   },
@@ -159,13 +160,13 @@ function handleMessage(m,playback=false){
     const recovering=workerStatus==='recovering';workerStatus=m.status;
     if(m.status==='ready'){if(recovering)notice('Session restored. Your unfinished shot was cancelled; you can throw again.',6500);}
     else{
-      workerReady=false;cancel();
+      workerReady=false;startup?.network(false);cancel();
       shotPlayback.clear(true);shotTimeline=null;clearLiveMotion();
       if(m.status==='recovering'||m.status==='failed')notice(m.message,1e8);
     }
   }
   if(m.type==='ready')checkStationVersion(m.layout);
-  if(m.type==='state'){if(snapshot&&m.stationTime<snapshot.stationTime){history.length=0;renderClock=null;}ballRotations.add(m);if(m.phase==='Flight')flightPending=false;previous=snapshot;snapshot=m;received=performance.now();history.push(m);if(history.length>30)history.shift();if(!playback||connectionStatus==='connected')workerReady=true;}
+  if(m.type==='state'){if(snapshot&&m.stationTime<snapshot.stationTime){history.length=0;renderClock=null;}ballRotations.add(m);if(m.phase==='Flight')flightPending=false;previous=snapshot;snapshot=m;received=performance.now();history.push(m);if(history.length>30)history.shift();if(!playback||connectionStatus==='connected')workerReady=true;startup?.network(workerReady);}
   if(m.type==='error'||m.type==='notice'){if(!m.id||m.id===guestId){if(m.type==='error')flightPending=false;notice(m.message);stopChargeSound();chargeMeter.reset();}}
   if(m.type==='impact'){lastImpact=m;$('last-impact').textContent=m.label;if(m.qualifying)sound.cue('impact',m);}
 }
@@ -308,27 +309,29 @@ function createAvatar(id){
 
 async function load(){
   try{
-    const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);const data=await fetch('/assets/station.json').then(r=>r.json());loadedLayout=data.layoutSha256;if(checkStationVersion(snapshot?.layout))return;
-    const [atrium,robot,hardware,detailData]=await Promise.all([
-      loader.loadAsync('/assets/runtime/atrium.glb',e=>{$('load-progress').style.width=`${e.total?Math.min(75,e.loaded/e.total*75):15}%`;$('loading-message').textContent=`Opening the atrium · ${Math.round(e.loaded/1024/1024)} MB`; }),
-      loader.loadAsync('/assets/runtime/ori.glb'),
-      loader.loadAsync('/assets/runtime/atrium-detail.glb'),
-      fetch('/assets/atrium-detail.json').then(r=>r.json())
+    const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+    const [data,atrium,robot,hardware,detailData]=await Promise.all([
+      fetch('/assets/station.json').then(r=>{if(!r.ok)throw Error('Station metadata unavailable');return r.json();}),
+      ...['atrium','ori','atrium-detail'].map(name=>loader.loadAsync(`/assets/runtime/${name}.glb`,e=>startup.download(name,e))),
+      fetch('/assets/atrium-detail.json').then(r=>{if(!r.ok)throw Error('Station detail unavailable');return r.json();})
     ]);
-    station=atrium.scene;robotAsset=robot;$('loading-message').textContent='Preparing surfaces and camera…';
+    loadedLayout=data.layoutSha256;if(checkStationVersion(snapshot?.layout))return;
+    station=atrium.scene;robotAsset=robot;startup.progress(78,'Preparing the station surfaces…');await yieldLoadingUI();
     // Hardware sits on existing surfaces. Keep it out of camera collision
     // raycasts, just as the surface decals are, to avoid little camera jolts.
     const hardwareScene=hardware.scene;scene.add(hardwareScene);
     hardwareScene.traverse(o=>{if(o.isMesh)o.receiveShadow=true;});
     const details=addStationDetails(scene,detailData);
-    addConcourseDetails(scene,data,renderer.capabilities.getMaxAnisotropy());
+    await yieldLoadingUI();addConcourseDetails(scene,data,renderer.capabilities.getMaxAnisotropy());await yieldLoadingUI();
     window.kyotoArt={...details.stats,sourceLayout:detailData.sourceLayoutSha256};
-    station.traverse(object=>{if(object.isMesh){object.geometry.computeBoundsTree();object.matrixAutoUpdate=false;object.updateMatrix();}});station.updateMatrixWorld(true);scene.add(station);
+    const meshes=[];station.traverse(object=>{if(object.isMesh)meshes.push(object);});let slice=performance.now();
+    for(const [i,object]of meshes.entries()){object.geometry.computeBoundsTree();object.matrixAutoUpdate=false;object.updateMatrix();if(performance.now()-slice>12){startup.progress(80+i/meshes.length*8,'Preparing surfaces and camera…');await yieldLoadingUI();slice=performance.now();}}
+    station.updateMatrixWorld(true);scene.add(station);
     cameraObstacles=new CameraObstacles(station);
     motion=createEscalators(scene,data.escalators);motion(0);
-    $('loading-message').textContent='Lighting the glass, stone and steel…';
+    startup.progress(90,'Lighting the glass, stone and steel…');await yieldLoadingUI();
     stationLook=dressStation(renderer,scene,sun,station,data);
-    stationLook.updateLights(camera.position,0);
+    await yieldLoadingUI();stationLook.updateLights(camera.position,0);
     stationLook.captureEnvironment();
     if(data.stationInstallations){
       const lights=document.createElement('button');lights.id='station-light-mode';lights.textContent='Station lights: Day';lights.setAttribute('aria-pressed','false');
@@ -338,13 +341,16 @@ async function load(){
     for(const root of [station,hardwareScene,details.group])freezeStaticTransforms(root);
     robotShadow=contactShadow(scene,station);ballShadow=contactShadow(scene,station);
     if(guestId)createAvatar(guestId);
+    startup.progress(96,'Warming up the graphics…');await yieldLoadingUI();
     await renderer.compileAsync(scene,camera);
     await blur.prepare();
-    loaded=true;startupMs=performance.now();$('load-progress').style.width='100%';$('loading').classList.add('done');canvas.focus();
-    if(sharedReplayId)await ui.openReplay(sharedReplayId);
-    else if(ui.state.selected)briefing.open(ui.state.selected);
+    renderer.render(scene,camera);await yieldLoadingUI();
+    loaded=true;startupMs=performance.now();
+    if(sharedReplayId){startup.progress(99,'Opening the replay…');await ui.openReplay(sharedReplayId);}
+    startup.complete();await startup.ready;frameSample=performance.now();frameSum=0;frames=0;canvas.focus();
+    if(!sharedReplayId&&ui.state.selected)briefing.open(ui.state.selected);
     if(!sharedReplayId)notice(mobile?.active?'Drag the scene to aim. Hold THROW, then release.':'Click the game to capture the mouse and aim. Esc releases it for menus.',7000);
-  }catch(error){$('loading-message').textContent=`Could not load: ${error.message}`;console.error(error);}
+  }catch(error){startup.fail(error);console.error(error);}
 }
 // Render a short buffered timeline so the release frame precedes the first
 // airborne pose even when those snapshots arrive in the same network packet.
@@ -383,13 +389,13 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   centerOnAim();
   if(capture)captureMouse();else canvas.focus();
 }});
-ui=competitionUI({onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>briefing.open(c),sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>{if(!startup?.active)briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 $('replay-free').onclick=()=>setFly(true);
 for(const id of ['replay-play','replay-restart','replay-recenter','replay-free'])$(id).addEventListener('click',()=>canvas.focus());
-names=playerName({send,cancel,notice});
+names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});
 if(sharedReplayId){document.body.classList.add('is-replay');$('connection').textContent='REPLAY VIEWER';$('edit-player-name').hidden=true;}
 const characterPicker=createCharacterPicker({onChange:id=>{characterChoice=id;for(const [owner,a]of avatars)if(owner===guestId||ui.state.mode==='replay')setAvatarCharacter(a,id);}});
-$('course-view').insertBefore(characterPicker.element,$('course-list'));
+if(sharedReplayId)$('course-view').insertBefore(characterPicker.element,$('course-list'));else $('loading-character').append(characterPicker.element);
 mobile=mobileControls({canvas,cancel,charge:startCharge,release,recall,
  look:(dx,dy)=>{
   if(fly.active){fly.look(dx,dy);return;}
@@ -402,6 +408,9 @@ mobile=mobileControls({canvas,cancel,charge:startCharge,release,recall,
  speed:()=>{sound.unlock();setFastForward(!fastForwardHeld);}
 });
 
+startup=progressiveLoading({replay:!!sharedReplayId,onDone:()=>{names.finishStartup();$('course-view').insertBefore(characterPicker.element,$('course-list'));}});
+startup.network(workerReady);
+
 window.addEventListener('kyoto:retry',()=>{recall();captureMouse();canvas.focus();});
 window.addEventListener('kyoto:hint',event=>{const h=event.detail;setPowerRange(h.powerRange||'precision');yaw=h.yaw;pitch=h.pitch;top=h.top;kick=h.kick;$('top').value=top;$('kick').value=kick;syncSpin();centerOnAim();notice(`Suggested aim set. Release at the white ${throwSpeed(h.holdMs/((ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*1000),h.powerRange||'precision').toFixed(1)} m/s mark.`,7000);canvas.focus();});
 let lastFrame=performance.now(),frames=0,frameSum=0,frameSample=performance.now(),lastTelemetry=0;
@@ -409,7 +418,7 @@ const frameTimes=[];
 let qualityCheck=0,qualityGoodSince=0;
 function animate(now){
   const frameStart=performance.now();requestAnimationFrame(animate);const rawDt=(now-lastFrame)/1000,dt=Math.min(.1,rawDt);lastFrame=now;
-  if(!loaded){renderer.render(scene,camera);return;}
+  if(!loaded||startup.active)return;
   shotTimeline=shotPlayback.sample(now);
   if(shotTimeline){for(const message of shotTimeline.messages)handleMessage(message,true);ballRotations.add(shotTimeline.after);}
   if(!rightDrag&&!fly.active){

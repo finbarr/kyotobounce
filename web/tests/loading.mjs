@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {LoadingGate} from '../public/loading.js';
+const gate=new LoadingGate({started:100});
+assert.equal(gate.phase(2499),'splash');assert.equal(gate.phase(2500),'setup');
+gate.world=true;gate.connected=true;assert.equal(gate.phase(3000),'setup','A cached station must not dismiss a player who is still typing');
+gate.player=true;assert.equal(gate.phase(3000),'ready');gate.player=false;assert.equal(gate.phase(3000),'setup','Editing a saved name withdraws readiness');
+gate.player=true;gate.connected=false;assert.equal(gate.phase(3000),'setup','Wait for the authoritative session');gate.connected=true;assert.equal(gate.phase(3000),'ready');
+const cached=new LoadingGate();cached.world=cached.player=cached.connected=true;assert.equal(cached.phase(1000),'splash');assert.equal(cached.phase(2400),'ready');
+const replay=new LoadingGate({replay:true});assert.equal(replay.phase(3000),'loading');replay.world=true;assert.equal(replay.phase(3000),'ready','Shared replay viewers do not have to create a player');
+replay.failed=true;assert.equal(replay.phase(3000),'error','Failed loads cannot enter the game');
+console.log('PASS splash duration, early readiness, name editing, connection gating, replay startup and loading failures');
