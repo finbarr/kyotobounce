@@ -14,6 +14,7 @@ export function gameConnection({url,hello,onMessage,onStatus,onTraffic=()=>{},We
   }
   function schedule(){
     if(stopped||retry)return;
+    if(document?.hidden===true){publish('waiting',{reason:'background'});return;}
     const delay=Math.min(8000,500*2**Math.min(attempts++,4))*(.8+random()*.4);
     publish('reconnecting',{retryMs:delay});retry=later(()=>{retry=undefined;connect();},delay);
   }
@@ -25,6 +26,7 @@ export function gameConnection({url,hello,onMessage,onStatus,onTraffic=()=>{},We
   }
   function connect(){
     if(stopped)return;
+    if(document?.hidden===true){publish('waiting',{reason:'background'});return;}
     const current=++generation;welcomed=false;probe=undefined;
     const ws=socket=new WebSocketImpl(url);let openedAt=now();lastReceived=lastProbe=openedAt;
     publish(attempts?'reconnecting':'connecting');
@@ -43,6 +45,7 @@ export function gameConnection({url,hello,onMessage,onStatus,onTraffic=()=>{},We
     });
     ws.addEventListener('close',event=>{
       if(current!==generation||stopped)return;
+      cancelLater(tick);tick=undefined;
       welcomed=false;probe=undefined;socket=undefined;
       publish('disconnected',{closeCode:event.code});
       if(event.code===4009){stopped=true;cancelLater(tick);publish('replaced');return;}

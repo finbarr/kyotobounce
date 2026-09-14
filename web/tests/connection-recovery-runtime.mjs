@@ -14,9 +14,10 @@ proxy.on('connection',down=>{
  down.on('close',()=>up.close());up.on('close',()=>down.close());up.on('error',()=>{});
 });
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
+const page={hidden:false,visibilityState:'visible',addEventListener(type,fn){this.wake=fn;},removeEventListener(){}};
 const messages=[],statuses=[],playback=new ShotPlayback();let guest={},transport;
 const wait=async predicate=>{const end=performance.now()+15000;while(performance.now()<end){const value=predicate();if(value)return value;await delay(10);}throw Error('Recovery test timed out');};
-transport=gameConnection({url:`ws://127.0.0.1:${proxy.address().port}`,hello:()=>({protocol:'shot-stream-v4',token:guest.token,sessionId:guest.sessionId}),WebSocketImpl:WebSocket,events:null,document:null,onStatus:(status,extra)=>{statuses.push({status,...extra,at:performance.now()});if(status==='interrupted')blackout=false;},onMessage:m=>{
+transport=gameConnection({url:`ws://127.0.0.1:${proxy.address().port}`,hello:()=>({protocol:'shot-stream-v4',token:guest.token,sessionId:guest.sessionId}),WebSocketImpl:WebSocket,events:null,document:page,onStatus:(status,extra)=>{statuses.push({status,...extra,at:performance.now()});if(status==='interrupted')blackout=false;},onMessage:m=>{
  if(m.type==='welcome')guest=m;
  if(m.type==='shot-resume')playback.resume(m);
  if(m.type==='shot-chunk')playback.accept(m,performance.now());
@@ -41,5 +42,16 @@ try{
  assert.equal(result.attempt,attempt);assert.ok(result.saved&&result.score>0);
  assert.equal(messages.filter(m=>m.type==='welcome'&&!m.resumed).length,1,'Recovery creates no second physics session');
  assert.equal(playback.stats().shotUnderrunMs,0);
+ const retainedSession=guest.sessionId,welcomes=messages.filter(m=>m.type==='welcome').length;
+ page.hidden=true;page.visibilityState='hidden';page.wake();downstreams.at(-1).terminate();
+ await wait(()=>statuses.at(-1)?.status==='waiting');
+ // Exceed the old 30-second server expiry as well as a throttled retry tick.
+ await delay(35000);
+ assert.equal(messages.filter(m=>m.type==='welcome').length,welcomes,'No background reconnection churn');
+ page.hidden=false;page.visibilityState='visible';page.wake();
+ await wait(()=>messages.filter(m=>m.type==='welcome').length===welcomes+1);
+ assert.equal(guest.resumed,true,'A suspended tab retains its original native session beyond 30 seconds');
+ assert.equal(guest.sessionId,retainedSession);assert.equal(playback.shot.attempt,attempt);
+ console.log('PASS 35-second background socket loss preserves the original session and throw on foreground resume');
  console.log(JSON.stringify({pass:'Real socket blackout, fast authenticated resume, uninterrupted buffered physics and saved score',recoveredMs:Math.round(recovered.at-failedAt),replay:origin+'/replay/'+attempt,score:result.score}));
 }finally{clearInterval(sample);transport.stop();for(const ws of [...upstreams,...downstreams])ws.terminate();await new Promise(r=>proxy.close(r));}

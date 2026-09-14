@@ -55,3 +55,17 @@ for(let i=0;i<20;i++){advance(1000);const ping=live.sent.findLast(m=>m.type==='p
 visible.hidden=true;visible.visibilityState='hidden';advance(10000);assert.equal(live.readyState,1,'Hidden tabs do not churn connections');
 visible.hidden=false;visible.visibilityState='visible';visible.wake();advance(2000);assert.equal(live.readyState,1,'Foreground wake gets a fresh probe and grace');healthy.stop();
 console.log('PASS live-state liveness, quiet buffered shots and background/wake grace');
+
+// Chrome can suspend a background page beyond both heartbeat and retry timers.
+// A closed socket must stay parked until foreground, rather than opening fresh
+// sessions every minute while no rendering/input can run.
+const background={hidden:false,visibilityState:'visible',addEventListener(type,fn){this.wake=fn;},removeEventListener(){}};
+const parked=gameConnection({url:'ws://test',hello:()=>({sessionId:'parked-session'}),onMessage(){},onStatus(){},WebSocketImpl:Socket,now:()=>time,later,cancelLater:id=>timers.delete(id),random:()=>.5,events:null,document:background});
+advance(0);const beforeSleep=sockets.at(-1);beforeSleep.open();beforeSleep.receive({type:'welcome',resumed:true});
+background.hidden=true;background.visibilityState='hidden';background.wake();beforeSleep.close();
+const beforeWake=sockets.length;advance(180000);
+assert.equal(sockets.length,beforeWake,'A disconnected background tab must not keep opening sockets');
+background.hidden=false;background.visibilityState='visible';background.wake();
+assert.equal(sockets.length,beforeWake+1,'Foreground reconnects immediately');
+const afterSleep=sockets.at(-1);afterSleep.open();assert.equal(afterSleep.sent[0].sessionId,'parked-session');afterSleep.receive({type:'welcome',resumed:true});parked.stop();
+console.log('PASS background disconnect parking and immediate authenticated foreground resume');

@@ -29,7 +29,11 @@ const starters=JSON.parse(await readFile(resolve('web/starter-challenges.json'),
 store.syncCampaign(starters);
 type Connection = {guest?:Guest;id:string;queue:ConnectionQueue;metrics:ConnectionMetrics;budget:RequestBudget;lastClientReport:number;requiresReload?:boolean;replaced?:boolean;intentional?:boolean;opened:number;alive:boolean;lastWrite:number;lastReplay:number};
 const connections = new Map<WebSocket,Connection>();
+// Background tabs may be suspended for minutes. Keep their authenticated
+// session through a normal tab switch; reclaim an idle slot if capacity is full.
+const SESSION_RESUME_GRACE_MS=5*60_000;
 const detached = new Map<string,ReturnType<typeof setTimeout>>();
+function expireDetached(id:string){clearTimeout(detached.get(id));detached.delete(id);shots.delete(id);competition.remove(id);}
 const worker = new PhysicsWorker();
 const shots=new Map<string,ShotStream>();
 const eventLoop=monitorEventLoopDelay({resolution:20});eventLoop.enable();
@@ -125,6 +129,9 @@ wss.on('connection',socket=>{
     const now=performance.now();
     if(!c.budget.accept(!!c.guest&&m?.type==='input',Buffer.byteLength(text),now)){c.metrics.closeCause='request-rate';socket.close(1008,'Too many requests. Please reconnect.');return;}
     if(!m){send(socket,{type:'error',message:'Invalid message'});return;}
+    // Valid application traffic also proves the socket is alive, even when a
+    // browser or proxy delays a control-frame pong.
+    c.alive=true;
     if(c.guest&&m.type==='ping'){send(socket,{type:'pong',sequence:m.sequence,server:{eventLoopMaxMs,workerStateAgeMs:c.metrics.lastState?Math.round(now-c.metrics.lastState):0,pendingRequests:worker.requests.size}});return;}
     if(c.guest&&m.type==='client-performance'){
       if(now-c.lastClientReport<4000)return;c.lastClientReport=now;const report=clientPerformance(m.report);
@@ -141,6 +148,7 @@ wss.on('connection',socket=>{
         if(m.type!=='hello')throw new Error('Join first');
         const candidate=typeof m.sessionId==='string'?competition.members.get(m.sessionId):undefined;
         const resumed=candidate&&typeof m.token==='string'&&candidate.guest.token===m.token?candidate:undefined;
+        if(!resumed&&competition.members.size>=16){const oldest=detached.keys().next().value;if(oldest)expireDetached(oldest);}
         if(!resumed&&competition.members.size>=16){socket.close(1013,'All 16 play slots are occupied. Please try again shortly.');return;}
         const guest=resumed?.guest||store.guest(typeof m.token==='string'?m.token:undefined);
         if(resumed){
@@ -193,7 +201,7 @@ wss.on('connection',socket=>{
       else{
         shots.get(c.id)?.setRate(1);
         competition.disconnect(c.id);
-        const timer=setTimeout(()=>{detached.delete(c.id);shots.delete(c.id);competition.remove(c.id);},30000);
+        const timer=setTimeout(()=>expireDetached(c.id),SESSION_RESUME_GRACE_MS);
         timer.unref();detached.set(c.id,timer);
       }
     }
