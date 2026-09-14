@@ -24,3 +24,24 @@ GPU timer queries are **off** by default: they severely perturbed frame pacing o
 Open `http://127.0.0.1:4350/bench/textures.html` to compare every embedded texture after actual Chrome ImageBitmap decoding, using the same decoding options as Three.js. The full asset test independently decodes geometry using Three's bundled meshopt decoder and compares every ordered triangle's attributes, materials, node transforms and bind poses.
 
 See [RESULTS.md](RESULTS.md) and [results.json](results.json) for the measured result and its limits.
+
+## Coplanar edge regression
+
+Run `npm run benchmark:render -- 4350 HEAD` and open
+`http://127.0.0.1:4350/bench/edge-stability.html`. The wall and floor presets
+reproduce the ticket-hall cladding seam and 0.1 mm tactile base respectively.
+Toggle **Stable depth layers** to compare the actual material fix at the same
+camera position; **Small camera sweep** checks the moving, fully lit surfaces.
+
+**Measure 21 angles** uses a diagnostic mask to isolate the target on the current station mesh.
+At each angle it compares the fully lit target against a reference with only the
+competing backing omitted. No geometry is displaced. It reports pixels where
+the backing changes a target pixel by more than 12/255 in any RGB channel; per-angle counts are in the report
+element's `data-results`. The skyway preset is for visual inspection only.
+
+Chrome on macOS, 1470 × 786 drawing buffer, September 13, 2026: wall failures
+ranged from 0 to 19,983 pixels before the fix and were zero at all 21 angles
+afterwards. Floor failures ranged from 0 to 41 and were also zero afterwards.
+These are depth-coverage checks, not an image-quality or whole-station FPS claim.
+The fully lit floor comparison additionally shows the distant strip base staying
+continuous instead of breaking up between its physical raised ribs.

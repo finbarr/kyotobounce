@@ -94,6 +94,22 @@ export function prepareGraniteMaps(material){
   return resized;
 }
 
+// The shell and its pale return walls share coplanar faces (for example x=25
+// beside Ticket Trick). Thin tactile bases are only 0.1 mm above their floor.
+// Give those authored layers a stable depth order without moving vertices,
+// changing collision, disabling depth tests, or changing the visible material.
+export function applyStationDepthLayer(material){
+  const backing=/^Granite - plain draft(?: \| Browser)?$/.test(material.name);
+  const finish=/^(Fleet tactile yellow|station-additions-yellow)(?: \| Browser)?$/.test(material.name);
+  if(!backing&&!finish)return false;
+  material.polygonOffset=true;
+  // A slope offset on the tactile material can pull its base over the ribs
+  // at grazing angles. Constant depth units preserve their relative relief.
+  material.polygonOffsetFactor=backing?2:0;
+  material.polygonOffsetUnits=backing?4:-4;
+  return true;
+}
+
 const roughness={floor:.32,wall:.56,stone:.4,paving:.65,stair:.6,stainless:.28,paint:.43,guard:.09,facade:.14,wood:.58};
 export function applyStationMaterial(material,family,textures,reflections){
   const m=material; m.userData.stationFamily=family;

@@ -1,0 +1,62 @@
+<!doctype html><meta charset="utf-8"><title>Station edge inspection</title>
+<style>body{margin:0;background:#14212a;color:#fff;font:14px system-ui}header{padding:12px;display:flex;gap:20px;align-items:center}canvas{display:block}pre{position:fixed;bottom:10px;left:10px;background:#14212acc;padding:12px;pointer-events:none}</style>
+<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>
+<header><label>View <select id="view"><option value="wall">Ticket wall seam</option><option value="floor">Yellow floor strips</option><option value="skyway">Skyway floor edge</option></select></label><label><input id="fixed" type="checkbox"> Stable depth layers</label><label><input id="motion" type="checkbox"> Small camera sweep</label><label><input id="shadows" type="checkbox" checked> Shadows</label><button id="audit">Measure 21 angles</button></header><canvas id="scene"></canvas><pre id="report">Loading actual game assets…</pre>
+<script type="module">
+import * as T from 'three';import{GLTFLoader}from'three/addons/loaders/GLTFLoader.js';import{MeshoptDecoder}from'three/addons/libs/meshopt_decoder.module.js';import{RoomEnvironment}from'three/addons/environments/RoomEnvironment.js';import{dressStation}from'/current/station-look.js';import{applyStationDepthLayer}from'/current/station-materials.js';
+const $=id=>document.getElementById(id),r=new T.WebGLRenderer({canvas:$('scene'),antialias:true,preserveDrawingBuffer:true});r.setPixelRatio(1);r.setSize(innerWidth,innerHeight-50);r.toneMapping=T.ACESFilmicToneMapping;r.toneMappingExposure=1.25;
+const s=new T.Scene();s.background=new T.Color(0xc3cdd4);const p=new T.PMREMGenerator(r),room=new RoomEnvironment();s.environment=p.fromScene(room,.02).texture;s.environmentIntensity=.55;s.add(new T.HemisphereLight(0xe1eeff,0x79715f,1.1));const sun=new T.DirectionalLight(0xfff0d5,3.1);sun.position.set(-40,100,-50);s.add(sun);
+const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder),[g,data]=await Promise.all([loader.loadAsync('/assets/runtime/atrium.glb'),fetch('/assets/source/station.json').then(r=>r.json())]);s.add(g.scene);const look=dressStation(r,s,sun,g.scene,data);look.captureEnvironment();const mats=new Set();g.scene.traverse(o=>{if(o.isMesh)for(const m of Array.isArray(o.material)?o.material:[o.material])mats.add(m);});
+const camera=new T.PerspectiveCamera(55,innerWidth/(innerHeight-50),.035,450);
+function layers(fixed){for(const m of mats){if(applyStationDepthLayer(m))m.polygonOffset=fixed;}}
+const views={wall:[[20,1.6,17],[25,1.6,24]],floor:[[2,.65,20],[0,0,0]],skyway:[[1,46.5,-2.326],[12,45.2,-4]]};function place(d){const[a,b]=views[$('view').value];camera.position.fromArray(a);camera.position.x+=d;camera.lookAt(...b);}
+$('view').onchange=()=>{place(0);$('report').textContent='Ready';$('audit').disabled=$('view').value==='skyway';};$('fixed').onchange=()=>layers($('fixed').checked);$('shadows').onchange=()=>{sun.castShadow=$('shadows').checked;r.shadowMap.needsUpdate=true;};
+layers(false);$('report').textContent='Ready · exact game GLB/materials · no avatar or HUD';place(0);let measuring=false;
+$('audit').onclick=async()=>{
+  measuring=true;
+  const selected=$('view').value;
+  const target=selected==='wall'?/^Pale cladding/:/^Fleet tactile yellow/;
+  const backing=selected==='wall'?/^Granite - plain draft/:/honed granite floor/;
+  const swaps=[];
+  g.scene.traverse(o=>{
+    if(!o.isMesh)return;
+    const originals=Array.isArray(o.material)?o.material:[o.material];
+    const mask=originals.map(m=>new T.MeshBasicMaterial({color:target.test(m.name)?0xffffff:0,side:m.side,toneMapped:false,visible:!backing.test(m.name)}));
+    swaps.push({o,original:o.material,mask:Array.isArray(o.material)?mask:mask[0]});
+  });
+  const gl=r.getContext(),w=r.domElement.width,h=r.domElement.height;
+  const read=()=>{r.render(s,camera);const p=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,p);return p;};
+  const rows=[];
+  for(let i=0;i<21;i++){
+    place((i-10)*.005);
+    for(const q of swaps)q.o.material=q.mask;
+    const mask=read();
+    for(const q of swaps)q.o.material=q.original;
+    layers(false);
+    for(const m of mats)if(backing.test(m.name))m.visible=false;
+    const reference=read();
+    for(const m of mats)m.visible=true;
+    const counts=[];
+    for(const fixed of [false,true]){
+      layers(fixed);const pixels=read();let missing=0,total=0;
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        if(selected==='wall'&&(x<w*.36||x>w*.45||y<h*.3))continue;
+        const k=(y*w+x)*4;
+        if(mask[k]>240&&mask[k+1]>240&&mask[k+2]>240){
+          total++;
+          if(Math.max(...[0,1,2].map(c=>Math.abs(reference[k+c]-pixels[k+c])))>12)missing++;
+        }
+      }
+      counts.push({fixed,missing,total});
+    }
+    rows.push({angle:i,counts});
+  }
+  for(const q of swaps)for(const m of Array.isArray(q.mask)?q.mask:[q.mask])m.dispose();
+  layers($('fixed').checked);place(0);
+  $('report').dataset.results=JSON.stringify({view:selected,rows});
+  const before=rows.map(r=>r.counts[0].missing),after=rows.map(r=>r.counts[1].missing);
+  $('report').textContent=`${selected}: 21 camera angles\nIncorrectly covered pixels before: ${Math.min(...before)}–${Math.max(...before)}\nAfter: ${Math.min(...after)}–${Math.max(...after)}\n${Math.max(...after)===0&&Math.max(...before)>0?'PASS':'REVIEW'}`;
+  measuring=false;
+};
+r.setAnimationLoop(t=>{if(measuring)return;if($('motion').checked)place(Math.sin(t/1200)*.08);r.render(s,camera);});
+</script>
