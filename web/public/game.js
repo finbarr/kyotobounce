@@ -387,7 +387,7 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   const c=ui.state.selected;
   if(c){const target=c.waypoints?.[0]||c.goal||c.start;const dx=target.center.x-c.start.center.x,dz=target.center.z-c.start.center.z;yaw=Math.atan2(dx,dz)*180/Math.PI;pitch=THREE.MathUtils.clamp(12+Math.atan2(target.center.y-c.start.center.y,Math.hypot(dx,dz))*180/Math.PI,-20,55);}
   centerOnAim();
-  if(capture)captureMouse();else canvas.focus();
+  if(capture)captureMouse();else{ui.openLevels();canvas.focus();}
 }});
 ui=competitionUI({onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>{if(!startup?.active)briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 $('replay-free').onclick=()=>setFly(true);
@@ -395,7 +395,7 @@ for(const id of ['replay-play','replay-restart','replay-recenter','replay-free']
 names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});
 if(sharedReplayId){document.body.classList.add('is-replay');$('connection').textContent='REPLAY VIEWER';$('edit-player-name').hidden=true;}
 const characterPicker=createCharacterPicker({onChange:id=>{characterChoice=id;for(const [owner,a]of avatars)if(owner===guestId||ui.state.mode==='replay')setAvatarCharacter(a,id);}});
-if(sharedReplayId)$('course-view').insertBefore(characterPicker.element,$('course-list'));else $('loading-character').append(characterPicker.element);
+if(sharedReplayId)$('course-list').after(characterPicker.element);else $('loading-character').append(characterPicker.element);
 mobile=mobileControls({canvas,cancel,charge:startCharge,release,recall,
  look:(dx,dy)=>{
   if(fly.active){fly.look(dx,dy);return;}
@@ -408,7 +408,7 @@ mobile=mobileControls({canvas,cancel,charge:startCharge,release,recall,
  speed:()=>{sound.unlock();setFastForward(!fastForwardHeld);}
 });
 
-startup=progressiveLoading({replay:!!sharedReplayId,onDone:()=>{names.finishStartup();$('course-view').insertBefore(characterPicker.element,$('course-list'));}});
+startup=progressiveLoading({replay:!!sharedReplayId,onDone:()=>{names.finishStartup();$('course-list').after(characterPicker.element);}});
 startup.network(workerReady);
 
 window.addEventListener('kyoto:retry',()=>{recall();captureMouse();canvas.focus();});

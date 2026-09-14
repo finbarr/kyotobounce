@@ -16,6 +16,19 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
 
  <div id="result-card" hidden><span class="eyebrow" id="result-label"></span><div class="result-rank" id="result-rank"></div><h2 id="result-title"></h2><p id="result-breakdown"></p><div id="result-math"></div><p class="result-tip" id="result-tip"></p><div class="actions"><button id="try-result">Try again <kbd>R</kbd></button><button id="watch-result">Watch replay</button><button id="share-result">Copy replay link ↗</button><button id="next-challenge">Next challenge <kbd>SPACE</kbd> →</button></div></div>`;document.body.append(host);
  const results=document.createElement('div');results.id='results-screen';document.body.append(results);results.append($('result-card'));
+ const levelsButton=document.createElement('button');levelsButton.id='toggle-levels';levelsButton.type='button';levelsButton.textContent='LEVELS';levelsButton.setAttribute('aria-controls','competition');levelsButton.setAttribute('aria-expanded','false');document.querySelector('.session').prepend(levelsButton);
+ const closeLevels=document.createElement('button');closeLevels.id='close-levels';closeLevels.type='button';closeLevels.textContent='×';closeLevels.setAttribute('aria-label','Close levels');$('course-view').querySelector('.panel-top').append(closeLevels);
+ let levelsOpen=false;
+ function showLevels(open){
+  if(levelsOpen===open)return;
+  levelsOpen=open;document.body.classList.toggle('levels-open',open);levelsButton.setAttribute('aria-expanded',String(open));
+  if(open){cancel();$('result-card').hidden=true;host.scrollTop=0;}
+ }
+ levelsButton.onclick=()=>showLevels(!levelsOpen);
+ closeLevels.onclick=()=>{showLevels(false);levelsButton.focus();};
+ document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement)showLevels(false);});
+ document.addEventListener('keydown',e=>{if(e.code==='Escape'&&levelsOpen){showLevels(false);levelsButton.focus();}});
+ for(const id of ['explore','show-overview','use-hint'])$(id).addEventListener('click',()=>showLevels(false));
  const ranking=resultBoard({host:document.body,watch:openReplay,sound,getGuestId,share:copyLevel});
  // A single layout owns replay panels; the game restores these shared widgets on exit.
  const replayView=document.createElement('section');replayView.id='replay-view';replayView.hidden=true;
@@ -31,7 +44,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
  const state={chapter:null,mode:'play',session:null,challenges:[],selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v3'},selectedWaypoint:null,editId:null,placing:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
  const designPath=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x5fffe3,transparent:true,opacity:.8,depthWrite:false}));scene.add(designPath);designPath.visible=false;
  let capturedDesign=null,designRequest=false;
- function setMode(mode){state.mode=mode;onModeChange(mode);}
+ function setMode(mode){showLevels(false);state.mode=mode;onModeChange(mode);}
  function clearDesign(){capturedDesign=null;designPath.geometry.dispose();designPath.geometry=new THREE.BufferGeometry();designPath.visible=false;$('design-proof').hidden=true;}
  function proofUnchanged(){return capturedDesign&&capturedDesign.geometry===designGeometry(state.draft);}
  function showProof(){const unchanged=proofUnchanged();$('design-proof').hidden=!capturedDesign;$('design-proof').textContent=unchanged?'✓ RECORDED ROUTE · Every generated target was reached. The cyan line shows the shot. Its aim and power will be saved.':'EDITED ROUTE · The cyan line is the original shot. Record again to verify the changed targets.';$('design-proof').dataset.verified=String(!!unchanged);}
@@ -72,8 +85,13 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
  }
  function presentation(){
   const replaying=state.mode==='replay'||sharedReplay;
+  const throwing=['Charging','Release','Flight'].includes(getPhase());
+  if(throwing||replaying||document.body.classList.contains('is-briefing')||document.body.classList.contains('mobile-ui'))showLevels(false);
+  levelsButton.hidden=replaying||state.mode!=='play';levelsButton.disabled=throwing;
+  levelsButton.title=throwing?'Finish or recall your shot to change levels':'Choose a level or robot';
   document.body.classList.toggle('is-results',!replaying&&!$('result-card').hidden);document.body.classList.toggle('is-replay',replaying);
   host.hidden=replaying;
+  if(host.dataset.mode!==state.mode)host.dataset.mode=state.mode;
   for(const [id,destination] of [['combo-hud','replay-metrics'],['result-leaderboard','replay-metrics'],['shot-speed','replay-speed-slot'],['combo-spectacle','replay-stage']]){const element=$(id),parent=replaying?$(destination):document.body;if(element.parentElement!==parent)parent.append(element);}
   $('result-leaderboard').hidden=state.mode==='replay'?!state.replay:state.mode!=='play'||!state.selected;
   $('course-view').hidden=sharedReplay||state.mode!=='play';$('editor-view').hidden=state.mode!=='editor';$('replay-view').hidden=!sharedReplay&&state.mode!=='replay';
@@ -85,7 +103,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
   $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?'READY TO THROW · SHARED SCORES':'Explore the station freely';
   const changed=state.selected?.id!==session.challenge?.id||state.selected?.revision!==session.challenge?.revision;
   state.selected=session.challenge;
-  if(changed){state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
+  if(changed){showLevels(false);state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
   $('course-title').textContent=state.selected?.name||'PICK YOUR LINE.';$('challenge-detail').hidden=!state.selected;
   if(state.selected){const c=state.selected;$('challenge-description').textContent=c.scoring==='waypoint-v3'?`${c.waypoints?.length||0} waypoints · ${c.goal?(c.waypoints?.length?'optional destination bonus':'destination required'):'no destination required'} · all shots can rank · collect every waypoint to clear`:`Start within ${c.start.radius.toFixed(2)} m · settle inside ${c.goal.radius.toFixed(2)} m${c.requiredSurface?' · required route contact':''}`;if(c.campaign)$('challenge-description').textContent=c.campaign.brief+' '+$('challenge-description').textContent;state.hint=state.selected.hint||null;$('use-hint').hidden=!state.hint;$('hint-note').textContent=state.hint?.note||'';$('edit-challenge').hidden=state.selected.creator!==getGuestId();}
   if(state.mode==='play')drawDisks(state.selected);
@@ -198,6 +216,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},scene,send
  }
  $('next-challenge').onclick=advanceCompleted;
  return {
+  openLevels:()=>showLevels(true),
   state,advanceCompleted,openReplay,replayViewport:()=>replayViewport,
   playbackRate(fastForward=false){return state.mode==='replay'?(state.replayPlaying?(fastForward?2:1):0):1;},
   scorePresentation(){return {score:state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore,challenge:state.mode==='replay'?state.replay?.challenge:state.selected,attempt:state.mode==='replay'?state.replay?.attempt:scoreAttempt,time:state.mode==='replay'?state.replayTime:getLiveTime(),mode:state.mode,epoch:scoreEpoch};},

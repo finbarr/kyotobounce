@@ -50,13 +50,11 @@
 #result-leaderboard li.own-score[data-rank="2"] .rank-place{color:#d6e7f2}
 #result-leaderboard li.own-score[data-rank="3"] .rank-place{color:#e8b398}
 .board-empty{color:#a7b7cc;font:10px/1.7 ui-monospace,monospace}
-body:has(#result-leaderboard:not([hidden])) #competition{right:302px;width:270px}
 body:has(#result-leaderboard:not([hidden])) #shot-details{right:24px;bottom:43px}
 .is-briefing .briefing-heading{right:305px}
 .is-briefing #result-leaderboard{top:155px;max-height:calc(100dvh - 405px)}
 @media(max-width:900px){
  #result-leaderboard{right:14px;width:220px;top:100px;max-height:calc(100dvh - 180px);padding:9px}
- body:has(#result-leaderboard:not([hidden])) #competition{right:248px;width:240px}
  .is-briefing .briefing-heading{right:248px}
  .is-briefing #result-leaderboard{top:175px;max-height:calc(100dvh - 390px)}
  .is-results #result-leaderboard{max-height:36dvh}
@@ -72,9 +70,6 @@ body:has(#result-leaderboard:not([hidden])) #shot-details{right:24px;bottom:43px
  #result-leaderboard strong,#result-leaderboard [data-rank="1"] strong{font-size:9px}
  #result-leaderboard .own-score .rank-name::after{content:''}
  #result-leaderboard .board-footnote{font-size:7px}
- body:has(#result-leaderboard:not([hidden])) #competition{left:8px;right:auto;top:100px;width:calc(100vw - 200px);padding:10px;max-height:calc(100dvh - 175px)}
- body:has(#result-leaderboard:not([hidden])) #competition h2{font-size:18px}
- body:has(#result-leaderboard:not([hidden])) #competition .panel-top{flex-wrap:wrap;gap:8px}
 
  .is-briefing .briefing-heading{right:20px}
  .is-briefing #result-leaderboard{top:175px;max-height:calc(100dvh - 445px);min-height:110px}
@@ -85,6 +80,32 @@ body:has(#result-leaderboard:not([hidden])) #shot-details{right:24px;bottom:43px
 #result-leaderboard>.board-heading,#result-leaderboard>.own-placement,#result-leaderboard>.board-footnote{flex-shrink:0}
 #result-leaderboard>ol{min-height:0;overflow:auto;scrollbar-width:thin;padding-bottom:2px}
 #result-leaderboard .share-level:hover,#result-leaderboard .share-level:focus-visible{color:#152634}
+
+/* Gameplay menus are intentional; releasing the mouse must not cover a shot.
+   Shared rail dimensions reserve space even with a full top ten or short window. */
+#toggle-levels{color:var(--cyan);border-color:#39d9ed80;font-size:9px;padding:10px 12px}
+#toggle-levels[aria-expanded=true]{background:var(--cyan);color:var(--ink)}
+#competition #close-levels,#competition #close-editor{font-size:22px;line-height:1;min-width:28px;min-height:28px;padding:0 4px;margin-left:8px}
+#competition #course-list{max-height:none;overflow:visible;padding-right:0}
+#competition #editor-view{max-height:none;overflow:visible}
+.mobile-ui #toggle-levels,.mobile-ui #close-levels{display:none}
+body:not(.mobile-ui):not(.levels-open)>#competition[data-mode=play]{display:none}
+body:not(.mobile-ui).levels-open>#competition{display:block;visibility:visible}
+body:not(.mobile-ui):not(.is-replay){--game-edge:24px;--game-rail:260px;--game-gap:16px;--game-top:106px;--game-bottom:62px}
+body:not(.mobile-ui):not(.is-replay)>#competition{top:var(--game-top);right:var(--game-edge);width:300px;max-height:calc(100dvh - var(--game-top) - var(--game-bottom));padding:18px;z-index:10}
+body:not(.mobile-ui):not(.is-replay):has(>#result-leaderboard:not([hidden]))>#competition{right:calc(var(--game-edge) + var(--game-rail) + var(--game-gap));width:300px}
+body:not(.mobile-ui):not(.is-replay):not(.is-briefing)>#result-leaderboard{top:var(--game-top);right:var(--game-edge);width:var(--game-rail);max-height:calc(100dvh - var(--game-top) - var(--game-bottom) - 80px)}
+body:not(.mobile-ui):not(.is-replay)>#shot-speed{right:var(--game-edge);bottom:var(--game-bottom);width:var(--game-rail);height:64px;min-height:0;padding:10px;box-shadow:none}
+body:not(.mobile-ui):not(.is-replay)>#shot-speed strong{font-size:13px}
+body:not(.mobile-ui):not(.is-replay)>#shot-speed small{font-size:8px;letter-spacing:0}
+body:not(.mobile-ui):not(.is-replay)>#combo-hud{left:var(--game-edge);bottom:var(--game-bottom);width:340px}
+body:not(.mobile-ui):not(.is-replay)>#combo-spectacle #combo-burst{top:max(156px,18%);right:calc(var(--game-edge) + var(--game-rail) + 80px);width:min(420px,calc(100vw - 760px))}
+body:not(.mobile-ui):not(.is-replay)>#combo-spectacle #combo-burst strong{font-size:clamp(32px,4vw,74px)}
+body:not(.mobile-ui):not(.is-replay)>#combo-spectacle #combo-burst strong.word-burst{font-size:clamp(30px,3vw,56px)}
+body:not(.mobile-ui):not(.is-replay)>#combo-spectacle #combo-line{left:380px;right:calc(var(--game-edge) + var(--game-rail) + var(--game-gap));bottom:calc(var(--game-bottom) + 10px)}
+body:not(.mobile-ui):not(.is-replay)>footer{flex-wrap:nowrap;gap:16px;align-items:center;white-space:nowrap;font-size:8px}
+body.is-designer:not(.mobile-ui)>#fly-control{left:calc((100vw - 340px)/2);max-width:calc(100vw - 380px)}
+@media(min-width:901px) and (max-width:1100px){body:not(.mobile-ui):not(.is-replay)>footer span:nth-of-type(4){display:none}}
 
 /* Replay viewer: one score rail and one transport, with an open camera stage. */
 .is-replay #competition,.is-replay #results-screen,.is-replay #throw-panel,.is-replay #power-control,.is-replay #flight-panel,.is-replay #nickname,.is-replay #edit-player-name,.is-replay #shot-details,.is-replay footer,.is-replay #fly-control{display:none!important}
