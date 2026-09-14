@@ -1,6 +1,8 @@
 // Optional local diagnostics, also exposed in the DOM for browser inspection.
 export function shotDetails(cancel){
   const panel=document.getElementById('shot-details'),output=document.getElementById('shot-state');
+  panel.hidden=new URLSearchParams(location.search).get('debug')!=='1';
+  if(panel.hidden)return ()=>{};
   let report=null,lastFlight=null,lastUpdate=0;
   panel.addEventListener('toggle',()=>{if(panel.open)cancel();});
   document.getElementById('save-shot-report').onclick=()=>{

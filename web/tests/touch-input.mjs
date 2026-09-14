@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {TouchInput,stickVector} from '../public/touch-input.js';
+let events=[],look=[],zooms=[],movement;
+const input=new TouchInput({charge:()=>events.push('charge'),release:()=>events.push('release'),cancel:()=>events.push('cancel'),look:(x,y)=>look.push([x,y]),zoom:r=>zooms.push(r),tap:()=>events.push('tap'),move:v=>movement=v});
+const rect={x:0,y:0,width:120,height:120};
+assert.deepEqual(stickVector(0,0,50),{x:0,z:0});assert.deepEqual(stickVector(3,2,50),{x:0,z:0});assert.equal(Math.hypot(...Object.values(stickVector(100,100,50))),1);
+input.down('throw',1,250,750,rect);input.down('look',2,200,250,rect);input.move(2,240,270);input.up(2);
+assert.deepEqual(events,['charge'],'Lifting the aiming finger must not throw');assert.deepEqual(look,[[40,20]]);
+input.down('move',3,60,60,rect);input.move(3,60,0);assert.equal(movement.z,1);input.up(3);assert.equal(movement.z,0);assert.deepEqual(events,['charge']);input.up(1);input.up(1,true);assert.deepEqual(events,['charge','release'],'Lost capture after release cannot cancel or release twice');
+input.down('throw',4,0,0,rect);assert.equal(input.down('throw',5,0,0,rect),false);input.up(4,true);assert.equal(events.at(-1),'cancel');assert.equal(events.filter(e=>e==='release').length,1);
+input.down('look',6,0,0,rect);input.down('look',7,100,0,rect);input.move(7,200,0);assert.equal(zooms.at(-1),.5);input.up(7);input.move(6,10,20);assert.deepEqual(look.at(-1),[10,20]);input.up(6);assert.equal(events.filter(e=>e==='tap').length,0,'A pinch cannot place a designer target');
+input.down('look',8,10,10,rect);input.up(8);assert.equal(events.at(-1),'tap');
+input.down('up',9,0,0,rect);assert.equal(movement.y,1);input.down('down',10,0,0,rect);assert.equal(movement.y,0);input.up(9);assert.equal(movement.y,-1);input.reset();assert.deepEqual(movement,{x:0,z:0,y:0});input.up(10);assert.deepEqual(movement,{x:0,z:0,y:0});
+input.down('throw',11,0,0,rect);input.down('move',12,0,0,rect);input.reset();input.up(11);assert.equal(events.at(-1),'charge','A reset discards a held throw without releasing it');assert.equal(input.pointers.size,0);
+console.log('PASS touch pointer ownership, aim while charging, joystick normalization, cancellation, pinch transitions, designer taps and fly height');

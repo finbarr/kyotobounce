@@ -1,0 +1,83 @@
+/* Touch controls are also available in narrow desktop windows. */
+#mobile-ui[hidden],#mobile-controls[hidden],#mobile-tools[hidden],#mobile-ui button[hidden],#mobile-height[hidden],#mobile-move[hidden]{display:none!important}
+#mobile-stage{position:fixed;inset:250px 12px calc(248px + max(12px,env(safe-area-inset-bottom)));pointer-events:none}
+#mobile-tools{position:fixed;top:68px;left:10px;right:10px;z-index:16;display:flex;gap:7px}
+#mobile-tools button{flex:1;min-height:44px;background:#142438f2;font-size:12px;color:#f4e6c9;border:1px solid #8cafbf66}
+#mobile-tools [aria-expanded=true],#mobile-tools [aria-pressed=true]{color:#173030;background:#96eddb}
+#mobile-close{position:fixed;z-index:26;top:68px;right:12px;min-height:44px;padding:10px 16px;background:#ffd260;color:#15283b;font-weight:bold}
+#mobile-controls{position:fixed;z-index:16;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));height:126px;display:flex;align-items:end;justify-content:space-between;gap:12px;pointer-events:none}
+#mobile-controls button,#mobile-move{pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#mobile-hint{position:absolute;bottom:130px;left:0;right:0;text-align:center;color:#e5f7f2;background:#132336dd;font:10px/1.4 ui-monospace,monospace;padding:7px;margin:0;pointer-events:none}
+#mobile-move{position:relative;width:124px;height:124px;border-radius:50%;background:#13243cbf;border:1px solid #96bfbd88;box-shadow:inset 0 0 0 14px #ffffff05;flex-shrink:0}
+#mobile-move>span{position:absolute;top:10px;width:100%;text-align:center;font:9px ui-monospace,monospace;letter-spacing:1px;color:#a9d2d5}
+#mobile-move>b{position:absolute;inset:0;display:grid;place-items:center;font:36px system-ui;color:#aac2c833;pointer-events:none}
+#mobile-stick{position:absolute;left:40px;top:40px;width:44px;height:44px;background:#b6f0e2bd;border:1px solid #d8fff2;border-radius:50%;pointer-events:none}
+#mobile-actions{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:128px;pointer-events:none}
+#mobile-actions button{min-height:44px;background:#132439ec;border:1px solid #a5c6c98a;color:#d8f9eb;font-size:12px;padding:10px}
+#mobile-actions #mobile-throw{height:96px;color:#1b2739;background:#ffd260;border:2px solid #fff2b8;border-radius:18px;box-shadow:0 4px 0 #9a743b;font-size:10px;letter-spacing:1px}
+#mobile-throw strong{font:900 24px/1.3 Impact,'Arial Narrow',sans-serif;letter-spacing:1px}
+#mobile-actions #mobile-throw[data-charging=true]{background:#a5ffe1;border-color:#e0fff4;box-shadow:0 0 24px #84f3cb66}
+#mobile-actions #mobile-cancel{min-height:30px;font-size:10px;padding:5px;background:#3c2232}
+#mobile-actions #mobile-speed[aria-pressed=true],#mobile-actions #mobile-boost[aria-pressed=true]{background:#ffd260;color:#142236}
+#mobile-height{display:flex;gap:6px}#mobile-height button{flex:1}
+.mobile-ui{overscroll-behavior:none}.mobile-ui #game{touch-action:none}.mobile-ui button,.mobile-ui a{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.mobile-ui header{padding:12px;min-height:58px;align-items:center}.mobile-ui .seal{display:none}.mobile-ui h1{font-size:21px;letter-spacing:.6px}.mobile-ui header p,.mobile-ui .session>span,.mobile-ui #nickname,.mobile-ui footer{display:none}
+.mobile-ui .session{gap:6px}.mobile-ui .audio-controls{flex-direction:row;gap:5px}.mobile-ui .audio-controls button{min-height:36px;font-size:8px;padding:7px}.mobile-ui #edit-player-name{font-size:9px;min-height:36px;max-width:88px;padding:7px}
+.mobile-ui #fly-control{display:none!important}
+.mobile-ui:not(.is-replay) #competition,.mobile-ui:not(.is-replay) #throw-panel,.mobile-ui #flight-panel{display:none!important}
+.mobile-ui:not(.is-replay) #power-control{position:fixed;inset:auto 10px calc(166px + max(12px,env(safe-area-inset-bottom)));transform:none;width:auto;max-width:none;margin:0;padding:10px 12px;z-index:10;box-shadow:none}
+.mobile-ui #power-control .power-ranges{gap:6px;margin-bottom:8px}.mobile-ui #power-control .power-ranges button{flex:1;min-height:36px;padding:7px;font-size:10px}.mobile-ui #power-control .range-key{display:none}
+.mobile-ui #power-control .power-label{font-size:9px;margin-bottom:5px}.mobile-ui #power-number{font-size:19px}.mobile-ui #power-control .power-track{height:12px}.mobile-ui #power-control .power-ticks,.mobile-ui #power-control .power-caption{display:none}.mobile-ui .power-hint{font-size:8px;margin-top:6px}
+.mobile-ui:not(.is-replay) #arcade-hud,.mobile-ui:not(.is-replay) #combo-hud{position:fixed;left:10px;right:auto;top:122px;bottom:auto;width:calc(100vw - 196px);max-width:none;max-height:118px;min-width:0;margin:0;padding:10px;transform:none;box-shadow:none;overflow:auto;pointer-events:auto}
+.mobile-ui:not(.is-replay) #arcade-hud>span{font-size:15px;white-space:normal}.mobile-ui:not(.is-replay) #arcade-hud>div{flex-wrap:wrap;gap:7px;font-size:8px}.mobile-ui:not(.is-replay) #combo-total{font-size:30px;margin:4px 0;line-height:1}.mobile-ui:not(.is-replay) #combo-factors{font-size:7px;flex-wrap:wrap;gap:4px}
+.mobile-ui:not(.is-replay) #combo-hud .special-label,.mobile-ui:not(.is-replay) #special-track,.mobile-ui:not(.is-replay) #combo-trick,.mobile-ui:not(.is-replay) #combo-motion,.mobile-ui:not(.is-replay) .combo-landing{display:none}
+.mobile-ui:not(.is-replay) #combo-hud .combo-heading{font-size:6px;display:flex}.mobile-ui:not(.is-replay) #combo-hud .combo-heading b{display:none}.mobile-ui:not(.is-replay) #waypoint-card{margin-top:6px}.mobile-ui .waypoint-card-heading{font-size:7px}
+.mobile-ui:not(.is-replay) #result-leaderboard{position:fixed;left:auto;right:10px;top:122px;bottom:auto;width:166px;max-height:118px;margin:0;padding:8px;z-index:10}
+.mobile-ui:not(.is-replay) #result-leaderboard .board-course,.mobile-ui:not(.is-replay) #result-leaderboard .share-level,.mobile-ui:not(.is-replay) .board-footnote{display:none}
+.mobile-ui:not(.is-replay) #result-leaderboard .board-heading{margin-bottom:6px;gap:4px}.mobile-ui:not(.is-replay) #result-leaderboard .eyebrow{font-size:7px;letter-spacing:.5px}.mobile-ui:not(.is-replay) #result-leaderboard #ranking-announcement{font-size:11px}
+.mobile-ui #result-leaderboard li,.mobile-ui #result-leaderboard [data-rank="1"],.mobile-ui #result-leaderboard [data-rank="2"],.mobile-ui #result-leaderboard [data-rank="3"]{min-height:38px;height:38px}
+.mobile-ui #result-leaderboard li>button{grid-template-columns:22px minmax(0,1fr) auto;font-size:9px;padding:5px;gap:4px}.mobile-ui #result-leaderboard strong,.mobile-ui #result-leaderboard [data-rank="1"] strong{font-size:10px}
+.mobile-ui:not(.is-replay) #shot-speed{display:none!important}
+.mobile-ui #notice{top:242px;left:50%;max-width:90vw;font-size:10px}
+.mobile-ui[data-mobile-panel="levels"] #competition,.mobile-ui[data-mobile-panel="settings"] #throw-panel{display:block!important;visibility:visible!important;position:fixed;z-index:25;inset:120px 10px 12px;width:auto;max-width:none;max-height:none;overflow:auto;transform:none;padding:18px;background:#111e32fc;border:1px solid #a7c6be77;box-shadow:0 0 0 150vmax #07101ebf;pointer-events:auto;scrollbar-width:thin}
+.mobile-ui[data-mobile-panel="levels"] #competition h2,.mobile-ui[data-mobile-panel="settings"] #throw-panel h2{font-size:27px;display:block}
+.mobile-ui[data-mobile-panel="settings"] #throw-panel .actions,.mobile-ui[data-mobile-panel="settings"] #throw-panel .panel-top button{display:flex}
+.mobile-ui[data-mobile-panel="settings"] #throw-panel .panel-top{gap:12px}
+.mobile-ui #competition button,.mobile-ui #throw-panel button,.mobile-ui #competition select{min-height:44px;font-size:12px}.mobile-ui #competition input,.mobile-ui #player-name-dialog input{font-size:16px}.mobile-ui input[type=range]{min-height:32px;touch-action:pan-y}
+.mobile-ui #competition .field,.mobile-ui #competition p{font-size:12px}.mobile-ui .spin-row{margin:24px 0}
+.mobile-ui.is-briefing #mobile-tools,.mobile-ui.mobile-blocked #mobile-controls,.mobile-ui.is-briefing #result-leaderboard{display:none!important}
+.mobile-ui.is-briefing .briefing-heading{inset:20px 18px auto;max-height:25dvh;overflow:auto}.mobile-ui .briefing-heading h2{font-size:28px;margin:9px 0}.mobile-ui .briefing-heading p{font-size:11px;line-height:1.4}.mobile-ui #briefing-back{min-height:40px}
+.mobile-ui .briefing-bottom{inset:auto 12px 12px;display:flex;flex-direction:column;gap:10px;padding:14px;max-height:32dvh;overflow:auto}.mobile-ui .briefing-facts{min-width:0;max-width:none;width:100%}.mobile-ui .briefing-facts>span{font-size:10px}.mobile-ui .briefing-facts p{font-size:10px;margin:5px 0}.mobile-ui .briefing-facts .map-key,.mobile-ui .briefing-points,.mobile-ui .cutaway-note{display:none}.mobile-ui #briefing-play{width:100%;min-width:0;min-height:50px;font-size:22px;padding:14px}.mobile-ui #briefing-play small{display:none}
+.mobile-ui .map-label{padding:5px 7px;gap:5px}.mobile-ui .map-label>b{font-size:16px}.mobile-ui .map-label>span{font-size:8px}.mobile-ui .map-label small{display:none}
+.mobile-ui:not(.is-replay) #results-screen{position:fixed;inset:auto 10px max(12px,env(safe-area-inset-bottom));max-height:40dvh;display:block;overflow:auto;z-index:16}
+.mobile-ui #results-screen #result-card{padding:15px;max-height:none}.mobile-ui #results-screen #result-card h2{font-size:33px}.mobile-ui #results-screen #result-breakdown{font-size:11px}.mobile-ui #results-screen .result-tip{display:none}.mobile-ui #results-screen .actions{gap:8px;display:grid;grid-template-columns:1fr 1fr;position:static}.mobile-ui #results-screen .actions button{min-height:44px;padding:10px;font-size:11px}.mobile-ui #results-screen .actions #next-challenge{grid-column:1 / -1}.mobile-ui #results-screen .actions #share-result{grid-column:1 / -1;min-height:44px}.mobile-ui #results-screen #result-math{display:none}
+.mobile-ui #player-name-dialog{padding:20px;max-height:90dvh;overflow:auto}.mobile-ui #player-name-dialog h2{font-size:34px}
+/* Replays retain their dedicated layout, with larger touch targets. */
+.mobile-ui.is-replay #mobile-stage{display:none}.mobile-ui.is-replay #replay-view{top:66px}.mobile-ui.is-replay #replay-view button{min-height:40px}.mobile-ui.is-replay #replay-scrub{min-height:38px;touch-action:pan-y}.mobile-ui.is-replay #replay-view #shot-speed{min-height:40px}.mobile-ui.is-replay .replay-tools{gap:6px}.mobile-ui.is-replay #replay-status{font-size:10px;line-height:1.5}
+.mobile-ui.is-replay #mobile-controls{position:absolute;left:4px;right:4px;bottom:4px;height:104px;z-index:16}.mobile-ui.is-replay #mobile-move{width:104px;height:104px}.mobile-ui.is-replay #mobile-stick{left:30px;top:30px}.mobile-ui.is-replay #mobile-hint{bottom:108px;font-size:9px}.mobile-ui.is-replay #mobile-actions{min-width:118px}.mobile-ui.is-replay #mobile-controls button{min-height:40px}
+.mobile-ui.mobile-flight:not(.is-replay) #mobile-controls{justify-content:flex-end;height:100px}.mobile-ui.mobile-flight:not(.is-replay) #mobile-stage{bottom:calc(140px + max(12px,env(safe-area-inset-bottom)))}
+@media(max-width:380px){.mobile-ui #edit-player-name{display:none}.mobile-ui h1{font-size:19px}.mobile-ui .audio-controls button{font-size:7px}.mobile-ui:not(.is-replay) #arcade-hud,.mobile-ui:not(.is-replay) #combo-hud{width:calc(100vw - 172px);padding:8px}.mobile-ui:not(.is-replay) #result-leaderboard{width:146px}.mobile-ui #result-leaderboard li>button{font-size:8px}.mobile-ui #result-leaderboard strong{font-size:9px}.mobile-ui #mobile-tools button{font-size:11px}}
+@media(max-height:700px) and (orientation:portrait){#mobile-stage{top:224px;bottom:calc(210px + max(12px,env(safe-area-inset-bottom)))}.mobile-ui:not(.is-replay) #result-leaderboard,.mobile-ui:not(.is-replay) #combo-hud{max-height:92px}#mobile-controls{height:100px}#mobile-move{width:100px;height:100px}#mobile-stick{left:28px;top:28px}#mobile-actions #mobile-throw{height:82px}#mobile-hint{bottom:108px;font-size:9px}.mobile-ui:not(.is-replay) #power-control{bottom:calc(141px + max(12px,env(safe-area-inset-bottom)));padding:7px 10px}.mobile-ui #power-control .power-ranges{margin-bottom:3px}.mobile-ui #power-control .power-ranges button{min-height:32px}.mobile-ui #power-control .power-label{font-size:8px}.mobile-ui #notice{top:220px}.mobile-ui.is-replay #replay-status{font-size:8px}.mobile-ui.is-replay .replay-camera button{font-size:8px}}
+@media(orientation:landscape) and (max-height:600px){
+ .mobile-ui header{min-height:44px;padding:5px 12px}.mobile-ui h1{font-size:20px}.mobile-ui .audio-controls button{min-height:32px}
+ #mobile-tools{top:50px;right:auto;left:12px;width:300px}.mobile-ui #mobile-tools button{min-height:38px;font-size:10px}
+ #mobile-stage{inset:98px 180px 112px}#mobile-controls{height:96px}#mobile-move{width:96px;height:96px}#mobile-stick{left:26px;top:26px}#mobile-actions #mobile-throw{height:80px}#mobile-hint{left:116px;right:143px;bottom:0;font-size:8px}
+ .mobile-ui:not(.is-replay) #power-control{left:130px;right:156px;bottom:calc(27px + max(12px,env(safe-area-inset-bottom)));padding:6px 10px;max-width:400px;margin:auto}.mobile-ui #power-control .power-ranges{margin-bottom:4px}.mobile-ui #power-control .power-ranges button{min-height:32px;padding:5px;font-size:9px}.mobile-ui #power-control .power-hint{display:none}
+ .mobile-ui:not(.is-replay) #arcade-hud,.mobile-ui:not(.is-replay) #combo-hud{left:12px;top:98px;width:152px;max-height:120px}.mobile-ui:not(.is-replay) #result-leaderboard{right:12px;top:50px;width:154px;max-height:172px}
+ #mobile-close{top:50px;min-height:38px}.mobile-ui[data-mobile-panel="levels"] #competition,.mobile-ui[data-mobile-panel="settings"] #throw-panel{inset:98px 12px 12px}
+ .mobile-ui .briefing-heading{top:12px!important;max-height:36dvh!important;right:12px!important}.mobile-ui .briefing-heading h2{font-size:24px}.mobile-ui .briefing-heading p{max-width:75%;font-size:10px}.mobile-ui .briefing-bottom{flex-direction:row;max-height:26dvh;gap:12px;padding:10px}.mobile-ui #briefing-play{width:210px;flex-shrink:0;font-size:19px}.mobile-ui .briefing-facts p{font-size:8px}
+ .mobile-ui:not(.is-replay) #results-screen{left:178px;right:178px;bottom:12px;max-height:60dvh}.mobile-ui #results-screen #result-card h2{font-size:26px}.mobile-ui #results-screen .actions button{min-height:40px;font-size:10px;padding:7px}
+ .mobile-ui #notice{top:96px;max-width:45vw}
+ .mobile-ui.is-replay #replay-view{top:50px}.mobile-ui.is-replay #replay-transport{padding:7px}.mobile-ui.is-replay #replay-status{font-size:8px}.mobile-ui.is-replay #replay-view button{min-height:36px}.mobile-ui.is-replay #replay-view #shot-speed{min-height:36px}.mobile-ui.is-replay #replay-scrub{min-height:32px}
+ .mobile-ui.is-replay #mobile-controls{height:80px}.mobile-ui.is-replay #mobile-move{width:80px;height:80px}.mobile-ui.is-replay #mobile-stick{left:18px;top:18px}.mobile-ui.is-replay #mobile-controls button{padding:5px;min-height:32px}.mobile-ui.is-replay #mobile-hint{bottom:83px;left:0;right:0}.mobile-ui.is-replay #mobile-actions{min-width:102px;gap:4px}
+}
+
+.mobile-ui #shot-details,.mobile-ui kbd{display:none!important}
+.mobile-ui.is-briefing #mobile-controls{display:none!important}
+
+@media(max-width:760px) and (min-height:561px) and (max-height:700px){
+ .mobile-ui.is-replay #replay-view{grid-template-rows:auto minmax(0,1fr) 90px auto;gap:8px}
+ .mobile-ui.is-replay #replay-summary{padding:8px}.mobile-ui.is-replay #close-replay{min-height:28px;margin-top:4px;font-size:8px}
+ .mobile-ui.is-replay .replay-tools{flex-wrap:nowrap;gap:4px}.mobile-ui.is-replay #share-replay{font-size:8px;padding:6px;white-space:nowrap}.mobile-ui.is-replay .replay-camera button{padding:6px;font-size:8px}.mobile-ui.is-replay #shot-speed{padding:6px}
+ .mobile-ui.is-replay #replay-status{font-size:8px;line-height:1.4;margin-top:5px}
+}
