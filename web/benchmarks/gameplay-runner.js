@@ -13,6 +13,31 @@ export function install(g){
  const output=host.querySelector('pre'),samples=[],frames=[],resources=[];let running=false,last=0,hiddenFrames=0;
  const state=()=>({view:g.getView(),phase:g.getSnapshot()?.phase,challenge:g.ui.state.selected?.id,charging:g.chargeMeter.charging,session:{busy:g.ui.state.session?.busy,attempt:g.ui.state.session?.attempt},result:g.ui.state.lastResult?{attempt:g.ui.state.lastResult.attempt,success:g.ui.state.lastResult.success,score:g.ui.state.lastResult.score,challenge:g.ui.state.lastResult.challenge?.id}:null,render:g.renderer.info.memory,programs:g.renderer.info.programs.length,pixelRatio:g.renderer.getPixelRatio(),camera:window.kyotoState?.camera});
  host.querySelector('#bench-state').onclick=()=>output.textContent=JSON.stringify(state(),null,2);
+ const latePacketButton=document.createElement('button');latePacketButton.textContent='Check abandoned throw messages';host.prepend(latePacketButton);
+ latePacketButton.onclick=async()=>{
+  latePacketButton.disabled=true;
+  try{
+   await until(()=>window.kyotoState?.ready&&!g.startup.active,120000);g.briefing.dismiss();g.ui.closeLevels();
+   if(g.getSnapshot()?.phase!=='Aim'||g.chargeMeter.charging){g.recall();await until(()=>g.getSnapshot()?.phase==='Aim'&&!g.getView().recallPending&&!g.ui.state.session?.busy);}
+   g.hint();g.startCharge();await until(()=>g.chargeMeter.charging);await delay(300);g.release();
+   await until(()=>g.getSnapshot()?.phase==='Flight'&&g.getView().ballCameraActive);
+   const old=structuredClone(g.getSnapshot()),oldSession=structuredClone(g.ui.state.session);
+   g.recall();g.startCharge();await until(()=>!g.getView().recallPending&&g.chargeMeter.charging&&g.getSnapshot()?.phase==='Charging'&&g.getSnapshot()?.attempt!==old.attempt);
+   const current=g.getSnapshot(),currentSession=g.ui.state.session;
+   // Deliver one abandoned batch directly at the production message boundary.
+   // No timing lottery: these packets must be harmless even after reset ACK.
+   const stale=[old,oldSession,{type:'shot-resume',attempt:old.attempt,time:old.stationTime},{type:'shot-chunk',attempt:old.attempt,sequence:0,base:old,frames:[old],events:[],complete:false}];
+   for(const message of stale)g.handleMessage(message);
+   if(g.getSnapshot()!==current||g.ui.state.session!==currentSession||g.shotPlayback.active)throw Error('Abandoned physics or session replaced the new charge');
+   await new Promise(requestAnimationFrame);
+   if(g.getView().ballCameraActive||!g.chargeMeter.charging)throw Error('Abandoned throw took camera control');
+   const held=state();g.release();await until(()=>g.getSnapshot()?.phase==='Flight'&&g.getView().ballCameraActive);
+   const following=state();g.recall();
+   const result={stage:'abandoned-throw',pass:true,held,following};await fetch('/__gameplay/report',{method:'POST',body:JSON.stringify(result)});
+   output.textContent='PASS — delayed old state, session, resume and trajectory cannot replace the new charge; the new release follows normally.';
+  }catch(error){output.textContent='FAIL '+error.stack;await fetch('/__gameplay/report',{method:'POST',body:JSON.stringify({stage:'abandoned-throw',pass:false,error:error.stack,state:state()})});}
+  finally{latePacketButton.disabled=false;}
+ };
  function frame(now){if(running&&last){if(document.hidden)hiddenFrames++;else frames.push(now-last);}last=now;requestAnimationFrame(frame);}requestAnimationFrame(frame);
  async function report(stage){const sorted=frames.toSorted((a,b)=>a-b),quantile=p=>sorted[Math.min(sorted.length-1,Math.floor(sorted.length*p))]||0;
   const value={stage,throws:samples.length,hiddenFrames,frames:frames.length,median:quantile(.5),p95:quantile(.95),p99:quantile(.99),over50:frames.filter(x=>x>50).length,heap:performance.memory?{used:performance.memory.usedJSHeapSize,total:performance.memory.totalJSHeapSize}:null,render:{...g.renderer.info.memory},programs:g.renderer.info.programs.length,sceneObjects:(()=>{let count=0;g.scene.traverse(()=>count++);return count;})(),pixelRatio:g.renderer.getPixelRatio(),samples:samples.slice(-10),resources:[...resources]};

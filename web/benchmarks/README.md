@@ -45,3 +45,19 @@ afterwards. Floor failures ranged from 0 to 41 and were also zero afterwards.
 These are depth-coverage checks, not an image-quality or whole-station FPS claim.
 The fully lit floor comparison additionally shows the distant strip base staying
 continuous instead of breaking up between its physical raised ribs.
+
+## Reset and delayed physics
+
+Run an isolated game with `npm run dev -- 4386` and the local instrumentation
+proxy with `node web/benchmarks/gameplay-server.mjs 4388 4386 current`. Open
+`http://127.0.0.1:4388`, enter a name, then click **Check abandoned throw messages**.
+It captures a real throw, recalls it, starts another charge, and delivers the
+old state, session, resume and trajectory directly to the game's message handler.
+The new charge and camera must stay unchanged; releasing the new throw must
+still enable ball following. Results are saved in `.local/gameplay-benchmark/`.
+
+`npm test` also exercises the local throw lifecycle without timing: holding and
+charging reject flight, reset revokes the attempt and reconnect permission,
+and both release-before-acknowledgement and explicit reconnect remain valid.
+The renderer checks this ownership independently of its buffered physics phase.
+Interpolation is cleared on reset and never spans different attempt IDs.
