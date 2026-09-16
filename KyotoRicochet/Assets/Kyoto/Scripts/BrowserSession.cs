@@ -55,7 +55,7 @@ namespace Kyoto
             public Vector3 contactNormal,surfaceVelocity;
             public int contactBudgetExhaustions,overlapRecoveries;
         }
-        [Serializable] class Notice {public string type="notice",id,message;}
+        [Serializable] class Notice {public string type="notice",id,message,attempt;}
         [Serializable] class ImpactEvent
         {
             public string type="impact",id,attempt,surface,label;
@@ -113,7 +113,7 @@ namespace Kyoto
         }
         void ActivateClock()=>StationMotion.SetAnalyticTime(gameObject.scene,stationTime);
         void Send(object data)=>output(data);
-        void Note(string id,string message)=>Send(new Notice{id=id,message=message});
+        void Note(string id,string message)=>Send(new Notice{id=id,message=message,attempt=attempt});
         public void Handle(Command c)
 
         {
@@ -152,8 +152,8 @@ namespace Kyoto
                 case "charge":
                     if(state.phase=="Result")Reset();
                     if(owner!=null){Note(c.id,"Wait for the active throw.");break;}
-                    if(!InStart(p)){Note(c.id,"Stand inside the start circle on its selected floor.");break;}
                     attempt=c.request;
+                    if(!InStart(p)){Note(c.id,"Stand inside the start circle on its selected floor.");break;}
                     if(!p.walker.TryRelease(p.state.yaw,p.state.pitch,out _,state.radius)){Note(c.id,"Move away from the wall before throwing.");break;}
                     p.state.powerRange=c.powerRange=="precision"?"precision":"full";
                     owner=p;state.owner=c.id;state.phase="Charging";chargeAt=StationMotion.Time(gameObject.scene);state.chargeTime=chargeAt;p.move=Vector2.zero;
@@ -167,7 +167,11 @@ namespace Kyoto
                     if(owner==p&&(state.phase=="Charging"||state.phase=="Release"))Reset();
                     p.move=Vector2.zero;
                     break;
-                case "recall":if(owner==null||owner==p||state.phase=="Result"){if(state.phase=="Flight"||ahead)Note(p.state.id,"Shot recalled. No score awarded.");Reset();}break;
+                case "recall":
+                    bool recalled=owner==null||owner==p||state.phase=="Result";
+                    if(recalled){Reset();Publish();}
+                    if(!string.IsNullOrEmpty(c.request))Send(new RpcReply{request=c.request,ok=recalled,message=recalled?"":"Finish the active throw first."});
+                    break;
                 case "home":
                     if(owner==null||state.phase=="Result"){if(state.phase=="Result")Reset();p.walker.Place((activeChallenge==null?layout.spawn:activeChallenge.start.center)+Vector3.up*.03f);p.state.yaw=0;p.state.pitch=15;p.move=Vector2.zero;}
                     break;
@@ -197,7 +201,7 @@ namespace Kyoto
                 if(GoalStep())Finish(true,"Target settled");
                 else if(sleepDwell>.6f)Finish(false,activeChallenge?.goal==null?"Ball stopped":"Ball stopped outside the goal");
                 else if(ball.Body.position.y < -5)
-                {pendingNotice=new Notice{id=owner.state.id,message="Ball left the station. Attempt cancelled; no score awarded."};}
+                {pendingNotice=new Notice{id=owner.state.id,attempt=attempt,message="Ball left the station. Attempt cancelled; no score awarded."};}
             }
             // A result is issued only after physical rest. Keep the station clock
             // running, while the finished ball and its complete replay stay still.
@@ -222,7 +226,7 @@ namespace Kyoto
                 for(int i=walkerPoses.Count-1;i>=0;i--)if(walkerPoses[i].t<=elapsed){owner?.walker.Place(walkerPoses[i].p);break;}
             }
             ahead=false;playbackRate=1;playbackElapsed=0;pendingResult=null;pendingNotice=null;walkerPoses.Clear();
-            state.phase="Aim";state.owner="";owner=null;state.power=0;distinct.Clear();impactTimes.Clear();impactCount=0;goalDwell=0;state.diagnostics.endReason="";state.diagnostics.endedAt=0;
+            attempt=null;state.phase="Aim";state.owner="";owner=null;state.power=0;distinct.Clear();impactTimes.Clear();impactCount=0;goalDwell=0;state.diagnostics.endReason="";state.diagnostics.endedAt=0;
         }
         float ThrowSpeed(float power)
         {

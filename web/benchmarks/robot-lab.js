@@ -1,0 +1,38 @@
+import * as T from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {createAvatar,poseAvatar,setAvatarCharacter,celebrateAvatar} from '/avatar.js';
+const asset=await new GLTFLoader().loadAsync('/assets/ori.glb'),a=createAvatar(asset),scene=new T.Scene();
+scene.background=new T.Color(0x263a49);scene.add(a.group,new T.HemisphereLight(0xffffff,0x343646,2));
+const light=new T.DirectionalLight(0xffe5c1,3);light.position.set(3,6,4);scene.add(light,light.target);
+const rim=new T.DirectionalLight(0x81d8ed,1.3);rim.position.set(-3,2,-3);scene.add(rim);
+scene.add(new T.GridHelper(500,1000,0x6a99a5,0x3f5964));
+const floor=new T.Mesh(new T.PlaneGeometry(500,500),new T.MeshStandardMaterial({color:0x304450,roughness:.65}));floor.rotation.x=-Math.PI/2;floor.position.y=-.004;scene.add(floor);
+const renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(2,devicePixelRatio));renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=T.ACESFilmicToneMapping;document.body.append(renderer.domElement);
+const camera=new T.PerspectiveCamera(40,innerWidth/innerHeight,.035,600);camera.position.set(2.6,1.8,3.3);
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,1,0);controls.enableDamping=true;controls.update();
+const ball=new T.Mesh(new T.SphereGeometry(.08,24,16),new T.MeshStandardMaterial({color:0xff9c24,roughness:.3}));scene.add(ball);
+const p={id:'review',feet:{x:0,y:0,z:0},release:{x:-.22,y:1.48,z:-.32},yaw:180,pitch:15,powerRange:'precision',top:0,kick:0,power:0,grounded:true,movement:{x:0,z:0}};
+let motion='idle',phase='Aim',time=0,last=performance.now(),paused=false,sequenceStart=null,releaseTime=0,result=null,lastReport=0;
+const directions={idle:[0,0],forward:[0,1],backward:[0,-1],left:[-1,0],right:[1,0],diagonal:[.707,.707]};
+const report=document.getElementById('report'),fast=document.getElementById('fast'),slope=document.getElementById('slope');
+for(const b of document.querySelectorAll('[data-motion]'))b.onclick=()=>{sequenceStart=null;motion=b.dataset.motion;phase='Aim';};
+document.getElementById('character').onchange=e=>setAvatarCharacter(a,e.target.value);
+document.getElementById('sequence').onclick=()=>{sequenceStart=time;phase='Aim';};
+for(const [id,range]of [['charge','precision'],['power','full']])document.getElementById(id).onclick=()=>{motion='idle';sequenceStart=null;phase='Charging';p.powerRange=range;p.power=.85;};
+document.getElementById('throw').onclick=()=>{phase='Release';releaseTime=time+.12;};
+document.getElementById('dance').onclick=()=>{sequenceStart=null;motion='idle';phase='Result';result={type:'result',saved:true,score:1000000,attempt:'visual-'+time,records:{courseBest:true},challenge:{id:'review',waypoints:[{id:'a'}]},waypointHits:[{waypointId:'a'}],breakdown:{waypointsHit:1,waypointsTotal:1,outcome:'perfect'}};celebrateAvatar(a,result);};
+document.getElementById('pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Resume':'Pause';};
+for(const [id,z]of [['front',3.3],['back',-3.3]])document.getElementById(id).onclick=()=>{camera.position.copy(a.group.position).add(new T.Vector3(2.6,1.8,z));controls.target.copy(a.group.position).add(new T.Vector3(0,1,0));controls.update();};
+addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();});
+function frame(now){requestAnimationFrame(frame);const dt=paused?0:Math.min(.05,(now-last)/1000);last=now;time+=dt;
+ if(sequenceStart!==null){const parts=['forward','idle','right','left','idle','backward','diagonal','idle'];const n=Math.floor((time-sequenceStart)/2);motion=parts[n%parts.length];fast.checked=n>=parts.length;}
+ const [x,z]=directions[motion],speed=fast.checked?4.2:1.4,delta=new T.Vector3(x*speed*dt,0,z*speed*dt);if(slope.checked)delta.y=delta.z*.2;
+ a.group.position.add(delta);p.feet={x:a.group.position.x,y:a.group.position.y,z:-a.group.position.z};p.movement={x:x*speed,z:-z*speed};p.release={x:p.feet.x-.22,y:p.feet.y+1.48,z:p.feet.z-.32};
+ if(phase==='Release'&&time>=releaseTime)phase='Flight';
+ const state={owner:p.id,releaseTime,ball:{x:p.feet.x+Math.sin(time)*2,y:p.feet.y+2,z:p.feet.z-3},attempt:result?.attempt,diagnostics:{sleeping:phase==='Result'},velocity:{x:0,y:0,z:0},spin:{x:0,y:0,z:0}};
+ poseAvatar(a,p,phase,state,time);ball.visible=!['Flight','Result'].includes(phase);ball.position.copy(a.held);
+ camera.position.add(delta);controls.target.add(delta);controls.update();light.position.copy(a.group.position).add(new T.Vector3(3,6,4));light.target.position.copy(a.group.position);
+ renderer.render(scene,camera);
+ if(now-lastReport>200){lastReport=now;report.textContent=`${a.character.toUpperCase()} · ${phase} · ${motion} · ${speed} m/s\nPelvis bend: ${(100*(.86-a.bones.hips.position.y)).toFixed(1)} cm\nStep: ${a.gait?.swing?.side||'settled'} · ${(a.gait?.swing?.progress||0).toFixed(2)}\nLeg heading: ${(a.gait.heading*180/Math.PI).toFixed(0)}° · Torso stays on aim\nDrag to orbit · wheel to zoom`;} }
+requestAnimationFrame(frame);

@@ -21,59 +21,14 @@ def enable(layer):
  for child in layer.children:enable(child)
 enable(bpy.context.view_layer.layer_collection)
 source_scene.frame_set(1);bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
-# The west-wing facade caps/substrates share top planes with the closed floor
-# slabs. Keep the floor as the visible surface where they overlap, including
-# the former K020 doorway case. Preserve exposed rims, sides and collision.
-FLOOR_PREFIXES=('west-north-floor-','west-south-floor-')
-CAP_PREFIXES=('west-north-slab-edge-','west-south-slab-edge-',
-              'west-north-substrate-','west-south-substrate-')
-def is_cap(name):return name.startswith(CAP_PREFIXES)
-floor_triangles={side:[] for side in ('north','south')}
-for floor in source_scene.objects:
-    if floor.type!='MESH' or floor.hide_render or not floor.name.startswith(FLOOR_PREFIXES):continue
-    side=floor.name.split('-')[1]
-    e=floor.evaluated_get(deps);fm=e.to_mesh();fm.calc_loop_triangles()
-    for triangle in fm.loop_triangles:
-        pts=[e.matrix_world@fm.vertices[i].co for i in triangle.vertices]
-        if (pts[1]-pts[0]).cross(pts[2]-pts[0]).z>1e-8 and max(v.z for v in pts)-min(v.z for v in pts)<1e-5:
-            floor_triangles[side].append(pts)
-    e.to_mesh_clear()
-if not all(floor_triangles.values()):raise RuntimeError('West-wing supporting floors are missing')
-cap_audit={'objects':{},'trianglesTrimmed':0,'coveredAreaM2':0}
-def planar_area(poly):
-    return abs(sum(a[0].x*b[0].y-b[0].x*a[0].y for a,b in zip(poly,poly[1:]+poly[:1])))*.5 if len(poly)>2 else 0
+# Remove hidden coplanar overlap throughout the station, not just floor caps.
+sys.path.insert(0,str(ROOT/'tools'))
+from coplanar_surfaces import CoplanarSurfaces
 
-def split_face(poly,a,b):
-    def distance(v):return (b.x-a.x)*(v[0].y-a.y)-(b.y-a.y)*(v[0].x-a.x)
-    inside=[];outside=[]
-    for v,w in zip(poly,poly[1:]+poly[:1]):
-        dv,dw=distance(v),distance(w)
-        (inside if dv>=0 else outside).append(v)
-        if (dv>=0)!=(dw>=0):
-            t=dv/(dv-dw)
-            at=(v[0].lerp(w[0],t),v[1].lerp(w[1],t),tuple(x+(y-x)*t for x,y in zip(v[2],w[2])))
-            inside.append(at);outside.append(at)
-    return inside,outside
-
-def visible_cap_fragments(name,vertices):
-    if not is_cap(name) or min(v[1].z for v in vertices)<.99:return [vertices]
-    original=planar_area(vertices);pieces=[vertices]
-    for floor_triangle in floor_triangles[name.split('-')[1]]:
-        if max(abs(v[0].z-floor_triangle[0].z) for v in vertices)>.0001:continue
-        remaining=[]
-        for poly in pieces:
-            inside=poly
-            for a,b in zip(floor_triangle,floor_triangle[1:]+floor_triangle[:1]):
-                if len(inside)<3:break
-                inside,outside=split_face(inside,a,b)
-                if planar_area(outside)>1e-9:remaining.append(outside)
-        pieces=remaining
-    removed=original-sum(planar_area(poly) for poly in pieces)
-    if removed>1e-8:
-        cap_audit['trianglesTrimmed']+=1;cap_audit['coveredAreaM2']+=removed
-        cap_audit['objects'][name]=cap_audit['objects'].get(name,0)+removed
-    return pieces
-
+def visible_object(obj):
+ return obj.type=='MESH' and not (obj.get('kyoto_dynamic') or obj.get('kyoto_lane') or obj.hide_render or obj.get('kyoto_authoring_helper') or obj.get('kyoto_auxiliary')=='walking surface' or obj.get('kyoto_motion_aux'))
+visible_objects=[obj for obj in source_scene.objects if visible_object(obj)]
+coplanar=CoplanarSurfaces(visible_objects,deps,records)
 groups={};counts={'sourceObjects':0,'triangles':0,'skippedDynamic':0,'skippedProxies':0}
 for obj in list(source_scene.objects):
  if obj.type!='MESH':continue
@@ -108,19 +63,19 @@ for obj in list(source_scene.objects):
     uv=(pt.x/span,pt.y/span) if abs(n.z)>.5 else (pt.y/span,pt.z/span) if abs(n.x)>.5 else (pt.x/span,pt.z/span)
    else:uv=tuple(uv_layer.data[li].uv) if uv_layer else (pt.x/2.4,pt.y/2.4)
    vertices.append((pt,normal,uv))
-  for polygon in visible_cap_fragments(obj.name,vertices):
+  for polygon in coplanar.fragments(obj.name,tri.polygon_index,vertices):
    for i in range(1,len(polygon)-1):
     face=[polygon[0],polygon[i],polygon[i+1]]
-    if is_cap(obj.name) and (face[1][0]-face[0][0]).cross(face[2][0]-face[0][0]).length<1e-10:continue
+    if (face[1][0]-face[0][0]).cross(face[2][0]-face[0][0]).length<1e-10:continue
     base=len(g['positions'])
     for pt,normal,uv in face:
      g['positions'].append(tuple(pt));g['normals'].append(tuple(normal));g['uv'].append(uv)
     g['faces'].append((base,base+1,base+2));counts['triangles']+=1
  e.to_mesh_clear()
-counts['floorCapDeduplication']=cap_audit
+counts['coplanarDeduplication']=coplanar.audit
 for required in ('west-north-slab-edge-2-0-0','west-south-substrate-2-2','west-south-slab-edge-3-2-2'):
- assert required in cap_audit['objects'], f'Expected overlapping cap {required} not found; review source revision'
-print('COLLECTED_BROWSER_ART',counts,'batches',len(groups),flush=True)
+ assert required in coplanar.audit['objects'], f'Expected overlapping cap {required} not found; review source revision'
+print('COLLECTED_BROWSER_ART',counts['sourceObjects'],'objects',counts['triangles'],'triangles',len(groups),'batches',flush=True)
 scene=bpy.data.scenes.new('Browser export');bpy.context.window.scene=scene
 mats={}
 def material(label):
@@ -167,4 +122,4 @@ public.update(layoutSha256=hashlib.sha256(LAYOUT.read_bytes()).hexdigest(),coord
 counts.update(batches=len(groups),materials=len(mats),glbBytes=(OUT/'atrium.glb').stat().st_size,sourceSha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),layoutSha256=public['layoutSha256'])
 REPORT.parent.mkdir(parents=True,exist_ok=True)
 REPORT.write_text(json.dumps(counts,indent=2)+'\n')
-print('KYOTO_BROWSER_ART_READY',json.dumps(counts),flush=True)
+print('KYOTO_BROWSER_ART_READY',json.dumps({k:v for k,v in counts.items() if k!='coplanarDeduplication'}),flush=True)

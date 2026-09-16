@@ -54,7 +54,7 @@ artifacts/layout-candidate/station-layout.json --output artifacts/browser-candid
 --source-output artifacts/hardware-source` on one command line after Blender's
 `--background --python` options.
 
-The browser exporter clips duplicate west-wing slab-edge and substrate top caps against the supporting floor slabs. It preserves exposed rims and vertical sides; the canonical collision layout stays unchanged. Its audit receipt records the removed coplanar area per object to catch regressions in this camera-dependent edge flicker.
+The browser exporter clips covered, coplanar architectural faces throughout the station using `tools/coplanar_surfaces.py`. It resolves wall returns, overlapping floor finishes, tactile bases, frame intersections and slab caps within 0.25 mm. Authored trim wins over backing, and floors win over slab-edge caps; exposed rims, curved/sloped geometry and the canonical collision layout stay unchanged. The export receipt records removed area per source object. Run `node web/tests/station-overlaps.mjs` to check wall, floor, tactile, landing and skyway seam coverage in the actual GLB. These surfaces no longer rely on material-wide depth offsets.
 
 The exporter reads textures beside the selected layout and writes its audit receipt
 inside the selected output. With no options, the original paths remain unchanged.
@@ -63,7 +63,7 @@ matching browser exports into `web/public/assets/`. Geometry changes alter the l
 
 `art-source/phase3/robot/build_robot.py` generates the original rig; `tools/build_atrium_detail.py` generates hardware. `tools/build_stair_materials.py` generates textures using Python, NumPy and Pillow. The Blender source remains the editable authority for manually authored station geometry.
 
-For a new release, run `npm run assets:pack -- assets-v7` (increment the current `assets-v6` version), review the archive allowlist and changed manifest, attach the archive from `artifacts/open-source/` to a public GitHub release with the matching tag, and commit the manifest alongside its code changes. Publish a new version instead of replacing an existing archive. Do not add multi-hundred-megabyte binaries to Git history.
+For a new release, run `npm run assets:pack -- assets-v8` (increment the current `assets-v7` version), review the archive allowlist and changed manifest, attach the archive from `artifacts/open-source/` to a public GitHub release with the matching tag, and commit the manifest alongside its code changes. Publish a new version instead of replacing an existing archive. Do not add multi-hundred-megabyte binaries to Git history.
 
 ## Provenance and boundaries
 

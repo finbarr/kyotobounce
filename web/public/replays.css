@@ -209,3 +209,8 @@ body.is-design-shot #design-shot-status{color:#c9fff1}
 #design-target-list [aria-pressed=true]{border-color:#bca3ff;background:#8870bb30}
 #launch-design-ball{margin-top:12px}
 #design-review-status{color:#bde8df!important}
+
+/* Progression stays above the score breakdown, including short screens. */
+#result-next{position:sticky;top:0;z-index:1;background:#17243b;margin:10px 0}
+#result-next:has(button[hidden]){display:none}
+#result-next #next-challenge{width:100%;min-height:44px;padding:12px;background:var(--gold);color:var(--ink);font-weight:900;line-height:1.5}

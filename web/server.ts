@@ -86,6 +86,7 @@ function send(socket:WebSocket,value:unknown){
 function broadcast(value:unknown,sessionId?:string){for(const [socket,c]of connections)if(c.guest&&(!sessionId||c.id===sessionId))send(socket,value);}
 worker.on('message', message=>{
   if('challenge' in message&&!message.challenge?.id)message.challenge=null;
+  if(['state','shot-frame','notice','impact','waypoint-hit','result'].includes(message.type)&&!competition.accepts(message))return;
   if(message.type==='shot-frame'){
     message.type='state';const now=performance.now();for(const c of connections.values())if(c.id===message.id)c.metrics.state(now,message.stationTime);competition.state(message);
     let shot=shots.get(message.id);

@@ -25,8 +25,8 @@ try{
  c.input({yaw:90,z:1});await delay(1000);
  for(let i=1;i<=30;i++){c.input({yaw:90+i*6});await delay(1000/60);}await delay(3000);capture('turn-stop');
  assert.ok(rows.at(-1).avatars.every(a=>a.blend===0&&a.feet.every((f,i)=>Math.hypot(f[0]-(i?-.115:.115),f[2])<.019)),'Native walk/turn settles both feet');
- c.send('home');await delay(300);await axis('x',17.8);await axis('z',4.65);await axis('x',30);capture('stair-landing');assert.ok(Math.abs(player().feet.y-5.5)<.1,'Native stairs reach landing');
+ await c.request('select-challenge',{challengeId:null},'selected');c.send('home');await delay(300);await axis('z',4.65);await axis('x',17.8);await axis('x',30);capture('stair-landing');assert.ok(Math.abs(player().feet.y-5.5)<.1,'Native stairs reach landing');
  await axis('z',1.571);await axis('x',33.6);capture('escalator-approach');c.input({yaw:90,z:1});await delay(3000);c.input({yaw:90});await delay(2000);capture('escalator-transition');
  assert.ok(player().feet.y>5.5,'Native escalator transition rises');
-}catch(e){failure=String(e);}finally{c.close();await mkdir(out.slice(0,out.lastIndexOf('/')),{recursive:true});await writeFile(out,JSON.stringify({status:failure?'fail':'pass',origin,frames,failure,rows},null,2)+'\n');}
+}catch(e){capture('failure');failure=String(e);}finally{c.close();await mkdir(out.slice(0,out.lastIndexOf('/')),{recursive:true});await writeFile(out,JSON.stringify({status:failure?'fail':'pass',origin,frames,failure,rows},null,2)+'\n');}
 if(failure)throw new Error(failure);console.log('PASS native walk/turn/stop and stair/escalator route across all three rigs');

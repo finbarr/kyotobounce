@@ -8,8 +8,9 @@ namespace Kyoto
     [Serializable] public class BrowserDisk
     {public Vector3 center,normal;public float radius;public string surface;}
     [Serializable] public class BrowserWaypoint : BrowserDisk {public string id;}
+    [Serializable] public class BrowserHint {public float yaw,pitch,top,kick;public string powerRange;}
     [Serializable] public class BrowserChallenge
-    {public string id,name,layout,physics,requiredSurface,throwModel,scoring;public int revision;public BrowserDisk start,goal;public BrowserWaypoint[] waypoints;}
+    {public string id,name,layout,physics,requiredSurface,throwModel,scoring;public int revision;public BrowserDisk start,goal;public BrowserWaypoint[] waypoints;public BrowserHint hint;}
     public sealed partial class BrowserSession
     {
         public const string SimulationVersion="kyoto-p3-3";
@@ -93,7 +94,12 @@ namespace Kyoto
                     Reset();designArmed=false;activeChallenge=c.challenge;
                     foreach(var p in players.Values)
                     {
-                        if(activeChallenge!=null)p.walker.Place(activeChallenge.start.center+Vector3.up*.03f);
+                        if(activeChallenge!=null){
+                            p.walker.Place(activeChallenge.start.center+Vector3.up*.03f);
+                            var hint=activeChallenge.hint;
+                            if(hint!=null&&!string.IsNullOrEmpty(hint.powerRange)){p.state.yaw=hint.yaw;p.state.pitch=hint.pitch;p.state.top=hint.top;p.state.kick=hint.kick;p.state.powerRange=hint.powerRange=="full"?"full":"precision";}
+                            else{var target=activeChallenge.waypoints!=null&&activeChallenge.waypoints.Length>0?activeChallenge.waypoints[0]:activeChallenge.goal;var delta=target==null?Vector3.back:target.center-activeChallenge.start.center;p.state.yaw=Mathf.Atan2(delta.x,delta.z)*Mathf.Rad2Deg;p.state.pitch=Mathf.Clamp(12+Mathf.Atan2(delta.y,new Vector2(delta.x,delta.z).magnitude)*Mathf.Rad2Deg,-20,55);p.state.top=0;p.state.kick=0;p.state.powerRange="precision";}
+                        }
                         p.move=Vector2.zero;
                     }
                 }

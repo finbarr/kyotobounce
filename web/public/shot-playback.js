@@ -6,11 +6,15 @@ export class ShotPlayback {
   this.clear(true);return true;
  }
  shot=null;discarded=new Set();resumeAt=null;rate=1;
+ expected=undefined;
+ waitForAttempt(){this.clear(true);this.expected=null;}
+ expect(attempt){if(attempt&&attempt!==this.expected){this.clear(true);this.expected=attempt;}}
+ accepts(attempt){return this.expected===undefined||attempt===this.expected;}
  clear(discard=false){if(discard&&this.shot){this.discarded.add(this.shot.attempt);if(this.discarded.size>8)this.discarded.delete(this.discarded.values().next().value);}this.shot=null;this.resumeAt=null;this.rate=1;}
  setRate(rate,now){if(rate!==1&&rate!==2)throw new Error('Invalid playback rate');this.advance(now);this.rate=rate;}
  resume(message){if(this.shot?.attempt!==message.attempt)this.resumeAt=message;}
  accept(chunk,now){
-  if(this.discarded.has(chunk.attempt))return;
+  if(!this.accepts(chunk.attempt)||this.discarded.has(chunk.attempt))return false;
   if(this.shot?.attempt!==chunk.attempt){
    const first={...chunk.base,...chunk.frames[0]},resume=this.resumeAt?.attempt===chunk.attempt?this.resumeAt.time:null;
    const start=resume??first.releaseTime-.12;
@@ -21,7 +25,7 @@ export class ShotPlayback {
   s.sequence=chunk.sequence;
   for(const frame of chunk.frames)s.frames.push({...chunk.base,...frame});
   s.events.push(...chunk.events.map(event=>({...event,at:event.stationTime??chunk.base.releaseTime+event.time})).filter(event=>event.at>=s.eventFloor));
-  s.complete=chunk.complete;
+  s.complete=chunk.complete;return true;
  }
  result(message){if(this.shot?.attempt!==message.attempt)return false;this.shot.result=message;return true;}
  get active(){return !!this.shot;}

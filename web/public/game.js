@@ -1,3 +1,4 @@
+import {levelEntryAim} from './level-entry.js';
 import {levelIdFromPath} from './level-links.js';
 import {freezeStaticTransforms} from './static-transforms.js';
 import {FlyCamera,flyTargets} from './fly-camera.js';
@@ -15,7 +16,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { createAvatar as makeAvatar, poseAvatar, setAvatarCharacter, celebrateAvatar, cancelAvatarCelebration, isAvatarCelebrating, avatarWantsResultView } from './avatar.js';
+import { createAvatar as makeAvatar, disposeAvatar, poseAvatar, setAvatarCharacter, celebrateAvatar, cancelAvatarCelebration, isAvatarCelebrating, avatarWantsResultView } from './avatar.js';
 import { createCharacterPicker, readCharacterChoice } from './character-picker.js';
 import { computeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
 import { createEscalators } from './escalators.js';
@@ -141,9 +142,15 @@ function checkStationVersion(layout){
   notice('A new station version is ready. Updating the game…',1e8);
   location.reload();return true;
 }
+let recallPending=false,recallChargeQueued=false;
+function resumeQueuedCharge(){if(!recallPending&&snapshot?.phase==='Aim'&&recallChargeQueued){recallChargeQueued=false;startCharge();}}
 function handleMessage(m,playback=false){
+  if(m.type==='session'&&!recallPending&&m.attempt)shotPlayback.expect(m.attempt);
+  if(m.type==='recalled'){recallPending=false;resumeQueuedCharge();return;}
+  if(recallPending&&(['shot-chunk','shot-resume','result','impact','waypoint-hit'].includes(m.type)||(m.type==='state'&&m.phase!=='Aim')))return;
+  if(['result','impact','waypoint-hit'].includes(m.type)&&!shotPlayback.accepts(m.attempt))return;
   if(m.type==='shot-resume'){shotPlayback.resume(m);return;}
-  if(m.type==='shot-chunk'){if(checkStationVersion(m.base.layout))return;shotPlayback.accept(m,performance.now());flightPending=false;workerReady=true;return;}
+  if(m.type==='shot-chunk'){if(checkStationVersion(m.base.layout))return;if(shotPlayback.accept(m,performance.now())){flightPending=false;workerReady=true;}return;}
   if(!playback&&m.type==='result'&&shotPlayback.result(m))return;
   if(!playback&&m.type==='state'){
     if(['Aim','Charging'].includes(m.phase)){shotPlayback.clear(true);shotTimeline=null;}
@@ -156,12 +163,15 @@ function handleMessage(m,playback=false){
   if(m.type==='result'){setFastForward(false);lastResultAttempt=m.attempt;keys.clear();if(pointerLocked()){resultMouseRelease=true;document.exitPointerLock();}}
   if(m.type==='result'&&ui?.state.mode==='play'&&m.saved&&m.score>0)pendingRobotResult=m;
   if(m.type==='selected'||m.type==='replay')pendingRobotResult=null;
-  if(m.type==='session'){if(requestedLevel&&!m.restoring){const level=requestedLevel;requestedLevel=null;send('select-challenge',{challengeId:level});}const level=`${m.challenge?.id||''}:${m.challenge?.revision||''}`;if(level!==powerLevel){powerLevel=level;if(!m.designing)setPowerRange(m.challenge?.hint?.powerRange||'full',true);}}
+  if(m.type==='session'){if(requestedLevel&&!m.restoring){const level=requestedLevel;requestedLevel=null;send('select-challenge',{challengeId:level});}const level=`${m.challenge?.id||''}:${m.challenge?.revision||''}`;if(level!==powerLevel){powerLevel=level;if(!m.designing&&ui?.state.mode==='play')applyLevelAim(m.challenge);}}
   if(m.type==='welcome'){
     const returning=!!guestId;guestId=m.sessionId;identityId=m.id;localStorage.setItem('kyoto-guest-id',m.id);localStorage.setItem('kyoto-guest',m.token);$('nickname').value=m.name;
     // Input stays disabled until a fresh authoritative state arrives.
     workerReady=false;
     if(returning){
+      // A reset reply can be lost with the socket. Reissue the idempotent recall
+      // on the restored connection instead of leaving the new charge queued.
+      if(recallPending){recallPending=false;recallChargeQueued=false;recall();}
       if(!m.resumed){shotPlayback.clear(true);shotTimeline=null;pendingRobotResult=null;ui?.dismissResult();}
       notice(m.resumed?'Connection restored. Your session is ready.':'Reconnected. The previous session ended; your saved scores are safe.',6500);
     }
@@ -177,6 +187,8 @@ function handleMessage(m,playback=false){
   }
   if(m.type==='ready')checkStationVersion(m.layout);
   if(m.type==='state'){if(snapshot&&m.stationTime<snapshot.stationTime){history.length=0;renderClock=null;}ballRotations.add(m);if(m.phase==='Flight')flightPending=false;previous=snapshot;snapshot=m;received=performance.now();history.push(m);if(history.length>30)history.shift();if(!playback||connectionStatus==='connected')workerReady=true;startup?.network(workerReady);}
+  if(m.type==='state')resumeQueuedCharge();
+  if(m.type==='error'){recallPending=false;recallChargeQueued=false;}
   if(m.type==='error'||m.type==='notice'){if(!m.id||m.id===guestId){if(m.type==='error')flightPending=false;notice(m.message);stopChargeSound();chargeMeter.reset();}}
   if(m.type==='impact'){lastImpact=m;$('last-impact').textContent=m.label;if(m.qualifying)sound.cue('impact',m);}
 }
@@ -188,13 +200,14 @@ function restoreThrowAim(){
   centerOnAim();
 }
 function startCharge(){
-  if(fly.active)return;
+  if(fly.active||ui?.completed)return;
+  if(recallPending){recallChargeQueued=true;return;}
   if(names?.active||mobile?.menu||briefing?.blocked||!loaded||!workerReady||!snapshot||chargeMeter.charging||!['play','design'].includes(ui.state.mode))return;
   if(flightPending||(chargeMeter.released&&snapshot.phase!=='Result')||ui.state.session?.busy||ui.state.session?.restoring||['Release','Flight'].includes(snapshot.phase))return;
   const settle=cancelAvatarCelebration(avatars.get(guestId));
   if(settle){robotChargeQueued=true;clearTimeout(robotChargeTimer);robotChargeTimer=setTimeout(()=>{if(robotChargeQueued){robotChargeQueued=false;startCharge();}},settle);return;}
   if(snapshot.phase==='Result'){returnRequested=true;restoreThrowAim();}
-  shotPlayback.clear(true);shotTimeline=null;
+  shotPlayback.waitForAttempt();shotTimeline=null;
   sound.unlock();sound.startCharge(ui.state.selected?.allowedInputs?.chargeSeconds||2.8);ui.dismissResult();sendInput();send('charge',{challengeId:ui.state.selected?.id||null,revision:ui.state.selected?.revision||null,layout:snapshot.layout,physics:snapshot.physics,powerRange,character:characterChoice});chargeMeter.start(performance.now(),(ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*1000);canvas.focus();
 }
 function setPowerRange(range,force=false){
@@ -205,9 +218,9 @@ function setPowerRange(range,force=false){
 }
 for(const range of ['precision','full'])$('power-'+range).onclick=()=>{setPowerRange(range);canvas.focus();};
 setPowerRange('full');
-function release(){robotChargeQueued=false;clearTimeout(robotChargeTimer);stopChargeSound();if(chargeMeter.charging){lastThrowAim={yaw,pitch,distance};flightManual=false;sound.cue('throw');sendInput();send('release');flightPending=true;chargeMeter.release(performance.now());}}
+function release(){recallChargeQueued=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);stopChargeSound();if(chargeMeter.charging){lastThrowAim={yaw,pitch,distance};flightManual=false;sound.cue('throw');sendInput();send('release');flightPending=true;chargeMeter.release(performance.now());}}
 function pointerLocked(){return document.pointerLockElement===canvas;}
-function cancel(){mobile?.reset();setFastForward(false);robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);stopChargeSound();flightPending=false;if(ui?.state.mode!=='replay')send('cancel');chargeMeter.reset();keys.clear();rightDrag=false;lastPointer=null;lockRequested=false;if(pointerLocked()){explicitMouseRelease=true;document.exitPointerLock();}}
+function cancel(){recallChargeQueued=false;mobile?.reset();setFastForward(false);robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);stopChargeSound();flightPending=false;if(ui?.state.mode!=='replay')send('cancel');chargeMeter.reset();keys.clear();rightDrag=false;lastPointer=null;lockRequested=false;if(pointerLocked()){explicitMouseRelease=true;document.exitPointerLock();}}
 function pointerLockFailed(error){
   if(error instanceof Error)console.warn('Mouse capture failed:',error.name,error.message);
   if(!lockRequested)return;
@@ -231,7 +244,18 @@ document.addEventListener('pointerlockchange',()=>{
   }else if(resultMouseRelease){resultMouseRelease=false;explicitMouseRelease=false;lockRequested=false;lastPointer=null;rightDrag=false;}
   else{const escaped=!explicitMouseRelease;explicitMouseRelease=false;cancel();if(escaped&&!document.hidden&&document.hasFocus()&&!briefing?.blocked&&!['Release','Flight'].includes(shotTimeline?.phase||snapshot?.phase))openLevelMenu();}
 });
-function recall(){if(ui?.state.mode==='design'){ui.retryDesign();return;}setFastForward(false);const settle=cancelAvatarCelebration(avatars.get(guestId));if(settle){clearTimeout(robotRetryTimer);robotRetryTimer=setTimeout(recall,settle);return;}pendingRobotResult=null;if(ui?.state.mode==='replay'){$('close-replay').click();return;}if(!send('recall')){notice('Reconnect before recalling this shot.');return;}shotPlayback.clear(true);shotTimeline=null;stopChargeSound();ui.dismissResult();chargeMeter.reset();flightPending=false;returnRequested=true;restoreThrowAim();trailCount=0;}
+function recall(){
+  robotChargeQueued=false;recallChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);
+  if(ui?.state.mode==='design'){ui.retryDesign();return;}
+  if(ui?.state.mode==='replay'){$('close-replay').click();return;}
+  if(recallPending)return;
+  if(!send('recall')){notice('Reconnect before recalling this shot.');return;}
+  recallPending=true;setFastForward(false);cancelAvatarCelebration(avatars.get(guestId));pendingRobotResult=null;
+  shotPlayback.waitForAttempt();shotTimeline=null;stopChargeSound();ui.dismissResult();chargeMeter.reset();
+  flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;
+  restoreThrowAim();trailCount=0;trailGeometry.setDrawRange(0,0);
+}
+
 function syncSpin(){top=Number($('top').value);kick=Number($('kick').value);$('top-value').textContent=top;$('kick-value').textContent=kick;}
 for(const id of ['top','kick'])$(id).addEventListener('input',syncSpin);
 $('clear-spin').onclick=()=>{$('top').value=0;$('kick').value=0;syncSpin();canvas.focus();};
@@ -400,12 +424,10 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   sound.cue('start');if(snapshot?.phase==='Result')recall();
   // Every way out of the briefing starts with the same aim, including Escape.
   // Mouse capture is optional; it must not be what initializes the camera.
-  const c=ui.state.selected;
-  if(c){const target=c.waypoints?.[0]||c.goal||c.start;const dx=target.center.x-c.start.center.x,dz=target.center.z-c.start.center.z;yaw=Math.atan2(dx,dz)*180/Math.PI;pitch=THREE.MathUtils.clamp(12+Math.atan2(target.center.y-c.start.center.y,Math.hypot(dx,dz))*180/Math.PI,-20,55);}
-  centerOnAim();
+  applyLevelAim(ui.state.selected);
   if(capture)captureMouse();else{briefing.dismiss();openLevelMenu();}
 }});
-ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>{if(!startup?.active)briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){shotPlayback.clear(true);shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:c=>{if(!startup?.active)briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 $('replay-free').onclick=()=>setFly(true);
 for(const id of ['replay-play','replay-restart','replay-recenter','replay-free'])$(id).addEventListener('click',()=>canvas.focus());
 names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});
@@ -428,7 +450,10 @@ startup=progressiveLoading({replay:!!sharedReplayId,onDone:()=>{names.finishStar
 startup.network(workerReady);
 
 window.addEventListener('kyoto:retry',()=>{recall();captureMouse();canvas.focus();});
-window.addEventListener('kyoto:hint',event=>{const h=event.detail;setPowerRange(h.powerRange||'precision');yaw=h.yaw;pitch=h.pitch;top=h.top;kick=h.kick;$('top').value=top;$('kick').value=kick;syncSpin();centerOnAim();notice(`Suggested aim set. Release at the white ${throwSpeed(h.holdMs/((ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*1000),h.powerRange||'precision').toFixed(1)} m/s mark.`,7000);canvas.focus();});
+function applyAim(h){setPowerRange(h.powerRange||'precision',true);yaw=h.yaw;pitch=h.pitch;top=h.top;kick=h.kick;$('top').value=top;$('kick').value=kick;syncSpin();centerOnAim();}
+function applyLevelAim(challenge){applyAim(levelEntryAim(challenge));distance=3.8;cameraClearance=distance;}
+window.addEventListener('kyoto:hint',event=>{const h=event.detail;applyAim(h);notice(`Suggested aim set. Release at the white ${throwSpeed(h.holdMs/((ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*1000),h.powerRange||'precision').toFixed(1)} m/s mark.`,7000);canvas.focus();});
+
 let lastFrame=performance.now(),frames=0,frameSum=0,frameSample=performance.now(),lastTelemetry=0;
 const frameTimes=[];
 let qualityCheck=0,qualityGoodSince=0;
@@ -477,7 +502,7 @@ function animate(now){
       poseAvatar(a,posed,phase,snapshot,stationTime);
 
     }
-    for(const [id,a]of avatars)if(!snapshot.players.some(p=>p.id===id)){scene.remove(a.group);avatars.delete(id);}
+    for(const [id,a]of avatars)if(!snapshot.players.some(p=>p.id===id)){disposeAvatar(a);avatars.delete(id);}
     if(inFlight){
       const prev=previous?.owner===snapshot.owner&&['Flight','Result'].includes(previous.phase)?previous:snapshot;
       if(previous?.phase==='Release'&&phase==='Flight'){

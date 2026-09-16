@@ -1,21 +1,24 @@
 import assert from 'node:assert/strict';
 import {writeFile,mkdir} from 'node:fs/promises';
 import {Client,delay} from './api-client.mjs';
-import {SCORING_VERSION} from '../types.ts';
+import {WAYPOINT_SCORING} from '../types.ts';
 import {scoreAttempt} from '../scoring.ts';
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173';
 const out=process.env.KYOTO_TEST_OUTPUT||'artifacts/phase3/combo-arcade/runtime.json';
 const c=new Client(origin.replace(/^http/,'ws')),checks=[];
 try{
  await c.join();c.send('name',{name:'Arcade QA'});const course=c.messages.findLast(m=>m.type==='catalog').challenges.find(c=>c.id==='atrium-first-bank');
- assert.equal(course.scoring,SCORING_VERSION);assert.equal(course.allowedInputs.chargeSeconds,2.8);
+ assert.equal(course.scoring,WAYPOINT_SCORING);assert.equal(course.allowedInputs.chargeSeconds,2.8);
  await c.request('select-challenge',{challengeId:course.id,revision:course.revision},'selected');
- for(const [name,holdMs,yaw]of [['perfect',260,90],['near',260,100],['tagged',373,90]]){
+ for(const [name,holdMs,yaw]of [['perfect',260,90],['miss',260,150],['overshoot',373,90]]){
   c.messages.length=0;const shot=await c.throw(holdMs,{yaw,pitch:15,powerRange:'precision'},45000),r=shot.result;
   const live=c.messages.filter(m=>m.type==='state'&&m.liveScore).map(m=>m.liveScore);
   assert.ok(live.length>10);assert.ok(live.some(m=>m.potential>10000));assert.ok(live.some(m=>m.styleBanks>0));
-  if(r.breakdown.outcome!==name)console.error(JSON.stringify({expected:name,actual:r.breakdown.outcome,holdMs,power:r.thrower.power,range:r.thrower.powerRange,velocity:r.velocity,final:shot.state.ball,breakdown:r.breakdown}));
-  assert.equal(r.breakdown.outcome,name);assert.equal(shot.state.diagnostics.sleeping,true);assert.ok(Math.hypot(...Object.values(shot.state.velocity))<1e-5);assert.ok(Math.hypot(...Object.values(shot.state.spin))<1e-5);
+  if(name==='perfect'&&r.breakdown.outcome!==name)console.error(JSON.stringify({expected:name,actual:r.breakdown.outcome,holdMs,power:r.thrower.power,range:r.thrower.powerRange,velocity:r.velocity,final:shot.state.ball,breakdown:r.breakdown}));
+  if(name==='perfect')assert.equal(r.breakdown.outcome,'perfect');
+  if(name==='miss'){assert.equal(r.success,false);assert.ok(r.breakdown.waypointCount<course.waypoints.length);assert.ok(r.saved&&r.score>0,'A missed route still ranks its in-bounds score');}
+  if(name==='overshoot'){assert.equal(r.success,true,'Every waypoint clears even without the optional landing');assert.equal(r.destinationReached,false);}
+ assert.equal(shot.state.diagnostics.sleeping,true);assert.ok(Math.hypot(...Object.values(shot.state.velocity))<1e-5);assert.ok(Math.hypot(...Object.values(shot.state.spin))<1e-5);
   assert.equal(c.messages.some(m=>'scorePoses' in m),false,'Private positions must not be broadcast');
   const rotationFrames=c.messages.filter(m=>m.type==='state'&&m.rotationSamples?.length);
   assert.ok(rotationFrames.some(m=>m.rotationSamples.length>=5),'Render orientations must retain native subframes');
@@ -23,15 +26,14 @@ try{
   const replay=(await c.request('replay',{attempt:r.attempt},'replay')).replay;
   assert.ok(replay.scoreFrames.length>20);assert.deepEqual(replay.scoreFrames.at(-1).score,r.breakdown);assert.deepEqual(scoreAttempt(replay),r.breakdown);assert.equal(replay.score,r.score);
   assert.equal(replay.thrower.powerRange,'precision');assert.ok(Math.abs(Math.hypot(...Object.values(replay.velocity))-(.5+11.5*replay.thrower.power))<.00001,'The displayed linear speed is the actual native launch speed');
-  assert.ok(Math.abs(live.at(-1).potential-r.breakdown.potential)<=1,'Live multiplier exactly agrees with final replay');
+  assert.ok(Math.abs(live.at(-1).potential+r.breakdown.destinationBonus-r.breakdown.potential)<=1,'Live multiplier exactly agrees with final replay');
   if(name==='perfect'){assert.equal(r.breakdown.landingMultiplier,1);assert.ok(live.some(m=>m.goalVisited),'The goal must light before the result');assert.ok(r.score>=15000);}
-  if(name==='tagged'){assert.equal(r.breakdown.goalVisited,true);assert.ok(r.breakdown.landingMultiplier>=.25);}
   let settlingRegression;
   if(name==='perfect'){
    const entered=replay.scoreFrames.find(f=>f.score.goalVisited);
    assert.ok(entered&&replay.duration>entered.t+.05,'Native completion still waits after target entry for physical rest');
    assert.equal(r.breakdown.bankMultiplier,entered.score.bankMultiplier,'Settling never inflates the multiplier');
-   assert.equal(r.breakdown.potential-entered.score.potential,r.breakdown.movementPoints-entered.score.movementPoints,'Settling adds only linear movement points');
+   assert.equal(r.breakdown.potential-r.breakdown.destinationBonus-entered.score.potential,r.breakdown.movementPoints-entered.score.movementPoints,'Settling adds only linear movement points');
    const atRest=replay.poses.at(-1),extraRest={...replay,poses:[...replay.poses,{...atRest,t:atRest.t+10}]};
    assert.deepEqual(scoreAttempt(extraRest),r.breakdown,'Rest adds no points');
    settlingRegression={entry:entered.t,finish:replay.duration,potential:entered.score.potential};

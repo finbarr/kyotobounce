@@ -52,6 +52,7 @@ tools/*
 !tools/pack-assets.mjs
 !tools/dev.mjs
 !tools/export_browser_art.py
+!tools/coplanar_surfaces.py
 !tools/export_atrium_layout.py
 !tools/build_atrium_detail.py
 !tools/build_stair_materials.py

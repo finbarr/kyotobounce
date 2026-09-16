@@ -1,3 +1,4 @@
+import {completedCourse,nextCampaignCourse} from './level-progress.js';
 import {copyLevel,levelURL,fetchLevel} from './level-links.js';
 import {designGeometry} from './design-geometry.js';
 import * as THREE from 'three';
@@ -15,6 +16,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  <div id="design-shot-view" hidden><span class="eyebrow">DESIGN BALL / RECORD YOUR LINE</span><h2 id="design-shot-title">THROW THE LEVEL.</h2><p id="design-shot-status" role="status">Walk to your launch spot. Hold Space or the mouse to charge, then release. F scouts without moving the robot.</p><p id="design-shot-help">Spaced banks become waypoints. A clear landing becomes an optional finish bonus.</p><button id="design-back">Exit creator <kbd>ESC</kbd></button></div>
 
  <div id="result-card" hidden><span class="eyebrow" id="result-label"></span><div class="result-rank" id="result-rank"></div><h2 id="result-title"></h2><p id="result-breakdown"></p><div id="result-math"></div><p class="result-tip" id="result-tip"></p><div class="actions"><button id="try-result">Try again <kbd>R</kbd></button><button id="watch-result">Watch replay</button><button id="share-result">Copy replay link ↗</button><button id="next-challenge">Next level <kbd>SPACE / N</kbd> →</button></div></div>`;document.body.append(host);
+ const completionAction=document.createElement('div');completionAction.id='result-next';$('result-label').after(completionAction);completionAction.append($('next-challenge'));
  const results=document.createElement('div');results.id='results-screen';document.body.append(results);results.append($('result-card'));
  const levelsButton=document.createElement('button');levelsButton.id='toggle-levels';levelsButton.type='button';levelsButton.innerHTML='LEVELS <kbd>L</kbd>';levelsButton.setAttribute('aria-keyshortcuts','L');levelsButton.setAttribute('aria-controls','competition');levelsButton.setAttribute('aria-expanded','false');document.querySelector('.session').prepend(levelsButton);
  const closeLevels=document.createElement('button');closeLevels.id='close-levels';closeLevels.type='button';closeLevels.textContent='×';closeLevels.setAttribute('aria-label','Close levels');$('course-view').querySelector('.panel-top').append(closeLevels);
@@ -104,7 +106,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
   $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?'READY TO THROW · SHARED SCORES':'Explore the station freely';
   const changed=state.selected?.id!==session.challenge?.id||state.selected?.revision!==session.challenge?.revision;
   state.selected=session.challenge;
-  if(changed){showLevels(false);state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
+  if(changed){state.lastResult=null;showLevels(false);state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
   $('course-title').textContent=state.selected?.name||'PICK YOUR LINE.';$('challenge-detail').hidden=!state.selected;
   if(state.selected){const c=state.selected;$('challenge-description').textContent=c.scoring==='waypoint-v3'?`${c.waypoints?.length||0} waypoints · ${c.goal?(c.waypoints?.length?'optional destination bonus':'destination required'):'no destination required'} · all shots can rank · collect every waypoint to clear`:`Start within ${c.start.radius.toFixed(2)} m · settle inside ${c.goal.radius.toFixed(2)} m${c.requiredSurface?' · required route contact':''}`;if(c.campaign)$('challenge-description').textContent=c.campaign.brief+' '+$('challenge-description').textContent;state.hint=state.selected.hint||null;$('use-hint').hidden=!state.hint;$('hint-note').textContent=state.hint?.note||'';$('edit-challenge').hidden=state.selected.creator!==getGuestId();}
   if(state.mode==='play')drawDisks(state.selected);
@@ -216,7 +218,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
   $('replay-scrub').min=String(replayStart());$('replay-scrub').max=String(replay.duration);$('replay-scrub').value=String(state.replayTime);$('replay-play').textContent='Pause';drawDisks(replay.challenge);ranking.update(replay.challenge,replay.standings?.after||[]);fetchLevel(replay.challenge.id).then(board=>{if(state.replay===replay&&state.mode==='replay')ranking.update(board.challenge,board.entries);}).catch(()=>{});presentation();resetView();
  }
  if(sharedReplay)presentation();
- $('close-replay').onclick=()=>{replayRequest++;if(sharedReplay){location.href=$('play-replay-level').href;return;}history.replaceState(null,'',state.selected?levelURL(state.selected.id):'/');document.title=state.selected?`${state.selected.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';feedback.reset();setMode('play');state.replay=null;state.replayPlaying=false;renderBoard();drawDisks(state.selected);presentation();resetView();};
+ $('close-replay').onclick=()=>{replayRequest++;if(sharedReplay){location.href=$('play-replay-level').href;return;}history.replaceState(null,'',state.selected?levelURL(state.selected.id):'/');document.title=state.selected?`${state.selected.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';feedback.reset();setMode('play');state.replay=null;state.replayPlaying=false;renderBoard();drawDisks(state.selected);presentation();resetView('level');if(completed()){$('result-card').hidden=false;updateCompletionAction();}};
  function restartReplay(){cancel();scoreEpoch++;feedback.reset();state.replayTime=replayStart();state.replayPlaying=true;$('replay-play').textContent='Pause';resetView('replay');}
  $('replay-restart').onclick=restartReplay;
  $('replay-play').onclick=()=>{cancel();if(!state.replayPlaying&&state.replayTime>=state.replay.duration){restartReplay();return;}state.replayPlaying=!state.replayPlaying;$('replay-play').textContent=state.replayPlaying?'Pause':'Play';};
@@ -227,19 +229,28 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  $('share-result').onclick=()=>copyReplay(state.lastResult.attempt,$('share-result'));
  $('share-replay').onclick=()=>{if(state.replay)copyReplay(state.replay.attempt,$('share-replay'));};
  let nextRequested=false;
+ function completed(){return completedCourse(state.mode,state.lastResult,state.selected);}
+ function updateCompletionAction(){
+  const button=$('next-challenge');button.hidden=!completed();
+  const next=nextCampaignCourse(state.challenges,state.selected);
+  button.innerHTML=next?'Next level <kbd>SPACE / N</kbd> →':state.selected?.campaign?'Campaign complete · Choose a level <kbd>SPACE / N</kbd>':'Level complete · Choose a level <kbd>SPACE / N</kbd>';
+ }
  function advanceCompleted(){
-  const next=state.challenges.find(c=>c.order===(state.selected?.order??-2)+1);
   if(nextRequested)return true;
-  if(state.mode!=='play'||getPhase()!=='Result'||!state.lastResult?.success||!next)return false;
-  nextRequested=true;send('select-challenge',{challengeId:next.id,revision:next.revision});return true;
+  if(!completed())return false;
+  const next=nextCampaignCourse(state.challenges,state.selected);
+  if(!next){showLevels(true);return true;}
+  nextRequested=true;
+  if(!send('select-challenge',{challengeId:next.id,revision:next.revision})){nextRequested=false;notice('Reconnect to continue to the next level.');}
+  return true;
  }
  $('next-challenge').onclick=advanceCompleted;
  return {
   openLevels:()=>showLevels(true),closeLevels:()=>showLevels(false),get levelsOpen(){return levelsOpen;},focusLevel,navigateLevels,
-  state,advanceCompleted,openReplay,exitDesign,retryDesign:()=>startDesign(state.draft.start),replayViewport:()=>replayViewport,
+  state,advanceCompleted,get completed(){return completed();},openReplay,exitDesign,retryDesign:()=>startDesign(state.draft.start),replayViewport:()=>replayViewport,
   playbackRate(fastForward=false){return state.mode==='replay'?(state.replayPlaying?(fastForward?2:1):0):1;},
   scorePresentation(){return {score:state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore,challenge:state.mode==='replay'?state.replay?.challenge:state.selected,attempt:state.mode==='replay'?state.replay?.attempt:scoreAttempt,time:state.mode==='replay'?state.replayTime:getLiveTime(),mode:state.mode,epoch:scoreEpoch};},
-  dismissResult(){$('result-card').hidden=true;ranking.reset();feedback.reset();liveScore=null;scoreEpoch++;},
+  dismissResult(){state.lastResult=null;$('result-card').hidden=true;ranking.reset();feedback.reset();liveScore=null;scoreEpoch++;},
   message(m){
    if(m.type==='selected'||m.type==='error'){nextRequested=false;selectingLevel=false;renderCatalog();}
    if(m.type==='state'&&state.mode!=='replay'){if(m.liveScore){liveScore=m.liveScore;scoreAttempt=m.attempt;feedback.accept(m.liveScore,m.attempt,state.selected);}if(['Aim','Charging'].includes(m.phase)){feedback.reset();liveScore=null;}}
@@ -283,7 +294,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
     }
     if(b){const row=document.createElement('div'),name=document.createElement('span'),points=document.createElement('b');name.textContent=`MOVEMENT · ${(b.movingSeconds||0).toFixed(1)} s × 100`;points.textContent=(b.total>0?b.movementPoints||0:0).toLocaleString();row.append(name,points);$('result-math').append(row);}
     $('result-tip').textContent=waypoint?(m.challenge?.waypoints?.length?'Collect EVERY waypoint to clear. All in-bounds shots rank. R · TRY AGAIN':'Land in the destination to clear. All in-bounds shots rank. R · TRY AGAIN'):b?.outcome==='miss'?`Finish within ${b.proximityRange.toFixed(1)} m to earn proximity points.`:'R · TRY AGAIN     ESC · REPLAY & MENUS';
-    $('watch-result').hidden=!m.saved;$('share-result').hidden=!m.saved;ranking.show(m);$('next-challenge').hidden=!m.success||!state.challenges.some(c=>c.order===(state.selected?.order??-2)+1);
+    $('watch-result').hidden=!m.saved;$('share-result').hidden=!m.saved;ranking.show(m);updateCompletionAction();
     if(!feedback.clearing)sound.cue('result',rank);
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches){const began=performance.now(),attempt=m.attempt;function count(now){if(state.lastResult?.attempt!==attempt)return;const t=Math.min(1,(now-began)/800);$('result-title').textContent=`${Math.round(m.score*(1-(1-t)**3)).toLocaleString()} PTS`;if(t<1)requestAnimationFrame(count);}requestAnimationFrame(count);}
 

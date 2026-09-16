@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, applyStationDepthLayer, isAuthoredStationFixture } from './station-materials.js';
+import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture } from './station-materials.js';
 import { configureStationDaylight, createStationReflections } from './station-lighting.js';
 import {createStationInstallations} from './station-installations.js';
 
@@ -136,7 +136,6 @@ export function dressStation(renderer,scene,sun,station,data){
     if(root===station){o.receiveShadow=true;o.castShadow=materials.every(m=>!m.transparent&&!/glaz|Glass|lettering|diffuser|lamp|lens/i.test(m.name));}
     for(const m of materials){
       if(done.has(m))continue;done.add(m);
-      applyStationDepthLayer(m);
       if(isAuthoredStationFixture(m.name))continue;
       resampledMaps.push(...prepareGraniteMaps(m));
       for(const key of ['map','normalMap','roughnessMap'])if(m[key]){

@@ -1,624 +1,10 @@
 [
   {
-    "id": "kyoto-konbinidirect",
-    "revision": 2,
-    "name": "Snack Run",
-    "creator": "station",
-    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
-    "physics": "kyoto-p3-3",
-    "throwModel": "robot-v4",
-    "scoring": "waypoint-v3",
-    "allowedInputs": {
-      "chargeSeconds": 2.8,
-      "power": [
-        0,
-        1
-      ],
-      "pitch": [
-        -65,
-        80
-      ],
-      "top": [
-        -200,
-        200
-      ],
-      "kick": [
-        -200,
-        200
-      ]
-    },
-    "start": {
-      "center": {
-        "x": -56,
-        "y": 7.34999942779541,
-        "z": -18
-      },
-      "normal": {
-        "x": 0,
-        "y": 1,
-        "z": 0
-      },
-      "radius": 0.25,
-      "surface": "k019-west-2f-gallery"
-    },
-    "goal": {
-      "center": {
-        "x": -51.60438537597656,
-        "y": 7.349999904632568,
-        "z": -18.219999313354492
-      },
-      "normal": {
-        "x": 0,
-        "y": 1.000000238418579,
-        "z": 0
-      },
-      "radius": 1,
-      "surface": "konbini-floor"
-    },
-    "waypoints": [
-      {
-        "id": "patch-1",
-        "center": {
-          "x": -53.775543212890625,
-          "y": 7.349999904632568,
-          "z": -18.219999313354492
-        },
-        "normal": {
-          "x": 0,
-          "y": 1.000000238418579,
-          "z": 0
-        },
-        "radius": 0.15000000596046448,
-        "surface": "konbini-floor"
-      },
-      {
-        "id": "patch-2",
-        "center": {
-          "x": -51.75627899169922,
-          "y": 7.349999904632568,
-          "z": -18.219999313354492
-        },
-        "normal": {
-          "x": 0,
-          "y": 1.000000238418579,
-          "z": 0
-        },
-        "radius": 0.85,
-        "surface": "konbini-floor"
-      }
-    ],
-    "hint": {
-      "yaw": 90,
-      "pitch": -10,
-      "top": -70,
-      "kick": 0,
-      "holdMs": 243.47826086956522,
-      "powerRange": "precision",
-      "note": "1.50 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
-    },
-    "order": 0,
-    "campaign": {
-      "chapter": 1,
-      "chapterTitle": "First Departures",
-      "difficulty": "WARM UP",
-      "distance": 6.9,
-      "brief": "Roll through the open convenience-store entrance. Collect the purple patches, then park beside the shelves."
-    }
-  },
-  {
-    "id": "kyoto-corner-store",
-    "revision": 1,
-    "name": "Corner Store",
-    "creator": "station",
-    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
-    "physics": "kyoto-p3-3",
-    "throwModel": "robot-v4",
-    "scoring": "waypoint-v3",
-    "allowedInputs": {
-      "chargeSeconds": 2.8,
-      "power": [
-        0,
-        1
-      ],
-      "pitch": [
-        -65,
-        80
-      ],
-      "top": [
-        -200,
-        200
-      ],
-      "kick": [
-        -200,
-        200
-      ]
-    },
-    "start": {
-      "center": {
-        "x": -51.599998474121094,
-        "y": 7.349999904632568,
-        "z": -18
-      },
-      "normal": {
-        "x": 0,
-        "y": 1.000000238418579,
-        "z": 0
-      },
-      "radius": 0.25,
-      "surface": "konbini-floor"
-    },
-    "goal": null,
-    "waypoints": [
-      {
-        "center": {
-          "x": -49.96905517578125,
-          "y": 9.34195613861084,
-          "z": -15
-        },
-        "normal": {
-          "x": 1.1920927533992738e-7,
-          "y": 0,
-          "z": -0.9999999999999929
-        },
-        "radius": 0.35,
-        "surface": "konbini-side--1",
-        "id": "bank-1"
-      },
-      {
-        "center": {
-          "x": -49.5,
-          "y": 9.294805526733398,
-          "z": -16.00791358947754
-        },
-        "normal": {
-          "x": -0.9999999999999929,
-          "y": 0,
-          "z": -1.1920927533992738e-7
-        },
-        "radius": 0.6,
-        "surface": "konbini-back",
-        "id": "bank-2"
-      }
-    ],
-    "hint": {
-      "yaw": 25,
-      "pitch": 15,
-      "top": 0,
-      "kick": 0,
-      "holdMs": 2800,
-      "powerRange": "precision",
-      "note": "12.00 m/s · H sets the bank angle. Bank off the side wall above the fridges, turn into the back wall, then let the ball fall into the shop. Two faces, one tight corner."
-    },
-    "order": 1,
-    "campaign": {
-      "chapter": 1,
-      "chapterTitle": "First Departures",
-      "difficulty": "WARM UP",
-      "distance": 10.5,
-      "brief": "Bank off the side wall above the fridges, turn into the back wall, then let the ball fall into the shop. Two faces, one tight corner."
-    }
-  },
-  {
-    "id": "kyoto-ceiling-service",
-    "revision": 1,
-    "name": "Ceiling Service",
-    "creator": "station",
-    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
-    "physics": "kyoto-p3-3",
-    "throwModel": "robot-v4",
-    "scoring": "waypoint-v3",
-    "allowedInputs": {
-      "chargeSeconds": 2.8,
-      "power": [
-        0,
-        1
-      ],
-      "pitch": [
-        -65,
-        80
-      ],
-      "top": [
-        -200,
-        200
-      ],
-      "kick": [
-        -200,
-        200
-      ]
-    },
-    "start": {
-      "center": {
-        "x": -51.599998474121094,
-        "y": 7.349999904632568,
-        "z": -18
-      },
-      "normal": {
-        "x": 0,
-        "y": 1.000000238418579,
-        "z": 0
-      },
-      "radius": 0.25,
-      "surface": "konbini-floor"
-    },
-    "goal": null,
-    "waypoints": [
-      {
-        "center": {
-          "x": -50.85955047607422,
-          "y": 10.449999809265137,
-          "z": -16.608863830566406
-        },
-        "normal": {
-          "x": 0,
-          "y": -1,
-          "z": 0
-        },
-        "radius": 0.15,
-        "surface": "konbini-ceiling",
-        "id": "bank-1"
-      },
-      {
-        "center": {
-          "x": -50.9948844909668,
-          "y": 9.886106491088867,
-          "z": -15
-        },
-        "normal": {
-          "x": 1.1920927533992738e-7,
-          "y": 0,
-          "z": -0.9999999999999929
-        },
-        "radius": 0.35,
-        "surface": "konbini-side--1",
-        "id": "bank-2"
-      },
-      {
-        "center": {
-          "x": -51.898372650146484,
-          "y": 7.349999904632568,
-          "z": -16.63445281982422
-        },
-        "normal": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "radius": 0.35,
-        "surface": "konbini-floor",
-        "id": "bank-3"
-      }
-    ],
-    "hint": {
-      "yaw": 20,
-      "pitch": 55,
-      "top": 0,
-      "kick": 0,
-      "holdMs": 436.1809045226131,
-      "powerRange": "full",
-      "note": "16.00 m/s · H sets the bank angle. Shoot above the shelves: ceiling first, side wall second, floor third. A compact three-dimensional rebound inside the convenience store."
-    },
-    "order": 2,
-    "campaign": {
-      "chapter": 1,
-      "chapterTitle": "First Departures",
-      "difficulty": "WARM UP",
-      "distance": 15,
-      "brief": "Shoot above the shelves: ceiling first, side wall second, floor third. A compact three-dimensional rebound inside the convenience store."
-    }
-  },
-  {
-    "id": "kyoto-ticket",
-    "revision": 2,
-    "name": "Ticket Trick",
-    "creator": "station",
-    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
-    "physics": "kyoto-p3-3",
-    "throwModel": "robot-v4",
-    "scoring": "waypoint-v3",
-    "allowedInputs": {
-      "chargeSeconds": 2.8,
-      "power": [
-        0,
-        1
-      ],
-      "pitch": [
-        -65,
-        80
-      ],
-      "top": [
-        -200,
-        200
-      ],
-      "kick": [
-        -200,
-        200
-      ]
-    },
-    "start": {
-      "center": {
-        "x": 20,
-        "y": 0,
-        "z": -20
-      },
-      "normal": {
-        "x": 0,
-        "y": 1,
-        "z": 0
-      },
-      "radius": 0.4000000059604645,
-      "surface": "concourse"
-    },
-    "goal": null,
-    "waypoints": [
-      {
-        "id": "patch-1",
-        "center": {
-          "x": 20.074819564819336,
-          "y": 0,
-          "z": -23.379383087158203
-        },
-        "normal": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "radius": 0.85,
-        "surface": "concourse"
-      },
-      {
-        "id": "patch-2",
-        "center": {
-          "x": 20.7,
-          "y": 0.32,
-          "z": -27.779998779296875
-        },
-        "normal": {
-          "x": 0,
-          "y": 0,
-          "z": -1
-        },
-        "radius": 0.19,
-        "surface": "concourse-ticket-machine-1"
-      }
-    ],
-    "hint": {
-      "yaw": 175,
-      "pitch": 5,
-      "top": -40,
-      "kick": 0,
-      "holdMs": 1095.6521739130435,
-      "powerRange": "precision",
-      "note": "5.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
-    },
-    "order": 3,
-    "campaign": {
-      "chapter": 1,
-      "chapterTitle": "First Departures",
-      "difficulty": "WARM UP",
-      "distance": 15.3,
-      "brief": "Skip across the ticket hall, then catch the back of a ticket machine for the final wall patch."
-    }
-  },
-  {
-    "id": "kyoto-garden-switchback",
-    "revision": 1,
-    "name": "Garden Switchback",
-    "creator": "station",
-    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
-    "physics": "kyoto-p3-3",
-    "throwModel": "robot-v4",
-    "scoring": "waypoint-v3",
-    "allowedInputs": {
-      "chargeSeconds": 2.8,
-      "power": [
-        0,
-        1
-      ],
-      "pitch": [
-        -65,
-        80
-      ],
-      "top": [
-        -200,
-        200
-      ],
-      "kick": [
-        -200,
-        200
-      ]
-    },
-    "start": {
-      "center": {
-        "x": 105,
-        "y": 34.619998931884766,
-        "z": -12
-      },
-      "normal": {
-        "x": 0,
-        "y": 1,
-        "z": 0
-      },
-      "radius": 0.25,
-      "surface": "east-court-garden-floor"
-    },
-    "goal": null,
-    "waypoints": [
-      {
-        "center": {
-          "x": 105.7538070678711,
-          "y": 37.355403900146484,
-          "z": -15.714956283569336
-        },
-        "normal": {
-          "x": 0.35225505277279906,
-          "y": 0,
-          "z": 0.9359040430493034
-        },
-        "radius": 0.15,
-        "surface": "east-court-south-curved-fascia",
-        "id": "bank-1"
-      },
-      {
-        "center": {
-          "x": 111.57414245605469,
-          "y": 35.369998931884766,
-          "z": -12.04854965209961
-        },
-        "normal": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "radius": 0.35,
-        "surface": "east-court-restaurant-platform",
-        "id": "bank-2"
-      },
-      {
-        "center": {
-          "x": 112.68939208984375,
-          "y": 36.25123977661133,
-          "z": -11.51958179473877
-        },
-        "normal": {
-          "x": -1,
-          "y": 0,
-          "z": 0
-        },
-        "radius": 0.35,
-        "surface": "east-restaurant-glazing-0",
-        "id": "bank-3"
-      }
-    ],
-    "hint": {
-      "yaw": 165,
-      "pitch": 25,
-      "top": 0,
-      "kick": 0,
-      "holdMs": 379.8994974874372,
-      "powerRange": "full",
-      "note": "14.00 m/s · H sets the bank angle. Clip the curved fascia, drop onto the restaurant terrace, then turn back off its glass wall. The targets wrap around the garden corner."
-    },
-    "order": 4,
-    "campaign": {
-      "chapter": 1,
-      "chapterTitle": "First Departures",
-      "difficulty": "WARM UP",
-      "distance": 18,
-      "brief": "Clip the curved fascia, drop onto the restaurant terrace, then turn back off its glass wall. The targets wrap around the garden corner."
-    }
-  },
-  {
-    "id": "kyoto-terrace",
-    "revision": 2,
-    "name": "Terrace Turnaround",
-    "creator": "station",
-    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
-    "physics": "kyoto-p3-3",
-    "throwModel": "robot-v4",
-    "scoring": "waypoint-v3",
-    "allowedInputs": {
-      "chargeSeconds": 2.8,
-      "power": [
-        0,
-        1
-      ],
-      "pitch": [
-        -65,
-        80
-      ],
-      "top": [
-        -200,
-        200
-      ],
-      "kick": [
-        -200,
-        200
-      ]
-    },
-    "start": {
-      "center": {
-        "x": -36,
-        "y": 7.350000381469727,
-        "z": -5
-      },
-      "normal": {
-        "x": 0,
-        "y": 1,
-        "z": 0
-      },
-      "radius": 0.4000000059604645,
-      "surface": "west-2f-landing"
-    },
-    "goal": {
-      "center": {
-        "x": -33.968658447265625,
-        "y": 7.34999942779541,
-        "z": 1.8038419485092163
-      },
-      "normal": {
-        "x": 0,
-        "y": 1,
-        "z": 0
-      },
-      "radius": 1.5,
-      "surface": "west-2f-landing"
-    },
-    "waypoints": [
-      {
-        "id": "patch-1",
-        "center": {
-          "x": -35.89179611206055,
-          "y": 7.350000381469727,
-          "z": -8.760974884033203
-        },
-        "normal": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "radius": 0.85,
-        "surface": "west-2f-landing"
-      },
-      {
-        "id": "patch-2",
-        "center": {
-          "x": -34.11557388305664,
-          "y": 7.350000381469727,
-          "z": 0.8807566165924072
-        },
-        "normal": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "radius": 0.85,
-        "surface": "west-2f-landing"
-      }
-    ],
-    "hint": {
-      "yaw": 175,
-      "pitch": 15,
-      "top": -50,
-      "kick": 0,
-      "holdMs": 1095.6521739130435,
-      "powerRange": "precision",
-      "note": "5.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
-    },
-    "order": 5,
-    "campaign": {
-      "chapter": 2,
-      "chapterTitle": "Angles and Returns",
-      "difficulty": "GET CREATIVE",
-      "distance": 18.3,
-      "brief": "Use the seating partition to turn the ball back across the terrace. Bank first, collect on the way home."
-    }
-  },
-  {
     "id": "atrium-first-bank",
-    "revision": 11,
-    "name": "First Bank",
+    "revision": 12,
+    "name": "First Bounce",
     "creator": "station",
-    "order": 6,
+    "order": 0,
     "start": {
       "center": {
         "x": 0,
@@ -646,14 +32,14 @@
     "physics": "kyoto-p3-3",
     "hint": {
       "yaw": 90,
-      "pitch": 15,
+      "pitch": -8,
       "top": 0,
       "kick": 0,
       "holdMs": 259,
-      "note": "1.56 m/s · H sets the suggested aim. Charge to the marker and watch the final rolls into the gold circle.",
+      "note": "1.56 m/s · You start aimed at two generous targets in the open atrium. Hold Space to the white mark and release. R retries; Space advances after a clear.",
       "powerRange": "precision"
     },
-    "scoring": "combo-v7",
+    "scoring": "waypoint-v3",
     "allowedInputs": {
       "chargeSeconds": 2.8,
       "power": [
@@ -675,12 +61,44 @@
     },
     "throwModel": "robot-v4",
     "campaign": {
-      "chapter": 2,
-      "chapterTitle": "Angles and Returns",
-      "difficulty": "GET CREATIVE",
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "WARM UP",
       "distance": 24.4,
-      "brief": "Learn the bounce: keep the ball on a straight line and let the last few rolls carry it into the gold circle."
-    }
+      "brief": "Your first bounce, out in the open atrium. Send a gentle shot through two generous purple targets. The gold landing is an optional bonus."
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": 2.5,
+          "y": 0,
+          "z": 19.78
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 1.15,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": 6.5,
+          "y": 0,
+          "z": 19.78
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 1.15,
+        "surface": "concourse"
+      }
+    ]
   },
   {
     "id": "kyoto-platform",
@@ -794,13 +212,627 @@
       "powerRange": "precision",
       "note": "1.80 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
     },
+    "order": 1,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "WARM UP",
+      "distance": 27.3,
+      "brief": "Stretch your gentle throw into a longer diagonal across the open concourse. Three smaller patches reward more precise aim and charge."
+    }
+  },
+  {
+    "id": "kyoto-terrace",
+    "revision": 2,
+    "name": "Terrace Turnaround",
+    "creator": "station",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
+    "physics": "kyoto-p3-3",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v3",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -36,
+        "y": 7.350000381469727,
+        "z": -5
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "west-2f-landing"
+    },
+    "goal": {
+      "center": {
+        "x": -33.968658447265625,
+        "y": 7.34999942779541,
+        "z": 1.8038419485092163
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1.5,
+      "surface": "west-2f-landing"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -35.89179611206055,
+          "y": 7.350000381469727,
+          "z": -8.760974884033203
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "west-2f-landing"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -34.11557388305664,
+          "y": 7.350000381469727,
+          "z": 0.8807566165924072
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "west-2f-landing"
+      }
+    ],
+    "hint": {
+      "yaw": 175,
+      "pitch": 15,
+      "top": -50,
+      "kick": 0,
+      "holdMs": 1095.6521739130435,
+      "powerRange": "precision",
+      "note": "5.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 2,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "WARM UP",
+      "distance": 18.3,
+      "brief": "Your first return bank: use the terrace partition to send the ball back across the open landing. Collect the return patch after the bounce."
+    }
+  },
+  {
+    "id": "kyoto-konbinidirect",
+    "revision": 2,
+    "name": "Snack Run",
+    "creator": "station",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
+    "physics": "kyoto-p3-3",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v3",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -56,
+        "y": 7.34999942779541,
+        "z": -18
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "k019-west-2f-gallery"
+    },
+    "goal": {
+      "center": {
+        "x": -51.60438537597656,
+        "y": 7.349999904632568,
+        "z": -18.219999313354492
+      },
+      "normal": {
+        "x": 0,
+        "y": 1.000000238418579,
+        "z": 0
+      },
+      "radius": 1,
+      "surface": "konbini-floor"
+    },
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": -53.775543212890625,
+          "y": 7.349999904632568,
+          "z": -18.219999313354492
+        },
+        "normal": {
+          "x": 0,
+          "y": 1.000000238418579,
+          "z": 0
+        },
+        "radius": 0.15000000596046448,
+        "surface": "konbini-floor"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": -51.75627899169922,
+          "y": 7.349999904632568,
+          "z": -18.219999313354492
+        },
+        "normal": {
+          "x": 0,
+          "y": 1.000000238418579,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "konbini-floor"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": -10,
+      "top": -70,
+      "kick": 0,
+      "holdMs": 243.47826086956522,
+      "powerRange": "precision",
+      "note": "1.50 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 3,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "WARM UP",
+      "distance": 6.9,
+      "brief": "Roll through the open convenience-store entrance. Collect the purple patches, then park beside the shelves."
+    }
+  },
+  {
+    "id": "kyoto-corner-store",
+    "revision": 1,
+    "name": "Corner Store",
+    "creator": "station",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
+    "physics": "kyoto-p3-3",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v3",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -51.599998474121094,
+        "y": 7.349999904632568,
+        "z": -18
+      },
+      "normal": {
+        "x": 0,
+        "y": 1.000000238418579,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "konbini-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -49.96905517578125,
+          "y": 9.34195613861084,
+          "z": -15
+        },
+        "normal": {
+          "x": 1.1920927533992738e-7,
+          "y": 0,
+          "z": -0.9999999999999929
+        },
+        "radius": 0.35,
+        "surface": "konbini-side--1",
+        "id": "bank-1"
+      },
+      {
+        "center": {
+          "x": -49.5,
+          "y": 9.294805526733398,
+          "z": -16.00791358947754
+        },
+        "normal": {
+          "x": -0.9999999999999929,
+          "y": 0,
+          "z": -1.1920927533992738e-7
+        },
+        "radius": 0.6,
+        "surface": "konbini-back",
+        "id": "bank-2"
+      }
+    ],
+    "hint": {
+      "yaw": 25,
+      "pitch": 15,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 2800,
+      "powerRange": "precision",
+      "note": "12.00 m/s · H sets the bank angle. Bank off the side wall above the fridges, turn into the back wall, then let the ball fall into the shop. Two faces, one tight corner."
+    },
+    "order": 4,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "First Departures",
+      "difficulty": "WARM UP",
+      "distance": 10.5,
+      "brief": "Bank off the side wall above the fridges, turn into the back wall, then let the ball fall into the shop. Two faces, one tight corner."
+    }
+  },
+  {
+    "id": "kyoto-ticket",
+    "revision": 2,
+    "name": "Ticket Trick",
+    "creator": "station",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
+    "physics": "kyoto-p3-3",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v3",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": 20,
+        "y": 0,
+        "z": -20
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "concourse"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "id": "patch-1",
+        "center": {
+          "x": 20.074819564819336,
+          "y": 0,
+          "z": -23.379383087158203
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.85,
+        "surface": "concourse"
+      },
+      {
+        "id": "patch-2",
+        "center": {
+          "x": 20.7,
+          "y": 0.32,
+          "z": -27.779998779296875
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        "radius": 0.19,
+        "surface": "concourse-ticket-machine-1"
+      }
+    ],
+    "hint": {
+      "yaw": 175,
+      "pitch": 5,
+      "top": -40,
+      "kick": 0,
+      "holdMs": 1095.6521739130435,
+      "powerRange": "precision",
+      "note": "5.00 m/s · H sets aim and spin. Charge to the marked speed; follow the purple patches."
+    },
+    "order": 5,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Angles and Returns",
+      "difficulty": "GET CREATIVE",
+      "distance": 15.3,
+      "brief": "Skip across the ticket hall, then catch the back of a ticket machine for the final wall patch."
+    }
+  },
+  {
+    "id": "kyoto-ceiling-service",
+    "revision": 1,
+    "name": "Ceiling Service",
+    "creator": "station",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
+    "physics": "kyoto-p3-3",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v3",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": -51.599998474121094,
+        "y": 7.349999904632568,
+        "z": -18
+      },
+      "normal": {
+        "x": 0,
+        "y": 1.000000238418579,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "konbini-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -50.85955047607422,
+          "y": 10.449999809265137,
+          "z": -16.608863830566406
+        },
+        "normal": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        },
+        "radius": 0.15,
+        "surface": "konbini-ceiling",
+        "id": "bank-1"
+      },
+      {
+        "center": {
+          "x": -50.9948844909668,
+          "y": 9.886106491088867,
+          "z": -15
+        },
+        "normal": {
+          "x": 1.1920927533992738e-7,
+          "y": 0,
+          "z": -0.9999999999999929
+        },
+        "radius": 0.35,
+        "surface": "konbini-side--1",
+        "id": "bank-2"
+      },
+      {
+        "center": {
+          "x": -51.898372650146484,
+          "y": 7.349999904632568,
+          "z": -16.63445281982422
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.35,
+        "surface": "konbini-floor",
+        "id": "bank-3"
+      }
+    ],
+    "hint": {
+      "yaw": 20,
+      "pitch": 55,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 436.1809045226131,
+      "powerRange": "full",
+      "note": "16.00 m/s · H sets the bank angle. Shoot above the shelves: ceiling first, side wall second, floor third. A compact three-dimensional rebound inside the convenience store."
+    },
+    "order": 6,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Angles and Returns",
+      "difficulty": "GET CREATIVE",
+      "distance": 15,
+      "brief": "Shoot above the shelves: ceiling first, side wall second, floor third. A compact three-dimensional rebound inside the convenience store."
+    }
+  },
+  {
+    "id": "kyoto-garden-switchback",
+    "revision": 1,
+    "name": "Garden Switchback",
+    "creator": "station",
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
+    "physics": "kyoto-p3-3",
+    "throwModel": "robot-v4",
+    "scoring": "waypoint-v3",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "start": {
+      "center": {
+        "x": 105,
+        "y": 34.619998931884766,
+        "z": -12
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "east-court-garden-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 105.7538070678711,
+          "y": 37.355403900146484,
+          "z": -15.714956283569336
+        },
+        "normal": {
+          "x": 0.35225505277279906,
+          "y": 0,
+          "z": 0.9359040430493034
+        },
+        "radius": 0.15,
+        "surface": "east-court-south-curved-fascia",
+        "id": "bank-1"
+      },
+      {
+        "center": {
+          "x": 111.57414245605469,
+          "y": 35.369998931884766,
+          "z": -12.04854965209961
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.35,
+        "surface": "east-court-restaurant-platform",
+        "id": "bank-2"
+      },
+      {
+        "center": {
+          "x": 112.68939208984375,
+          "y": 36.25123977661133,
+          "z": -11.51958179473877
+        },
+        "normal": {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.35,
+        "surface": "east-restaurant-glazing-0",
+        "id": "bank-3"
+      }
+    ],
+    "hint": {
+      "yaw": 165,
+      "pitch": 25,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 379.8994974874372,
+      "powerRange": "full",
+      "note": "14.00 m/s · H sets the bank angle. Clip the curved fascia, drop onto the restaurant terrace, then turn back off its glass wall. The targets wrap around the garden corner."
+    },
     "order": 7,
     "campaign": {
       "chapter": 2,
       "chapterTitle": "Angles and Returns",
       "difficulty": "GET CREATIVE",
-      "distance": 27.3,
-      "brief": "Send a gentle diagonal shot across the open concourse. Pick up the chain before the final landing."
+      "distance": 18,
+      "brief": "Clip the curved fascia, drop onto the restaurant terrace, then turn back off its glass wall. The targets wrap around the garden corner."
     }
   },
   {

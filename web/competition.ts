@@ -6,14 +6,14 @@ import { PhysicsWorker } from './worker.ts';
 import type { Guest,Challenge,Disk,Waypoint,NativeResult,Hint } from './types.ts';
 import { SCORING_VERSION,WAYPOINT_SCORING,ACTIVE_SCORING,SUPPORTED_SCORING,THROW_MODEL,CHARGE_SECONDS } from './types.ts';
 
-export type Member={designing?:boolean;designProof?:{token:string;geometry:string;hint:Hint};id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>;lastResult?:any;attemptPresentation?:{playerName:string;character:NonNullable<NativeResult['character']>}};
+export type Member={recalling?:boolean;designing?:boolean;designProof?:{token:string;geometry:string;hint:Hint};id:string;guest:Guest;selected:Challenge|null;chargeAt?:number;attempt?:string;snapshot:any;snapshotAt?:number;selecting:boolean;restoring:boolean;combo?:ComboTracker;scoreFrames?:NonNullable<NativeResult['scoreFrames']>;lastResult?:any;attemptPresentation?:{playerName:string;character:NonNullable<NativeResult['character']>}};
 export class Competition {
  store:Store;worker:PhysicsWorker;publish:(message:unknown,sessionId?:string)=>void;
  members=new Map<string,Member>();
  pending=new Map<string,{id:string;challenge:Challenge|null}>();
  initializing=false;layout='';physics='';animation='ori-carry-v2';
  constructor(store:Store,worker:PhysicsWorker,publish:(message:unknown,sessionId?:string)=>void){this.store=store;this.worker=worker;this.publish=publish;}
- session(m:Member){return {type:'session',id:m.id,busy:!!m.attempt,designing:!!m.designing,restoring:m.restoring,challenge:m.selected};}
+ session(m:Member){return {type:'session',id:m.id,busy:!!m.attempt,attempt:m.attempt||null,recalling:!!m.recalling,designing:!!m.designing,restoring:m.restoring,challenge:m.selected};}
  sync(m:Member){this.publish(this.session(m),m.id);}
  playable(c:Challenge){return c.layout===this.layout&&c.physics===this.physics&&c.throwModel===THROW_MODEL&&ACTIVE_SCORING.includes(c.scoring||'')&&this.store.challenge(c.id)?.revision===c.revision;}
  catalog(){return {type:'catalog',challenges:this.store.list().filter(c=>this.playable(c))};}
@@ -55,6 +55,13 @@ export class Competition {
   m.restoring=false;this.sync(m);this.board(m);
  }
  async ready(message:any){this.initializing=true;try{this.layout=message.layout;this.physics=message.physics;this.store.discardRetired(this.layout,this.physics);}finally{this.initializing=false;}await Promise.all([...this.members.values()].map(m=>this.restore(m)));this.publish(this.catalog());}
+ accepts(message:any){
+  const m=this.members.get(message.id);if(!m)return false;
+  if(message.type==='state'&&message.phase==='Aim')return !m.attempt;
+  if(m.recalling)return false;
+  if(message.type==='state'&&message.phase==='Result')return message.attempt===(m.attempt||m.lastResult?.attempt);
+  return !!m.attempt&&message.attempt===m.attempt;
+ }
  state(message:any){
   const m=this.members.get(message.id);
   if(m){
@@ -77,7 +84,7 @@ export class Competition {
  nameChanged(guest:Guest){for(const m of this.members.values()){if(m.guest.id===guest.id)m.guest.name=guest.name;this.board(m);}}
  result(result:NativeResult){
   const expected=this.pending.get(result.attempt),member=this.members.get(result.id);
-  if(!expected||expected.id!==result.id||!member)return;
+  if(!expected||expected.id!==result.id||!member||member.attempt!==result.attempt)return;
   const scoreFrames=member.scoreFrames;this.clearAttempt(member);
   const c=expected.challenge;
   if(member.designing){
@@ -204,8 +211,12 @@ export class Competition {
    this.worker.send({type:'cancel',id});return;
   }
   if(m.type==='recall'){
-   if(member.chargeAt!==undefined){this.clearAttempt(member);this.sync(member);}
-   this.worker.send({type:'recall',id});return;
+   // Forfeit immediately, before awaiting native reset. Late output no longer
+   // belongs to a live attempt, including notices from the discarded shot.
+   this.clearAttempt(member);member.lastResult=undefined;member.recalling=true;this.sync(member);
+   try{await this.worker.request({type:'recall',id});}
+   finally{member.recalling=false;this.sync(member);}
+   return {type:'recalled'};
   }
   if(m.type==='home'){if(member.attempt)throw new Error('Cancel or finish your throw first');this.worker.send({type:'home',id});return;}
   throw new Error('Unsupported command');
