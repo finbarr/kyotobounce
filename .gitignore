@@ -39,6 +39,7 @@ docs/*
 !docs/DEPLOYING.md
 !docs/FLIGHT-CONTACT-FIXES.md
 !docs/FLEET_QUEUE.md
+!docs/GAMEPLAY-FIX-QUEUE.md
 !docs/PERFORMANCE-AUDIT.md
 !docs/COURSE-AUDIT.md
 !docs/SHOT-PLAYBACK.md
