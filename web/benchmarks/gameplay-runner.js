@@ -13,6 +13,13 @@ export function install(g){
  const output=host.querySelector('pre'),samples=[],frames=[],resources=[];let running=false,last=0,hiddenFrames=0;
  const state=()=>({view:g.getView(),phase:g.getSnapshot()?.phase,challenge:g.ui.state.selected?.id,charging:g.chargeMeter.charging,session:{busy:g.ui.state.session?.busy,attempt:g.ui.state.session?.attempt},result:g.ui.state.lastResult?{attempt:g.ui.state.lastResult.attempt,success:g.ui.state.lastResult.success,score:g.ui.state.lastResult.score,challenge:g.ui.state.lastResult.challenge?.id}:null,render:g.renderer.info.memory,programs:g.renderer.info.programs.length,pixelRatio:g.renderer.getPixelRatio(),camera:window.kyotoState?.camera});
  host.querySelector('#bench-state').onclick=()=>output.textContent=JSON.stringify(state(),null,2);
+ const progressButton=document.createElement('button');progressButton.textContent='Preview level progress';host.prepend(progressButton);
+ progressButton.onclick=()=>{
+  g.briefing.dismiss();const courses=g.ui.state.challenges.filter(c=>c.campaign).toSorted((a,b)=>a.order-b.order);
+  g.ui.state.chapter=String(courses[0].campaign.chapter);
+  g.ui.message({type:'course-progress',full:true,entries:courses.map((c,i)=>({challengeId:c.id,revision:c.revision,completed:i<2,bestScore:i<3?100000:0,rank:[1,250,12][i]??null}))});
+  g.ui.openLevels();host.hidden=true;
+ };
  const latePacketButton=document.createElement('button');latePacketButton.textContent='Check abandoned throw messages';host.prepend(latePacketButton);
  latePacketButton.onclick=async()=>{
   latePacketButton.disabled=true;

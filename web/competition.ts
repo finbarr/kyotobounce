@@ -19,6 +19,7 @@ export class Competition {
  catalog(){return {type:'catalog',challenges:this.store.list().filter(c=>this.playable(c))};}
  standings(c:Challenge,guest:string){return {type:'leaderboard',challenge:c,entries:this.store.leaderboard(c),personal:this.store.personalPlacement(c,guest)};}
  board(m:Member){if(m.selected)this.publish(this.standings(m.selected,m.guest.id),m.id);}
+ progress(m:Member,c?:Challenge){return {type:'course-progress',full:!c,entries:this.store.courseProgress(m.guest.id,c)};}
  remember(m:Member){this.store.setSetting(`selected:${m.guest.id}`,m.selected?{id:m.selected.id,revision:m.selected.revision}:{id:null});}
  async add(guest:Guest,id:string){
   const saved=this.store.setting(`selected:${guest.id}`);
@@ -113,11 +114,15 @@ export class Competition {
    const stored={...result,id:member.guest.id};this.store.saveResult(stored,this.animation);result.standings=stored.standings;
   }
   const {poses,contacts,scoreFrames:recordedFrames,...summary}=result;member.lastResult={...summary,type:'result',saved:!!c&&result.score>0};this.publish(member.lastResult,member.id);
-  if(c)for(const m of this.members.values())if(m.selected?.id===c.id&&m.selected.revision===c.revision)this.board(m);
+  if(c)for(const m of this.members.values()){
+   if(m.selected?.id===c.id&&m.selected.revision===c.revision)this.board(m);
+   if(result.score>0)this.publish(this.progress(m,c),m.id);
+  }
   this.sync(member);
  }
  async command(member:Member,m:any):Promise<unknown>{
   const id=member.id;
+  if(m.type==='course-progress')return this.progress(member);
   if(member.restoring)throw new Error('Your attempt is being restored. Try again in a moment.');
   if(m.type==='playback-rate'){
    if(Object.keys(m).some(key=>!['type','attempt','rate'].includes(key))||![1,2].includes(m.rate)||typeof m.attempt!=='string')throw new Error('Choose normal or 2x shot playback');

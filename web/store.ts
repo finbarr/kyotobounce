@@ -1,7 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import {ReplayCache,type ReplayCacheOptions} from './replay-cache.ts';
 import { randomUUID } from 'node:crypto';
-import type { Challenge,Guest,NativeResult,LeaderboardEntry } from './types.ts';
+import type { Challenge,Guest,NativeResult,LeaderboardEntry,CourseProgress } from './types.ts';
 import { withChallengeRules,SCORING_VERSION,ACTIVE_SCORING,THROW_MODEL,PHYSICS_VERSION } from './types.ts';
 export class Store {
  db:DatabaseSync;
@@ -119,6 +119,24 @@ export class Store {
  }
  personalBest(c:Challenge,guest:string):number{
   return Number(this.db.prepare('SELECT score FROM attempts WHERE challenge=? AND revision=? AND guest=? ORDER BY score DESC LIMIT 1').get(c.id,c.revision,guest)?.score||0);
+ }
+ courseProgress(guest:string,course?:Challenge):CourseProgress[]{
+  // One compact query for the selector; never load replay blobs or issue a
+  // separate leaderboard request for every course. Completion is independent
+  // of which personal shot ranks highest, since incomplete shots can score.
+  return this.db.prepare(`WITH personal AS (
+    SELECT c.id,c.revision,
+      EXISTS(SELECT 1 FROM attempts a WHERE a.challenge=c.id AND a.revision=c.revision AND a.guest=? AND a.success=1) AS completed,
+      (SELECT a.id FROM attempts a WHERE a.challenge=c.id AND a.revision=c.revision AND a.guest=? AND a.score>0
+       ORDER BY a.score DESC,a.duration,a.accepted,a.id LIMIT 1) AS best
+    FROM challenges c WHERE c.revision=(SELECT MAX(revision) FROM challenges WHERE id=c.id)
+      AND (? IS NULL OR (c.id=? AND c.revision=?))
+  ) SELECT p.id AS challengeId,p.revision,p.completed,COALESCE(t.score,0) AS bestScore,
+    CASE WHEN t.id IS NOT NULL THEN (SELECT COUNT(*)+1 FROM attempts a JOIN guests g ON a.guest=g.id
+      WHERE a.challenge=p.id AND a.revision=p.revision AND a.score>0
+      AND (a.score>t.score OR (a.score=t.score AND (a.duration,a.accepted,a.id)<(t.duration,t.accepted,t.id)))) END AS rank
+    FROM personal p LEFT JOIN attempts t ON t.id=p.best`).all(guest,guest,course?.id??null,course?.id??null,course?.revision??null)
+    .map(row=>({challengeId:String(row.challengeId),revision:Number(row.revision),completed:!!row.completed,bestScore:Number(row.bestScore),rank:row.rank===null?null:Number(row.rank)}));
  }
  replayResponse(id:string){
   const cached=this.replayCache.get(id);if(cached)return {entry:cached,status:'HIT'};

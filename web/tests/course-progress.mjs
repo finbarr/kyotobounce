@@ -1,0 +1,42 @@
+import assert from 'node:assert/strict';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {Store} from '../store.ts';
+import {Competition} from '../competition.ts';
+import {PHYSICS_VERSION,THROW_MODEL,SCORING_VERSION} from '../types.ts';
+const directory=await mkdtemp(join(tmpdir(),'kyoto-progress-')),path=join(directory,'scores.sqlite');
+let store=new Store(path);
+try{
+ const a=store.guest(),b=store.guest(),disk={center:{x:0,y:0,z:0},radius:1,surface:'floor'};
+ const base={revision:1,creator:'station',name:'Progress fixture',layout:'station',physics:PHYSICS_VERSION,throwModel:THROW_MODEL,scoring:SCORING_VERSION,start:disk,goal:disk};
+ const courses=['unplayed','partial','completed','crowded','ties','broadcast'].map(id=>({...base,id}));
+ for(const course of courses)store.saveChallenge(course);
+ const shot=(challenge,attempt,guest,score,success=false,duration=10)=>({type:'result',challenge,attempt,id:guest.id,score,success,duration,surfaces:0,poses:[],contacts:[]});
+ const save=(...args)=>store.saveResult(shot(...args),'animation');
+ const row=id=>store.courseProgress(a.id).find(p=>p.challengeId===id);
+ assert.deepEqual(row('unplayed'),{challengeId:'unplayed',revision:1,completed:false,bestScore:0,rank:null});
+ save(courses[1],'miss',a,100,false);assert.equal(row('partial').completed,false);assert.equal(row('partial').rank,1,'Scoring does not imply completing the course');
+ save(courses[2],'clear',a,100,true);save(courses[2],'bigger-miss',a,200,false);
+ assert.deepEqual(row('completed'),{challengeId:'completed',revision:1,completed:true,bestScore:200,rank:1},'Completion survives a higher incomplete personal score');
+ for(let i=0;i<249;i++)save(courses[3],'other-'+i,b,1000+i);
+ save(courses[3],'my-250',a,100,true);assert.equal(row('crowded').rank,250,'Rank includes all shots, even repeated entries by one player');
+ save(courses[3],'my-worse',a,1);assert.equal(row('crowded').rank,250,'Use the best personal entry');
+ save(courses[3],'overtake',b,2000);assert.equal(row('crowded').rank,251,'Rank is current, not the placement stored in an old replay');
+ save(courses[4],'tie-z',a,1000,true,5);save(courses[4],'tie-a',b,1000,true,5);save(courses[4],'tie-fast',b,1000,true,4);
+ store.db.prepare('UPDATE attempts SET accepted=1 WHERE challenge=?').run(courses[4].id);
+ for(const course of courses)assert.equal(row(course.id).rank,store.personalPlacement(course,a.id)?.rank??null,'Selector uses exactly the leaderboard tie ordering');
+ assert.equal(row('ties').rank,3);
+ assert.equal(store.courseProgress(b.id,courses[2])[0].completed,false,'Progress belongs to a player, not the whole level');
+ const published=[],game=new Competition(store,{ready:true},(message,id)=>published.push({message,id}));game.layout=base.layout;game.physics=base.physics;
+ const ma={id:'session-a',guest:a,selected:courses[0],restoring:true},mb={id:'session-b',guest:b,selected:null,restoring:false};game.members.set(ma.id,ma);game.members.set(mb.id,mb);
+ const all=await game.command(ma,{type:'course-progress',guest:b.id});
+ assert.equal(all.full,true);assert.equal(all.entries.find(p=>p.challengeId==='crowded').rank,251,'Read-only progress uses authenticated identity even during worker restoration');
+ mb.attempt='native-result';game.pending.set(mb.attempt,{id:mb.id,challenge:courses[5]});
+ game.result({...shot(courses[5],mb.attempt,b,1000,true),id:mb.id,layout:base.layout,physics:base.physics,reason:'Target settled',releaseTime:1,chargeTime:0,thrower:{},poses:[{t:0,p:{x:0,y:.023,z:0},q:{x:0,y:0,z:0,w:1}}]});
+ const updates=published.filter(p=>p.message.type==='course-progress');assert.equal(updates.length,2);
+ for(const {id,message}of updates){assert.equal(message.full,false);assert.equal(message.entries.length,1);assert.deepEqual(message.entries,store.courseProgress(game.members.get(id).guest.id,courses[5]),'Updates are private and reach players viewing another course');}
+ store.saveChallenge({...courses[2],revision:2});assert.deepEqual(row('completed'),{challengeId:'completed',revision:2,completed:false,bestScore:0,rank:null},'A changed course does not inherit retired progress');
+ const persisted=store.courseProgress(a.id);store.close();store=new Store(path);assert.deepEqual(store.courseProgress(a.id),persisted,'Progress survives a server restart');
+ console.log('PASS independent completion/best rank, #251, repeated players, ties, revisions, persistence, authenticated query and private live updates for all selected courses');
+}finally{store.close();await rm(directory,{recursive:true,force:true});}

@@ -44,7 +44,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  const replayControls=['replay-play','replay-restart','replay-scrub','replay-recenter','replay-free','share-replay'];
  function replayTimeLabel(){const duration=state.replay?.duration||0,t=Math.max(0,Math.min(duration,state.replayTime));const clock=t=>{t=Math.round(t*10)/10;return `${Math.floor(t/60)}:${(t%60).toFixed(1).padStart(4,'0')}`;},label=`${clock(t)} / ${clock(duration)}`;if($('replay-time').textContent!==label){$('replay-time').textContent=label;$('replay-scrub').setAttribute('aria-valuetext',`${t.toFixed(1)} of ${duration.toFixed(1)} seconds`);}}
  const classicScoreGuide=$('score-guide').innerHTML;
- const state={chapter:null,mode:'play',session:null,challenges:[],selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v3'},selectedWaypoint:null,editId:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
+ const state={chapter:null,mode:'play',session:null,challenges:[],progress:new Map(),selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v3'},selectedWaypoint:null,editId:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
  const designPath=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x5fffe3,transparent:true,opacity:.8,depthWrite:false}));scene.add(designPath);designPath.visible=false;
  let capturedDesign=null,designRequest=null,designSaving=false,designNotice='';
  function setMode(mode){showLevels(false);state.mode=mode;onModeChange(mode);}
@@ -155,9 +155,18 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
    button.dataset.stage=c.campaign?String(c.order+1).padStart(2,'0'):'＋';
    button.dataset.challenge=c.id;
    button.disabled=selectingLevel||!!state.session?.restoring||['Release','Flight'].includes(getPhase());
-   button.setAttribute('aria-label',c.name);button.setAttribute('aria-pressed',String(state.selected?.id===c.id));
+   button.setAttribute('aria-pressed',String(state.selected?.id===c.id));
    const copy=document.createElement('span'),name=document.createElement('strong');copy.className='course-copy';name.textContent=c.name;copy.append(name);
    if(c.campaign){const meta=document.createElement('small');meta.textContent=`${c.campaign.difficulty} · ${c.campaign.distance} m route`;copy.append(meta);}
+   const saved=state.progress.get(c.id),progress=saved?.revision===c.revision?saved:null;
+   const status=document.createElement('span'),completion=document.createElement('span'),rank=document.createElement('span');
+   status.className='course-status';completion.className='course-completion';rank.className='course-rank';
+   completion.dataset.completed=String(!!progress?.completed);rank.dataset.first=String(progress?.rank===1);
+   completion.textContent=progress?(progress.completed?'✓ COMPLETED':'○ NOT COMPLETED'):'CHECKING…';
+   rank.textContent=progress?(progress.rank?`${progress.rank===1?'★ ':''}RANK #${progress.rank.toLocaleString()}`:'NO SCORE'):'RANK —';
+   status.append(completion,rank);copy.append(status);
+   button.setAttribute('aria-label',`${c.name}. ${progress?(progress.completed?'Completed':'Not completed'):'Checking completion'}. ${progress?.rank?`Your rank: ${progress.rank}`:progress?'No score yet':'Checking rank'}.`);
+   if(progress?.bestScore)button.title=`Your best: ${progress.bestScore.toLocaleString()} points`;
    button.append(copy);button.addEventListener('click',()=>chooseLevel(c));list.append(button);
   }
   if(!ordered.length){const p=document.createElement('p');p.textContent='Create a course with a start and waypoint chain or destination.';list.append(p);}
@@ -257,7 +266,12 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
    if(m.type==='worker-status'&&m.status!=='ready'){feedback.reset();liveScore=null;scoreEpoch++;if(['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='Recording interrupted. Throw another design ball after reconnecting.';renderEditor();}}
    if(m.type==='welcome'&&!m.resumed&&['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='The recording session ended. Throw a new design ball before saving.';renderEditor();}
    if(m.type==='session'){state.session=m;if(m.designing&&state.mode==='play')setMode('design');updateSession();}
-   if(m.type==='catalog'){state.challenges=m.challenges;renderCatalog();}
+   if(m.type==='catalog'){state.challenges=m.challenges;renderCatalog();if(!sharedReplay)send('course-progress');}
+   if(m.type==='course-progress'){
+    if(m.full)state.progress.clear();
+    for(const entry of m.entries)state.progress.set(entry.challengeId,entry);
+    renderCatalog();
+   }
    if(m.type==='design-ready'){
     designRequest=null;clearDesign();state.draft={start:state.draft.start,goal:null,waypoints:[],scoring:'waypoint-v3'};state.selectedWaypoint=null;setMode('design');drawDisks(null);renderEditor();presentation();notice('Design ball ready · Walk, aim and throw.');
    }
