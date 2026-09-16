@@ -29,8 +29,8 @@ export function install(g){
    // A held fast-forward key reaches completion as repeated keydowns. It must
    // neither advance nor charge; a later fresh key press uses the normal UI.
    const before=g.ui.state.selected;document.getElementById('game').focus();
-   for(let i=0;i<8;i++)window.dispatchEvent(new KeyboardEvent('keydown',{code:'Space',key:' ',repeat:true,bubbles:true}));
-   window.dispatchEvent(new KeyboardEvent('keyup',{code:'Space',key:' ',bubbles:true}));
+   for(let i=0;i<8;i++)document.getElementById('game').dispatchEvent(new KeyboardEvent('keydown',{code:'Space',key:' ',repeat:true,bubbles:true}));
+   document.getElementById('game').dispatchEvent(new KeyboardEvent('keyup',{code:'Space',key:' ',bubbles:true}));
    if(g.ui.state.selected!==before||g.chargeMeter.charging)throw Error('Held Space changed level or charged');
    output.textContent='LOCAL PRESENTATION FIXTURE — no score submitted.\n'+mode+'; held Space guard PASS';
   }catch(e){output.textContent='FAIL '+e.stack;}
