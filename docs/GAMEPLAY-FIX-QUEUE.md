@@ -49,4 +49,4 @@ Fix and verify all five items in docs/GAMEPLAY-FIX-QUEUE.md, then deploy the com
 
 ## Deployment
 
-- [ ] Merge the verified worktree, publish the current asset pack, deploy the dedicated Linux worker/browser/service, and verify production health and release hashes without creating test scores.
+- [x] Merged and pushed to `main`; published `assets-v7` with verified archive SHA-256. Deployed release `2026-09-16T01-29-12-003Z` to `https://kyotobounce.com`. Read-only checks confirm ready native physics, active service with zero restarts, matching live browser/source/station hashes, and dedicated-worker hash `7c033b62112274125ae31263a9a3d974289d417d3cd07bc7e60c4fb90b2c2bbd`. No production test scores were created. Temporary local services/review tabs were stopped; compact measurement receipts are in `.local/gameplay-verification/`.
