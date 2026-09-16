@@ -94,13 +94,15 @@ const sound=arcadeAudio();
 const flyControl=document.createElement('div');flyControl.id='fly-control';flyControl.innerHTML='<button id="toggle-fly" aria-pressed="false">F · SCOUT COURSE</button><span id="fly-help" hidden>WASD · FLY / MOUSE · LOOK / E Q · UP DOWN / SHIFT · BOOST / F · RETURN</span>';document.body.append(flyControl);
 function setFly(active,capture=false){
  if(active&&(names?.active||briefing?.blocked||(!['editor','replay'].includes(ui?.state.mode)&&['Charging','Release','Flight'].includes(shotTimeline?.phase||snapshot?.phase)))){notice('Finish or recall your throw before scouting.');return;}
- if(active!==fly.active){cancel();if(active)fly.enter(camera);else fly.leave();keys.clear();if(ui?.state.mode!=='replay')send('input',{x:0,z:0,yaw,pitch,top,kick,fast:false});}
+ // Switching cameras resets held controls, but keeps an existing or pending
+ // pointer lock. Releasing and recapturing it races pointerlockchange.
+ if(active!==fly.active){cancel({releaseMouse:false});if(active)fly.enter(camera);else fly.leave();keys.clear();if(ui?.state.mode!=='replay')send('input',{x:0,z:0,yaw,pitch,top,kick,fast:false});}
  if(ui?.state.mode==='replay'){
   $('replay-recenter').setAttribute('aria-pressed',String(!fly.active));$('replay-free').setAttribute('aria-pressed',String(fly.active));
   $('replay-status').textContent=fly.active?'Free camera · WASD fly · Q/E height · Shift boost · Right-drag to look · F to follow':'Mouse over scene to orbit · Click to capture · Esc for controls · Scroll to zoom · Hold Space for 2×';
  }
  document.body.classList.toggle('is-flying',fly.active);$('toggle-fly').setAttribute('aria-pressed',String(fly.active));$('toggle-fly').textContent=fly.active?'F · RETURN TO ROBOT':'F · SCOUT COURSE';$('fly-help').hidden=!fly.active;
- if(active&&capture)captureMouse();canvas.focus();
+ if(capture)captureMouse();canvas.focus();
 }
 $('toggle-fly').onclick=()=>setFly(!fly.active,true);
 function designerView(mode){if(mode!=='play')briefing?.dismiss();setFly(mode==='editor');if(mode==='play'){aimOrbit=null;ballCameraActive=false;robotResultCamera=false;flightManual=false;centerOnAim();}if(mode==='replay'){returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;manualCamera=false;aimOrbit=null;}if(mode==='design'){liveThrow.reset();discardThrowMotion();returnRequested=true;flightPending=false;lastThrowAim=null;centerOnAim();}}
@@ -243,7 +245,7 @@ for(const range of ['precision','full'])$('power-'+range).onclick=()=>{setPowerR
 setPowerRange('full');
 function release(){recallChargeQueued=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);stopChargeSound();if(chargeMeter.charging){lastThrowAim={yaw,pitch,distance};flightManual=false;sound.cue('throw');sendInput();send('release');liveThrow.release();flightPending=true;chargeMeter.release(performance.now());}}
 function pointerLocked(){return document.pointerLockElement===canvas;}
-function cancel(){if(liveThrow.mode==='charging'){liveThrow.reset();discardThrowMotion();}recallChargeQueued=false;mobile?.reset();setFastForward(false);robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);stopChargeSound();flightPending=false;if(ui?.state.mode!=='replay')send('cancel');chargeMeter.reset();keys.clear();rightDrag=false;lastPointer=null;lockRequested=false;if(pointerLocked()){explicitMouseRelease=true;document.exitPointerLock();}}
+function cancel({releaseMouse=true}={}){if(liveThrow.mode==='charging'){liveThrow.reset();discardThrowMotion();}recallChargeQueued=false;mobile?.reset();setFastForward(false);robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);stopChargeSound();flightPending=false;if(ui?.state.mode!=='replay')send('cancel');chargeMeter.reset();keys.clear();rightDrag=false;lastPointer=null;if(releaseMouse){lockRequested=false;if(pointerLocked()){explicitMouseRelease=true;document.exitPointerLock();}}}
 function pointerLockFailed(error){
   if(error instanceof Error)console.warn('Mouse capture failed:',error.name,error.message);
   if(!lockRequested)return;
