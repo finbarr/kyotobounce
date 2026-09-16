@@ -99,7 +99,7 @@ station.traverse((o) => {
 station.updateMatrixWorld(true);
 scene.add(station);
 const obstacles = new CameraObstacles(station),
-  motion = createEscalators(scene, data.escalators);
+  motion = createEscalators(scene, data.escalators, detailData.combSupports);
 motion(0);
 const look = dressStation(renderer, scene, sun, station, data);
 look.updateLights(camera.position, 0);

@@ -368,7 +368,7 @@ async function load(){
     for(const [i,object]of meshes.entries()){object.geometry.computeBoundsTree();object.matrixAutoUpdate=false;object.updateMatrix();if(performance.now()-slice>12){startup.progress(80+i/meshes.length*8,'Preparing surfaces and camera…');await yieldLoadingUI();slice=performance.now();}}
     station.updateMatrixWorld(true);scene.add(station);
     cameraObstacles=new CameraObstacles(station);
-    motion=createEscalators(scene,data.escalators);motion(0);
+    motion=createEscalators(scene,data.escalators,detailData.combSupports);motion(0);
     startup.progress(90,'Lighting the glass, stone and steel…');await yieldLoadingUI();
     stationLook=dressStation(renderer,scene,sun,station,data);
     await yieldLoadingUI();stationLook.updateLights(camera.position,0);
