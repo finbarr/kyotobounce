@@ -1,3 +1,4 @@
+import {startMarker} from './start-marker.js';
 import {completedCourse,nextCampaignCourse} from './level-progress.js';
 import {copyLevel,levelURL,fetchLevel} from './level-links.js';
 import {designGeometry} from './design-geometry.js';
@@ -11,7 +12,7 @@ const $=id=>document.getElementById(id),v=p=>new THREE.Vector3(p.x,p.y,-p.z);
 export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
  const feedback=arcadeFeedback(sound);
  const host=document.createElement('aside');host.id='competition';host.innerHTML=`
- <div id="course-view"><div class="panel-top"><span class="eyebrow">STAGE SELECT / 選択</span><button id="new-challenge">＋ Create</button></div><h2 id="course-title">PICK YOUR LINE.</h2><div id="turn-status"></div><label class="campaign-picker" id="campaign-picker" hidden><span id="campaign-count"></span><select id="campaign-chapter" aria-label="Campaign chapter"></select></label><div id="course-list"></div><div class="actions"><button id="explore">Free exploration</button></div><div id="challenge-detail" hidden><p id="challenge-description"></p><button id="show-overview">◎ View course overview</button><button id="use-hint" hidden>Set suggested aim <kbd>H</kbd></button><p id="hint-note"></p><div id="timing-hint" hidden><span class="eyebrow">ESCALATOR RELEASE TIMING</span><div class="timing-track"><i id="timing-window"></i><b id="timing-cursor"></b></div><p id="timing-caption"></p></div><div class="actions"><button id="share-challenge">Copy level link ↗</button><button id="edit-challenge" hidden>Revise</button></div><details id="score-guide"><summary>HOW TO SCORE</summary><p><strong>10,000 base × (1 + 0.5 per distinct bank) × landing accuracy.</strong> Banks add to the multiplier; impact speed does not multiply it.</p><p>Keep 100% inside the gold bullseye. The outer rings show 75%, 50% and 25%, fading to zero at the edge. Height counts too. Tagging the target guarantees 25% even if it rolls out.</p><p>Spaced banks count once per surface; a flight of treads counts as one. Movement adds 100 points per second outside every multiplier. Waiting and spinning in place add nothing. Banks freeze at the first target hit. A far miss still banks its movement points.</p><p>The score locks only when the ball stops moving and spinning. Recall forfeits the shot.</p></details></div></div>
+ <div id="course-view"><div class="panel-top"><span class="eyebrow">STAGE SELECT / 選択</span><button id="new-challenge">＋ Create</button></div><h2 id="course-title">PICK YOUR LINE.</h2><div id="turn-status"></div><label class="campaign-picker" id="campaign-picker" hidden><span id="campaign-count"></span><select id="campaign-chapter" aria-label="Campaign chapter"></select></label><div id="course-list"></div><div id="challenge-detail" hidden><p id="challenge-description"></p><button id="show-overview">◎ View course overview</button><button id="use-hint" hidden>Set suggested aim <kbd>H</kbd></button><p id="hint-note"></p><div id="timing-hint" hidden><span class="eyebrow">ESCALATOR RELEASE TIMING</span><div class="timing-track"><i id="timing-window"></i><b id="timing-cursor"></b></div><p id="timing-caption"></p></div><div class="actions"><button id="share-challenge">Copy level link ↗</button><button id="edit-challenge" hidden>Revise</button></div><details id="score-guide"><summary>HOW TO SCORE</summary><p><strong>10,000 base × (1 + 0.5 per distinct bank) × landing accuracy.</strong> Banks add to the multiplier; impact speed does not multiply it.</p><p>Keep 100% inside the gold bullseye. The outer rings show 75%, 50% and 25%, fading to zero at the edge. Height counts too. Tagging the target guarantees 25% even if it rolls out.</p><p>Spaced banks count once per surface; a flight of treads counts as one. Movement adds 100 points per second outside every multiplier. Waiting and spinning in place add nothing. Banks freeze at the first target hit. A far miss still banks its movement points.</p><p>The score locks only when the ball stops moving and spinning. Recall forfeits the shot.</p></details></div></div>
  <div id="editor-view" hidden><div class="panel-top"><span class="eyebrow">DESIGN BALL / REVIEW YOUR ROUTE</span><button id="close-editor" aria-label="Discard design and return to game">✕</button></div><h2 id="design-review-title">YOUR SHOT. YOUR LEVEL.</h2><p id="design-proof" role="status" hidden></p><p id="design-review-status" role="status"></p><div class="actions"><button id="fly-start">View start</button><button id="fly-finish">View finish</button></div><div id="design-targets"><b id="design-target-count"></b><div id="design-target-list"></div></div><label class="field">Level name<input id="challenge-name" maxlength="64" placeholder="The impossible bank"></label><button id="save-challenge" disabled>Save &amp; play level →</button><button id="launch-design-ball">Throw another design ball <kbd>R</kbd></button><p>Fly along the cyan path to inspect the course. Targets come from your actual shot. Throw again to change the route.</p></div>
  <div id="design-shot-view" hidden><span class="eyebrow">DESIGN BALL / RECORD YOUR LINE</span><h2 id="design-shot-title">THROW THE LEVEL.</h2><p id="design-shot-status" role="status">Walk to your launch spot. Hold Space or the mouse to charge, then release. F scouts without moving the robot.</p><p id="design-shot-help">Spaced banks become waypoints. A clear landing becomes an optional finish bonus.</p><button id="design-back">Exit creator <kbd>ESC</kbd></button></div>
 
@@ -31,7 +32,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  levelsButton.onclick=()=>{if(levelsOpen){showLevels(false);resume();}else showLevels(true);};
  closeLevels.onclick=()=>{showLevels(false);resume();};
  document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement)showLevels(false);});
- for(const id of ['explore','show-overview','use-hint'])$(id).addEventListener('click',()=>showLevels(false));
+ for(const id of ['show-overview','use-hint'])$(id).addEventListener('click',()=>showLevels(false));
  const ranking=resultBoard({host:document.body,watch:openReplay,sound,getGuestId,share:copyLevel});
  // A single layout owns replay panels; the game restores these shared widgets on exit.
  const replayView=document.createElement('section');replayView.id='replay-view';replayView.hidden=true;
@@ -63,6 +64,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
   const range=challenge.start&&challenge.goal?THREE.MathUtils.clamp(v(challenge.start.center).distanceTo(v(challenge.goal.center))*.35,3,12):3;
   for(const [key,color]of [['start',0x39d9ed],['goal',0xffd260]]){
    const d=challenge[key];if(!d)continue;
+   if(key==='start'){markers.add(startMarker(d,challenge.hint?.yaw||0));continue;}
    const mesh=(geometry,opacity,tint=color,height=.016)=>{
     const o=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:tint,side:THREE.DoubleSide,transparent:true,opacity,depthWrite:false}));
     o.rotation.x=-Math.PI/2;o.position.copy(v(d.center));o.position.y+=height;o.userData={key,opacity,tint};markers.add(o);return o;
@@ -103,12 +105,12 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  }
  function updateSession(){
   const session=state.session;if(!session)return;if(session.busy)$('result-card').hidden=true;
-  $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?'READY TO THROW · SHARED SCORES':'Explore the station freely';
+  $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?'READY TO THROW · SHARED SCORES':'Choose a level to start';
   const changed=state.selected?.id!==session.challenge?.id||state.selected?.revision!==session.challenge?.revision;
   state.selected=session.challenge;
   if(changed){state.lastResult=null;showLevels(false);state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
   $('course-title').textContent=state.selected?.name||'PICK YOUR LINE.';$('challenge-detail').hidden=!state.selected;
-  if(state.selected){const c=state.selected;$('challenge-description').textContent=c.scoring==='waypoint-v3'?`${c.waypoints?.length||0} waypoints · ${c.goal?(c.waypoints?.length?'optional destination bonus':'destination required'):'no destination required'} · all shots can rank · collect every waypoint to clear`:`Start within ${c.start.radius.toFixed(2)} m · settle inside ${c.goal.radius.toFixed(2)} m${c.requiredSurface?' · required route contact':''}`;if(c.campaign)$('challenge-description').textContent=c.campaign.brief+' '+$('challenge-description').textContent;state.hint=state.selected.hint||null;$('use-hint').hidden=!state.hint;$('hint-note').textContent=state.hint?.note||'';$('edit-challenge').hidden=state.selected.creator!==getGuestId();}
+  if(state.selected){const c=state.selected;$('challenge-description').textContent=c.scoring==='waypoint-v3'?`Throw from anywhere · ${c.waypoints?.length||0} waypoints · ${c.goal?(c.waypoints?.length?'optional destination bonus':'destination required'):'no destination required'} · all shots can rank · collect every waypoint to clear`:`Throw from anywhere · settle inside ${c.goal.radius.toFixed(2)} m${c.requiredSurface?' · required route contact':''}`;if(c.campaign)$('challenge-description').textContent=c.campaign.brief+' '+$('challenge-description').textContent;state.hint=state.selected.hint||null;$('use-hint').hidden=!state.hint;$('hint-note').textContent=state.hint?.note||'';$('edit-challenge').hidden=state.selected.creator!==getGuestId();}
   if(state.mode==='play')drawDisks(state.selected);
   $('timing-hint').hidden=!state.selected?.hint?.period;
   $('score-guide').hidden=false;
@@ -194,7 +196,6 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  $('show-overview').onclick=()=>{if(state.selected&&!state.session?.busy)overview(state.selected);};
  $('new-challenge').onclick=()=>openEditor();$('edit-challenge').onclick=()=>openEditor(true);
  $('close-editor').onclick=exitDesign;$('design-back').onclick=exitDesign;
- $('explore').onclick=()=>{cancel();send('select-challenge',{challengeId:null});};
  function renderEditor(){
   showProof();$('fly-start').disabled=!capturedDesign;$('fly-finish').disabled=!capturedDesign||!state.draft.goal;
   $('design-targets').hidden=!capturedDesign;

@@ -21,7 +21,7 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
  $('mobile-levels').onclick=()=>panel(menu==='levels'?'':'levels');$('mobile-settings').onclick=()=>panel(menu==='settings'?'':'settings');$('mobile-close').onclick=()=>panel('');
  $('mobile-scout').onclick=()=>{panel('');fly();};$('mobile-cancel').onclick=()=>{input.reset();cancel();};$('mobile-speed').onclick=speed;$('mobile-recall').onclick=recall;
  $('mobile-boost').onclick=()=>{boost=!boost;movement.fast=boost;$('mobile-boost').setAttribute('aria-pressed',String(boost));};
- for(const id of ['fly-start','fly-finish','launch-design-ball','design-back','close-editor','explore','show-overview','use-hint'])$(id)?.addEventListener('click',()=>{if(active)panel('');});
+ for(const id of ['fly-start','fly-finish','launch-design-ball','design-back','close-editor','show-overview','use-hint'])$(id)?.addEventListener('click',()=>{if(active)panel('');});
  document.addEventListener('keydown',e=>{if(active&&menu&&e.code==='Escape'){e.preventDefault();panel('');}});
  return {
   get active(){return active;},get movement(){return movement;},get menu(){return menu;},viewport:()=>viewport&&state.resultVisible?{...viewport,height:Math.max(40,Math.min(viewport.height,resultTop-viewport.y-12))}:viewport,

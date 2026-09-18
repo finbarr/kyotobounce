@@ -21,13 +21,12 @@ export class Competition {
  board(m:Member){if(m.selected)this.publish(this.standings(m.selected,m.guest.id),m.id);}
  progress(m:Member,c?:Challenge){return {type:'course-progress',full:!c,entries:this.store.courseProgress(m.guest.id,c)};}
  remember(m:Member){this.store.setSetting(`selected:${m.guest.id}`,m.selected?{id:m.selected.id,revision:m.selected.revision}:{id:null});}
- async add(guest:Guest,id:string){
+ savedChallenge(guest:Guest):Challenge|null{
   const saved=this.store.setting(`selected:${guest.id}`);
-  let selected=saved?.id?this.store.challenge(saved.id):null;
-  // New players start on the first campaign stage. An explicit free-play
-  // preference remains free play; another player's old global choice is irrelevant.
-  if(!saved||(saved.id&&!selected))selected=this.store.list().filter(c=>c.campaign).sort((a,b)=>(a.order??Infinity)-(b.order??Infinity))[0]||null;
-  if(selected&&(selected.throwModel!==THROW_MODEL||!ACTIVE_SCORING.includes(selected.scoring||'')))selected=this.store.challenge(selected.id);
+  return (saved?.id?this.store.challenge(saved.id):null)||this.store.list().filter(c=>c.campaign).sort((a,b)=>(a.order??Infinity)-(b.order??Infinity))[0]||null;
+ }
+ async add(guest:Guest,id:string){
+  const selected=this.savedChallenge(guest);
   const m:Member={id,guest,selected,snapshot:null,selecting:false,restoring:true};this.members.set(id,m);this.sync(m);this.board(m);
   if(this.worker.ready&&!this.initializing)await this.restore(m);
   return m;
@@ -50,7 +49,7 @@ export class Competition {
    if(m.selected){if(!this.playable(m.selected))throw new Error('This course is no longer current');if(m.selected.scoring===WAYPOINT_SCORING)this.requireWaypoints();if(!SUPPORTED_SCORING.includes(m.selected.scoring||''))throw new Error('Scoring version changed');await this.worker.request({type:'select',id:m.id,challenge:m.selected});this.remember(m);}
   }catch(error){
    if(!this.worker.ready||!this.members.has(m.id))return;
-   m.selected=null;this.remember(m);this.publish({type:'notice',message:'This level could not be restored. Choose another level or explore.'},m.id);
+   m.selected=null;this.remember(m);this.publish({type:'notice',message:'This level could not be restored. Choose another level.'},m.id);
   }
   if(!this.members.has(m.id)||!this.worker.ready)return;
   m.restoring=false;this.sync(m);this.board(m);
@@ -144,16 +143,17 @@ export class Competition {
     if(member.designing){this.clearAttempt(member);this.worker.send({type:'recall',id});}
     await this.worker.request({type:'design-start',id,start});
    }finally{member.selecting=false;}
-   member.selected=null;member.lastResult=undefined;member.designProof=undefined;member.designing=true;this.remember(member);this.sync(member);
+   member.selected=null;member.lastResult=undefined;member.designProof=undefined;member.designing=true;this.sync(member);
    return {type:'design-ready'};
   }
   if(m.type==='design-cancel'){
+   const challenge=this.savedChallenge(member.guest);
    if(member.selecting||(member.attempt&&!member.designing))throw new Error('Finish your active shot first');
    member.selecting=true;try{
     this.clearAttempt(member);this.worker.send({type:'recall',id});
-    await this.worker.request({type:'select',id,challenge:null});
+    await this.worker.request({type:'select',id,challenge});
    }finally{member.selecting=false;}
-   member.designing=false;member.designProof=undefined;member.lastResult=undefined;member.selected=null;this.remember(member);this.sync(member);
+   member.designing=false;member.designProof=undefined;member.lastResult=undefined;member.selected=challenge;this.remember(member);this.sync(member);this.board(member);
    return {type:'design-cancelled'};
   }
   if(m.type==='place'){
@@ -179,10 +179,11 @@ export class Competition {
    this.store.saveChallenge(challenge);this.publish(this.catalog());return {type:'saved-challenge',challenge};
   }
   if(m.type==='select-challenge'){
+   if(!m.challengeId)throw new Error('Choose a level. You can walk and throw anywhere within it.');
    if(member.attempt||member.selecting)throw new Error('Finish your throw or level change first');
-   const challenge=m.challengeId?this.store.challenge(String(m.challengeId),Number(m.revision)||undefined):null;
-   if(m.challengeId&&!challenge)throw new Error('Level not found');
-   if(challenge&&!this.playable(challenge))throw new Error('This level has changed. Select its current version.');
+   const challenge=this.store.challenge(String(m.challengeId),Number(m.revision)||undefined);
+   if(!challenge)throw new Error('Level not found');
+   if(!this.playable(challenge))throw new Error('This level has changed. Select its current version.');
    if(challenge?.scoring===WAYPOINT_SCORING)this.requireWaypoints();
    member.selecting=true;try{await this.worker.request({type:'select',id,challenge});}finally{member.selecting=false;}
    member.designing=false;member.lastResult=undefined;member.selected=challenge;this.remember(member);this.sync(member);this.board(member);return {type:'selected',challenge};
@@ -196,6 +197,7 @@ export class Competition {
    return {type:'replay',replay};
   }
   if(m.type==='charge'){
+   if(!member.selected&&!member.designing)throw new Error('Choose a level before throwing.');
    if(m.character!==undefined&&!['ori','koma','don'].includes(m.character))throw new Error('Unknown robot character');
    if(m.powerRange!==undefined&&!['precision','full'].includes(m.powerRange))throw new Error('Choose precision or full power');
    if(member.attempt||member.selecting)throw new Error('Your attempt or level change is already active');

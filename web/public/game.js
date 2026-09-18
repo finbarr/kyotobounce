@@ -284,7 +284,7 @@ function recall(){
 function syncSpin(){top=Number($('top').value);kick=Number($('kick').value);$('top-value').textContent=top;$('kick-value').textContent=kick;}
 for(const id of ['top','kick'])$(id).addEventListener('input',syncSpin);
 $('clear-spin').onclick=()=>{$('top').value=0;$('kick').value=0;syncSpin();canvas.focus();};
-$('home').onclick=()=>{send('home');lastThrowAim=null;returnRequested=true;yaw=180;pitch=12;centerOnAim();canvas.focus();};
+$('home').onclick=()=>{send('home');lastThrowAim=null;returnRequested=true;applyLevelAim(ui.state.selected);canvas.focus();};
 for(const id of ['retry','flight-retry'])$(id).onclick=()=>{recall();canvas.focus();};
 $('recenter').onclick=()=>{if(flightControls()){azimuth=-(lastThrowAim?.yaw??yaw)*Math.PI/180;elevation=-(lastThrowAim?.pitch??pitch)*Math.PI/180;distance=2.8;takeCameraControl();}else{centerOnAim();distance=3.8;}canvas.focus();};
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
@@ -554,7 +554,7 @@ function animate(now){
     if(phase!==lastPhase){if(phase==='Flight'){trailCount=0;}if(phase==='Aim'){trailCount=0;trailGeometry.setDrawRange(0,0);}if(phase==='Result'&&!replaying&&ui.state.mode==='play')notice('Score locked · R to retry · Esc for replay and menus');lastPhase=phase;}
     $('flight-label').textContent=phase==='Result'?'BALL AT REST':snapshot.diagnostics?.supported?'STILL ROLLING':'IN FLIGHT';
     $('throw-panel').hidden=inFlight;$('flight-panel').hidden=!inFlight||!!ui.state.selected;$('surfaces').textContent=snapshot.surfaces;
-    $('phase-label').textContent=phase==='Charging'?'WINDING UP':phase==='Release'?'RELEASING':ui.state.mode==='design'?'DESIGN BALL':ui.state.selected?'READY TO THROW':'FREE EXPLORATION';
+    $('phase-label').textContent=phase==='Charging'?'WINDING UP':phase==='Release'?'RELEASING':ui.state.mode==='design'?'DESIGN BALL':ui.state.selected?'READY TO THROW':'CHOOSE A LEVEL';
     const power=chargeMeter.sample(now,phase);
     const model=ui.state.selected?.throwModel||THROW_MODEL,speed=throwSpeed(power,powerRange,model),maximum=throwSpeed(1,powerRange,model);
     $('power-fill').style.width=`${power*100}%`;

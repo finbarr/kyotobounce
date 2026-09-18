@@ -66,8 +66,16 @@ try{
  const returning=onboarding.guest();onboarding.setSetting(`selected:${returning.id}`,{id:later.id});
  assert.equal((await game.add(returning,'returning')).selected.id,later.id,'Returning players keep their own stage');
  const explorer=onboarding.guest();onboarding.setSetting(`selected:${explorer.id}`,{id:null});
- assert.equal((await game.add(explorer,'explorer')).selected,null,'Deliberately choosing free exploration is respected');
+ assert.equal((await game.add(explorer,'explorer')).selected.id,first.id,'An unset level now enters the first stage');
  const removed=onboarding.guest();onboarding.setSetting(`selected:${removed.id}`,{id:'removed'});
  assert.equal((await game.add(removed,'removed')).selected.id,first.id,'A removed course falls back to the campaign');
- console.log('PASS first-stage onboarding, cold native startup, returning stage, explicit exploration and deleted-stage fallback');
+ const member=game.members.get('returning');
+ await assert.rejects(game.command(member,{type:'select-challenge',challengeId:null}),/Choose a level/);
+ assert.equal(member.selected.id,later.id,'Rejecting a missing level preserves the selected course');
+ worker.capabilities=['design-ball-v1'];
+ await game.command(member,{type:'design-start'});assert.equal(member.selected,null);assert.equal(member.designing,true);
+ assert.equal(onboarding.setting(`selected:${returning.id}`).id,later.id,'Designing keeps the last played level');
+ await game.command(member,{type:'design-cancel'});assert.equal(member.selected.id,later.id,'Leaving the designer restores the last played level');
+ assert.equal(requests.at(-1).challenge.id,later.id,'The native worker also returns to that course');
+ console.log('PASS first-stage onboarding, cold native startup, returning stage, unset-level and deleted-stage fallback');
 }finally{onboarding.close();}

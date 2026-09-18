@@ -181,13 +181,6 @@ namespace Kyoto
             }
         }
         static bool Finite(Vector3 p)=>!(float.IsNaN(p.x)||float.IsNaN(p.y)||float.IsNaN(p.z)||float.IsInfinity(p.x)||float.IsInfinity(p.y)||float.IsInfinity(p.z));
-        bool InStart(Player p)
-        {
-            if(activeChallenge==null)return true;
-            var disk=activeChallenge.start;Vector3 feet=p.walker.transform.position;
-            return Vector2.Distance(new Vector2(feet.x,feet.z),new Vector2(disk.center.x,disk.center.z))<=disk.radius+.0001f
-                &&Mathf.Abs(feet.y-disk.center.y)<.06f&&FloorAt(feet,out var floor)&&SurfaceId(floor.collider)==disk.surface;
-        }
         void RecordImpact(Surface surface,Vector3 point,float speed)
         {
             if(state.phase!="Flight")return;
@@ -230,11 +223,7 @@ namespace Kyoto
                 releaseTime=state.releaseTime,chargeTime=state.chargeTime,thrower=thrower,launchPosition=state.launchPosition,velocity=launchVelocity,spin=launchSpin,
                 poses=replayPoses.ToArray(),contacts=replayContacts.ToArray(),design=designArmed?CaptureDesign():null};
         }
-        void ConstrainWalker(Player p,Vector3 previousFeet)
-        {
-            if(activeChallenge==null)return;
-            if(!InStart(p))p.walker.Place(previousFeet);
-        }
+
     }
 }
 #endif

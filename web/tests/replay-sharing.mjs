@@ -20,9 +20,9 @@ try{
  const same=result('same-tie',players[5],11000,9);s.saveResult(same,'animation');assert.equal(same.standings.rank,2,'Both equal scores remain, with the earlier attempt first');
  const last=result('outside-ten',players[9],1);s.saveResult(last,'animation');assert.equal(last.standings.rank,16);
  const miss=result('zero',players[9],0);s.saveResult(miss,'animation');assert.equal(miss.standings.after.length,10);assert.equal(miss.standings.rank,null);
- const competition=new Competition(s,{send(){}},()=>{});competition.layout='layout';competition.physics='physics';const member={id:'session',guest:players[0],selected:null,restoring:false,selecting:false};
- await competition.command(member,{type:'charge',layout:'layout',physics:'physics',character:'koma'});
- await assert.rejects(competition.command(member,{type:'charge',layout:'layout',physics:'physics',character:'don'}),/already active/);assert.equal(member.attemptPresentation.character,'koma','A rejected duplicate charge cannot change the saved robot');
+ const competition=new Competition(s,{send(){}},()=>{});competition.layout='layout';competition.physics='physics';const member={id:'session',guest:players[0],selected:c,restoring:false,selecting:false};
+ await competition.command(member,{type:'charge',challengeId:c.id,revision:c.revision,layout:'layout',physics:'physics',character:'koma'});
+ await assert.rejects(competition.command(member,{type:'charge',challengeId:c.id,revision:c.revision,layout:'layout',physics:'physics',character:'don'}),/already active/);assert.equal(member.attemptPresentation.character,'koma','A rejected duplicate charge cannot change the saved robot');
  const snapshot=s.replay('new');s.rename(players[10].id,'New name');assert.deepEqual(s.replay('new'),snapshot,'Renaming does not mutate an original replay');
  assert.ok(!JSON.stringify(snapshot).includes(players[10].token));assert.equal(snapshot.character,'don');
  const duplicate={...shot,score:999999};assert.equal(s.saveResult(duplicate,'animation'),false);assert.equal(s.replay('new').score,9600);

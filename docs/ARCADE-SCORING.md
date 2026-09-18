@@ -28,6 +28,10 @@ Movement time is measured from consecutive authoritative 180 Hz positions, exclu
 
 The server calculates live frames and final results from the same native records. Clients cannot submit a score. The game is pre-launch: current partial and complete records remain valid; retired station/course records are discarded. Courses keep their current IDs and revisions; no legacy scoring implementation or migration is retained.
 
+## Launch position
+
+Every level permits walking and throwing anywhere in the station. The cream-and-navy checkered START pad marks the spawn and suggested launch position, not a movement or scoring boundary. The Start button returns the robot to it. All shots still belong to the selected course and use its targets and leaderboard; moving farther away can create longer, more inventive bank shots. There is no separate free-exploration mode. Walking itself awards no points.
+
 ## Presentation
 
 The current level’s top ten stays visible while aiming, flying, scouting, viewing the course and watching results. Your entries have teal backgrounds, matched by player ID rather than name. The board retains your latest shot rank below the top ten; before a shot it shows your best off-board placement. Custom courses have stable `/level/<id>` URLs and copy-link controls; the link opens the current saved revision.

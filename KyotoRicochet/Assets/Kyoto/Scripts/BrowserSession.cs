@@ -153,7 +153,6 @@ namespace Kyoto
                     if(state.phase=="Result")Reset();
                     if(owner!=null){Note(c.id,"Wait for the active throw.");break;}
                     attempt=c.request;
-                    if(!InStart(p)){Note(c.id,"Stand inside the start circle on its selected floor.");break;}
                     if(!p.walker.TryRelease(p.state.yaw,p.state.pitch,out _,state.radius)){Note(c.id,"Move away from the wall before throwing.");break;}
                     p.state.powerRange=c.powerRange=="precision"?"precision":"full";
                     owner=p;state.owner=c.id;state.phase="Charging";chargeAt=StationMotion.Time(gameObject.scene);state.chargeTime=chargeAt;p.move=Vector2.zero;
@@ -182,7 +181,7 @@ namespace Kyoto
             ActivateClock();
             if(state.phase=="Release"&&Time.realtimeSinceStartupAsDouble>=releaseAt)
             {
-                if(InStart(owner)&&owner.walker.TryRelease(owner.state.yaw,owner.state.pitch,out var release,state.radius))
+                if(owner.walker.TryRelease(owner.state.yaw,owner.state.pitch,out var release,state.radius))
                 {
                     var velocity=Quaternion.Euler(-owner.state.pitch,owner.state.yaw,0)*Vector3.forward*ThrowSpeed(pendingPower);
                     ball.Launch(release,velocity,SpinControls.Compose(owner.state.yaw,owner.state.top,owner.state.kick));
@@ -211,7 +210,8 @@ namespace Kyoto
                 bool frozen=p==owner&&(state.phase=="Charging"||state.phase=="Release"||state.phase=="Flight"||state.phase=="Result");
                 var move=frozen||Time.realtimeSinceStartupAsDouble-p.lastInput>.3?Vector2.zero:p.move;
                 Vector3 previousFeet=p.walker.transform.position;
-                p.walker.Move(move,p.state.yaw,p.fast,BallBody.Step);ConstrainWalker(p,previousFeet);
+                // The course start is a suggested launch spot, not a movement boundary.
+                p.walker.Move(move,p.state.yaw,p.fast,BallBody.Step);
                 Vector3 travelled=Vector3.ProjectOnPlane(p.walker.transform.position-previousFeet,Vector3.up);
                 p.state.movement=move.sqrMagnitude>.001f?travelled/BallBody.Step:Vector3.zero;
                 if(p.walker.Grounded&&move.sqrMagnitude>.001f)p.state.walked+=travelled.magnitude;
