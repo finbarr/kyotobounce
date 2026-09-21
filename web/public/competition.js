@@ -1,3 +1,4 @@
+import {isTutorial} from './tutorial.js';
 import {startMarker} from './start-marker.js';
 import {completedCourse,nextCampaignCourse} from './level-progress.js';
 import {copyLevel,levelURL,fetchLevel} from './level-links.js';
@@ -243,7 +244,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  function updateCompletionAction(){
   const button=$('next-challenge');button.hidden=!completed();
   const next=nextCampaignCourse(state.challenges,state.selected);
-  button.innerHTML=next?'Next level <kbd>SPACE / N</kbd> →':state.selected?.campaign?'Campaign complete · Choose a level <kbd>SPACE / N</kbd>':'Level complete · Choose a level <kbd>SPACE / N</kbd>';
+  button.innerHTML=next?(isTutorial(state.selected)?'Play Level 1 <kbd>SPACE / N</kbd> →':'Next level <kbd>SPACE / N</kbd> →'):state.selected?.campaign?'Campaign complete · Choose a level <kbd>SPACE / N</kbd>':'Level complete · Choose a level <kbd>SPACE / N</kbd>';
  }
  function advanceCompleted(){
   if(nextRequested)return true;
@@ -280,7 +281,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
     designRequest=null;clearDesign();setMode('play');resetView('level');drawDisks(state.selected);renderEditor();presentation();resume();
    }
    if(m.type==='saved-challenge'){designSaving=false;clearDesign();renderEditor();setMode('play');presentation();send('select-challenge',{challengeId:m.challenge.id,revision:m.challenge.revision});notice('Level saved. Copy its level link to share it.');}
-   if(m.type==='selected'){history.replaceState(null,'',m.challenge?levelURL(m.challenge.id):'/');document.title=m.challenge?`${m.challenge.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';replayRequest++;$('result-card').hidden=true;resetView('level');if(m.challenge&&state.mode==='play')overview(state.selected||m.challenge);}
+   if(m.type==='selected'){history.replaceState(null,'',m.challenge?levelURL(m.challenge.id):'/');document.title=m.challenge?`${m.challenge.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';replayRequest++;$('result-card').hidden=true;resetView('level');if(m.challenge&&state.mode==='play')overview(state.selected||m.challenge,{automatic:true});}
    if(m.type==='leaderboard'){if(state.selected?.id===m.challenge.id&&state.selected.revision===m.challenge.revision){state.board=m.entries;state.personal=m.personal||null;renderBoard();}}
    if(m.type==='replay'){loadReplay(m.replay);}
    if(m.type==='result'){
@@ -309,6 +310,10 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
     }
     if(b){const row=document.createElement('div'),name=document.createElement('span'),points=document.createElement('b');name.textContent=`MOVEMENT · ${(b.movingSeconds||0).toFixed(1)} s × 100`;points.textContent=(b.total>0?b.movementPoints||0:0).toLocaleString();row.append(name,points);$('result-math').append(row);}
     $('result-tip').textContent=waypoint?(m.challenge?.waypoints?.length?'Collect EVERY waypoint to clear. All in-bounds shots rank. R · TRY AGAIN':'Land in the destination to clear. All in-bounds shots rank. R · TRY AGAIN'):b?.outcome==='miss'?`Finish within ${b.proximityRange.toFixed(1)} m to earn proximity points.`:'R · TRY AGAIN     ESC · REPLAY & MENUS';
+    if(isTutorial(m.challenge)){
+     $('result-label').textContent=m.success?'TUTORIAL COMPLETE':'ONE MORE TRY';
+     $('result-tip').textContent=m.success?'Your score is on the Level 0 board. Play Level 1, or retry to climb the rankings.':'Touch the purple patch to clear. Retry with R, then H for suggested aim. On touch, tap Try again and Use suggested aim.';
+    }
     $('watch-result').hidden=!m.saved;$('share-result').hidden=!m.saved;ranking.show(m);updateCompletionAction();
     if(!feedback.clearing)sound.cue('result',rank);
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches){const began=performance.now(),attempt=m.attempt;function count(now){if(state.lastResult?.attempt!==attempt)return;const t=Math.min(1,(now-began)/800);$('result-title').textContent=`${Math.round(m.score*(1-(1-t)**3)).toLocaleString()} PTS`;if(t<1)requestAnimationFrame(count);}requestAnimationFrame(count);}

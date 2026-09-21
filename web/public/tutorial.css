@@ -1,0 +1,16 @@
+#tutorial{position:fixed;top:112px;left:50%;transform:translateX(-50%);width:min(390px,calc(100vw - 640px));z-index:13;padding:14px 18px;background:#122237f5;border:1px solid #9ce9dd66;border-top:3px solid #99efdc;box-shadow:5px 5px 0 #0b142580;color:#f6edda;pointer-events:auto}
+.tutorial-top{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#99efdc;font:700 10px ui-monospace,monospace;letter-spacing:1px}.tutorial-top b{margin-left:10px;color:#c4d3e5}
+#tutorial-hide{font:24px/1 system-ui;width:36px;height:36px;padding:0;border:0;background:transparent;color:#b9cbda;flex-shrink:0}
+#tutorial h2{font:800 23px/1.1 system-ui,sans-serif;letter-spacing:-.4px;margin:5px 0 8px}
+#tutorial p{font:13px/1.5 system-ui,sans-serif;letter-spacing:0;color:#c8d8e8;margin:0}
+#tutorial-action{margin-top:12px;min-height:40px;padding:8px 14px;background:#99efdc;color:#102236;font:700 12px system-ui,sans-serif;border:0}
+#tutorial button:focus-visible{outline:3px solid #ffd260;outline-offset:3px}
+.tutorial-active #notice{visibility:hidden}
+.tutorial-active #fly-control,.tutorial-active:not(.mobile-ui) #throw-panel{visibility:hidden}
+.mobile-ui #tutorial{top:122px;left:10px;right:186px;transform:none;width:auto;padding:9px 10px;max-height:184px;overflow:auto;box-shadow:none}
+.mobile-ui.tutorial-active:not(.mobile-flight) #arcade-hud{visibility:hidden}
+.mobile-ui #tutorial h2{font-size:16px;margin:3px 0 5px}.mobile-ui #tutorial p{font-size:11px;line-height:1.35}.mobile-ui .tutorial-top{font-size:8px;letter-spacing:0}.mobile-ui .tutorial-top b{margin-left:4px}
+.mobile-ui #tutorial-hide{width:32px;height:32px}.mobile-ui #tutorial-action{font-size:11px;margin-top:8px;min-height:44px;width:100%}
+.mobile-ui.tutorial-active.mobile-flight #combo-hud{visibility:hidden}
+@media(max-width:380px){.mobile-ui #tutorial{right:166px}.mobile-ui #tutorial .tutorial-top b{display:none}}
+@media(orientation:landscape) and (max-height:600px){.mobile-ui #tutorial{top:102px;left:12px;right:auto;width:240px;max-height:calc(100dvh - 244px)}.mobile-ui #tutorial p{font-size:11px}}

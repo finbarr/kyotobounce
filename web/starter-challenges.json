@@ -1,5 +1,78 @@
 [
   {
+    "id": "kyoto-tutorial",
+    "revision": 1,
+    "name": "Welcome to Kyoto",
+    "creator": "station",
+    "order": -1,
+    "start": {
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 20
+      },
+      "radius": 0.75,
+      "surface": "concourse"
+    },
+    "goal": null,
+    "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
+    "physics": "kyoto-p3-3",
+    "hint": {
+      "yaw": 90,
+      "pitch": -8,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 560,
+      "note": "2.8 m/s · A gentle first throw. Aim at the wide purple patch and release at the white mark. Let the ball settle to save your score.",
+      "powerRange": "precision"
+    },
+    "scoring": "waypoint-v3",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "throwModel": "robot-v4",
+    "campaign": {
+      "chapter": 0,
+      "chapterTitle": "Tutorial",
+      "difficulty": "LEARN TO PLAY",
+      "distance": 5.5,
+      "brief": "Learn to move, aim and throw in the open atrium. Touch the wide purple waypoint, then let your ball settle. Your first high score counts here too."
+    },
+    "waypoints": [
+      {
+        "id": "first-waypoint",
+        "center": {
+          "x": 3.5,
+          "y": 0,
+          "z": 20.5
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 2,
+        "surface": "concourse"
+      }
+    ]
+  },
+  {
     "id": "atrium-first-bank",
     "revision": 12,
     "name": "First Bounce",

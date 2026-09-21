@@ -8,6 +8,8 @@
 #loading-message{min-height:15px;margin:8px 0;line-height:1.5;max-width:560px}
 #loading .load-track{width:100%;min-width:260px;margin:10px 0;height:6px;overflow:hidden}
 #loading .load-track i{transition:width .18s linear}
+#loading .load-track.indeterminate i{width:30%!important;animation:loading-scan 1.5s ease-in-out infinite alternate}
+@keyframes loading-scan{to{transform:translateX(230%)}}
 #loading-name form{margin:0}#loading-name form>.eyebrow{font-size:8px;letter-spacing:1.5px;color:#93e9d7}
 #loading #loading-name h2{font:900 32px/.98 Impact,'Arial Narrow',sans-serif;letter-spacing:0;transform:none;text-shadow:none;margin:10px 0;color:#ffdc85}
 #loading #loading-name p{font:12px/1.5 system-ui,sans-serif;letter-spacing:0;text-align:left;color:#c5d4e8;margin:10px 0}
@@ -41,4 +43,4 @@
  #loading-name label{margin:0}#loading-name input{padding:10px;margin-bottom:0}#loading #loading-name .name-status{margin:5px 0}
  #loading-robot{grid-row:auto;padding:10px 14px}#loading #loading-tip{display:none}#loading .load-track{margin:6px 0}
 }
-@media(prefers-reduced-motion:reduce){#loading .load-track i{transition:none}}
+@media(prefers-reduced-motion:reduce){#loading .load-track i{transition:none;animation:none!important}}

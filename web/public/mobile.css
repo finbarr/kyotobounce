@@ -81,3 +81,6 @@
  .mobile-ui.is-replay .replay-tools{flex-wrap:nowrap;gap:4px}.mobile-ui.is-replay #share-replay{font-size:8px;padding:6px;white-space:nowrap}.mobile-ui.is-replay .replay-camera button{padding:6px;font-size:8px}.mobile-ui.is-replay #shot-speed{padding:6px}
  .mobile-ui.is-replay #replay-status{font-size:8px;line-height:1.4;margin-top:5px}
 }
+/* Clip at the root as well as the body. Otherwise off-screen startup panels
+   can inflate mobile innerWidth, which the renderer then freezes into canvas. */
+html{width:100%;height:100%;overflow:hidden}

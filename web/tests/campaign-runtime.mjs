@@ -11,7 +11,7 @@ await Promise.all(['kyoto-konbinidirect','kyoto-garden','kyoto-skyway'].map(asyn
  try{
   await client.join();const catalog=client.messages.findLast(m=>m.type==='catalog').challenges;
   const campaign=catalog.filter(c=>c.creator==='station').sort((a,b)=>a.order-b.order);
-  assert.equal(campaign.length,30);assert.equal(campaign.at(-1).order,29);
+  assert.equal(campaign.length,31);assert.equal(campaign.at(-1).order,29);
   const c=campaign.find(c=>c.id===id);assert.ok(c);
   await client.request('select-challenge',{challengeId:c.id,revision:c.revision},'selected');
   const {holdMs,powerRange,yaw,pitch,top,kick}=c.hint;

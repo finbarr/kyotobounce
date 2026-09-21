@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {throwSpeed} from '../public/throw-power.js';
 import {PHYSICS_VERSION} from '../types.ts';
-const courses=JSON.parse(await readFile(new URL('../starter-challenges.json',import.meta.url)));
+const [tutorial,...courses]=JSON.parse(await readFile(new URL('../starter-challenges.json',import.meta.url)));
+assert.equal(tutorial.id,'kyoto-tutorial');assert.equal(tutorial.order,-1);assert.equal(tutorial.campaign.chapter,0);assert.equal(tutorial.goal,null);assert.equal(tutorial.waypoints.length,1);assert.ok(tutorial.waypoints[0].radius>=2);
+assert.equal(tutorial.scoring,'waypoint-v3');
 const proofs=JSON.parse(await readFile(new URL('../levels/proof-inputs.json',import.meta.url)));
 assert.equal(courses.length,30,'The campaign has thirty authored stages');
 assert.equal(new Set(courses.map(c=>c.id)).size,30);
@@ -30,6 +32,7 @@ for(const [i,c] of courses.entries()){
 assert.equal(signatures.size,30,'No duplicate route and throw');assert.ok(heights.size>=8,'Routes explore the station vertically');
 assert.ok(courses.at(-1).campaign.distance>=200,'The finale covers a substantial station route');
 assert.ok(courses.filter(c=>c.waypoints?.length).length>=25,'The campaign retains waypoint play');
+const tutorialProof=proofs.courses.find(p=>p.id===tutorial.id&&p.revision===tutorial.revision);assert.ok(tutorialProof);assert.ok(tutorialProof.repeat>=2&&tutorialProof.neighbors.length>=4);assert.ok(Math.abs(throwSpeed(tutorial.hint.holdMs/2800,tutorial.hint.powerRange)-tutorialProof.shot.speed)<.0001);
 const ricochets=proofs.courses.filter(p=>p.features);
 assert.equal(ricochets.length,10,'Ten routes replace straight floor chains with authored ricochets');
 for(const p of ricochets){const c=courses.find(c=>c.id===p.id);assert.ok(c.waypoints.filter(w=>w.normal.y<.5).length>=p.features.minNonFloorTargets);assert.ok(p.features.minSharpTurns>=1);}

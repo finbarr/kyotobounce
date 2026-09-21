@@ -11,11 +11,11 @@ async function enter(token){
 try{
  const fresh=await enter(),catalog=fresh.messages.findLast(m=>m.type==='catalog').challenges;
  const campaign=catalog.filter(c=>c.campaign).sort((a,b)=>a.order-b.order),first=campaign[0],next=campaign[1];
- assert.equal(first.order,0);
+ assert.equal(first.order,-1);assert.equal(first.id,'kyoto-tutorial');assert.equal(next.order,0);
  if(fresh.state.challenge?.id!==first.id)await fresh.next(m=>m.type==='state'&&m.challenge?.id===first.id);
  assert.equal(fresh.messages.findLast(m=>m.type==='session').challenge.id,first.id);
  const p=fresh.state.players.find(p=>p.id===fresh.id),start=first.start.center;
- assert.ok(Math.hypot(p.feet.x-start.x,p.feet.z-start.z)<=first.start.radius+.01,'The native robot starts inside level 1');
+ assert.ok(Math.hypot(p.feet.x-start.x,p.feet.z-start.z)<=first.start.radius+.01,'The native robot starts inside Level 0');
  await fresh.request('select-challenge',{challengeId:next.id},'selected');const token=fresh.token;fresh.close();
  const returning=await enter(token);assert.equal(returning.messages.findLast(m=>m.type==='session').challenge.id,next.id,'Returning players resume their chosen level');
  await assert.rejects(returning.request('select-challenge',{challengeId:null},'selected'),/Choose a level/);

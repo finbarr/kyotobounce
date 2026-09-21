@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {TutorialGuide,isTutorial} from '../public/tutorial.js';
+import {nextCampaignCourse} from '../public/level-progress.js';
+import {readFile} from 'node:fs/promises';
+const courses=JSON.parse(await readFile('web/starter-challenges.json','utf8')),c=courses[0],g=new TutorialGuide();
+assert.ok(isTutorial(c));assert.equal(nextCampaignCourse(courses,c).order,0);
+g.enter(c);g.update({phase:'Aim',feet:{x:0,z:0}});assert.equal(g.step,'move');g.update({phase:'Aim',feet:{x:.5,z:0}});assert.equal(g.step,'aim');
+g.action('aim');assert.equal(g.step,'charge');g.update({phase:'Flight'});assert.equal(g.step,'flight');g.update({phase:'Aim'});assert.equal(g.step,'charge','Recall returns to throw coaching without granting completion');
+g.update({phase:'Result',result:{success:false}});assert.equal(g.step,'retry');g.update({phase:'Aim'});assert.equal(g.step,'charge');
+g.update({phase:'Result',result:{success:true}});assert.equal(g.step,'complete');g.enter(c,true);assert.equal(g.step,'complete','Score updates do not restart the lesson');
+g.enter(courses[1]);assert.equal(g.course,null);g.enter(c,true);assert.equal(g.dismissed,true,'Previously cleared tutorial does not force tips');g.action('restart');assert.equal(g.step,'move');assert.equal(g.dismissed,false);g.action('dismiss');assert.equal(g.dismissed,true);
+assert.equal(isTutorial({...c,creator:'player'}),false,'Only the station-authored course gets onboarding');
+console.log('PASS tutorial movement, aim, recall, retry, completion, revisit and Level 1 progression');

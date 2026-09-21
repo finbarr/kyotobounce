@@ -2,6 +2,68 @@
   "layout": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8",
   "courses": [
     {
+      "id": "kyoto-tutorial",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "speed": 2.8,
+        "range": "precision",
+        "input": {
+          "yaw": 90,
+          "pitch": -8,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "speed": 2,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "speed": 3.6,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "speed": 2.8,
+          "range": "precision",
+          "input": {
+            "yaw": 80,
+            "pitch": -8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "speed": 2.8,
+          "range": "precision",
+          "input": {
+            "yaw": 100,
+            "pitch": -8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ]
+    },
+    {
       "id": "atrium-first-bank",
       "revision": 12,
       "repeat": 2,

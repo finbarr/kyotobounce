@@ -27,6 +27,12 @@ The build script currently supports macOS development and `npm run build:worker 
 
 Use Chrome for captured-pointer playtesting. Escape releases the mouse. The in-app browser can be useful for viewing menus, but its pointer-lock support may differ.
 
+Fresh players enter Level 0, “Welcome to Kyoto”, with movement, aim, charge and scoring prompts. It has its own authoritative leaderboard and leads into Level 1 on Space. Returning players keep their selected course. To repeat the prompts on a completed tutorial, select Level 0 and choose **Show tutorial tips**.
+
+The loading bar weights the five station/model downloads by decoded byte size from `browser-build.json`; rebuild browser assets after changing art. Missing size metadata shows indeterminate progress until downloads finish. The splash and robot/name setup remain available while downloads and scene preparation run.
+
+With an isolated game running, `KYOTO_TEST_ORIGIN=http://127.0.0.1:4174 node web/tests/tutorial-browser.mjs` checks the keyboard flow and desktop/mobile layouts. `web/tests/loading-browser.mjs` checks the real loader through a slow compressed response without Content-Length. Both use local Google Chrome; neither should target production.
+
 `GET /api/health` reports service/worker status. Read the checkout's worker log if physics is unavailable. `web/public/debug.js` implements the development inspection surface. Production blocks `/api/debug/*` at the proxy.
 
 `npm test` needs no assets or worker. `npm run test:runtime` needs a running game and writes its receipt under ignored `artifacts/`; it exercises full native throws, score/replay agreement and client score-spoof rejection. It creates persistent test records, so keep its database disposable.

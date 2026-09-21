@@ -1,6 +1,8 @@
 # Kyoto campaign
 
-The campaign contains 30 stages in six chapters, with five stages per chapter. Suggested route length rises from 6.9 m to 270.7 m. Ten routes focus on wall and ceiling ricochets: inside the convenience store, around garden corners, across Skyway glass, under the gallery and down from the roof. They mix with deliveries, stair cascades and cross-station throws.
+Level 0, **Welcome to Kyoto**, introduces movement, aiming, charge timing and scoring through one generous floor waypoint in the open atrium. It has no destination requirement and uses the same authoritative scoring, leaderboard and replay system as other levels. Its suggested 2.8 m/s shot clears at full rest, as do tested 2.0/3.6 m/s throws and ±10° aim variants. Native proof inputs are in `web/levels/proof-inputs.json`.
+
+The following 30 stages retain their numbers and six chapters, with five stages per chapter. Suggested route length rises from 6.9 m to 270.7 m. Ten routes focus on wall and ceiling ricochets: inside the convenience store, around garden corners, across Skyway glass, under the gallery and down from the roof. They mix with deliveries, stair cascades and cross-station throws.
 
 `web/starter-challenges.json` is the complete current station campaign. The service replaces retired station-authored definitions and their scores at startup. Unchanged campaign scores and player-created courses survive while their scoring rules remain current. This scoring revision resets development boards and retires old-rule courses and replays. There are no archived development campaigns or compatibility catalogs.
 
