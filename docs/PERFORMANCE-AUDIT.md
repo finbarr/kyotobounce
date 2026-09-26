@@ -72,3 +72,12 @@ include the phase and shot-stream status. Long gaps between a precomputed shot
 and the next live snapshot are expected, so `stateGapMaxMs` alone is not evidence
 of a freeze. All added fields are bounded numeric values or allowlisted enums;
 no player names, credentials, or positions are logged.
+
+## Local browser investigation — 2026-09-26
+
+The [gameplay stability investigation](../web/benchmarks/STABILITY.md) reproduces
+music-clock drift under main-thread stalls and synchronous layout in the score
+HUD. It includes local fixes, Chrome benchmarks, research references, and the
+limits of the findings. An intermittent 883 ms browser frame gap was observed
+with a healthy shot buffer; its full cause remains unconfirmed. This was an
+isolated local test, not a new production capacity audit.

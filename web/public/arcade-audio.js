@@ -2,7 +2,8 @@
 export function arcadeAudio(){
  let ctx,master,musicBus,sfxBus,compressor,timer,next=0,step=0,charge=null,lastImpact=0,white,travel,travelGain,travelFilter;
  const cues={};let waypointRun=false,chainVoice=0,rate=1,audioOrigin=0,scoreOrigin=0;
- const voices=new Set();
+ const voices=new Set(),noiseBuffers=new Map();
+ let skippedMusicSteps=0,schedulerGapMaxMs=0,lastSchedule=null;
  const scoreTime=()=>scoreOrigin+(ctx?ctx.currentTime-audioOrigin:0)*rate;
  const audioTime=t=>ctx.currentTime+(t-scoreTime())/rate;
  // Keep scheduled notes in musical time. Retiming preserves the current phrase
@@ -53,8 +54,12 @@ export function arcadeAudio(){
   });
  }
  function noise(t,duration,level){
-  const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),data=buffer.getChannelData(0);
-  let seed=739;for(let i=0;i<data.length;i++){seed=(seed*16807)%2147483647;data[i]=(seed/1073741824-1)*(1-i/data.length);}
+  let buffer=noiseBuffers.get(duration);
+  if(!buffer){
+   buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate);const data=buffer.getChannelData(0);
+   let seed=739;for(let i=0;i<data.length;i++){seed=(seed*16807)%2147483647;data[i]=(seed/1073741824-1)*(1-i/data.length);}
+   noiseBuffers.set(duration,buffer);
+  }
   voice(t,duration,(at,remaining,offset)=>{
    const n=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();n.buffer=buffer;n.playbackRate.value=rate;f.type='highpass';f.frequency.value=Math.min(ctx.sampleRate*.45,6500*rate);
    envelope(g,at,remaining,level,offset,duration);n.connect(f).connect(g).connect(musicBus);n.start(at,offset);n.stop(at+remaining);
@@ -64,8 +69,15 @@ export function arcadeAudio(){
 
  function schedule(){
   if(!ctx||ctx.state!=='running'||document.hidden)return;
-  if(next<scoreTime())next=scoreTime()+.04*rate;
-  while(next<scoreTime()+.15*rate){
+  const now=scoreTime();
+  if(lastSchedule!==null)schedulerGapMaxMs=Math.max(schedulerGapMaxMs,(ctx.currentTime-lastSchedule)*1000);
+  lastSchedule=ctx.currentTime;
+  // Keep the original beat grid even after a long frame. Moving the next beat
+  // to "now" stretches every late interval and makes the whole song slow down.
+  // A half-second queue absorbs ordinary stalls; skip expired beats after a
+  // larger interruption instead of replaying a burst of overdue notes.
+  if(next<now){const missed=Math.ceil((now-next)/beat);next+=missed*beat;step+=missed;skippedMusicSteps+=missed;}
+  while(next<now+.5*rate){
    if(prefs.music&&!prefs.muted){
     const phrase=Math.floor(step/64),section=Math.floor(phrase/2)%4,part=Math.floor(step/16)%4;
     const motif=phrases[arrangement[phrase%arrangement.length]],index=step%16;
@@ -95,8 +107,9 @@ export function arcadeAudio(){
  }
  async function unlock(){
   try{
-   if(!ctx){ctx=new AudioContext();audioOrigin=ctx.currentTime;scoreOrigin=0;master=ctx.createGain();musicBus=ctx.createGain();sfxBus=ctx.createGain();compressor=ctx.createDynamicsCompressor();compressor.threshold.value=-12;compressor.knee.value=12;compressor.ratio.value=5;master.connect(compressor).connect(ctx.destination);musicBus.connect(master);sfxBus.connect(master);update();timer=setInterval(schedule,60);}
-   if(ctx.state==='suspended'&&!document.hidden){await ctx.resume();next=scoreTime()+.04*rate;}
+   if(!ctx){ctx=new AudioContext();audioOrigin=ctx.currentTime;scoreOrigin=0;next=.04*rate;master=ctx.createGain();musicBus=ctx.createGain();sfxBus=ctx.createGain();compressor=ctx.createDynamicsCompressor();compressor.threshold.value=-12;compressor.knee.value=12;compressor.ratio.value=5;master.connect(compressor).connect(ctx.destination);musicBus.connect(master);sfxBus.connect(master);update();timer=setInterval(schedule,25);}
+   if(ctx.state==='suspended'&&!document.hidden)await ctx.resume();
+   schedule();
   }catch{/* Audio must never block gameplay when unavailable. */}
  }
  function stopCharge(){if(!charge||!ctx)return;const {o,g}=charge;charge=null;g.gain.cancelScheduledValues(ctx.currentTime);g.gain.setTargetAtTime(.0001,ctx.currentTime,.015);o.stop(ctx.currentTime+.1);}
@@ -195,5 +208,5 @@ export function arcadeAudio(){
  window.addEventListener('pagehide',()=>{clearInterval(timer);ctx?.close();});
  document.getElementById('sound-toggle').onclick=()=>{prefs.muted=!prefs.muted;save();};
  document.getElementById('music-toggle').onclick=()=>{prefs.music=!prefs.music;save();};update();
- return {unlock,cue,motion,startCharge,stopCharge,setPlaybackRate,get state(){return {initialized:!!ctx,status:ctx?.state||'locked',...prefs,step,playbackRate:rate,bpm:112*rate,voices:voices.size,cues:{...cues}};}};
+ return {unlock,cue,motion,startCharge,stopCharge,setPlaybackRate,get state(){return {initialized:!!ctx,status:ctx?.state||'locked',...prefs,step,playbackRate:rate,bpm:112*rate,skippedMusicSteps,schedulerGapMaxMs,voices:voices.size,cues:{...cues}};}};
 }

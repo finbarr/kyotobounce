@@ -61,3 +61,10 @@ charging reject flight, reset revokes the attempt and reconnect permission,
 and both release-before-acknowledgement and explicit reconnect remain valid.
 The renderer checks this ownership independently of its buffered physics phase.
 Interpolation is cleared on reset and never spans different attempt IDs.
+
+## Gameplay and music stability
+
+See [STABILITY.md](STABILITY.md) for the September 26 investigation, measured
+results, and commands for `stability.mjs` and `audio-stability.mjs`. The gameplay
+runner records normal frame pacing, optional CPU profiles and Chrome traces;
+the audio runner compares beat timing under controlled JavaScript stalls.

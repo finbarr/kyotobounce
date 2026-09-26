@@ -13,7 +13,7 @@ try{
  const advance=seconds=>{for(let i=0;i<seconds*100;i++){context.currentTime+=.01;for(const source of context.sources)if(source.onended&&source.endTime<=context.currentTime){const end=source.onended;source.onended=null;end();}scheduler();}};
  scheduler();const initial=sound.state.step;advance(2);const normal=sound.state.step-initial;
  sound.setPlaybackRate(2);assert.equal(sound.state.bpm,224);const start=sound.state.step;advance(2);const doubled=sound.state.step-start;
- assert.ok(Math.abs(doubled-2*normal)<=1,`${normal} normal beats vs ${doubled} fast beats`);
+ assert.ok(Math.abs(normal-2*112/30)<=1&&Math.abs(doubled-2*224/30)<=1,`${normal} normal beats vs ${doubled} fast beats`);
  sound.cue('menu');let source=context.sources.at(-1);assert.equal(source.frequency.value,1320);assert.ok(Math.abs(source.endTime-source.startTime-.0375)<1e-6,'Cue envelope and tail run at 2x');
  sound.motion(10,true,true);source=context.sources.at(-1);assert.equal(source.playbackRate.value,2,'Rolling audio speeds up too');
  sound.setPlaybackRate(1);assert.equal(sound.state.bpm,112);assert.equal(source.playbackRate.value,1);
@@ -25,5 +25,25 @@ try{
  sound.setPlaybackRate(2);assert.equal(sound.state.cues.clear,1,'Fast-forward retimes the fanfare without retriggering it');
  assert.ok(Math.max(...context.sources.filter(n=>n.onended).map(n=>n.endTime))-context.currentTime<1.2,'The active fanfare follows 2x playback');
  controls.get('sound-toggle').onclick();sound.setPlaybackRate(2);assert.equal(sound.state.muted,true,'Fast-forward preserves mute preference');
- console.log('PASS 112/224 BPM music, retimed voices, doubled SFX pitch/envelopes, rolling playback and mute preservation');
+ // Repeated main-thread stalls must not move the score's beat grid. The queue
+ // covers 250 ms stalls, while longer stalls skip expired steps in bounded work.
+ for(const rate of [1,2]){
+  const stable=arcadeAudio();await stable.unlock();stable.setPlaybackRate(rate);scheduler();
+  const start=stable.state.step;let stalledAt=1;
+  while(context.currentTime<30){
+   context.currentTime+=.025;
+   if(context.currentTime>=stalledAt){context.currentTime+=.25;stalledAt+=1;}
+   for(const n of context.sources)if(n.onended&&n.endTime<=context.currentTime){const end=n.onended;n.onended=null;end();}
+   scheduler();
+  }
+  assert.ok(Math.abs(stable.state.step-start-context.currentTime*112/30*rate)<=1,'Stalls preserve musical time at both playback rates');
+  assert.equal(stable.state.skippedMusicSteps,0,'The lookahead covers a 250 ms scheduler stall');
+  const before=stable.state.step,created=context.sources.length;
+  context.currentTime+=10;scheduler();
+  assert.ok(stable.state.step-before>=Math.floor(10*112/30*rate),'An overrun catches the score up to the audio clock');
+  assert.ok(stable.state.skippedMusicSteps>0,'Expired beats are skipped');
+  assert.ok(context.sources.length-created<40,'Recovery never emits a backlog of notes');
+  assert.ok(context.sources.slice(created).every(n=>n.startTime>=context.currentTime),'Recovery only schedules future voices');
+ }
+ console.log('PASS stall resilience, bounded recovery, 112/224 BPM music, retimed voices, doubled SFX pitch/envelopes, rolling playback and mute preservation');
 }finally{Object.assign(globalThis,original);}

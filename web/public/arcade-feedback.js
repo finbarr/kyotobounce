@@ -17,6 +17,7 @@ export function arcadeFeedback(sound){
  clearBanner.innerHTML='<div class="clear-rays"></div><div class="clear-medal"><span class="clear-crown">★ ★ ★</span><span class="clear-kicker">ALL WAYPOINTS / 全制覇</span><strong>100<span>%</span></strong><span class="clear-ribbon">PERFECT ROUTE!</span><small id="clear-count"></small></div>';
  spectacle.append(clearBanner);
  const clearStatus=document.createElement('div');clearStatus.className='clear-status';clearStatus.setAttribute('role','status');document.body.append(clearStatus);
+ let totalAnimation=null;
  let clearTime=0,clearPending=null,clearFired=false,clearVolley=0,clearAnimations=[],currentCourse=null;
  let current=null,lastAttempt='',display=0,bankCount=0,waypointCount=0,tagged=false,flash=0,trickTime=0,burstTime=0,cooldown=0,pending=null,animations=[],tricks=[],highestTier=0,lastUpdate=performance.now();
  function cancelAnimations(){animations.forEach(a=>a.cancel());animations=[];}
@@ -35,7 +36,7 @@ export function arcadeFeedback(sound){
  }
  function pop(text,kind){
   $('combo-trick').textContent=text;hud.dataset.cue=kind;flash=.5;trickTime=2.4;
-  if(!reduced()){$('combo-total').getAnimations().forEach(a=>a.cancel());$('combo-total').animate([{transform:'scale(1.14) rotate(-3deg)'},{transform:'scale(1) rotate(-2deg)'}],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'});}
+  if(!reduced()){totalAnimation?.cancel();totalAnimation=$('combo-total').animate([{transform:'scale(1.14) rotate(-3deg)'},{transform:'scale(1) rotate(-2deg)'}],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'});}
  }
  function celebrate(event,audible=true){
   cancelAnimations();const tier=Math.max(heatTier(current),event.tier||0),big=['special','result','destination','goal'].includes(event.kind);
@@ -54,7 +55,7 @@ export function arcadeFeedback(sound){
   if(audible)sound.cue(event.kind,{multiplier:event.multiplier,tier});
  }
  const api={
-  reset(){punches.reset();current=null;currentCourse=null;lastAttempt='';display=0;bankCount=0;waypointCount=0;tagged=false;flash=0;trickTime=0;burstTime=0;cooldown=0;pending=null;tricks=[];highestTier=0;lastUpdate=performance.now();cancelAnimations();resetClear();particles.reset();hud.hidden=true;spectacle.hidden=true;hud.dataset.cue='';$('combo-line').textContent='';},
+  reset(){totalAnimation?.cancel();totalAnimation=null;punches.reset();current=null;currentCourse=null;lastAttempt='';display=0;bankCount=0;waypointCount=0;tagged=false;flash=0;trickTime=0;burstTime=0;cooldown=0;pending=null;tricks=[];highestTier=0;lastUpdate=performance.now();cancelAnimations();resetClear();particles.reset();hud.hidden=true;spectacle.hidden=true;hud.dataset.cue='';$('combo-line').textContent='';},
   accept(score,attempt,challenge,silent=false){
    if(!currentScore(score))return;
    const rewind=current&&(score.styleBanks<bankCount||(score.waypointCount||0)<waypointCount);
@@ -81,7 +82,9 @@ export function arcadeFeedback(sound){
   },
   update(dt,phase,mode,rate=1){
    const now=performance.now(),elapsed=Math.max(0,(now-lastUpdate)/1000)*rate;lastUpdate=now;
-   for(const animation of [...animations,...clearAnimations,...$('combo-total').getAnimations()])if(animation.playbackRate!==rate)animation.updatePlaybackRate(rate);
+   if(totalAnimation&&['finished','idle'].includes(totalAnimation.playState))totalAnimation=null;
+   // Keep our animation handles: getAnimations() flushes pending style/layout.
+   for(const animation of [...animations,...clearAnimations,...(totalAnimation?[totalAnimation]:[])])if(animation.playbackRate!==rate)animation.updatePlaybackRate(rate);
    const visible=['play','replay'].includes(mode)&&!!current;
    hud.hidden=!visible||!(phase==='Flight'||mode==='replay'&&phase==='Result');cooldown=Math.max(0,cooldown-elapsed);burstTime=Math.max(0,burstTime-elapsed);clearTime=Math.max(0,clearTime-elapsed);
    if(clearPending&&visible&&['Flight','Result'].includes(phase)&&rate>0)clearWaypoints();
