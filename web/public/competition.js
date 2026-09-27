@@ -1,3 +1,4 @@
+import {setText,setHidden,setAttribute} from './dom-updates.js';
 import {isTutorial} from './tutorial.js';
 import {startMarker} from './start-marker.js';
 import {completedCourse,nextCampaignCourse} from './level-progress.js';
@@ -91,18 +92,18 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
   const replaying=state.mode==='replay'||sharedReplay;
   const throwing=['Release','Flight'].includes(getPhase());
   if(throwing||replaying||document.body.classList.contains('is-briefing')||document.body.classList.contains('mobile-ui'))showLevels(false);
-  levelsButton.hidden=replaying||state.mode!=='play';levelsButton.disabled=throwing||!!state.session?.restoring;
-  levelsButton.title=throwing?'Finish your shot, or press R to recall it':'L · Choose a level or robot';
+  setHidden(levelsButton,replaying||state.mode!=='play');levelsButton.disabled=throwing||!!state.session?.restoring;
+  setAttribute(levelsButton,'title',throwing?'Finish your shot, or press R to recall it':'L · Choose a level or robot');
   document.body.classList.toggle('is-results',!replaying&&!$('result-card').hidden);document.body.classList.toggle('is-replay',replaying);
-  host.hidden=replaying;
+  setHidden(host,replaying);
   if(host.dataset.mode!==state.mode)host.dataset.mode=state.mode;
   for(const [id,destination] of [['combo-hud','replay-metrics'],['result-leaderboard','replay-metrics'],['shot-speed','replay-speed-slot'],['combo-spectacle','replay-stage']]){const element=$(id),parent=replaying?$(destination):document.body;if(element.parentElement!==parent)parent.append(element);}
-  $('result-leaderboard').hidden=state.mode==='replay'?!state.replay:state.mode!=='play'||!state.selected;
-  $('course-view').hidden=sharedReplay||state.mode!=='play';$('editor-view').hidden=state.mode!=='editor';$('replay-view').hidden=!sharedReplay&&state.mode!=='replay';
-  designPath.visible=state.mode==='editor'&&!!capturedDesign;$('design-shot-view').hidden=state.mode!=='design';document.body.classList.toggle('is-designer',state.mode==='editor');
+  setHidden($('result-leaderboard'),state.mode==='replay'?!state.replay:state.mode!=='play'||!state.selected);
+  setHidden($('course-view'),sharedReplay||state.mode!=='play');setHidden($('editor-view'),state.mode!=='editor');setHidden($('replay-view'),!sharedReplay&&state.mode!=='replay');
+  designPath.visible=state.mode==='editor'&&!!capturedDesign;setHidden($('design-shot-view'),state.mode!=='design');document.body.classList.toggle('is-designer',state.mode==='editor');
   document.body.classList.toggle('is-design-shot',state.mode==='design');
-  if(state.mode==='design'){const phase=getPhase(),inFlight=['Release','Flight'].includes(phase);$('design-shot-title').textContent=designRequest?'GETTING READY…':inFlight?'RECORDING YOUR SHOT.':'THROW THE LEVEL.';$('design-shot-status').textContent=designNotice||(inFlight?'The route is recording. Wait for the ball to settle, or hold Space for 2× playback.':'Walk to your launch spot. Hold Space or the mouse to charge, then release. F scouts the station.');$('design-shot-help').textContent=inFlight?'R · Discard this shot and try again':'Spaced banks become waypoints. A clear landing becomes an optional finish bonus.';}
-  if(!['play','design'].includes(state.mode)){$('throw-panel').hidden=true;$('flight-panel').hidden=true;$('result-card').hidden=true;}
+  if(state.mode==='design'){const phase=getPhase(),inFlight=['Release','Flight'].includes(phase);setText($('design-shot-title'),designRequest?'GETTING READY…':inFlight?'RECORDING YOUR SHOT.':'THROW THE LEVEL.');setText($('design-shot-status'),designNotice||(inFlight?'The route is recording. Wait for the ball to settle, or hold Space for 2× playback.':'Walk to your launch spot. Hold Space or the mouse to charge, then release. F scouts the station.'));setText($('design-shot-help'),inFlight?'R · Discard this shot and try again':'Spaced banks become waypoints. A clear landing becomes an optional finish bonus.');}
+  if(!['play','design'].includes(state.mode)){setHidden($('throw-panel'),true);setHidden($('flight-panel'),true);setHidden($('result-card'),true);}
  }
  function updateSession(){
   const session=state.session;if(!session)return;if(session.busy)$('result-card').hidden=true;

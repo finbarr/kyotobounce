@@ -2,7 +2,7 @@
 export function shotDetails(cancel){
   const panel=document.getElementById('shot-details'),output=document.getElementById('shot-state');
   panel.hidden=new URLSearchParams(location.search).get('debug')!=='1';
-  if(panel.hidden)return ()=>{};
+  if(panel.hidden)return null;
   let report=null,lastFlight=null,lastUpdate=0;
   panel.addEventListener('toggle',()=>{if(panel.open)cancel();});
   document.getElementById('save-shot-report').onclick=()=>{

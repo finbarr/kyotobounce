@@ -1,3 +1,4 @@
+import {staticRayQueries} from './static-ray-queries.js';
 import * as THREE from 'three';
 import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture } from './station-materials.js';
 import { configureStationDaylight, createStationReflections } from './station-lighting.js';
@@ -177,13 +178,14 @@ export function contactShadow(scene,station){
   const material=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});
   const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1),material);mesh.rotation.x=-Math.PI/2;mesh.renderOrder=2;scene.add(mesh);
   const ray=new THREE.Raycaster();ray.firstHitOnly=true;ray.ray.direction.set(0,-1,0);ray.far=8;
-  const up=new THREE.Vector3(0,0,1);
+  const up=new THREE.Vector3(0,0,1),normal=new THREE.Vector3();
+  const supporting=hit=>hit.face&&normal.copy(hit.face.normal).transformDirection(hit.object.matrixWorld).y>.45;
   return (position,radius,visible=true)=>{
     mesh.visible=visible;if(!visible)return;
-    ray.ray.origin.copy(position).add(new THREE.Vector3(0,.2,0));
-    const hit=ray.intersectObject(station,true).find(h=>h.face&&h.face.normal.clone().transformDirection(h.object.matrixWorld).y>.45);
+    ray.ray.origin.copy(position);ray.ray.origin.y+=.2;
+    const hit=staticRayQueries(station).first(ray,supporting);
     if(!hit){mesh.visible=false;return;}
-    const normal=hit.face.normal.clone().transformDirection(hit.object.matrixWorld),height=Math.max(0,position.y-hit.point.y);
+    normal.copy(hit.face.normal).transformDirection(hit.object.matrixWorld);const height=Math.max(0,position.y-hit.point.y);
     mesh.position.copy(hit.point).addScaledVector(normal,.008);mesh.quaternion.setFromUnitVectors(up,normal);
     mesh.scale.setScalar(radius*(1+height*.25));material.opacity=Math.max(0,1-height/7);
   };

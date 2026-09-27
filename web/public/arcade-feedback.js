@@ -1,8 +1,11 @@
+import {setText,setHidden,setData,setStyle} from './dom-updates.js';
 import {currentScore,scoreEvents,pendingScoreEvent,heatTier,HEAT_STAGES,allWaypointsCollected} from './waypoint-score.js';
 import {arcadeParticles} from './arcade-particles.js';
 import {waypointCard} from './waypoint-card.js';
-const $=id=>document.getElementById(id),format=n=>Math.round(n).toLocaleString();
+const integers=new Intl.NumberFormat(),multipliers=new Intl.NumberFormat(undefined,{maximumFractionDigits:2});
+const format=n=>integers.format(Math.round(n));
 export function arcadeFeedback(sound){
+ const elements=new Map(),$=id=>{let node=elements.get(id);if(!node){node=document.getElementById(id);if(node)elements.set(id,node);}return node;};
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
  const hud=document.createElement('section');hud.id='combo-hud';hud.hidden=true;hud.setAttribute('aria-label','Live shot score');
  hud.innerHTML=`<div class="combo-heading"><span>LIVE COMBO / コンボ</span><b id="combo-status">BUILD YOUR LINE</b></div><div class="special-label"><b id="special-name">SPECIAL</b><span id="special-next">25,000 PTS</span></div><div id="special-track"><i id="special-fill"></i></div><div id="combo-total">0</div><div id="combo-factors"><b id="combo-banks">×1.00 COMBO</b><b id="combo-targets">HIT A TARGET</b></div><div class="combo-landing"><span id="combo-accuracy"></span><strong id="combo-cash"></strong></div><div id="combo-motion"></div><div id="combo-trick" aria-live="polite"></div>`;
@@ -43,7 +46,7 @@ export function arcadeFeedback(sound){
   spectacle.hidden=false;spectacle.dataset.tier=tier;spectacle.dataset.kind=event.kind;burstTime=big?2.1:1.15;cooldown=big?.45:.22;
   const color='#'+HEAT_STAGES[tier].color.toString(16).padStart(6,'0');spectacle.style.setProperty('--combo-tint',color);
   $('combo-call').textContent=event.kind==='special'?event.label:event.kind==='result'?'LINE COMPLETE / 大当たり':event.kind==='waypoint'?(event.count>1?`${event.label} / 同時ヒット`:'WAYPOINT LINK / 連鎖'):event.kind==='destination'?'DESTINATION BONUS':event.kind==='goal'?'TARGET TAGGED':'CLEAN BANK';
-  $('combo-mult').textContent=event.kind==='special'?event.label:event.kind==='result'?format(current.total):event.kind==='destination'?`+${format(current.destinationBonus)}`:event.kind==='bank'?`+${event.bonus.toFixed(2)}×`:event.kind==='waypoint'&&event.count>1?`${event.count} HITS`:`×${Number(event.multiplier).toLocaleString(undefined,{maximumFractionDigits:2})}`;
+  $('combo-mult').textContent=event.kind==='special'?event.label:event.kind==='result'?format(current.total):event.kind==='destination'?`+${format(current.destinationBonus)}`:event.kind==='bank'?`+${event.bonus.toFixed(2)}×`:event.kind==='waypoint'&&event.count>1?`${event.count} HITS`:`×${multipliers.format(Number(event.multiplier))}`;
   $('combo-mult').classList.toggle('word-burst',event.kind==='special');
   const digits=$('combo-mult').textContent.length;$('combo-mult').style.fontSize=event.kind==='special'?'':`clamp(30px,${Math.min(6,60/digits)}vw,${Math.min(100,700/digits)}px)`;
   $('combo-sub').textContent=event.kind==='special'?`${format(current.total)} POINTS · LEVEL ${tier}`:event.kind==='result'?'POINTS BANKED':event.kind==='goal'?'25% SECURED · LAND THE FINISH':event.kind==='waypoint'?`${event.label} · ${format(current.total)} PTS` :event.label;
@@ -86,31 +89,31 @@ export function arcadeFeedback(sound){
    // Keep our animation handles: getAnimations() flushes pending style/layout.
    for(const animation of [...animations,...clearAnimations,...(totalAnimation?[totalAnimation]:[])])if(animation.playbackRate!==rate)animation.updatePlaybackRate(rate);
    const visible=['play','replay'].includes(mode)&&!!current;
-   hud.hidden=!visible||!(phase==='Flight'||mode==='replay'&&phase==='Result');cooldown=Math.max(0,cooldown-elapsed);burstTime=Math.max(0,burstTime-elapsed);clearTime=Math.max(0,clearTime-elapsed);
+   setHidden(hud,!visible||!(phase==='Flight'||mode==='replay'&&phase==='Result'));cooldown=Math.max(0,cooldown-elapsed);burstTime=Math.max(0,burstTime-elapsed);clearTime=Math.max(0,clearTime-elapsed);
    if(clearPending&&visible&&['Flight','Result'].includes(phase)&&rate>0)clearWaypoints();
    if(clearTime&&visible&&!reduced())while(clearVolley<3&&3.2-clearTime>=clearVolley*.28){particles.burst(6,true);clearVolley++;}
-   clearBanner.hidden=!visible||!clearTime;
+   setHidden(clearBanner,!visible||!clearTime);
    if(!clearTime&&clearAnimations.length){clearAnimations.forEach(a=>a.cancel());clearAnimations=[];}
    if(pending&&!cooldown&&!clearTime&&visible&&phase==='Flight'&&rate>0){const event=pending;pending=null;celebrate(event);}
-   particles.update(elapsed,visible&&!reduced());spectacle.hidden=!visible||(!burstTime&&!clearTime&&!particles.active);
-   $('combo-burst').hidden=!burstTime;$('combo-line').hidden=phase!=='Flight'||!burstTime;
+   particles.update(elapsed,visible&&!reduced());setHidden(spectacle,!visible||(!burstTime&&!clearTime&&!particles.active));
+   setHidden($('combo-burst'),!burstTime);setHidden($('combo-line'),phase!=='Flight'||!burstTime);
    if(!burstTime&&animations.length)cancelAnimations();
    if(!current)return;
    const waypoint=current.version==='waypoint-v3',allClear=allWaypointsCollected(current,currentCourse),value=waypoint||phase==='Result'?current.total:current.potential,tier=allClear?6:heatTier(current),next=HEAT_STAGES[tier+1];
-   display=reduced()||rate===0?value:display+(value-display)*(1-Math.exp(-dt*18));$('combo-total').textContent=format(display);
-   hud.style.setProperty('--combo-tint','#'+HEAT_STAGES[tier].color.toString(16).padStart(6,'0'));hud.dataset.tier=tier;
-   $('special-name').textContent=tier?HEAT_STAGES[tier].name:'SPECIAL';$('special-next').textContent=next?`${format(next.at)} PTS`:'MAXIMUM OVERDRIVE';
+   display=reduced()||rate===0?value:display+(value-display)*(1-Math.exp(-dt*18));setText($('combo-total'),format(display));
+   hud.style.setProperty('--combo-tint','#'+HEAT_STAGES[tier].color.toString(16).padStart(6,'0'));setData(hud,'tier',tier);
+   setText($('special-name'),tier?HEAT_STAGES[tier].name:'SPECIAL');setText($('special-next'),next?`${format(next.at)} PTS`:'MAXIMUM OVERDRIVE');
    const progress=next?Math.max(0,Math.min(1,((current.total||0)-HEAT_STAGES[tier].at)/(next.at-HEAT_STAGES[tier].at))):1;
-   $('special-fill').style.transform=`scaleX(${progress})`;
-   $('combo-banks').textContent=`×${current.comboMultiplier.toLocaleString(undefined,{maximumFractionDigits:2})} COMBO`;
-   $('combo-targets').textContent=`×${format(current.waypointMultiplier||1)} ${waypoint?'TARGETS':'BASE'} + ${current.bankBonus.toFixed(2)}× BANKS${allClear?' · 100%':''}`;
-   $('combo-accuracy').textContent=waypoint?(tagged?'DESTINATION BONUS':!currentCourse?.goal?'NO DESTINATION':currentCourse?.waypoints?.length?'DESTINATION OPTIONAL':'LAND IN THE DESTINATION'):`${Math.round((current.landingMultiplier||0)*100)}% LANDING`;
-   $('combo-motion').textContent=`+${format(current.movementPoints||0)} MOVEMENT · 100 PTS / SEC`;
-   $('combo-cash').textContent=`${format(current.total)} ${phase==='Result'?'PTS BANKED':waypoint?'PTS IN PLAY':'PTS IF IT STOPS HERE'}`;
-   $('combo-status').textContent=phase==='Result'?'SHOT COMPLETE':allClear?'100% · ALL WAYPOINTS':tagged?'LAND THE FINISH':waypointCount?'KEEP COLLECTING':bankCount>=3?'KEEP LINKING':'FIND YOUR LINE';
-   hud.classList.toggle('on-target',!!tagged);flash=Math.max(0,flash-elapsed);trickTime=Math.max(0,trickTime-elapsed);if(!flash)hud.dataset.cue='';$('combo-trick').style.opacity=trickTime?1:0;
+   setStyle($('special-fill'),'transform',`scaleX(${progress})`);
+   setText($('combo-banks'),`×${multipliers.format(current.comboMultiplier)} COMBO`);
+   setText($('combo-targets'),`×${format(current.waypointMultiplier||1)} ${waypoint?'TARGETS':'BASE'} + ${current.bankBonus.toFixed(2)}× BANKS${allClear?' · 100%':''}`);
+   setText($('combo-accuracy'),waypoint?(tagged?'DESTINATION BONUS':!currentCourse?.goal?'NO DESTINATION':currentCourse?.waypoints?.length?'DESTINATION OPTIONAL':'LAND IN THE DESTINATION'):`${Math.round((current.landingMultiplier||0)*100)}% LANDING`);
+   setText($('combo-motion'),`+${format(current.movementPoints||0)} MOVEMENT · 100 PTS / SEC`);
+   setText($('combo-cash'),`${format(current.total)} ${phase==='Result'?'PTS BANKED':waypoint?'PTS IN PLAY':'PTS IF IT STOPS HERE'}`);
+   setText($('combo-status'),phase==='Result'?'SHOT COMPLETE':allClear?'100% · ALL WAYPOINTS':tagged?'LAND THE FINISH':waypointCount?'KEEP COLLECTING':bankCount>=3?'KEEP LINKING':'FIND YOUR LINE');
+   hud.classList.toggle('on-target',!!tagged);flash=Math.max(0,flash-elapsed);trickTime=Math.max(0,trickTime-elapsed);if(!flash)setData(hud,'cue','');setStyle($('combo-trick'),'opacity',trickTime?1:0);
    // DOM diagnostics make cue/particle behavior inspectable without private state.
-   hud.dataset.events=String(bankCount+waypointCount);hud.dataset.particles=String(particles.active);
+   setData(hud,'events',String(bankCount+waypointCount));setData(hud,'particles',String(particles.active));
   },
   get score(){return current;},get goalFlash(){return tagged?flash:0;},get clearing(){return clearTime>0;}
  };

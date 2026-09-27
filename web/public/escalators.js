@@ -36,10 +36,20 @@ export function createEscalators(scene,specs,combSupports=[]) {
     const treads=new THREE.InstancedMesh(geometry,metal,s.stepCount);treads.name='exposed treads';treads.receiveShadow=true;treads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     const bounds=new THREE.Box3().setFromPoints(points).expandByScalar(Math.max(s.width,s.stepHeight,pitch));
     treads.boundingBox=bounds;treads.boundingSphere=bounds.getBoundingSphere(new THREE.Sphere());group.add(treads);
-    return {s,points,distances,length,pitch,from,to,treads,sizes,centers:Array.from({length:s.stepCount},()=>new THREE.Vector3()),publicSteps:new Uint8Array(s.stepCount)};
+    group.updateWorldMatrix(true,false);
+    const worldBounds=bounds.clone().applyMatrix4(group.matrixWorld);
+    return {s,points,distances,length,pitch,from,to,treads,sizes,worldBounds,centers:Array.from({length:s.stepCount},()=>new THREE.Vector3()),publicSteps:new Uint8Array(s.stepCount)};
   });
-  return time=>{
+  const frustum=new THREE.Frustum(),projection=new THREE.Matrix4();
+  const stats={lanes:lanes.length,updated:0,skipped:0,instances:0};
+  const update=(time,camera)=>{
+    stats.updated=stats.skipped=stats.instances=0;
+    if(camera){camera.updateMatrixWorld();frustum.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));}
     for(const l of lanes){
+      // Treads receive the frozen architecture shadow; they do not cast it.
+      // Initial reflection capture calls update without a camera to pose all lanes.
+      if(camera&&!frustum.intersectsBox(l.worldBounds)){stats.skipped++;continue;}
+      stats.updated++;
       const {s,points,distances,length,pitch,from,to,treads,sizes,centers,publicSteps}=l;
       for(let i=0;i<s.stepCount;i++){
         let at=((i*pitch+s.phase*pitch+s.speed*time)%length+length)%length;
@@ -63,7 +73,8 @@ export function createEscalators(scene,specs,combSupports=[]) {
         position.set(p.x,p.y-s.stepHeight/2,-(start+end)/2);scale.set(s.width,s.stepHeight,depth);
         matrix.compose(position,identity,scale);treads.setMatrixAt(count,matrix);sizes.setXYZ(count,s.width,s.stepHeight,depth);count++;
       }
-      treads.count=count;treads.instanceMatrix.needsUpdate=true;sizes.needsUpdate=true;
+      stats.instances+=count;treads.count=count;treads.instanceMatrix.needsUpdate=true;sizes.needsUpdate=true;
     }
   };
+  update.stats=stats;return update;
 }

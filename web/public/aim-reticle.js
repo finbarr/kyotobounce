@@ -1,3 +1,4 @@
+import {staticRayQueries} from './static-ray-queries.js';
 import * as THREE from 'three';
 
 // Same yaw/pitch convention as the native launch, reflected into Three's Z.
@@ -18,7 +19,7 @@ export function aimOrigin(player,yaw){
 const raycaster=new THREE.Raycaster();raycaster.firstHitOnly=true;
 export function projectAimReticle(origin,direction,camera,station){
   raycaster.set(origin,direction);raycaster.far=300;
-  const hit=raycaster.intersectObject(station,true)[0];
+  const hit=staticRayQueries(station).first(raycaster);
   const target=hit?.point||origin.clone().addScaledVector(direction,300);
   const projected=target.clone().project(camera);
   const visible=projected.z>=-1&&projected.z<=1&&Math.abs(projected.x)<1&&Math.abs(projected.y)<1;
