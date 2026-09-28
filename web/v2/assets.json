@@ -1,9 +1,9 @@
 {
-  "layout": ".local/station-realism/station-gate-bank-02/station-layout.json",
-  "layoutSha256": "dd3806b2164e06ddd1f5ff404046d21ff59b127c2285a2e065d07fd7eec285f7",
-  "station": ".local/station-realism/gate-bank-browser-02/station.json",
-  "geometry": ".local/station-realism/gate-bank-browser-02/atrium.runtime.glb",
-  "geometrySha256": "30a0eda6eb24ff842306a47cb8b166c507b138f9f6b210124ff4c5ae309d58ef",
+  "layout": ".local/v2/station-niwa-service-02/station-layout.json",
+  "layoutSha256": "1d08dcd0e86b8f5b33ea831614dba3b02716ba792a0d693ce2080ca003c30091",
+  "station": ".local/v2/station-niwa-service-02/station.json",
+  "geometry": ".local/v2/station-niwa-service-02/atrium.runtime.glb",
+  "geometrySha256": "9ad10d6a7e28a261f527f4e9d18cb489f1640c0b5096a5aee088155268ee33fd",
   "detail": ".local/station-realism/hall-basement-motion-02/atrium-detail.json",
   "motionLayout": ".local/station-realism/station-hall-basement-05/station-layout.json",
   "spawn": {
@@ -11,5 +11,14 @@
     "y": 30.80703,
     "z": 6.07587
   },
-  "sourceScene": ".local/station-realism/station-gate-bank-02/KyotoAtrium.blend"
+  "sourceScene": ".local/station-realism/station-gate-bank-02/KyotoAtrium.blend",
+  "sourceComponents": [
+    {
+      "directory": ".local/v2/niwa-service-02",
+      "builder": "web/station/realism/build-niwa-service.mjs",
+      "builderSha256": "1e1bf616f753dcef9a16e957e908631e60f601c5f05b0c2f0dbe5bfb43ac2c7f",
+      "glbSha256": "3a6d91cd10e5daa25beebe7673f79f528bf206c99794d0c007d33b7f39162117",
+      "nativeSha256": "0e95ee79adcdd2f0c927a754780a6c42a3f06cf2a0db3d80d3a03adf98c74c9e"
+    }
+  ]
 }

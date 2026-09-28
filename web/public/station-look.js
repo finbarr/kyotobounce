@@ -1,6 +1,6 @@
 import {staticRayQueries} from './static-ray-queries.js';
 import * as THREE from 'three';
-import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture, usesCourtyardReflection } from './station-materials.js';
+import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture, usesCourtyardReflection, applyNiwaServicePlaster } from './station-materials.js';
 import { configureStationDaylight, createStationReflections } from './station-lighting.js';
 import {createStationInstallations} from './station-installations.js';
 
@@ -154,6 +154,7 @@ export function dressStation(renderer,scene,sun,station,data){
       }
       const family=stationMaterialFamily(m.name);
       if(family){applyStationMaterial(m,family,textures,reflections);families[family]=(families[family]||0)+1;}
+      applyNiwaServicePlaster(m,textures);
       // Preserve the accepted practical-light emission appearance and pool.
       if(/diffuser|spotlight lens|warm opal downlight/.test(m.name)){
         m.emissive.set(0xffe0a7);m.emissiveIntensity=2.2;m.color.set(0xe6d8b8);

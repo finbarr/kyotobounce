@@ -2,17 +2,23 @@
 
 The user wants to retain the useful visual reconstruction and replace all existing levels. Follow `research/kyoto-station/V2-ITERATION-PLAN.md` for the replacement ongoing goal: finish one task, commit and deliver it, then continue; no overall time cap, before/after presentations or routine review pauses. Historical course failures and repair queues below are no longer v2 blockers; do not repair old targets, hints, starts or progression. Core movement, physics, collision and performance checks still apply. The replacement goal is active. The local v2 foundation is now integrated; current details follow.
 
-## Current playable v2 foundation — 28 September 2026
+## Current delivery: NIWA service counter — 28 September 2026
+
+The v2 preview includes the new service-counter cabinetry, dispensers, red tap handles, coffee-machine details and warm cove/plaster finish. See `research/kyoto-station/notes/NIWA-SERVICE-V2.md`. Current asset selection is `web/v2/assets.json`: source layout `1d08dcd0e86b8f5b33ea831614dba3b02716ba792a0d693ce2080ca003c30091`, runtime GLB `9ad10d6a7e28a261f527f4e9d18cb489f1640c0b5096a5aee088155268ee33fd`. The source is gate bank02 plus the editable NIWA component. The composer retains all inherited encoded geometry and images, adding 147,536 bytes and nine batches.
+
+Native collision, counter-front walking and Chrome rendering checks cover this section. The broader station and café remain unfinished. Next focused task: close the visible service-alcove end/floor gaps exposed by the interior view, keeping the counter and public frontage clear. Then continue the remaining interior/seating and station priorities.
+
+## Delivered v2 foundation — 28 September 2026
 
 Run `npm run dev:v2` with a compatible `KYOTO_WORKER_EXECUTABLE` (see `docs/LOCAL_PLAY.md`). The local preview is http://127.0.0.1:4425. It uses gate bank02's full reconstruction, courtyard free exploration and separate `.local/v2/4425/data/`. The old authored campaign is empty. No production deployment or asset-pack publication has occurred.
 
-`web/v2/assets.json` is the current asset selection. Source layout: `dd3806b2164e06ddd1f5ff404046d21ff59b127c2285a2e065d07fd7eec285f7`; browser GLB: `30a0eda6eb24ff842306a47cb8b166c507b138f9f6b210124ff4c5ae309d58ef`; derived spawn-only layout: `332cfce5c423598798b8116bb3d76eb07539583e89cdfd0053c8d0689e00611a`. Native spawn is `(107.14205, 30.80703, 6.07587)`. The route-source coordinates are Three coordinates and require Z inversion for native physics. Older eastCourtLevels metadata predates the registered courtyard and must not be used to place players.
+Foundation asset identities, before subsequent component additions: source layout: `dd3806b2164e06ddd1f5ff404046d21ff59b127c2285a2e065d07fd7eec285f7`; browser GLB: `30a0eda6eb24ff842306a47cb8b166c507b138f9f6b210124ff4c5ae309d58ef`; derived spawn-only layout: `332cfce5c423598798b8116bb3d76eb07539583e89cdfd0053c8d0689e00611a`. Native spawn is `(107.14205, 30.80703, 6.07587)`. The route-source coordinates are Three coordinates and require Z inversion for native physics. Older eastCourtLevels metadata predates the registered courtyard and must not be used to place players.
 
 Verification: typecheck, npm test and browser build pass. `test:runtime` checks grounded entry, walking, an unranked spinning throw through full rest, recall during flight and Home. `test:v2:browser` exercises the Chrome controls and checks that free throws do not show an empty score card. Browser receipt and current screenshot are in `.local/v2/browser/`. This is foundation acceptance, not full-station traversal or a long performance soak.
 
 Delivered next: NIWA glass now uses the thin-glass finish, and glass/aluminium/dark frames use the existing courtyard reflection capture. Browser build, authored-material preservation and actual Chrome shader/reflection/resource checks pass. Five captures remain fixed; a ten-second 1280 × 800 sample has p95 16.7 ms. See `research/kyoto-station/notes/COURTYARD-GLAZING-V2.md` and `.local/v2/courtyard-glass/receipt.json`.
 
-Next focused task: improve the sparse, uniformly bright café interior using the existing NIWA source/reference collection. Keep the clear exterior glazing. The native/GLB source assets are unchanged by the glazing delivery.
+The subsequent counter delivery is recorded above. The glazing delivery itself did not change native/GLB source assets.
 
 ## Historical remote handoff checkpoint — superseded by v2
 

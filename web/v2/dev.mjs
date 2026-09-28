@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {readFile,writeFile,mkdir,symlink,readlink,access,stat} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,symlink,readlink,access,stat,unlink} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {createReadStream} from 'node:fs';
 import {spawn} from 'node:child_process';
@@ -30,10 +30,11 @@ await mkdir(resolve(overlay,'assets/runtime'),{recursive:true});
 await mkdir(resolve(local,'data'),{recursive:true});
 await writeFile(resolve(local,'station-layout.json'),layoutBytes);
 await writeFile(resolve(overlay,'assets/station.json'),JSON.stringify(station)+'\n');
+const previous=await readFile(resolve(local,'asset-receipt.json'),'utf8').then(JSON.parse).catch(error=>{if(error.code==='ENOENT')return null;throw error;});
 const replacements={'assets/runtime/atrium.glb':config.geometry,'assets/atrium-detail.json':config.detail};
 for(const [name,sourcePath] of Object.entries(replacements)){
  const destination=resolve(overlay,name),target=resolve(sourcePath);
- try{await symlink(target,destination);}catch(error){if(error.code!=='EEXIST')throw error;assert.equal(await readlink(destination),target,'Refusing to overwrite a different local asset');}
+ try{await symlink(target,destination);}catch(error){if(error.code!=='EEXIST')throw error;const existing=await readlink(destination);if(existing!==target){const managed=name==='assets/runtime/atrium.glb'?previous?.geometry:previous?.detail;assert(managed&&existing===resolve(managed),'Refusing to overwrite an untracked local asset');await unlink(destination);await symlink(target,destination);}}
 }
 const build=await json('web/public/browser-build.json');
 for(const name of ['assets/station.json',...Object.keys(replacements)]){

@@ -56,7 +56,7 @@ export const isAuthoredStationFixture=name=>/^k02[5789][- ]/i.test(name);
 
 // These surfaces reflect the courtyard around NIWA, not the central atrium.
 // Use the existing courtyard capture for both glass and adjacent metalwork.
-export const usesCourtyardReflection=name=>/^Registered courtyard \| (court-fold-(upper-metal|mirror|dark-return|trim)|niwa-(glass|aluminium|dark-metal)) \| Browser$/.test(name);
+export const usesCourtyardReflection=name=>/^Registered courtyard \| (court-fold-(upper-metal|mirror|dark-return|trim)|niwa-(glass|aluminium|dark-metal|service-steel)) \| Browser$/.test(name);
 
 // Ordered, explicit recognition covers current exports AND retained old names.
 export function stationMaterialFamily(name){
@@ -215,4 +215,23 @@ diffuseColor.a=coverage;
 #include <opaque_fragment>`);
   };
   m.customProgramCacheKey=()=>`K032-pbr-4-${family}-${slabCourses}-${usesCourtyardReflection(m.name)}`;m.needsUpdate=true;
+}
+
+// The stationary cove's warm wall wash is encoded on its plaster finish. This
+// has no new realtime light/shadow pass; the authored height follows the fitting.
+export function applyNiwaServicePlaster(material,textures){
+ const finish=material.userData.niwaServicePlaster;if(!finish)return;
+ const coveY=Number(finish.coveY);if(!Number.isFinite(coveY))throw new Error('Invalid NIWA cove height');
+ material.onBeforeCompile=shader=>{
+  shader.uniforms.niwaGrain={value:textures.stoneColor};shader.uniforms.niwaCoveY={value:coveY};
+  shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vNiwaPosition;').replace('#include <begin_vertex>','#include <begin_vertex>\nvNiwaPosition=(modelMatrix*vec4(transformed,1.0)).xyz;');
+  shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vNiwaPosition;\nuniform sampler2D niwaGrain;\nuniform float niwaCoveY;');
+  shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
+float grain=texture2D(niwaGrain,vNiwaPosition.zy/.25).r;
+diffuseColor.rgb*=.92+.12*grain;`);
+  shader.fragmentShader=shader.fragmentShader.replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
+float cove=exp(-abs(vNiwaPosition.y-niwaCoveY)*7.0);
+totalEmissiveRadiance+=vec3(.38,.15,.04)*cove;`);
+ };
+ material.customProgramCacheKey=()=> 'niwa-service-plaster-1';material.needsUpdate=true;
 }

@@ -47,6 +47,8 @@ Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omi
 
 `web/v2/assets.json` identifies the current private reconstruction. Its layout and GLB hashes are checked before launch, along with escalator and comb-support correspondence. Only the spawn metadata changes; large geometry stays symlinked. The launch command creates a public asset overlay, matching browser manifest, native layout and asset receipt under `.local/v2/PORT/`. It also keeps the database and worker log there, separate from published saves.
 
+Small v2 additions can be emitted by their checked-in component builder and appended with `web/v2/compose-component.mjs`. `sourceComponents` in the asset manifest identifies these editable additions; the base Blender scene remains their station context. The composition receipt preserves the parent manifest, original encoded buffers and matching native panels.
+
 The private asset files must already be present at the manifest paths; this candidate has not been published as a release pack. Browser source changes require a reload. Metadata or service changes require restarting this command. When geometry changes, update the manifest to matching exported assets and rerun the relevant checks.
 
 ## Useful overrides
