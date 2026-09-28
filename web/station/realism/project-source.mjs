@@ -1,4 +1,4 @@
-import { chromeGraphicsArgs } from '../../../tools/chrome-graphics.mjs';
+import { chromeGraphicsArgs } from '../../../tools/remote/chrome-graphics.mjs';
 // Exact-camera source geometry inspection for reference registration.
 // This viewer does not move the requested camera to avoid obstacles.
 import assert from 'node:assert/strict';

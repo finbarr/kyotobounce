@@ -1,4 +1,4 @@
-import { chromeGraphicsArgs } from '../../../tools/chrome-graphics.mjs';
+import { chromeGraphicsArgs } from '../../../tools/remote/chrome-graphics.mjs';
 // Real Chrome controls against the isolated candidate; telemetry is read-only.
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';

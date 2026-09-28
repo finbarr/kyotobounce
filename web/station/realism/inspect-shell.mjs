@@ -1,4 +1,4 @@
-import { chromeGraphicsArgs } from '../../../tools/chrome-graphics.mjs';
+import { chromeGraphicsArgs } from '../../../tools/remote/chrome-graphics.mjs';
 // Inspect the retained municipal station shell separately from playable geometry.
 import {chromium} from 'playwright';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';

@@ -1,4 +1,4 @@
-import { chromeGraphicsArgs } from '../../../tools/chrome-graphics.mjs';
+import { chromeGraphicsArgs } from '../../../tools/remote/chrome-graphics.mjs';
 // Capture the actual game at fixed review cameras, with asynchronous GPU queries.
 // Research photographs are referenced by the manifest, never bundled here.
 import {chromium} from 'playwright';

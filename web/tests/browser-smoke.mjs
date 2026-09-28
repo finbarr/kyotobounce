@@ -1,4 +1,4 @@
-import { chromeGraphicsArgs } from '../../tools/chrome-graphics.mjs';
+import { chromeGraphicsArgs } from '../../tools/remote/chrome-graphics.mjs';
 import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
