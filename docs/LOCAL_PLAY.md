@@ -47,6 +47,8 @@ Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omi
 
 `web/v2/assets.json` identifies the current private reconstruction under `.local/v2/current/`. Its layout and GLB hashes are checked before launch, along with escalator and comb-support correspondence. An optional hardware GLB is also hash-checked. Only the spawn metadata changes; large geometry stays symlinked. The launch command creates a public asset overlay, matching browser manifest, native layout and asset receipt under `.local/v2/PORT/`. It also keeps the database and worker log there, separate from published saves.
 
+To validate the single temporary candidate without changing the current manifest, run `KYOTO_V2_ASSETS=.local/v2/candidate/station/assets.json npm run dev:v2 -- 4426`. Stop that preview after promotion and remove its generated overlay/layout; keep only useful small receipts.
+
 Small v2 additions can be emitted by their checked-in component builder and appended with `web/v2/compose-component.mjs`. `sourceComponents` in the asset manifest identifies the editable components. Major replacements can be installed in the base Blender scene; small additions can remain appended. Use their installation or composition receipts when rebuilding. The composition receipt preserves the parent manifest, original encoded buffers and matching native panels.
 
 The private asset files must already be present at the manifest paths; this candidate has not been published as a release pack. Browser source changes require a reload. Metadata or service changes require restarting this command. When geometry changes, update the manifest to matching exported assets and rerun the relevant checks.

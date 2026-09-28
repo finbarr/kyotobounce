@@ -1,9 +1,9 @@
 {
   "layout": ".local/v2/current/station/station-layout.json",
-  "layoutSha256": "deb67ce99da6d400b7bacb34dc2cada2417dd9d0e78c865a5198c286f652c211",
+  "layoutSha256": "03f075a5406af5f283cff979304e0398c5ad2ad6a50195016f3e102cdaee2055",
   "station": ".local/v2/current/station/station.json",
   "geometry": ".local/v2/current/station/atrium.runtime.glb",
-  "geometrySha256": "983f6cce1f1bf552e64ef6c27e3325a7cf6b26005df54b271e72359b13de839e",
+  "geometrySha256": "e23a7f5649ffd70032eabd638860c903cc97b604543965415fef09adcf4f449b",
   "detail": ".local/v2/current/motion/atrium-detail.json",
   "motionLayout": ".local/v2/current/source/station-layout.json",
   "spawn": {
@@ -33,6 +33,13 @@
       "builderSha256": "136fc33d3335abe4a278daca2032eb45c648a4f2de117e042ee731eaad0b72af",
       "glbSha256": "7ef4a72514bdd059385e7de5adf2806245ab98dcb41637c6438067508123b6b9",
       "nativeSha256": "05eca09081e11543ed80f63bd74511bdc14714c8d2abf0f5da68d3864cd5996e"
+    },
+    {
+      "directory": ".local/v2/current/components/west-stair-handrails",
+      "builder": "web/station/realism/build-west-stair-handrails.mjs",
+      "builderSha256": "7214689d9d64b89d7de299f3c6d0bf8f7a43413f0914905c2e4ff8078952e4d9",
+      "glbSha256": "015dde7a1184da92913626350082a2d68f92c3a88875210175b87d1b5121d9f5",
+      "nativeSha256": "6592681aaf3e10e25e7e6ffcc52a0a45d270f9cd0dce82adb0dfc58e6eff9508"
     }
   ],
   "hardware": ".local/v2/current/motion/atrium-detail.runtime.glb",

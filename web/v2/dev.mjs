@@ -8,7 +8,7 @@ const root=resolve(import.meta.dirname,'../..');
 process.chdir(root);
 const port=process.argv[2]||'4425';
 assert(/^\d+$/.test(port)&&Number(port)>=1024&&Number(port)<=65535,'Choose a port from 1024 to 65535');
-const config=JSON.parse(await readFile('web/v2/assets.json','utf8'));
+const config=JSON.parse(await readFile(process.env.KYOTO_V2_ASSETS||'web/v2/assets.json','utf8'));
 const hash=b=>createHash('sha256').update(b).digest('hex');
 async function hashFile(path){const digest=createHash('sha256');for await(const chunk of createReadStream(path))digest.update(chunk);return digest.digest('hex');}
 const json=p=>readFile(resolve(p),'utf8').then(JSON.parse);

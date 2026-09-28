@@ -6,6 +6,10 @@ Completed station work is merged into local `main`. The playable private bundle 
 
 The user wants to retain the useful visual reconstruction and replace all existing levels. Follow `research/kyoto-station/V2-ITERATION-PLAN.md` for the replacement ongoing goal: finish one task, commit and deliver it, then continue; no overall time cap, before/after presentations or routine review pauses. Historical course failures and repair queues below are no longer v2 blockers; do not repair old targets, hints, starts or progression. Core movement, physics, collision and performance checks still apply. The replacement goal is active. The local v2 foundation is now integrated; current details follow.
 
+## Current delivery: western lower-stair guards — 28 September 2026
+
+Both missing lower-stair handrails and their stone parapets are now appended to the current bundle. Rail geometry/normals and parapet caps come from the municipal source; hidden backing depth and finishes are inferred. The addition is 21 closed parts, 7,232 triangles and two render batches. Six native traversals and Chrome inspection pass; frame-time p95 is 16.7 ms. See `research/kyoto-station/notes/WESTERN-STAIR-GUARDS-V2.md`. Next remains the surrounding western frontage/gallery and onward upper connection.
+
 ## Current delivery: western circulation — 28 September 2026
 
 The v2 western connection now uses source-derived lower and upper escalator banks, intermediate and curved upper landings, 31 stair treads and source-shaped landing guards. Both complete moving routes and the staircase pass native traversals in both directions. See `research/kyoto-station/notes/WESTERN-CIRCULATION-V2.md`; current assets and hashes are selected by `web/v2/assets.json`.
