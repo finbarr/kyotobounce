@@ -12,7 +12,7 @@
 
 The saved NAKED interior photograph (`photos/niwa-naked-interior.jpg`) guides the fittings, cabinet palette, timber counter, red handles and warm cove beneath the dark ceiling. The exterior JR Central and Rurubu photographs guide the courtyard-facing context; source links are recorded in `NIWA-ENTRANCE-INTERIOR.md`. Photographic pixels are not game textures. Dimensions, equipment models, cabinet divisions and hidden room depth remain approximations.
 
-The room shell, public stairs and serving screen remain the existing reconstruction. Fixtures are checked to stay behind that screen. The current interior still has unfinished end/floor closures and sparse seating/bamboo context; this delivery completes the counter section, not the entire café.
+The room shell, public stairs and serving screen remain the existing reconstruction. Fixtures are checked to stay behind that screen. The subsequent alcove delivery closes the exposed service-room end and floor seam; see `NIWA-ALCOVE-V2.md`. Seating and bamboo context remain sparse.
 
 ## Source and integration
 

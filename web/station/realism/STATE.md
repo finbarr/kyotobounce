@@ -2,11 +2,15 @@
 
 The user wants to retain the useful visual reconstruction and replace all existing levels. Follow `research/kyoto-station/V2-ITERATION-PLAN.md` for the replacement ongoing goal: finish one task, commit and deliver it, then continue; no overall time cap, before/after presentations or routine review pauses. Historical course failures and repair queues below are no longer v2 blockers; do not repair old targets, hints, starts or progression. Core movement, physics, collision and performance checks still apply. The replacement goal is active. The local v2 foundation is now integrated; current details follow.
 
-## Current delivery: NIWA service counter — 28 September 2026
+## Current delivery: NIWA service alcove closure — 28 September 2026
 
-The v2 preview includes the new service-counter cabinetry, dispensers, red tap handles, coffee-machine details and warm cove/plaster finish. See `research/kyoto-station/notes/NIWA-SERVICE-V2.md`. Current asset selection is `web/v2/assets.json`: source layout `1d08dcd0e86b8f5b33ea831614dba3b02716ba792a0d693ce2080ca003c30091`, runtime GLB `9ad10d6a7e28a261f527f4e9d18cb489f1640c0b5096a5aee088155268ee33fd`. The source is gate bank02 plus the editable NIWA component. The composer retains all inherited encoded geometry and images, adding 147,536 bytes and nine batches.
+The v2 preview now closes the exposed service-room end with a plaster wall, dark plinth and rear floor seam. It joins the retained pier, canopy and backing while leaving the entrance and public frontage clear. The hidden depth is inferred. See `research/kyoto-station/notes/NIWA-ALCOVE-V2.md`.
 
-Native collision, counter-front walking and Chrome rendering checks cover this section. The broader station and café remain unfinished. Next focused task: close the visible service-alcove end/floor gaps exposed by the interior view, keeping the counter and public frontage clear. Then continue the remaining interior/seating and station priorities.
+Current assets are selected by `web/v2/assets.json`: source layout `17b6a4bad1997e2c36c88852824bf116d6fbb9e0e03ba8820934ceb3405c4ae0`, runtime GLB `d3ade1b314101c821ede1eddce430ed8d095c4682afba1634851ade9c9edce47`. The source is gate bank02 plus the service-counter and alcove component builders. This addition is three colliding parts, 36 triangles, two batches and 4,460 bytes, with inherited buffers unchanged.
+
+Native rays, full-station frontage walking, v2 throw/rest/recall and actual Chrome rendering pass. The final ten-second Chrome sample has p95 16.7 ms and max 16.8 ms. The café counter and closure are complete local deliveries; other café furnishings remain sparse. Next focused task: resolve the western landing/escalator connection using the existing source evidence, without preserving retired course targets.
+
+Previous counter delivery: cabinetry, dispensers, red taps, coffee-machine details and warm cove/plaster finish, recorded in `research/kyoto-station/notes/NIWA-SERVICE-V2.md`.
 
 ## Delivered v2 foundation — 28 September 2026
 

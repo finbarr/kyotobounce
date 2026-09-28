@@ -1,9 +1,9 @@
 {
-  "layout": ".local/v2/station-niwa-service-02/station-layout.json",
-  "layoutSha256": "1d08dcd0e86b8f5b33ea831614dba3b02716ba792a0d693ce2080ca003c30091",
-  "station": ".local/v2/station-niwa-service-02/station.json",
-  "geometry": ".local/v2/station-niwa-service-02/atrium.runtime.glb",
-  "geometrySha256": "9ad10d6a7e28a261f527f4e9d18cb489f1640c0b5096a5aee088155268ee33fd",
+  "layout": ".local/v2/station-niwa-alcove-01/station-layout.json",
+  "layoutSha256": "17b6a4bad1997e2c36c88852824bf116d6fbb9e0e03ba8820934ceb3405c4ae0",
+  "station": ".local/v2/station-niwa-alcove-01/station.json",
+  "geometry": ".local/v2/station-niwa-alcove-01/atrium.runtime.glb",
+  "geometrySha256": "d3ade1b314101c821ede1eddce430ed8d095c4682afba1634851ade9c9edce47",
   "detail": ".local/station-realism/hall-basement-motion-02/atrium-detail.json",
   "motionLayout": ".local/station-realism/station-hall-basement-05/station-layout.json",
   "spawn": {
@@ -19,6 +19,13 @@
       "builderSha256": "1e1bf616f753dcef9a16e957e908631e60f601c5f05b0c2f0dbe5bfb43ac2c7f",
       "glbSha256": "3a6d91cd10e5daa25beebe7673f79f528bf206c99794d0c007d33b7f39162117",
       "nativeSha256": "0e95ee79adcdd2f0c927a754780a6c42a3f06cf2a0db3d80d3a03adf98c74c9e"
+    },
+    {
+      "directory": ".local/v2/niwa-alcove-01",
+      "builder": "web/station/realism/build-niwa-alcove.mjs",
+      "builderSha256": "136fc33d3335abe4a278daca2032eb45c648a4f2de117e042ee731eaad0b72af",
+      "glbSha256": "7ef4a72514bdd059385e7de5adf2806245ab98dcb41637c6438067508123b6b9",
+      "nativeSha256": "05eca09081e11543ed80f63bd74511bdc14714c8d2abf0f5da68d3864cd5996e"
     }
   ]
 }
