@@ -10,7 +10,9 @@ Run `npm run dev:v2` with a compatible `KYOTO_WORKER_EXECUTABLE` (see `docs/LOCA
 
 Verification: typecheck, npm test and browser build pass. `test:runtime` checks grounded entry, walking, an unranked spinning throw through full rest, recall during flight and Home. `test:v2:browser` exercises the Chrome controls and checks that free throws do not show an empty score card. Browser receipt and current screenshot are in `.local/v2/browser/`. This is foundation acceptance, not full-station traversal or a long performance soak.
 
-Next focused task: inspect and improve the most conspicuous courtyard/café material or lighting issue in the playable build. Use the existing source/reference collection; keep each change integrated and independently deliverable.
+Delivered next: NIWA glass now uses the thin-glass finish, and glass/aluminium/dark frames use the existing courtyard reflection capture. Browser build, authored-material preservation and actual Chrome shader/reflection/resource checks pass. Five captures remain fixed; a ten-second 1280 × 800 sample has p95 16.7 ms. See `research/kyoto-station/notes/COURTYARD-GLAZING-V2.md` and `.local/v2/courtyard-glass/receipt.json`.
+
+Next focused task: improve the sparse, uniformly bright café interior using the existing NIWA source/reference collection. Keep the clear exterior glazing. The native/GLB source assets are unchanged by the glazing delivery.
 
 ## Historical remote handoff checkpoint — superseded by v2
 

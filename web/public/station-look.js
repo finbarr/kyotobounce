@@ -1,6 +1,6 @@
 import {staticRayQueries} from './static-ray-queries.js';
 import * as THREE from 'three';
-import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture } from './station-materials.js';
+import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture, usesCourtyardReflection } from './station-materials.js';
 import { configureStationDaylight, createStationReflections } from './station-lighting.js';
 import {createStationInstallations} from './station-installations.js';
 
@@ -131,12 +131,11 @@ export function dressStation(renderer,scene,sun,station,data){
   }
   let canopy=false;
   const courtyardMaterials=new Set();
-  const courtyardFinish=/^Registered courtyard \| court-fold-(upper-metal|mirror|dark-return|trim) \| Browser$/;
   station.traverse(o=>{
     for(const material of Array.isArray(o.material)?o.material:[o.material]){
       if(!material)continue;
       if(stationMaterialFamily(material.name)==='canopy')canopy=true;
-      if(courtyardFinish.test(material.name))courtyardMaterials.add(material);
+      if(usesCourtyardReflection(material.name))courtyardMaterials.add(material);
     }
   });
   const reflections=createStationReflections(renderer,scene,architecture,{canopy,courtyardMaterials:[...courtyardMaterials]});

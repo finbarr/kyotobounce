@@ -54,8 +54,13 @@ export function createStationTextures(renderer){
 // and emissive shop trim. Generic station finishes must not reinterpret them.
 export const isAuthoredStationFixture=name=>/^k02[5789][- ]/i.test(name);
 
+// These surfaces reflect the courtyard around NIWA, not the central atrium.
+// Use the existing courtyard capture for both glass and adjacent metalwork.
+export const usesCourtyardReflection=name=>/^Registered courtyard \| (court-fold-(upper-metal|mirror|dark-return|trim)|niwa-(glass|aluminium|dark-metal)) \| Browser$/.test(name);
+
 // Ordered, explicit recognition covers current exports AND retained old names.
 export function stationMaterialFamily(name){
+  if(name==='Registered courtyard | niwa-glass | Browser')return 'guard';
   if(/^station-additions-garden-paving(?: \| Browser)?$/.test(name))return 'paving';
   if(isAuthoredStationFixture(name))return null;
   if(/^station-additions-(ivory|stone|dark-stone|rose)/i.test(name))return 'wall';
@@ -191,7 +196,10 @@ roughnessFactor=clamp(roughnessFactor+(micro.b-.5)*${family==='stainless'?'.18':
 vec2 grainSlope=(micro.rg*2.0-1.0)*${family==='stair'?'.35':'.8'};
 normal=normalize(stationFrame(-vViewPosition,normal,guv)*vec3(grainSlope,sqrt(max(.01,1.0-dot(grainSlope,grainSlope)))));`);
     }
-    reflections.patch(shader,{canopy:family==='canopy'});
+    // Local courtyard materials use their own assigned PMREM through Three's
+    // standard environment sampler. The station-wide blend would replace it
+    // with hall radiance even though the material has a local envMap.
+    if(!usesCourtyardReflection(m.name))reflections.patch(shader,{canopy:family==='canopy'});
     // Provisional coated-envelope appearance, isolated from clear guard glass.
     // F0 and coverage are visual calibration values, not surveyed optical data.
     if(family==='canopy')shader.fragmentShader=shader.fragmentShader.replace('#include <lights_physical_fragment>',
@@ -206,5 +214,5 @@ outgoingLight=(totalDiffuse*${family==='guard'?'.045':family==='canopy'?'.04':'.
 diffuseColor.a=coverage;
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey=()=>`K032-pbr-3-${family}-${slabCourses}`;m.needsUpdate=true;
+  m.customProgramCacheKey=()=>`K032-pbr-4-${family}-${slabCourses}-${usesCourtyardReflection(m.name)}`;m.needsUpdate=true;
 }
