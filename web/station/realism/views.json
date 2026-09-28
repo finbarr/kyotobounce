@@ -1,0 +1,1281 @@
+{
+  "schema": 1,
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "coordinates": "Three.js: X east, Y up, Z south; metres; vertical FOV; roll in degrees",
+  "referencePeriod": "September 2026 public-space configuration; historical references used for permanent structure only",
+  "season": "leaf-on late summer; no autumn coloration or snow",
+  "registrationStatus": "North facade has measured 3D/2D correspondences and a fit within 25.6 px on the municipal shell. Fourteen views remain initial candidates. No visual reconstruction milestone is accepted.",
+  "views": [
+    {
+      "id": "central-hall",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          -70.921275,
+          21.235965,
+          1
+        ],
+        "target": [
+          52,
+          28,
+          1
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "structure-590",
+        "url": "https://www.kanebako-se.co.jp/media/5/9/0/590_800x600.jpg?t=1638846938",
+        "localFile": "photos/structure-590.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:42.525356+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "west pier inner edge",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "east pier inner edge",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Skyway underside",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "north lattice base",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "south gallery slab",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "concourse opening",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "grand-staircase",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          -72.3475413656327,
+          21.17136180701084,
+          -4.446848357668717
+        ],
+        "target": [
+          -113.1161574717448,
+          33.117228624532814,
+          21.920104571528174
+        ],
+        "fov": 66.20629060243228,
+        "rollDegrees": 1.5436001613856478
+      },
+      "source": {
+        "id": "square-img_grandstaircase_01",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_grandstaircase_01.jpg",
+        "localFile": "photos/square-img_grandstaircase_01.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:37.304571+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "first riser west corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "first riser east corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "north escalator lower newel",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "north escalator upper landing",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "south facade band intersection",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "top stair portal",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "canopy-junction",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          90,
+          36,
+          0
+        ],
+        "target": [
+          65,
+          49,
+          -4
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "structure-596",
+        "url": "https://www.kanebako-se.co.jp/media/5/9/6/596_800x600.jpg?t=1638846939",
+        "localFile": "photos/structure-596.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:44.743985+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "canopy crown",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "canopy north springing",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "canopy south springing",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "upper truss node",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Skyway portal corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "end vertical mullion",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "skyway-outward",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          -15.0,
+          46.85,
+          -2.326
+        ],
+        "target": [
+          -6.0,
+          46.85,
+          -12.0
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "square-img_skyway_02",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_skyway_02.jpg",
+        "localFile": "photos/square-img_skyway_02.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:36.158746+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "left mullion",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "right mullion",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "upper rail intersection",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "lower rail intersection",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Tower shaft center",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Tower base roofline",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "east-square",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          112,
+          36,
+          6
+        ],
+        "target": [
+          58,
+          44,
+          3
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "square-img_eastsquare_01",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_eastsquare_01.jpg",
+        "localFile": "photos/square-img_eastsquare_01.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:34.978866+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "yellow volume corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "western canopy end",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "south facade window corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "north parapet step",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "central tree bed corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Skyway portal",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "roof-garden",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          -156.0,
+          56.1982456,
+          20.4
+        ],
+        "target": [
+          -146.0,
+          55.4982456,
+          18.0
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "square-img_oozorahiroba_01",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_oozorahiroba_01.jpg",
+        "localFile": "photos/square-img_oozorahiroba_01.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:37.751653+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "near planter inside corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "far planter inside corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "yellow lamp post base",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "yellow lamp disc center",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "far terrace guard corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "central path junction",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "west-square",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          -62.0,
+          9.049999999999999,
+          40.0
+        ],
+        "target": [
+          -50.0,
+          10.35,
+          30.0
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "square-img_westsquare_01",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_westsquare_01.jpg",
+        "localFile": "photos/square-img_westsquare_01.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:41.258689+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "left polished column foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "center polished column foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "right polished column foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "curved balcony return",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "side stair foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "upper glazing corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "north-south-passage",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          -63.0,
+          9.0,
+          22.0
+        ],
+        "target": [
+          -63.0,
+          9.0,
+          48.0
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "square-img_pedestrianwalkway_01",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_pedestrianwalkway_01.jpg",
+        "localFile": "photos/square-img_pedestrianwalkway_01.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:40.992688+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "near column foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "second column foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "third column foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "first ceiling lamp center",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "far passage opening corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "West Gate branch corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "north-facade",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          18.182815683203312,
+          23.627818317557335,
+          -185.87547991148256
+        ],
+        "target": [
+          7.428487491550008,
+          33.90313331691829,
+          -86.98785517102212
+        ],
+        "fov": 32.52939040159346,
+        "rollDegrees": -0.655010928962938
+      },
+      "source": {
+        "id": "structure-594",
+        "url": "https://www.kanebako-se.co.jp/media/5/9/4/594_800x600.jpg?t=1638846939",
+        "localFile": "photos/structure-594.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:43.754705+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "Measured fit to municipal source geometry within image tolerance; current game silhouette fails visual comparison. Normal camera is obstructed by the Tower base; a labeled architectural cutaway is retained separately.",
+        "controlFile": "web/station/realism/registrations/north-facade.json",
+        "maxResidualPixels": 18.981334284315167,
+        "tolerancePixels": 25.6,
+        "fitRmsPixels": 8.865369803540498,
+        "fitPointCount": 9,
+        "checkPointCount": 2,
+        "imageTransform": {
+          "scale": 1.6,
+          "cropTopPixels": 120.0,
+          "description": "Uniform enlargement, centered vertical crop; no image warp"
+        },
+        "sourceGeometrySha256": "0df73fd383c265904711bf09e4a628d109f7792dc9e4be524d3f531666df06a1",
+        "measurementSensitivity": {
+          "samples": 64,
+          "seed": 20260927,
+          "method": "Independent uniform perturbations within the manually stated image-pick bounds. Excludes source geometry, lens and crop errors; these are not survey confidence intervals.",
+          "columns": [
+            "cameraX",
+            "cameraY",
+            "cameraZ",
+            "verticalFovDegrees"
+          ],
+          "percentiles": {
+            "p05": [
+              13.597939088641702,
+              0.10971840252854495,
+              -283.5727810616093,
+              19.90474567425312
+            ],
+            "p50": [
+              18.58221931589462,
+              23.33824286803762,
+              -186.03409511033854,
+              32.51848499499922
+            ],
+            "p95": [
+              44.910268564885875,
+              29.18957891431966,
+              -167.7410559463439,
+              36.68159279755189
+            ]
+          }
+        },
+        "anchors": [
+          {
+            "name": "East pier upper parapet east corner",
+            "imagePixel": [
+              204.8,
+              174.40000000000003
+            ],
+            "originalImagePixel": [
+              128,
+              184
+            ],
+            "worldPoint": [
+              56.435325622558594,
+              63.87761688232422,
+              -27.16023826599121
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 0.7737044299844622
+          },
+          {
+            "name": "East pier upper parapet west corner",
+            "imagePixel": [
+              331.20000000000005,
+              174.40000000000003
+            ],
+            "originalImagePixel": [
+              207,
+              184
+            ],
+            "worldPoint": [
+              40.149227142333984,
+              63.87745666503906,
+              -26.894376754760742
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 4.54144287525532
+          },
+          {
+            "name": "Glazed hall facade lower east corner",
+            "imagePixel": [
+              350.40000000000003,
+              555.2
+            ],
+            "originalImagePixel": [
+              219,
+              422
+            ],
+            "worldPoint": [
+              39.724151611328125,
+              15.440206527709961,
+              -28.205978393554688
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 18.981334284315167
+          },
+          {
+            "name": "Glazed hall facade lower west corner",
+            "imagePixel": [
+              1044.8,
+              555.2
+            ],
+            "originalImagePixel": [
+              653,
+              422
+            ],
+            "worldPoint": [
+              -52.9528694152832,
+              15.440206527709961,
+              -26.61513328552246
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 10.557596125415623
+          },
+          {
+            "name": "West pier upper front east corner",
+            "imagePixel": [
+              1052.8,
+              209.60000000000002
+            ],
+            "originalImagePixel": [
+              658,
+              206
+            ],
+            "worldPoint": [
+              -53.52586364746094,
+              59.09231948852539,
+              -33.372215270996094
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 3.1012523749029697
+          },
+          {
+            "name": "West pier upper front west corner",
+            "imagePixel": [
+              1204.8,
+              214.40000000000003
+            ],
+            "originalImagePixel": [
+              753,
+              209
+            ],
+            "worldPoint": [
+              -74.8512954711914,
+              59.09247970581055,
+              -33.01607131958008
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 2.3297984241458614
+          },
+          {
+            "name": "West opening upper east corner",
+            "imagePixel": [
+              1104.0,
+              340.8
+            ],
+            "originalImagePixel": [
+              690,
+              288
+            ],
+            "worldPoint": [
+              -58.871883392333984,
+              43.75735855102539,
+              -33.289005279541016
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "check",
+            "residualPixels": 14.14856845807183
+          },
+          {
+            "name": "Rear roof box front east upper corner",
+            "imagePixel": [
+              836.8000000000001,
+              235.20000000000005
+            ],
+            "originalImagePixel": [
+              523,
+              222
+            ],
+            "worldPoint": [
+              -34.62238311767578,
+              63.7822265625,
+              6.023516654968262
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 1.9590704787950313
+          },
+          {
+            "name": "Rear roof box front west upper corner",
+            "imagePixel": [
+              894.4000000000001,
+              238.40000000000003
+            ],
+            "originalImagePixel": [
+              559,
+              224
+            ],
+            "worldPoint": [
+              -44.697200775146484,
+              63.782257080078125,
+              6.180638313293457
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 2.049841539533229
+          },
+          {
+            "name": "East pier lower front parapet west corner",
+            "imagePixel": [
+              313.6,
+              195.20000000000005
+            ],
+            "originalImagePixel": [
+              196,
+              197
+            ],
+            "worldPoint": [
+              40.01472854614258,
+              58.957496643066406,
+              -34.87919616699219
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "fit",
+            "residualPixels": 13.83077337747889
+          },
+          {
+            "name": "West pier rear upper east corner",
+            "imagePixel": [
+              1014.4000000000001,
+              236.8
+            ],
+            "originalImagePixel": [
+              634,
+              223
+            ],
+            "worldPoint": [
+              -53.30183792114258,
+              59.092288970947266,
+              -19.855823516845703
+            ],
+            "confidence": "manually identified permanent feature; source mesh is approximate",
+            "use": "check",
+            "residualPixels": 4.88683917952269
+          }
+        ],
+        "inspectionCutaway": {
+          "nearPlaneMeters": 60,
+          "reason": "Exclude the unmodeled private Tower interior at the inferred photographic viewpoint. Not gameplay or performance acceptance."
+        }
+      },
+      "notes": "Undated photograph; no EXIF calibration. The camera is a best fit under centered, zero-distortion assumptions. Manual-pick sensitivity is recorded. Do not infer surveyed dimensions from the fitted camera. Municipal controls and current game geometry are distinct."
+    },
+    {
+      "id": "north-street-tower",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          0,
+          1.7,
+          -35
+        ],
+        "target": [
+          0,
+          20,
+          -160
+        ],
+        "fov": 70,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "square-img_ekimaesquare_01",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_ekimaesquare_01.jpg",
+        "localFile": "photos/square-img_ekimaesquare_01.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:37.947777+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "Tower shaft center",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Tower hotel roof west corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Tower hotel roof east corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "central bus canopy end",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "station return corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Porta entrance corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "hachijo-terrace",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          -60,
+          3,
+          125
+        ],
+        "target": [
+          10,
+          4,
+          125
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "hachijo-municipal-brochure",
+        "url": "https://www2.city.kyoto.lg.jp/html/shikai/img/joho/kankobutsu/siryou/H28/13-2.pdf",
+        "localFile": "plans/hachijo-municipal-brochure.pdf",
+        "date": "2016",
+        "retrievedAt": "2026-09-27T05:32:30.291351+00:00",
+        "page": 2
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "terrace west end",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "terrace east end",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "taxi stand canopy",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "bus lane curb",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "sunken garden edge",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "south entrance axis",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Municipal plan establishes topology only; select a pedestrian photo before fitting."
+    },
+    {
+      "id": "south-facade-plaza",
+      "lighting": "day",
+      "camera": {
+        "position": [
+          0,
+          12,
+          210
+        ],
+        "target": [
+          -15,
+          24,
+          60
+        ],
+        "fov": 60,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "hachijo-completion",
+        "url": "https://www.city.kyoto.lg.jp/tokei/cmsfiles/contents/0000301/301545/kanseikinen.pdf",
+        "localFile": "plans/hachijo-completion.pdf",
+        "date": "2016-2017",
+        "retrievedAt": "2026-09-27T05:32:29.975566+00:00",
+        "page": 6
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "west facade end",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "east facade end",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "central entrance axis",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "terrace canopy west end",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "terrace canopy east end",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "taxi island corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "grand-staircase-evening",
+      "lighting": "evening",
+      "camera": {
+        "position": [
+          -72.3475413656327,
+          21.17136180701084,
+          -4.446848357668717
+        ],
+        "target": [
+          -113.1161574717448,
+          33.117228624532814,
+          21.920104571528174
+        ],
+        "fov": 66.20629060243228,
+        "rollDegrees": 1.5436001613856478
+      },
+      "source": {
+        "id": "square-img_grandstaircase_03",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_grandstaircase_03.jpg",
+        "localFile": "photos/square-img_grandstaircase_03.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:37.606301+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "first riser west corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "first riser east corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "north escalator lower newel",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "north escalator upper landing",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "south facade band intersection",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "top stair portal",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "east-square-evening",
+      "lighting": "evening",
+      "camera": {
+        "position": [
+          112,
+          36,
+          6
+        ],
+        "target": [
+          58,
+          40,
+          3
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "square-img_eastsquare_04",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_eastsquare_04.jpg",
+        "localFile": "photos/square-img_eastsquare_04.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:35.363060+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "yellow volume corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "globe shelter base",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "south facade corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "north parapet step",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "central tree bed corner",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "Skyway portal",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    },
+    {
+      "id": "skyway-evening",
+      "lighting": "evening",
+      "camera": {
+        "position": [
+          -61.616039,
+          46.85,
+          -2.326107
+        ],
+        "target": [
+          67.074397,
+          46.85,
+          -2.326107
+        ],
+        "fov": 65,
+        "rollDegrees": 0
+      },
+      "source": {
+        "id": "square-img_skyway_03",
+        "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/service/square/img/img_skyway_03.jpg",
+        "localFile": "photos/square-img_skyway_03.jpg",
+        "date": "Undated; retrieved 2026-09-27 UTC",
+        "retrievedAt": "2026-09-27T05:37:36.362958+00:00",
+        "page": null
+      },
+      "registration": {
+        "status": "initial inspection pose; photo registration pending",
+        "maxResidualPixels": null,
+        "tolerancePixels": 25.6,
+        "anchors": [
+          {
+            "name": "left mullion foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "right mullion foot",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "left upper truss node",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "right upper truss node",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "far corridor portal",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          },
+          {
+            "name": "continuous handrail endpoint",
+            "imagePixel": null,
+            "worldPoint": null,
+            "confidence": "unassessed"
+          }
+        ]
+      },
+      "notes": "Reference date unknown unless explicitly recorded; image colors are not calibrated albedo."
+    }
+  ]
+}

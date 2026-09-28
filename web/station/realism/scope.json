@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "date": "2026-09-27",
+  "status": "Authoring boundary fixed for this goal; geometry registration and photograph matching remain in progress",
+  "coordinates": "Metres. Authoring XY: X east, Y north. Native: x=X, z=Y, y=height. Browser: x=X, z=-Y, y=height.",
+  "frameSha256": "841ad51e5808b6e15f483a46c14f6306865e0d5aa25dc3d64c83a33e936852cd",
+  "referencePeriod": "September 2026 public configuration; leaf-on late summer",
+  "detailedEnvelopeXY": {
+    "x": [
+      -330,
+      250
+    ],
+    "y": [
+      -330,
+      220
+    ]
+  },
+  "boundaryPolicy": "This rectangle bounds detailed public space and immediately adjoining street-facing facades. Finish the entire visible facade when the rectangle intersects it; do not cut a building at the boundary. Private interiors and additional blocks remain out of scope. Beyond it, retain economical skyline/rail scenery where visible, with no abrupt ground or horizon seams.",
+  "zones": [
+    {
+      "id": "station-public",
+      "label": "Station public complex",
+      "boundsXY": {
+        "x": [
+          -300,
+          215
+        ],
+        "y": [
+          -225,
+          50
+        ]
+      },
+      "scope": "Main north building, free passage, public upper spaces, Hachijo station frontage; tracks and platform roofs are visible scenery, not operational or unrestricted playable routes."
+    },
+    {
+      "id": "karasuma",
+      "label": "Karasuma plaza and immediate street faces",
+      "boundsXY": {
+        "x": [
+          -330,
+          250
+        ],
+        "y": [
+          29,
+          220
+        ]
+      },
+      "scope": "Forecourt, transit islands and shelters, pedestrian areas, pavement, planting and adjoining street-facing building facades."
+    },
+    {
+      "id": "hachijo",
+      "label": "Hachijo plaza and immediate street faces",
+      "boundsXY": {
+        "x": [
+          -330,
+          250
+        ],
+        "y": [
+          -330,
+          -190
+        ]
+      },
+      "scope": "Southern public station frontage, terraces, pedestrian spaces, taxi/bus infrastructure, road margins, planting and adjoining street-facing facades."
+    }
+  ],
+  "zoneLimits": "Zone boxes are overlapping work partitions, not cadastral boundaries or claims of public access. Resolve individual edges and circulation with the retained station and municipal plans.",
+  "evidence": {
+    "dataset": "https://www.geospatial.jp/ckan/dataset/plateau-26100-kyoto-shi-2024",
+    "gmlSha256": "068052fc73eb531626d3134153080c0132f199a5f2302798c13867e66a95c553",
+    "tile": "52353680",
+    "registeredFootprintsSha256": "64ffd6491b0bd80d74e9b937c20a7b7fe789670c2809ac24c9f6b4d59e137039",
+    "northStationBuilding": {
+      "sourceBuildingId": "26100-bldg-466068",
+      "creationDate": "2024-03-22",
+      "sourceSurveyYear": "2025",
+      "lod2SurfaceBoundsXYZ": [
+        [
+          -288.7845166764153,
+          189.25813568682133
+        ],
+        [
+          -44.17873918855131,
+          48.51637956910244
+        ],
+        [
+          -1.1374288329477693,
+          65.12584208705223
+        ]
+      ],
+      "lod2ExteriorVertexCount": 1860,
+      "id": "bldg_715decd8-65ed-44b0-a98f-a2a3e87c8c7f",
+      "name": "京都駅",
+      "measuredHeight": "66.3",
+      "areaM2": 30580.038390260783,
+      "boundsXY": [
+        [
+          -288.7844809757663,
+          189.25692521579404
+        ],
+        [
+          -44.17554926630246,
+          48.511830795570376
+        ]
+      ]
+    },
+    "plans": [
+      "research/kyoto-station/plans/hachijo-municipal-brochure.pdf",
+      "research/kyoto-station/plans/hachijo-completion.pdf",
+      "research/kyoto-station/architecture/world-architecture-1997.pdf"
+    ]
+  },
+  "uncertainties": [
+    "The retained municipal frame aligns existing source assets; independent image/survey residuals remain unmeasured.",
+    "LOD0 roof edges establish approximate horizontal building coverage; they do not establish ground-level wall positions, thresholds, or public access.",
+    "Multiple records are named Kyoto Station. Use unique sourceBuildingId and GML ID, never name alone.",
+    "Source heights and dates can differ by object and acquisition type. The northern complex has measuredHeight 66.3 m and LOD2 local roof max 65.126 m; do not uniformly rescale the current station to that value."
+  ],
+  "attribution": "Processed by Kyoto Bounce from Kyoto City / MLIT Project PLATEAU 2024 Kyoto City open 3D data. Coordinate transformation, boundary and annotations are our work. Source policy: https://www.mlit.go.jp/plateau/site-policy/ (checked 2026-09-27). Public Data License 1.0; policy permits CC BY 4.0 use. Retain source and modification credits in eventual asset pack."
+}

@@ -1,0 +1,64 @@
+// Source-anchored western Skyway bridge. Independent construction component.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+import * as T from 'three';
+import {writeGLB,readGLB} from '../../../tools/optimize-browser-assets.mjs';
+const [fitPath,layoutPath,out,datumPath]=process.argv.slice(2);assert(fitPath&&layoutPath&&out);assert(resolve(out).startsWith(resolve('.local')+'/'));await mkdir(out,{recursive:true});
+const hash=b=>createHash('sha256').update(b).digest('hex'),fitBytes=await readFile(fitPath),fit=JSON.parse(fitBytes),layoutBytes=await readFile(layoutPath);
+assert.equal(fit.source.sha256,'0df73fd383c265904711bf09e4a628d109f7792dc9e4be524d3f531666df06a1');
+const registrationBytes=await readFile('web/station/realism/registrations/west-skyway.json'),spec=JSON.parse(registrationBytes);assert.equal(hash(fitBytes),spec.fitSha256);
+const datumBytes=datumPath?await readFile(datumPath):null,datum=datumBytes?JSON.parse(datumBytes):null,offsetY=datum?.bridgeHeightOffsetM||0;
+if(datum){assert.equal(datum.fitSha256,hash(fitBytes));assert(offsetY>0&&offsetY<.3);}
+const ends=fit.westBridge.centerEndpointsRenderer.map(p=>new T.Vector3().fromArray(p).add(new T.Vector3(0,offsetY,0))),axis=ends[1].clone().sub(ends[0]),length=axis.length(),forward=axis.clone().normalize(),right=new T.Vector3(-forward.z,0,forward.x).normalize();
+const width=fit.westBridge.sourceOuterWidthsM.reduce((a,b)=>a+b)/2,half=width/2,level=t=>T.MathUtils.lerp(ends[0].y,ends[1].y,t),at=(s,w,h)=>{const p=ends[0].clone().addScaledVector(forward,s).addScaledVector(right,w);p.y=level(s/length)+h;return p.toArray()};
+assert(length>29&&length<30&&width>3&&width<3.2);
+const materials=[
+ {name:'West Skyway | clear glazing',pbrMetallicRoughness:{baseColorFactor:[.65,.79,.83,.19],roughnessFactor:.12,metallicFactor:.05},alphaMode:'BLEND',doubleSided:true},
+ {name:'West Skyway | grey metal framing',pbrMetallicRoughness:{baseColorFactor:[.45,.48,.48,1],roughnessFactor:.36,metallicFactor:.5}},
+ {name:'West Skyway | dark walking surface',pbrMetallicRoughness:{baseColorFactor:[.12,.135,.14,1],roughnessFactor:.78,metallicFactor:0}},
+ {name:'West Skyway | pale opaque south panels',pbrMetallicRoughness:{baseColorFactor:[.69,.71,.70,1],roughnessFactor:.46,metallicFactor:.18}}
+];
+const batches=materials.map(()=>({positions:[],indices:[]})),panels=[],members=[];
+function add(id,vertices,triangles,material,role){const p={id,vertices:vertices.map(([x,y,z])=>({x,y,z:-z})),triangles:triangles.flatMap((_,i)=>i%3?[]:[triangles[i+2],triangles[i+1],triangles[i]]),material:material===0?'glass':material===2?'floor':'roof',browserMaterial:material,role,collision:true};panels.push(p);const g=batches[material],start=g.positions.length/3;g.positions.push(...vertices.flat());g.indices.push(...triangles.map(i=>i+start));}
+const boxTris=[0,2,1,0,3,2,4,5,6,4,6,7,0,1,5,0,5,4,1,2,6,1,6,5,2,3,7,2,7,6,3,0,4,3,4,7];
+function box(id,s0,s1,w0,w1,h0,h1,material,role){add(id,[[s0,w0,h0],[s1,w0,h0],[s1,w1,h0],[s0,w1,h0],[s0,w0,h1],[s1,w0,h1],[s1,w1,h1],[s0,w1,h1]].map(p=>at(...p)),boxTris.flatMap((_,i)=>i%3?[]:[boxTris[i+2],boxTris[i+1],boxTris[i]]),material,role)}
+function beam(id,a,b,side=spec.frameSideM){const va=new T.Vector3().fromArray(a),vb=new T.Vector3().fromArray(b),d=va.distanceTo(vb);assert(d>.001);const geometry=new T.BoxGeometry(side,side,d),mesh=new T.Mesh(geometry);mesh.position.copy(va).add(vb).multiplyScalar(.5);mesh.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),vb.sub(va).normalize());mesh.updateMatrix();geometry.applyMatrix4(mesh.matrix);const p=geometry.attributes.position;add(id,Array.from({length:p.count},(_,i)=>[p.getX(i),p.getY(i),p.getZ(i)]),Array.from(geometry.index.array),1,'bridge-frame');geometry.dispose();members.push({id,lengthM:d,sideM:side});}
+function prism(id,quad,thickness,material,role){let pts=quad.map(p=>new T.Vector3().fromArray(p));const normal=pts[1].clone().sub(pts[0]).cross(pts[2].clone().sub(pts[0])).normalize();const back=pts.map(p=>p.clone().addScaledVector(normal,-thickness));const verts=[...pts,...back].map(p=>p.toArray());const tris=[0,1,2,0,2,3,6,5,4,7,6,4];for(let a=0;a<4;a++){let b=(a+1)%4;tris.push(b,a,a+4,b,a+4,b+4)}add(id,verts,tris,material,role)}
+box('west-skyway-deck',0,length,-half,half,-(datum?offsetY:spec.deckThicknessM),0,2,'bridge-floor');
+const count=Math.ceil(length/spec.targetBayM),stations=Array.from({length:count+1},(_,i)=>i*length/count),archCount=spec.archSegments,crown=fit.westBridge.sourceFloorToRoofM-offsetY,spring=crown-spec.archRiseM;
+const arch=Array.from({length:archCount+1},(_,i)=>{const theta=Math.PI*i/archCount;return [-half*Math.cos(theta),spring+spec.archRiseM*Math.sin(theta)]});
+for(let i=0;i<stations.length;i++){
+ const s=stations[i];for(const sign of [-1,1])beam(`west-skyway-post-${i}-${sign}`,at(s,sign*half,0),at(s,sign*half,spring));
+ // Sweep one continuous rectangular rib; separate boxes would leave jagged joints.
+ const vertices=[],triangles=[];for(let k=0;k<arch.length;k++){const theta=Math.PI*k/archCount,[w,h]=arch[k],normal=new T.Vector2(-spec.archRiseM*Math.cos(theta),half*Math.sin(theta)).normalize(),t=spec.frameSideM/2;for(const [ds,dn]of[[-t,-t],[t,-t],[t,t],[-t,t]])vertices.push(at(s+ds,w+normal.x*dn,h+normal.y*dn));}
+ for(let k=0;k<archCount;k++)for(let edge=0;edge<4;edge++){const a=k*4+edge,b=k*4+(edge+1)%4,c=b+4,d=a+4;triangles.push(a,c,b,a,d,c);}triangles.push(0,1,2,0,2,3);const last=archCount*4;triangles.push(last,last+2,last+1,last,last+3,last+2);add(`west-skyway-arch-${i}`,vertices,triangles.flatMap((_,j)=>j%3?[]:[triangles[j+2],triangles[j+1],triangles[j]]),1,'bridge-frame');members.push({id:`west-skyway-arch-${i}`,kind:'continuous arched rib',sideM:spec.frameSideM});
+}
+for(let i=1;i<stations.length;i++){
+ const a=stations[i-1],b=stations[i];
+ for(const sign of [-1,1]){
+  const w=sign*half,lo=sign===1?spec.opaqueHeightM:spec.baseHeightM;
+  const points=[at(a,w,lo),at(b,w,lo),at(b,w,spring),at(a,w,spring)];if(sign<0)points.reverse();prism(`west-skyway-side-glass-${i}-${sign}`,points,spec.glassThicknessM,0,'bridge-glazing');
+  box(`west-skyway-base-${i}-${sign}`,a,b,w-spec.baseThicknessM/2,w+spec.baseThicknessM/2,0,lo,sign===1?3:1,'bridge-base');
+  for(const h of [lo,spring])beam(`west-skyway-long-frame-${i}-${sign}-${h.toFixed(2)}`,at(a,w,h),at(b,w,h));
+  const railW=w-sign*spec.railInsetM;beam(`west-skyway-handrail-${i}-${sign}`,at(a,railW,spec.railHeightM),at(b,railW,spec.railHeightM),spec.railSideM);
+  beam(`west-skyway-rail-bracket-${i}-${sign}`,at(a,w,spec.railHeightM),at(a,railW,spec.railHeightM),spec.bracketSideM);
+  if(sign<0)for(const h of spec.northRailHeightsM)beam(`west-skyway-north-rail-${i}-${h}`,at(a,railW,h),at(b,railW,h),spec.bracketSideM);
+ }
+ const vertices=[],triangles=[];for(let k=0;k<arch.length;k++){const theta=Math.PI*k/archCount,[w,h]=arch[k],normal=new T.Vector2(-spec.archRiseM*Math.cos(theta),half*Math.sin(theta)).normalize();for(const [s,d]of[[a,-spec.glassThicknessM],[b,-spec.glassThicknessM],[b,0],[a,0]])vertices.push(at(s,w+normal.x*d,h+normal.y*d));}
+ for(let k=0;k<archCount;k++)for(let edge=0;edge<4;edge++){const x=k*4+edge,y=k*4+(edge+1)%4,z=y+4,q=x+4;triangles.push(x,z,y,x,q,z);}triangles.push(0,1,2,0,2,3);const last=archCount*4;triangles.push(last,last+2,last+1,last,last+3,last+2);add(`west-skyway-roof-glass-${i}`,vertices,triangles.flatMap((_,j)=>j%3?[]:[triangles[j+2],triangles[j+1],triangles[j]]),0,'bridge-glazing');
+}
+// Continuous crown/spring glazing bars; intermediate longitudinal bars follow the
+// photographed enclosure's broad panes, rather than every numerical arc segment.
+for(const k of [archCount/2])beam(`west-skyway-roof-long-${k}`,at(0,...arch[k]),at(length,...arch[k]),spec.frameSideM);
+// Weld coincident authoring vertices for topological edge checks, then check winding.
+let minimumVolumeM3=Infinity;for(const p of panels){const edges=new Map(),key=v=>[v.x,v.y,v.z].map(x=>x.toFixed(6)).join(',');for(let i=0;i<p.triangles.length;i+=3)for(let e=0;e<3;e++){const a=key(p.vertices[p.triangles[i+e]]),b=key(p.vertices[p.triangles[i+(e+1)%3]]);assert.notEqual(a,b,'Degenerate edge');const k=[a,b].sort().join('|'),row=edges.get(k)||{count:0,balance:0};row.count++;row.balance+=a<b?1:-1;edges.set(k,row);}assert([...edges.values()].every(e=>e.count===2&&e.balance===0),`Non-manifold component: ${p.id}`);let volume=0;const vs=p.vertices.map(v=>new T.Vector3(v.x,v.y,-v.z));for(let i=0;i<p.triangles.length;i+=3){const a=vs[p.triangles[i+2]],b=vs[p.triangles[i+1]],c=vs[p.triangles[i]];volume+=a.dot(b.clone().cross(c))/6;}assert(volume>1e-8,`Inverted or zero-volume component: ${p.id} (${volume})`);minimumVolumeM3=Math.min(minimumVolumeM3,volume);}
+const gltf={asset:{version:'2.0',generator:'Kyoto source-anchored western Skyway enclosure'},scene:0,scenes:[{nodes:materials.map((_,i)=>i)}],nodes:materials.map((m,i)=>({name:m.name,mesh:i})),meshes:[],materials,buffers:[],bufferViews:[],accessors:[]},parts=[];let offset=0;
+function append(typed,type,componentType,count,target,min,max){const b=Buffer.from(typed.buffer,typed.byteOffset,typed.byteLength),view=gltf.bufferViews.length;gltf.bufferViews.push({buffer:0,byteOffset:offset,byteLength:b.length,target});parts.push(b);offset+=b.length;const index=gltf.accessors.length;gltf.accessors.push({bufferView:view,componentType,count,type,...(min?{min,max}:{})});return index;}
+for(let material=0;material<batches.length;material++){const g=batches[material],p=new Float32Array(g.positions),ids=new Uint32Array(g.indices),min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];for(let i=0;i<p.length;i++){let k=i%3;min[k]=Math.min(min[k],p[i]);max[k]=Math.max(max[k],p[i]);}const geometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(p,3)).setIndex(new T.BufferAttribute(ids,1));geometry.computeVertexNormals();const normals=geometry.attributes.normal.array;const position=append(p,'VEC3',5126,p.length/3,34962,min,max),normal=append(normals,'VEC3',5126,normals.length/3,34962),index=append(ids,'SCALAR',5125,ids.length,34963);gltf.meshes.push({primitives:[{attributes:{POSITION:position,NORMAL:normal},indices:index,material,mode:4}]});geometry.dispose();}gltf.buffers.push({byteLength:offset});
+const glb=writeGLB(gltf,Buffer.concat(parts)),nativeBytes=Buffer.from(JSON.stringify({schemaVersion:1,coordinates:'Native X east,Y up,Z north',panels})+'\n');await writeFile(out+'/west-skyway.glb',glb);await writeFile(out+'/native-panels.json',nativeBytes);
+const decoded=readGLB(await readFile(out+'/west-skyway.glb')),saved=JSON.parse(await readFile(out+'/native-panels.json'));let cursors=materials.map(()=>0),icursors=materials.map(()=>0),maxError=0;
+for(const p of saved.panels){const m=p.browserMaterial,pr=decoded.json.meshes[m].primitives[0],pa=decoded.json.accessors[pr.attributes.POSITION],ia=decoded.json.accessors[pr.indices],pv=decoded.json.bufferViews[pa.bufferView],iv=decoded.json.bufferViews[ia.bufferView],at=cursors[m];for(const[i,v]of p.vertices.entries()){const q=[0,1,2].map(k=>decoded.bin.readFloatLE(pv.byteOffset+(at+i)*12+k*4));maxError=Math.max(maxError,Math.hypot(q[0]-v.x,q[1]-v.y,q[2]+v.z));}for(let i=0;i<p.triangles.length;i+=3)for(let k=0;k<3;k++)assert.equal(decoded.bin.readUInt32LE(iv.byteOffset+(icursors[m]+i+k)*4),at+p.triangles[i+2-k]);cursors[m]+=p.vertices.length;icursors[m]+=p.triangles.length;}
+assert(maxError<1e-5);
+const report={status:'Independent construction component; not installed in the playable station.',source:fit.source,fitSha256:hash(fitBytes),registrationSha256:hash(registrationBytes),inputLayoutSha256:hash(layoutBytes),geometry:{sourceEndpointsRenderer:fit.westBridge.centerEndpointsRenderer,...(datum?{floorEndpointsRenderer:ends.map(p=>p.toArray()),finishedFloorOffsetM:offsetY,datumSha256:hash(datumBytes),datumPath}:{}),lengthM:length,outerWidthM:width,sourceFloorToRoofM:fit.westBridge.sourceFloorToRoofM,...(datum?{floorToRoofM:crown}:{}),springHeightM:spring,archRiseM:spec.archRiseM,bays:count,actualBayM:length/count,archSegments:archCount,panels:panels.length,glassPanels:panels.filter(p=>p.material==='glass').length,frameMembers:members.length,triangles:batches.reduce((n,b)=>n+b.indices.length/3,0)},visualNativeCoordinateMaxErrorM:maxError,minimumClosedVolumeM3:minimumVolumeM3,additionalProbeTriangles:panels.filter(p=>p.id.startsWith('west-skyway-roof-glass-')).flatMap(p=>[8,16,24,31].map(k=>({id:p.id,triangleOffset:k*24+12}))),outputs:{glbFile:'west-skyway.glb',glbSha256:hash(glb),nativePanelsSha256:hash(nativeBytes)},limits:datum?[...spec.limits,...datum.limits]:spec.limits};await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({geometry:report.geometry,outputs:report.outputs,maximumCoordinateErrorM:maxError,closedManifoldPanels:panels.length}));

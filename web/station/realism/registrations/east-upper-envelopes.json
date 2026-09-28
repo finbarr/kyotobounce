@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "url": "https://data.city.kyoto.lg.jp/resource/?id=21224",
+    "attribution": "Kyoto City",
+    "license": "CC BY 4.0",
+    "sha256": "0df73fd383c265904711bf09e4a628d109f7792dc9e4be524d3f531666df06a1"
+  },
+  "inputLayoutSha256": "36927470d62f429ff0b31f884f9bd1db616b689508db6e7416b653ef24bd48ba",
+  "auditSha256": "43591f3aab6a0d4d0a7d20fefceb25240d07c87bb007917c136b2dc8ef59428b",
+  "removeBoxIds": [
+    "east-north-roof",
+    "east-north-upper-backing"
+  ],
+  "boxes": [
+    {
+      "id": "east-north-roof",
+      "center": {
+        "x": 88.106894,
+        "y": 59.41,
+        "z": 14.326107
+      },
+      "size": {
+        "x": 49.064994,
+        "y": 0.28,
+        "z": 11
+      },
+      "material": "silver",
+      "role": "roof",
+      "yaw": 0,
+      "collision": true,
+      "appearance": "blender-9cb5b3c04b60",
+      "bounds": {
+        "x": [
+          63.574397,
+          112.63939099999999
+        ],
+        "y": [
+          59.269999999999996,
+          59.55
+        ],
+        "z": [
+          8.826107,
+          19.826107
+        ]
+      }
+    },
+    {
+      "id": "east-north-upper-backing",
+      "center": {
+        "x": 88.106894,
+        "y": 48.325,
+        "z": 9.146107
+      },
+      "size": {
+        "x": 49.064994,
+        "y": 22.45,
+        "z": 0.25
+      },
+      "material": "dark-metal",
+      "role": "envelope",
+      "yaw": 0,
+      "collision": true,
+      "appearance": "blender-1f9da6667ce5",
+      "bounds": {
+        "x": [
+          63.574397,
+          112.63939099999999
+        ],
+        "y": [
+          37.1,
+          59.550000000000004
+        ],
+        "z": [
+          9.021107,
+          9.271107
+        ]
+      }
+    }
+  ],
+  "sourceRoofVolumeIntersections": 0,
+  "sourceBackingIntersections": 39,
+  "sourceBackingParallelAreaM2": 0,
+  "sectionXM": [
+    64,
+    70,
+    76,
+    85,
+    95,
+    105,
+    112
+  ],
+  "independentReference": {
+    "title": "World Architecture 61, November 1997",
+    "url": "https://www.usmodernist.org/WORLD/WA-1997-61.pdf",
+    "pdfPages": [
+      45,
+      46
+    ],
+    "printedPages": [
+      43,
+      44
+    ],
+    "features": [
+      "longitudinal sections",
+      "east/west elevations",
+      "station axonometric"
+    ],
+    "sha256": "615f46c740da214c978722d2e22e529bee058de8e129f5837a3ecc6ea42ec8eb"
+  },
+  "decision": "Remove the two generic draft boxes; source-derived eastern roof and retained municipal attachments represent the envelope. Do not translate the boxes onto another building wall.",
+  "limits": [
+    "Source model is coarse and sections are historical; this is an envelope correction, not an interior survey.",
+    "Other old canopy/Skyway geometry remains pending coordinated replacement."
+  ]
+}

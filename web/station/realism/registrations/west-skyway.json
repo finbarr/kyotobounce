@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "fitSha256": "e619a0cdacc2c3a459e18574fc38f6bc684ddae9bce0c7ba5c964462d4863753",
+  "references": [
+    {
+      "id": "zekkeikana-skyway42",
+      "url": "https://www.zekkeikana.com/kyoto/shimogyoku/skyway/skyway42.jpg",
+      "date": "2014-07-24",
+      "observation": "Arched glazed western approach, repeated portal ribs, dark floor, north low rails, opaque south base and handrail."
+    },
+    {
+      "id": "floor-10f",
+      "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_10f.svg",
+      "observation": "Diagonal western connection to straight central corridor; three northern viewing bays and eastern escalators. Schematic, not metric."
+    }
+  ],
+  "targetBayM": 1.3,
+  "archSegments": 32,
+  "archRiseM": 0.55,
+  "frameSideM": 0.08,
+  "glassThicknessM": 0.024,
+  "deckThicknessM": 0.16,
+  "opaqueHeightM": 0.9,
+  "baseHeightM": 0.12,
+  "baseThicknessM": 0.08,
+  "railInsetM": 0.14,
+  "railHeightM": 1.05,
+  "railSideM": 0.045,
+  "bracketSideM": 0.025,
+  "northRailHeightsM": [
+    0.55,
+    0.78
+  ],
+  "limits": [
+    "Municipal faces 9/10 establish the coarse source footprint and floor plane; these are not surveyed finished dimensions.",
+    "The source bridge top is flat. A shallow arched enclosure is independently visible in the dated photograph; .55m rise, 1.3m target pitch and member sections are explicit authoring hypotheses pending camera registration.",
+    "The source 3m floor-to-top envelope is retained; actual glass curvature, fabrication details, clear width and material coefficients need refinement.",
+    "This component has open ends for integration with the separately registered restaurant approach and central Skyway; it does not prove public route continuity.",
+    "Three viewing bays in the official plan belong to the central corridor and are not included in this western bridge component.",
+    "Photographs and maps are research references only; no source image is embedded as a game texture."
+  ]
+}

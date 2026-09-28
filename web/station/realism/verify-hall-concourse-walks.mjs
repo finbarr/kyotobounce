@@ -1,0 +1,32 @@
+// Native support, headroom and actual capsule movement across the hall/concourse seams.
+import assert from 'node:assert/strict';import{readFile,writeFile,mkdir}from'node:fs/promises';import{resolve}from'node:path';import{createHash,randomUUID}from'node:crypto';import{setTimeout as delay}from'node:timers/promises';import{PhysicsWorker}from'../../worker.ts';import*as T from'three';
+const[basePath,specPath,assembly,out]=process.argv.slice(2);assert(out&&resolve(out).startsWith(resolve('.local')+'/'));await mkdir(out,{recursive:false});
+const sha=b=>createHash('sha256').update(b).digest('hex'),sb=await readFile(specPath),s=JSON.parse(sb),nb=await readFile(assembly+'/native-panels.json'),n=JSON.parse(nb),build=JSON.parse(await readFile(assembly+'/report.json'));assert.equal(build.outputs.nativePanelsSha256,sha(nb));
+const layout=JSON.parse(await readFile(basePath));layout.panels=n.panels;for(const k of ['boxes','beams','flights'])layout[k]=[];layout.escalators=n.escalators;layout.status='Private hall/concourse seam walking check';const lb=Buffer.from(JSON.stringify(layout)+'\n');await writeFile(out+'/probe-layout.json',lb);
+process.env.KYOTO_LAYOUT=resolve(out+'/probe-layout.json');process.env.KYOTO_WORKER_LOG=resolve(out+'/worker.log');const worker=new PhysicsWorker(),id='hall-concourse-proof';let state;worker.on('message',m=>{if(m.type==='state'&&m.id===id)state=m});
+const until=async fn=>{const end=performance.now()+90000;while(!fn()){assert(performance.now()<end,'Native observation timed out');await delay(25)}};
+const root=new T.Group();for(const p of n.panels.filter(p=>p.collision!==false)){const g=new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(p.vertices.flatMap(v=>[v.x,v.y,-v.z]),3));const ids=[];for(let i=0;i<p.triangles.length;i+=3)ids.push(...p.triangles.slice(i,i+3).reverse());g.setIndex(ids);root.add(new T.Mesh(g,new T.MeshBasicMaterial({side:T.FrontSide})));}root.updateMatrixWorld(true);const browserRay=new T.Raycaster();
+const report={meaning:'Four hall/concourse floor seams and authored concourse feature support; not full station or completed-course acceptance.',specSha256:sha(sb),nativeSha256:sha(nb),glbSha256:build.outputs.glbSha256,supports:[],walks:[],pass:false};
+try{await worker.start();await until(()=>worker.ready);worker.send({type:'join',id});await until(()=>state?.players?.length);
+let buffer='';const pending=new Map();worker.socket.on('data',chunk=>{buffer+=chunk;let k;while((k=buffer.indexOf('\n'))>=0){const m=JSON.parse(buffer.slice(0,k));buffer=buffer.slice(k+1);pending.get(m.request)?.(m);pending.delete(m.request)}});
+const ray=async payload=>{const request=randomUUID();let timer;const p=new Promise((res,rej)=>{pending.set(request,res);timer=setTimeout(()=>{pending.delete(request);rej(Error('Ray timed out'))},10000)});worker.send({...payload,id,type:'place',request});try{return await p}finally{clearTimeout(timer)}};
+
+const F=0,point=(x,z)=>({x,y:F,z:-z});
+const pairs=[['north',point(-5,-11),point(-5,-9)],['east',point(19,0),point(17,0)],['west',point(-17,0),point(-15,0)],['gate-rear',point(1,12),point(1,10)]];
+const routes=pairs.map(([id,start,end])=>({id,start,end,checks:Array.from({length:7},(_,i)=>({x:start.x+(end.x-start.x)*i/6,y:F,z:start.z+(end.z-start.z)*i/6}))}));
+if(!process.env.KYOTO_SUPPORT_ONLY)for(const route of routes){
+ for(const p of route.checks){
+  const floor=await ray({slot:'waypoint',radius:.1,origin:{...p,y:p.y+.35},direction:{x:0,y:-1,z:0}});assert(floor.disk?.surface,'Missing floor');assert(Math.abs(floor.disk.center.y-s.floorY)<.001);
+  const head=await ray({slot:'waypoint',radius:.1,origin:{...p,y:p.y+1.8},direction:{x:0,y:1,z:0}});browserRay.set(new T.Vector3(p.x,p.y+1.8,-p.z),new T.Vector3(0,1,0));const expected=browserRay.intersectObject(root,true)[0];if(expected){assert(head.disk?.surface,'Missing expected ceiling');assert(Math.abs(head.disk.center.y-expected.point.y)<.001,'Ceiling height mismatch');assert(head.disk.center.y-s.floorY>2.1,'Insufficient head clearance');}else{assert(!head.disk?.surface,'Native overhead obstruction in browser opening');assert.equal(head.ok,false);}report.supports.push({route:route.id,point:p,floor:floor.disk,head:head.disk,expectedCeilingY:expected?.point.y??null});
+ }
+ const {start,end}=route,placed=await worker.request({type:'place',id,slot:'start',radius:.25,origin:{...start,y:start.y+.4},direction:{x:0,y:-1,z:0}});assert(placed.ok,'Invalid start');await worker.request({type:'design-start',id,start:placed.disk});await delay(150);
+ for(const target of [end,start]){
+  const samples=[],deadline=performance.now()+30000;
+  while(true){const feet=state.players.find(p=>p.id===id).feet,dx=target.x-feet.x,dz=target.z-feet.z,distance=Math.hypot(dx,dz);samples.push(feet);assert(Math.abs(feet.y-s.floorY)<.1,'Capsule left hall/concourse floor');if(distance<.15)break;assert(performance.now()<deadline,'Corridor walk blocked: '+route.id);worker.send({type:'input',id,x:0,z:Math.min(1,distance/.5),yaw:Math.atan2(dx,dz)*180/Math.PI,pitch:0,fast:false});await delay(70);}
+  worker.send({type:'input',id,x:0,z:0,fast:false});await delay(100);report.walks.push({route:route.id,target,samples,pass:true});
+ }
+}
+const catalogBytes=await readFile('web/starter-challenges.json'),catalog=JSON.parse(catalogBytes);report.catalogSha256=sha(catalogBytes);report.courseSupports=[];
+for(const course of catalog)for(const feature of [course.start,...(course.waypoints||[]),...(course.goal?[course.goal]:[])]){if(feature.surface!=='concourse')continue;const p=feature.center;const result=await ray({slot:'waypoint',radius:.1,origin:{...p,y:p.y+.35},direction:{x:0,y:-1,z:0}});const pass=Boolean(result.ok&&result.disk?.surface&&Math.abs(result.disk.center.y-p.y)<.01);report.courseSupports.push({course:course.id,feature:feature.id||'start-or-goal',center:p,result,pass});}
+report.supportOnly=Boolean(process.env.KYOTO_SUPPORT_ONLY);report.courseConflicts=report.courseSupports.filter(p=>!p.pass).map(p=>({course:p.course,feature:p.feature,center:p.center,observed:p.result.disk,message:p.result.message}));report.pass=report.courseConflicts.length===0;console.log(JSON.stringify({pass:report.pass,supportOnly:report.supportOnly,supports:report.supports.length,walks:report.walks.length,courseSupports:report.courseSupports.length,courseConflicts:report.courseConflicts}));
+}catch(e){report.error=String(e);throw e}finally{worker.stop();await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');}

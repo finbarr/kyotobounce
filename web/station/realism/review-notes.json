@@ -1,0 +1,17 @@
+{
+  "central-hall": "The lattice and piers are present. Compare canopy depth and pier spacing before changing detail; floor and facade colors are flatter and darker than the reference. The current camera is an inspection pose, not a solved match.",
+  "grand-staircase": "The lower stair pose comes from an earlier partial fit. Upper silhouette, facade glazing and planting need review. Do not change the riser count from conflicting published height claims.",
+  "canopy-junction": "The candidate is too distant to judge the engineer's close-up node photograph. Fit the camera before adding connector plates, bolts or drainage details.",
+  "skyway-outward": "The camera looks along the corridor instead of squarely out through the reference window. The expected Tower and city are absent. Both registration and exterior restoration are required.",
+  "east-square": "The tree, globe shelter and yellow volume already exist. The modeled tree has almost no canopy and the facade response is too uniform. The framing needs adjustment to the operator's wider view.",
+  "roof-garden": "The sparse upright bamboo and flat grass do not reproduce the dense layered planting. Establish bed geometry and foliage season from the reference before adding vegetation instances.",
+  "west-square": "The curve, columns and side stair exist, but the spatial proportions, bright stone and reflective ceiling need a fitted comparison. Dark banded columns dominate this candidate view.",
+  "north-south-passage": "Current repeated columns and blank side wall omit the visual depth of the public concourse reference. The photo is oblique; the model view is axial, so pixel residuals would be misleading.",
+  "north-facade": "The station's complete exterior wings, facade paneling and transport foreground are missing or simplified. Do not scale the playable atrium to the published length of the whole complex.",
+  "north-street-tower": "The candidate shows an empty horizon where the Tower, hotel and transport plaza should be. The recovered city source can supply registered context after collision and texture-budget checks.",
+  "hachijo-terrace": "The south approach and terrace are absent. The selected municipal sheet is a plan, not a camera reference; retain it for topology and select a pedestrian photograph before solving this view.",
+  "south-facade-plaza": "The southern facade, terrace, transit lanes and paving are absent or simplified. The municipal completion photograph is on PDF page 6; extract and fit its photo region rather than fitting the whole brochure page.",
+  "grand-staircase-evening": "The original game light artwork runs, but surrounding facade reflections remain daylight-like. Preserve original artwork; use the reference to assess light placement and exposure, not to copy protected animation.",
+  "east-square-evening": "The selected viewpoint does not show the projection wall as the operator photograph does. Fit it first; planting, facade depth and reflected practical light need work.",
+  "skyway-evening": "The corridor has illuminated accents, but the reference lighting is warmer and more spatially continuous. Verify reflections and exposure after matching the camera; retain original light-show artwork."
+}

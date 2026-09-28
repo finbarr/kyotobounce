@@ -1,0 +1,370 @@
+{
+  "reference": {
+    "id": "structure-594",
+    "url": "https://www.kanebako-se.co.jp/works/view/240",
+    "localFile": "research/kyoto-station/photos/structure-594.jpg",
+    "sha256": "a04613917362befeed8717f157d685f64e7c6fa22086299475a8a74ee8d23a4a",
+    "size": [
+      800,
+      600
+    ],
+    "date": "Undated architectural photograph; permanent geometry only"
+  },
+  "sourceGeometry": {
+    "file": ".local/station-realism/station-shell/municipal-station.glb",
+    "sha256": "0df73fd383c265904711bf09e4a628d109f7792dc9e4be524d3f531666df06a1",
+    "status": "Municipal shell used for survey anchors, not current game geometry"
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "initialCamera": {
+    "position": [
+      5,
+      22,
+      -110
+    ],
+    "target": [
+      5,
+      40,
+      0
+    ],
+    "fov": 62,
+    "rollDegrees": 0,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "anchors": [
+    {
+      "id": "east-top-left",
+      "name": "East pier upper parapet east corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        128,
+        184
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        56.435325622558594,
+        63.87761688232422,
+        -27.16023826599121
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 4841,
+      "sourceInspectionPixel": [
+        291.8452369198925,
+        170.8105002271035
+      ]
+    },
+    {
+      "id": "east-roof-back-right",
+      "name": "East pier upper parapet west corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        207,
+        184
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        40.149227142333984,
+        63.87745666503906,
+        -26.894376754760742
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 4855,
+      "sourceInspectionPixel": [
+        402.7854376308859,
+        171.6603897866086
+      ]
+    },
+    {
+      "id": "glass-bottom-left",
+      "name": "Glazed hall facade lower east corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        219,
+        422
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        39.724151611328125,
+        15.440206527709961,
+        -28.205978393554688
+      ],
+      "sourceObject": "BuildingInstallation1481",
+      "sourceVertexIndex": 4985,
+      "sourceInspectionPixel": [
+        378.83555366990277,
+        508.0343540690838
+      ]
+    },
+    {
+      "id": "glass-bottom-right",
+      "name": "Glazed hall facade lower west corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        653,
+        422
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -52.9528694152832,
+        15.440206527709961,
+        -26.61513328552246
+      ],
+      "sourceObject": "BuildingInstallation1481",
+      "sourceVertexIndex": 3675,
+      "sourceInspectionPixel": [
+        1067.4462477882598,
+        507.06812905072445
+      ]
+    },
+    {
+      "id": "west-top-left",
+      "name": "West pier upper front east corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        658,
+        206
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -53.52586364746094,
+        59.09231948852539,
+        -33.372215270996094
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 3640,
+      "sourceInspectionPixel": [
+        1069.6576782561256,
+        182.11255525392062
+      ]
+    },
+    {
+      "id": "west-top-right",
+      "name": "West pier upper front west corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        753,
+        209
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -74.8512954711914,
+        59.09247970581055,
+        -33.01607131958008
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 3620,
+      "sourceInspectionPixel": [
+        1223.7007656493256,
+        183.29467110841708
+      ]
+    },
+    {
+      "id": "west-opening-upper-left",
+      "name": "West opening upper east corner",
+      "use": "check",
+      "confidence": "medium",
+      "imagePixel": [
+        690,
+        288
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -58.871883392333984,
+        43.75735855102539,
+        -33.289005279541016
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 448,
+      "sourceInspectionPixel": [
+        1123.0769075289309,
+        291.29698226722695
+      ]
+    },
+    {
+      "id": "roof-box-front-left",
+      "name": "Rear roof box front east upper corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        523,
+        222
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -34.62238311767578,
+        63.7822265625,
+        6.023516654968262
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 5699,
+      "sourceInspectionPixel": [
+        835.7919031636154,
+        248.83055961090426
+      ]
+    },
+    {
+      "id": "roof-box-front-right",
+      "name": "Rear roof box front west upper corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        559,
+        224
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -44.697200775146484,
+        63.782257080078125,
+        6.180638313293457
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 5683,
+      "sourceInspectionPixel": [
+        885.2624133432488,
+        249.09762510556257
+      ]
+    },
+    {
+      "id": "east-top-right",
+      "name": "East pier lower front parapet west corner",
+      "use": "fit",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        196,
+        197
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        40.01472854614258,
+        58.957496643066406,
+        -34.87919616699219
+      ],
+      "sourceObject": "Untitled202",
+      "sourceVertexIndex": 19962,
+      "sourceInspectionPixel": [
+        378.1029504818949,
+        177.93647313686677
+      ]
+    },
+    {
+      "id": "west-roof-back-east",
+      "name": "West pier rear upper east corner",
+      "use": "check",
+      "confidence": "provisional-high",
+      "imagePixel": [
+        634,
+        223
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -53.30183792114258,
+        59.092288970947266,
+        -19.855823516845703
+      ],
+      "sourceObject": "Untitled199",
+      "sourceVertexIndex": 778,
+      "sourceInspectionPixel": [
+        1007.8845650498778,
+        220.87597605134806
+      ]
+    }
+  ],
+  "rejectedCorrespondences": [
+    {
+      "id": "glass-top-left",
+      "name": "Canopy upper east junction",
+      "use": "check",
+      "confidence": "medium",
+      "imagePixel": [
+        233,
+        258
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        50.4388427734375,
+        56.93467712402344,
+        4.505733489990234
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 910,
+      "sourceInspectionPixel": [
+        410.53895629680767,
+        279.2786696726476
+      ],
+      "reason": "The visible canopy junction is an occlusion boundary, not the selected roof vertex."
+    },
+    {
+      "id": "glass-top-right",
+      "name": "Canopy upper west junction",
+      "use": "check",
+      "confidence": "medium",
+      "imagePixel": [
+        642,
+        258
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -70.3119125366211,
+        58.95741653442383,
+        6.6174540519714355
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 9650,
+      "sourceInspectionPixel": [
+        1012.743173717921,
+        272.6941477695004
+      ],
+      "reason": "The visible canopy junction is an occlusion boundary, not the selected roof vertex."
+    },
+    {
+      "id": "west-opening-base-corner",
+      "name": "West opening lower east corner",
+      "use": "check",
+      "confidence": "medium",
+      "imagePixel": [
+        701,
+        422
+      ],
+      "imagePickUncertaintyPixels": 3,
+      "worldPoint": [
+        -58.043704986572266,
+        22.152359008789062,
+        -33.29881286621094
+      ],
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 3635,
+      "sourceInspectionPixel": [
+        1138.8446229867795,
+        456.8195893043018
+      ],
+      "reason": "The photograph pick is on the foreground balustrade, while the mesh vertex is an interior opening threshold."
+    }
+  ],
+  "methodNote": "Added the east front/back parapet depth pair to constrain viewpoint. Two other landmarks remain excluded from optimization; they are review checks, not a blind statistical holdout.",
+  "cameraBounds": {
+    "min": [
+      -160,
+      0,
+      -500
+    ],
+    "max": [
+      180,
+      90,
+      -55
+    ]
+  },
+  "sensitivitySamples": 64,
+  "status": "Measured north-facade registration. Source geometry is a municipal model, not an independent survey. Current game geometry remains to be compared."
+}

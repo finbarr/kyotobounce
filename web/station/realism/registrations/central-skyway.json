@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "outerWidthM": 2.56,
+  "deckThicknessM": 0.16,
+  "targetBayM": 1.28,
+  "frameSideM": 0.065,
+  "glassThicknessM": 0.024,
+  "screenHeightM": 2.45,
+  "opaqueHeightM": 0.75,
+  "baseHeightM": 0.12,
+  "baseThicknessM": 0.1,
+  "railHeightM": 1.05,
+  "railSideM": 0.045,
+  "railInsetM": 0.14,
+  "bracketSideM": 0.025,
+  "bayWidthM": 6,
+  "bayProjectionM": 3.4,
+  "viewingBays": [
+    {
+      "fraction": 0.32
+    },
+    {
+      "fraction": 0.51
+    },
+    {
+      "fraction": 0.7
+    }
+  ],
+  "references": [
+    {
+      "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_10f.svg",
+      "meaning": "Continuous east-west corridor, western diagonal approach, three north viewing bays, eastern escalators. Schematic, not metric."
+    },
+    {
+      "url": "https://www.zekkeikana.com/kyoto/shimogyoku/skyway/skyway45.jpg",
+      "meaning": "Dated 2014 corridor: dark floor, glazed screens, handrails, south low wall and vents."
+    },
+    {
+      "url": "https://www.zekkeikana.com/kyoto/shimogyoku/skyway/skyway46.jpg",
+      "meaning": "Dated 2014 viewing bay reaches inclined exterior glazing with guard rails and information panels."
+    }
+  ],
+  "limits": [
+    "West bridge endpoint and roof axes come from municipal geometry; extending the bridge to the main roof boundary is an explicit geometric construction hypothesis, not a source floor measurement.",
+    "Central corridor floor is not present as a verified continuous source surface. Finished-floor datum, corridor width, eastern landing, screen heights, bay dimensions and locations remain provisional.",
+    "Bay count and north-side placement are operator-map evidence; approximate relative spacing is taken from a schematic. Absolute dimensions cannot be inferred from that map.",
+    "Bay intrusion into the unmodified inner roof must be audited. Roof framing, support bearings, suspended hangers, viewing information panels and eastern escalators are unfinished.",
+    "No source photograph is embedded as a game texture. No public route, gameplay or performance acceptance is implied.",
+    "The western approach continues the provisional arched bridge enclosure to the main-corridor miter. Its 0.55m rise and 32-segment curve are authoring assumptions.",
+    "Bay guard projection was reduced from 3.8m to 3.4m after exact triangle/clearance-volume checks found the larger footprint intersected the registered outer glazing. Bay width and all three bays are preserved; final photo registration remains required."
+  ],
+  "approachArchRiseM": 0.55,
+  "approachArchSegments": 32
+}

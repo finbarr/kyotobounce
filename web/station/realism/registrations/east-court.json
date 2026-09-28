@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "footprintSha256": "a711360efc5e8f8d9137d1d5f82c0aafde1bce8bbbfc5fbeaf3910e8babc2f14",
+  "eastSkywayNativeSha256": "cd10d5f93f5aeb6231cb6ea447deaf8a0f1c712ebec7cf78353e3b15590b3dbc",
+  "originRenderer": [77.83226013183594, 29.97290802001953, -24.59440040588379],
+  "forwardRenderer": [0.9998636516882471, 0, -0.016512965592029322],
+  "garden": {"u": [23.5, 44.5], "v": [13.5, 32], "riseM": 1.12},
+  "northStair": {"u": [27, 43], "steps": 7, "goingM": 0.34},
+  "westStair": {"v": [19.5, 28], "steps": 7, "goingM": 0.34},
+  "ramp": {"u": [6.7, 23.5], "v": [11.5, 13.5], "upperLandingEndU": 26},
+  "baseThicknessM": 0.28,
+  "gardenThicknessM": 0.28,
+  "references": [
+    "research/kyoto-station/maps/official-7f-station-map.svg",
+    "research/kyoto-station/photos/zekkeikana-skyway4b.jpg",
+    "research/kyoto-station/photos/square-img_eastsquare_01.jpg",
+    "https://data.city.kyoto.lg.jp/resource/?id=21224"
+  ],
+  "limits": [
+    "Source boundary and hole come from the 53-face municipal floor. Finished garden boundaries are provisional, guided by the source's coarse courtyard texture, not surveyed edges.",
+    "The 1.12m garden rise retains an earlier construction hypothesis. Seven 0.16m risers and 0.34m goings are explicit modeling assumptions, not measured as-built dimensions.",
+    "The official schematic confirms a ramp beside the Skyway bank. Its 16.8m run, 2m width, landing and 1:15 grade are provisional geometry, not accessibility certification.",
+    "This component reconstructs the arrival-to-garden connection. The 4F descent, eastern lift/toilet corridor, southern connection, garden fixtures and facade boundaries remain unfinished.",
+    "Source photographs and maps are references only. No pixels from them are used as game textures.",
+    "The coarse southern appendage is retained as a geometry reference; this is not a claim that every part is publicly accessible."
+  ]
+}

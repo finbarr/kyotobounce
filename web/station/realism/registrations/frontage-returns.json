@@ -1,0 +1,82 @@
+{
+  "sourceSha256": "0df73fd383c265904711bf09e4a628d109f7792dc9e4be524d3f531666df06a1",
+  "description": "Exact municipal source ray samples at the formerly clipped west inner facade return. Pixels refer to the registered 1280x720 north cutaway camera, not independently fitted photo landmarks.",
+  "samples": [
+    {
+      "key": "west-return-450",
+      "pixel": [
+        1038,
+        450
+      ],
+      "sourceObject": "Untitled.199",
+      "expectedSurface": "municipal-station-frontage-west-Untitled.199",
+      "point": {
+        "x": -53.38785221796594,
+        "y": 28.06348328263036,
+        "z": 25.097308149216587
+      },
+      "normal": {
+        "x": 0.9998632501505986,
+        "y": 5.528421040418764e-07,
+        "z": 0.01653726089701524
+      }
+    },
+    {
+      "key": "west-return-390",
+      "pixel": [
+        1027,
+        390
+      ],
+      "sourceObject": "Untitled.199",
+      "expectedSurface": "municipal-station-frontage-west-Untitled.199",
+      "point": {
+        "x": -53.34458583999186,
+        "y": 36.42107241238578,
+        "z": 22.498119661289124
+      },
+      "normal": {
+        "x": 0.9998639042035465,
+        "y": -6.814359884161058e-05,
+        "z": 0.016497527914549146
+      }
+    },
+    {
+      "key": "west-return-600",
+      "pixel": [
+        1050,
+        600
+      ],
+      "sourceObject": "Untitled.199",
+      "expectedSurface": "municipal-station-frontage-west-Untitled.199",
+      "point": {
+        "x": -53.4150225271748,
+        "y": 8.17724523992706,
+        "z": 26.691589751818356
+      },
+      "normal": {
+        "x": 0.9998645211298617,
+        "y": 0,
+        "z": 0.016460236503535303
+      }
+    },
+    {
+      "key": "west-return-350",
+      "pixel": [
+        1018,
+        350
+      ],
+      "sourceObject": "Untitled.203",
+      "expectedSurface": "municipal-station-frontage-west-Untitled.203",
+      "point": {
+        "x": -52.85383037943752,
+        "y": 42.12878263895071,
+        "z": 21.210475193734723
+      },
+      "normal": {
+        "x": -0.015689734574522534,
+        "y": 0.31416117823835754,
+        "z": 0.9492400045914985
+      }
+    }
+  ]
+}

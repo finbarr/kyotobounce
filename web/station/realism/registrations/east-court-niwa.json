@@ -1,0 +1,278 @@
+{
+  "reference": {
+    "localFile": "/Users/finbarr/code/games/kyoto/research/kyoto-station/photos/niwa-jr-02a.jpg",
+    "url": "https://souda-kyoto.jp/blog/01367.html",
+    "date": "Published 2025-09-08; capture date unknown",
+    "sha256": "6b8c8e3864bfc613bff09b768cb9d4447c9cd5e15093186942987a1f56d541cf",
+    "size": [
+      816,
+      544
+    ],
+    "viewId": "east-court-niwa",
+    "displayTitle": "East Square / NIWA terrace"
+  },
+  "sourceGeometry": {
+    "sha256": "0df73fd383c265904711bf09e4a628d109f7792dc9e4be524d3f531666df06a1",
+    "file": "/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism/station-shell/municipal-station.glb"
+  },
+  "viewport": {
+    "width": 1224,
+    "height": 816
+  },
+  "initialCamera": {
+    "position": [
+      107,
+      32.75,
+      -8
+    ],
+    "target": [
+      127,
+      36,
+      14
+    ],
+    "fov": 68,
+    "viewport": {
+      "width": 1224,
+      "height": 816
+    }
+  },
+  "cameraBounds": {
+    "min": [
+      85,
+      28,
+      -25
+    ],
+    "max": [
+      120,
+      38,
+      6
+    ]
+  },
+  "anchors": [
+    {
+      "id": "black-left",
+      "name": "black-left",
+      "worldPoint": [
+        130.31201171875,
+        40.143917083740234,
+        11.06374454498291
+      ],
+      "imagePixel": [
+        420,
+        185
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 15971,
+      "sourceInspectionPixel": [
+        523.9787556062174,
+        326.1928401005863
+      ],
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "black-ridge",
+      "name": "black-ridge",
+      "worldPoint": [
+        123.69839477539062,
+        40.14377975463867,
+        11.18907642364502
+      ],
+      "imagePixel": [
+        490,
+        164
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 15980,
+      "sourceInspectionPixel": [
+        624.8044044138805,
+        301.6384330915435
+      ],
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "black-right",
+      "name": "black-right",
+      "worldPoint": [
+        123.80748748779297,
+        40.1437873840332,
+        16.736230850219727
+      ],
+      "imagePixel": [
+        527,
+        181
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 16105,
+      "sourceInspectionPixel": [
+        696.0762328819093,
+        325.32916217975924
+      ],
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "low-left",
+      "name": "low-left",
+      "worldPoint": [
+        132.805419921875,
+        38.00395965576172,
+        3.369485855102539
+      ],
+      "imagePixel": [
+        308,
+        197
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 16131,
+      "sourceInspectionPixel": [
+        347.6273482731187,
+        352.04954922420956
+      ],
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "low-ridge",
+      "name": "low-ridge",
+      "worldPoint": [
+        130.68223571777344,
+        38.003910064697266,
+        3.398038864135742
+      ],
+      "imagePixel": [
+        331,
+        190
+      ],
+      "use": "check",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 16125,
+      "sourceInspectionPixel": [
+        371.51181164920314,
+        345.1633197210473
+      ],
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "low-right",
+      "name": "low-right",
+      "worldPoint": [
+        130.7645263671875,
+        38.0039176940918,
+        8.359261512756348
+      ],
+      "imagePixel": [
+        386,
+        204
+      ],
+      "use": "check",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 16117,
+      "sourceInspectionPixel": [
+        472.3245449058594,
+        361.9271199079189
+      ],
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "roof-box-ridge",
+      "name": "roof-box-ridge",
+      "worldPoint": [
+        167.476318359375,
+        63.479888916015625,
+        10.481871604919434
+      ],
+      "imagePixel": [
+        211,
+        65
+      ],
+      "imagePickUncertaintyPixels": 2,
+      "use": "fit",
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 14019,
+      "sourceInspectionPixel": [
+        352.6689644262542,
+        124.81007676756045
+      ],
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "roof-box-right",
+      "name": "roof-box-right",
+      "worldPoint": [
+        167.63182067871094,
+        63.47992706298828,
+        19.880847930908203
+      ],
+      "imagePixel": [
+        271,
+        87
+      ],
+      "imagePickUncertaintyPixels": 2,
+      "use": "fit",
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 14008,
+      "sourceInspectionPixel": [
+        437.7412840168239,
+        160.16203523038251
+      ],
+      "confidence": "provisional-high"
+    }
+  ],
+  "methodNote": "Six fitting landmarks span nearby equipment-box roof corners and a separate distant rooftop enclosure. Two low equipment-box corners are withheld. Coarse municipal geometry and source photo calibration remain uncertain. Initial equipment-only fit and rejected tentative junction identities retained separately. Nearer tower edge adds a perpendicular-distance constraint; it is not counted as two independent point landmarks.",
+  "sensitivitySamples": 100,
+  "rejectedCorrespondences": [
+    "orientation-fit tentative wall-band junction used an inferred height and cannot be a validation landmark.",
+    "orientation-fit tentative roof junction confused the far roof junction with the higher rooftop enclosure."
+  ],
+  "lineConstraints": [
+    {
+      "id": "foreground-tower-edge",
+      "name": "Foreground tower right vertical corner, source face4723",
+      "use": "fit",
+      "imageEndpoints": [
+        [
+          113,
+          0
+        ],
+        [
+          109,
+          173
+        ]
+      ],
+      "worldPoints": [
+        [
+          126.86482238769531,
+          36,
+          -8.20324993133545
+        ],
+        [
+          126.86482238769531,
+          42,
+          -8.20324993133545
+        ]
+      ],
+      "imagePickUncertaintyPixels": 1,
+      "sourceEdge": [
+        [
+          126.86482238769531,
+          34.378807067871094,
+          -8.20324993133545
+        ],
+        [
+          126.86482238769531,
+          58.193817138671875,
+          -8.20324993133545
+        ]
+      ],
+      "method": "Two points interpolated along the exact source edge constrain the observed infinite line; heights are not point correspondences."
+    }
+  ]
+}

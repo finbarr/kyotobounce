@@ -1,0 +1,15 @@
+// Check that entrance detail preserves the established public approach geometry.
+import assert from'node:assert/strict';import{readFile,writeFile}from'node:fs/promises';import{createHash}from'node:crypto';
+const[oldDir,newDir,oldAssembly,newAssembly,out]=process.argv.slice(2);assert(out);const sha=b=>createHash('sha256').update(b).digest('hex');
+const[ob,nb,or,nr,oa,na]=await Promise.all([oldDir+'/native-panels.json',newDir+'/native-panels.json',oldDir+'/report.json',newDir+'/report.json',oldAssembly+'/routes.json',newAssembly+'/routes.json'].map(p=>readFile(p)));
+const old=JSON.parse(ob),now=JSON.parse(nb),before=JSON.parse(or),after=JSON.parse(nr),oldRoutes=JSON.parse(oa),newRoutes=JSON.parse(na);
+assert.equal(sha(ob),before.outputs.nativePanelsSha256);assert.equal(sha(nb),after.outputs.nativePanelsSha256);
+for(const key of ['originRenderer','forwardRenderer','southRenderer','lowerY','landingY','planter','risers','rise','going','frontU','footU','flightRanges','posts','timberProfile','roofY','glassU','glassStartV','endV','routes'])assert.deepEqual(after.geometry[key],before.geometry[key],key);
+assert.deepEqual(before.textures.maps,after.textures.maps);assert.deepEqual(oldRoutes.routes,newRoutes.routes);assert.deepEqual(oldRoutes.additionalRoutes,newRoutes.additionalRoutes);
+const lookup=new Map(now.panels.map(p=>[p.id,p]));assert.equal(lookup.size,now.panels.length);let unchanged=0;const modified=[];
+for(const p of old.panels){const q=lookup.get(p.id);assert(q,p.id);if(p.id.startsWith('niwa-service-')){if(JSON.stringify(p)!==JSON.stringify(q))modified.push(p.id);}else{assert.deepEqual(q,p,p.id);unchanged++;}}
+const {originRenderer:O,forwardRenderer:D,southRenderer:A}=after.geometry,lo=after.entranceDetail.returnStartCourt,hi=after.entranceDetail.returnEndCourt,length=after.entranceDetail.returnLengthM,t=hi.map((x,i)=>(x-lo[i])/length);let minimumReturnClearance=Infinity,minimumFrontClearance=Infinity;
+const strips=now.panels.filter(p=>p.id.startsWith('niwa-bamboo-strip-'));assert.equal(strips.length,45);
+for(const p of strips){assert.equal(p.collision,false);for(const v of p.vertices){const x=v.x-O[0],z=-v.z-O[2],u=x*D[0]+z*D[2],w=x*A[0]+z*A[2];minimumReturnClearance=Math.min(minimumReturnClearance,(u-lo[0])*t[1]-(w-lo[1])*t[0]);minimumFrontClearance=Math.min(minimumFrontClearance,u-after.geometry.glassU);}}
+assert(minimumReturnClearance>.1);assert(minimumFrontClearance>.2);
+const report={oldNativeSha256:sha(ob),newNativeSha256:sha(nb),newGlbSha256:after.outputs.glbSha256,unchangedOldPanels:unchanged,modifiedOldServicePanels:modified,addedPanels:now.panels.length-old.panels.length,allFourteenPathsUnchanged:true,originalTextureImagesUnchanged:true,bambooStrips:strips.length,minimumBambooClearanceBehindReturnM:minimumReturnClearance,minimumBambooClearanceBehindFrontGlazingM:minimumFrontClearance,decorativePanels:now.panels.filter(p=>p.collision===false).length,collidingPanels:now.panels.filter(p=>p.collision!==false).length,pass:true,limits:after.entranceDetail.limits};await writeFile(out,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

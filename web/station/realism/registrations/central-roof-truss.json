@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "envelopeRegistrationSha256": "c2fe5f8fb9c3bdc371dc7f7c41382ed01a577a9bedd6456bd57a77228aa369d6",
+  "depthM": 2,
+  "tubeSideM": 0.1,
+  "source": {
+    "title": "World Architecture 61, November 1997, printed page 43",
+    "url": "https://www.usmodernist.org/WORLD/WA-1997-61.pdf",
+    "photograph": "https://www.kanebako-se.co.jp/works/view/240"
+  },
+  "construction": "Shared outer grid and inner chords offset along interpolated source vertex normals. Depth struts at lattice nodes, alternating diagonals in both parameter directions, closed perimeter depth.",
+  "limitations": [
+    "Nominal truss depth and tube width are published; grid pitch and phase remain authoring assumptions.",
+    "Aligned inner lattice and alternating diagonal phase are a construction hypothesis supported only qualitatively by photographs; not a fabrication reconstruction.",
+    "Outer square tubes are centered on the registered source envelope. The 2 m dimension is modeled between chord centerlines; exact outside-to-outside convention is unverified.",
+    "Source curvature is coarse; inner chords split at lattice joints and source-facet boundaries to preserve normal-offset connections. Collinear runs are merged.",
+    "Branch junctions, support bearings, member end joints, Skyway attachment, western and eastern flares remain unfinished."
+  ]
+}

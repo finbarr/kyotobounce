@@ -1,0 +1,49 @@
+// Measure source-anchored construction clearance, preserving obstruction evidence.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {createHash,randomUUID} from 'node:crypto';
+import {setTimeout as delay} from 'node:timers/promises';
+import * as T from 'three';
+import {MeshBVH,acceleratedRaycast} from 'three-mesh-bvh';
+import {readGLB} from '../../../tools/optimize-browser-assets.mjs';
+import {PhysicsWorker} from '../../worker.ts';
+const [basePath,assembly,skyway,out,bridgePath]=process.argv.slice(2);assert(basePath&&assembly&&skyway&&out&&resolve(out).startsWith(resolve('.local')+'/'));await mkdir(out,{recursive:true});
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const [baseBytes,glbBytes,nativeBytes,assemblyBytes,skywayBytes]=await Promise.all([readFile(basePath),readFile(assembly+'/assembly.glb'),readFile(assembly+'/native-panels.json'),readFile(assembly+'/report.json'),readFile(skyway+'/report.json')]);
+const layout=JSON.parse(baseBytes),build=JSON.parse(assemblyBytes),route=JSON.parse(skywayBytes),panels=JSON.parse(nativeBytes).panels;
+assert.equal(sha(glbBytes),build.outputs.glbSha256);assert.equal(sha(nativeBytes),build.outputs.nativePanelsSha256);assert(build.inputs.some(i=>i.glbSha256===route.outputs.glbSha256));
+layout.panels=[...layout.panels.filter(p=>p.id==='concourse'),...panels];for(const k of ['boxes','beams','flights','escalators'])layout[k]=[];layout.status='Isolated roof/Skyway construction assembly; not a playable station';
+const layoutBytes=Buffer.from(JSON.stringify(layout)+'\n');await writeFile(out+'/probe-layout.json',layoutBytes);
+const {json:j,bin}=readGLB(glbBytes),root=new T.Group();
+for(let m=0;m<j.meshes.length;m++){const p=j.meshes[m].primitives[0],a=j.accessors[p.attributes.POSITION],v=j.bufferViews[a.bufferView],ix=j.accessors[p.indices],iv=j.bufferViews[ix.bufferView],pos=new Float32Array(a.count*3),ids=new Uint32Array(ix.count);for(let k=0;k<pos.length;k++)pos[k]=bin.readFloatLE(v.byteOffset+k*4);for(let k=0;k<ids.length;k++)ids[k]=bin.readUInt32LE(iv.byteOffset+k*4);const geometry=new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(pos,3)).setIndex(new T.BufferAttribute(ids,1));geometry.boundsTree=new MeshBVH(geometry,{indirect:true});const mesh=new T.Mesh(geometry,new T.MeshBasicMaterial({side:T.FrontSide}));mesh.raycast=acceleratedRaycast;mesh.userData.faces=panels.filter(p=>p.browserMaterial===m).flatMap(p=>Array(p.triangles.length/3).fill(p.id));assert.equal(mesh.userData.faces.length,ids.length/3);root.add(mesh);}root.updateMatrixWorld(true);
+const surfaceTriangles=new Map();for(const mesh of root.children){const g=mesh.geometry,position=g.attributes.position,indices=g.index;for(let i=0;i<indices.count;i+=3){const id=mesh.userData.faces[i/3],rows=surfaceTriangles.get(id)||[];rows.push(new T.Triangle(...[0,1,2].map(k=>new T.Vector3().fromBufferAttribute(position,indices.getX(i+k)))));surfaceTriangles.set(id,rows);}}
+const ray=new T.Raycaster(),native=p=>({x:p[0],y:p[1],z:-p[2]});
+const bridge=JSON.parse(await readFile(bridgePath+'/report.json'));
+assert(build.inputs.some(i=>i.glbSha256===bridge.outputs.glbSha256));
+const ends=bridge.geometry.floorEndpointsRenderer, d=ends[1].map((v,k)=>v-ends[0][k]), length=Math.hypot(...d), direction=d.map(v=>v/length);
+const center=[...route.geometry.routeRenderer,ends[0].map((v,k)=>v+direction[k]),ends[1].map((v,k)=>v-direction[k])];
+const paths=[-.5,0,.5].map(w=>({w,points:center.map((p,i)=>{const prev=center[Math.max(0,i-1)],next=center[Math.min(center.length-1,i+1)];let dx=next[0]-prev[0],dz=next[2]-prev[2],len=Math.hypot(dx,dz);const lateral=i<2?route.geometry.stairThresholdRenderer.across.map(v=>-v):[-dz/len,0,dx/len];return p.map((v,k)=>v+lateral[k]*w);})}));
+const samples=[];
+for(const path of paths)for(let i=1;i<path.points.length;i++){const a=path.points[i-1],b=path.points[i],n=Math.ceil(Math.hypot(...b.map((v,k)=>v-a[k])));for(let j=0;j<=n;j++)samples.push({lane:path.w,segment:i,t:j/n,point:a.map((v,k)=>v+(b[k]-v)*j/n)});}
+const report={meaning:'Isolated restaurant and bridge construction. This does not establish source dimensions, installed station access or visual acceptance.',assemblyGlbSha256:sha(glbBytes),probeLayoutSha256:sha(layoutBytes),routeGlbSha256:route.outputs.glbSha256,samples:[],mismatches:[],sharedEdgeTies:[],obstructions:[],walks:[]};
+process.env.KYOTO_LAYOUT=resolve(out+'/probe-layout.json');process.env.KYOTO_WORKER_LOG=resolve(out+'/worker.log');
+const worker=new PhysicsWorker(),id='skyway-assembly-audit';let state;worker.on('message',m=>{if(m.type==='state'&&m.id===id)state=m});const until=async fn=>{const deadline=performance.now()+90000;while(!fn()){assert(performance.now()<deadline,'Native observation timed out');await delay(30);}};
+try{await worker.start();await until(()=>worker.ready);worker.send({type:'join',id});await until(()=>state?.players?.length);
+let buffer='';const pending=new Map();worker.socket.on('data',chunk=>{buffer+=chunk;let n;while((n=buffer.indexOf('\n'))>=0){const m=JSON.parse(buffer.slice(0,n));buffer=buffer.slice(n+1);pending.get(m.request)?.(m);pending.delete(m.request);}});
+async function cast(origin,direction){origin=origin.map(Math.fround);direction=direction.map(Math.fround);ray.set(new T.Vector3().fromArray(origin),new T.Vector3().fromArray(direction));ray.far=250;const hits=ray.intersectObject(root,true),hit=hits[0],expected=hit?{surface:hit.object.userData.faces[hit.faceIndex],point:native(hit.point.toArray())}:null;const request=randomUUID();let timer;const response=new Promise((res,rej)=>{pending.set(request,res);timer=setTimeout(()=>{pending.delete(request);rej(Error('Native ray timed out'));},10000);});worker.send({type:'place',id,slot:'waypoint',radius:.1,origin:native(origin),direction:native(direction),request});let result;try{result=await response;}finally{clearTimeout(timer);}const actual=result.disk?.surface?result.disk:null;
+const error=expected&&actual?Math.hypot(...['x','y','z'].map(k=>expected.point[k]-actual.center[k])):null;
+const actualPoint=actual?new T.Vector3(actual.center.x,actual.center.y,-actual.center.z):null;const actualSurfaceDistanceM=actualPoint?Math.min(...(surfaceTriangles.get(actual.surface)||[]).map(t=>t.closestPointToPoint(actualPoint,new T.Vector3()).distanceTo(actualPoint))):null;
+const tied=expected&&actual&&expected.surface!==actual.surface&&error<1e-5&&(actualSurfaceDistanceM<1e-5||hits.some(h=>h.object.userData.faces[h.faceIndex]===actual.surface&&Math.abs(h.distance-hit.distance)<1e-5&&Math.hypot(...['x','y','z'].map(k=>native(h.point.toArray())[k]-actual.center[k]))<1e-5));
+if(tied)report.sharedEdgeTies.push({origin,direction,expected,actual,error,actualSurfaceDistanceM,candidates:hits.filter(h=>Math.abs(h.distance-hit.distance)<1e-5).map(h=>({surface:h.object.userData.faces[h.faceIndex],point:native(h.point.toArray()),distance:h.distance}))});
+if((!!expected)!=(!!actual)||expected&&((expected.surface!==actual.surface&&!tied)||error>.001))report.mismatches.push({origin,direction,expected,actual,error});return {expected,actual,error};}
+for(const sample of samples){const p=sample.point,floor=await cast([p[0],p[1]+.35,p[2]],[0,-1,0]),head=await cast([p[0],p[1]+.05,p[2]],[0,1,0]),clearance=head.actual?head.actual.center.y-p[1]:null;const pass=!!floor.actual&&Math.abs(floor.actual.center.y-p[1])<.001&&(clearance===null||clearance>=2.1);const row={...sample,floor,head,clearanceM:clearance,pass};report.samples.push(row);if(!pass)report.obstructions.push({lane:sample.lane,segment:sample.segment,t:sample.t,point:p,floor:floor.actual?.surface,head:head.actual?.surface,clearanceM:clearance});}
+assert.equal(report.mismatches.length,0,'Browser/native assembly mismatch');
+for(const path of paths){
+ if(report.samples.some(s=>s.lane===path.w&&!s.pass))continue;
+ const start=path.points[0],placement=await worker.request({type:'place',id,slot:'start',radius:.3,origin:native([start[0],start[1]+.4,start[2]]),direction:{x:0,y:-1,z:0}});assert(placement.ok);await worker.request({type:'design-start',id,start:placement.disk});await delay(150);
+ for(const targets of [path.points.slice(1),path.points.slice(0,-1).reverse()]){const walk={lane:path.w,targets:targets.map(native),samples:[],pass:false};try{for(const target of targets){const feet0=state.players.find(p=>p.id===id).feet,goal=native(target),deadline=performance.now()+Math.max(20000,Math.hypot(goal.x-feet0.x,goal.z-feet0.z)/4*1000+15000);while(true){const feet=state.players.find(p=>p.id===id).feet,dx=goal.x-feet.x,dz=goal.z-feet.z,distance=Math.hypot(dx,dz);walk.samples.push(feet);assert(Math.abs(feet.y-target[1])<.1,'Capsule fell');if(distance<.18)break;assert(performance.now()<deadline,'Walk deadline elapsed before reaching target');worker.send({type:'input',id,x:0,z:Math.min(1,distance/.6),yaw:Math.atan2(dx,dz)*180/Math.PI,pitch:0,fast:distance>1});await delay(70);}}walk.pass=true;}catch(e){walk.error=String(e);}finally{worker.send({type:'input',id,x:0,z:0,fast:false});await delay(100);report.walks.push(walk);}if(!walk.pass)break;}
+}
+report.summary={expectedWalks:6,points:report.samples.length,rays:report.samples.length*2,mismatches:report.mismatches.length,sharedEdgeTies:report.sharedEdgeTies.length,obstructions:report.obstructions.length,minimumCoveredClearanceM:Math.min(...report.samples.map(s=>s.clearanceM??Infinity)),walks:report.walks.length,passingWalks:report.walks.filter(w=>w.pass).length,pass:report.obstructions.length===0&&report.walks.length===6&&report.walks.every(w=>w.pass)};console.log(JSON.stringify(report.summary,null,2));
+}finally{worker.stop();await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');}
+assert(report.summary?.pass,'West approach clearance or walking failed; inspect report');

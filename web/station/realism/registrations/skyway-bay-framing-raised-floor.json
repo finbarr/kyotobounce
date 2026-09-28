@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "parentNativeSha256": "62a143a22569808d7cc4422b9c8007b76732543c3c7bcfed885b27894904ccbc",
+  "skywayNativeSha256": "7961e6bd3efa91c7ab9a3b214539ee5e55312f8bc5a44b79a79b4e0ed7d67489",
+  "frameSideM": 0.1,
+  "sideFrameOutsetM": 0.04,
+  "frontFrameInsetM": 0.02,
+  "backFrameInsetM": 0.08,
+  "bottomFrameHeightM": -0.21,
+  "backHeaderHeightM": 2.7,
+  "glassGapM": 0.02,
+  "references": [
+    {
+      "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_10f.svg",
+      "meaning": "Three viewing bays along the northern side of the Skyway."
+    },
+    {
+      "url": "https://www.zekkeikana.com/kyoto/shimogyoku/skyway/skyway46.jpg",
+      "meaning": "An open viewing space reaching the inclined outer glazing, with guard rails and information boards."
+    }
+  ],
+  "limits": [
+    "The existence and open interior of the viewing bays are evidenced; exact opening dimensions, support sections, fabrication and load paths are not surveyed.",
+    "Sloped perimeter frames and ties are an explicit construction hypothesis. Geometric connectivity is not a structural engineering validation.",
+    "The existing central corridor and bay registration remain provisional; future photographic alignment may change these openings.",
+    "Exterior glazing and every outer-grid member must remain exactly unchanged. Only intersecting inner chords, diagonals and depth struts may be modified.",
+    "Front headers are set beneath the registered glass with a 20mm geometric gap; this is not a measured construction tolerance.",
+    "Bottom frame tops meet the provisional 160mm deck underside; the actual suspended floor construction remains to be registered.",
+    "Front header placement includes a conservative half-diagonal tube envelope in plan and height, rather than measuring clearance only at the member centerline.",
+    "Reference photograph skyway46 shows open viewing space beneath the outer roof. This revision removes inner lattice through the full vertical opening, retaining the registered outer grid and glass. Interrupted members attach to boundary frames; no overhead tie crosses the occupied bay.",
+    "The frontal frame moves from 150mm to 20mm inside the unchanged bay footprint, behind the viewing guard. Its low height at the inclined glazing is outside the checked circulation volume. Bay dimensions and floor remain unchanged; source-camera registration and engineering sections remain provisional."
+  ],
+  "openToOuterRoof": true
+}

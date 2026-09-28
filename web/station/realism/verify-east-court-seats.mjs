@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {resolve} from 'node:path';
+const [parentDir,courtDir,seatsDir,assemblyDir,previousWalkPath,out]=process.argv.slice(2);assert(out&&resolve(out).startsWith(resolve('.local')+'/'));
+const read=async p=>{const bytes=await readFile(p);return {bytes,json:JSON.parse(bytes),sha256:createHash('sha256').update(bytes).digest('hex')};};
+const [parent,court,seats,assembly,walk,parentReport]=await Promise.all([read(parentDir+'/native-panels.json'),read(courtDir+'/report.json'),read(seatsDir+'/native-panels.json'),read(assemblyDir+'/native-panels.json'),read(previousWalkPath),read(parentDir+'/report.json')]);
+assert.deepEqual(assembly.json.panels.slice(0,parent.json.panels.length),parent.json.panels);assert.deepEqual(assembly.json.escalators,parent.json.escalators);assert.deepEqual(assembly.json.combSupports,parent.json.combSupports);assert.equal(walk.json.assemblyGlbSha256,parentReport.json.outputs.glbSha256);assert(walk.json.summary.pass&&walk.json.walks.length===14);
+const g=court.json.geometry,O=g.originRenderer,D=g.forwardRenderer,A=g.southRenderer,local=p=>{const x=p[0]-O[0],z=p[2]-O[2];return[x*D[0]+z*D[2],x*A[0]+z*A[2],p[1]];},boxes=[];
+for(const panel of seats.json.panels){const points=panel.vertices.map(v=>local([v.x,v.y,-v.z]));assert(points.every(([u,v,y])=>u>=23.5&&u<=44.5&&v>=13.5&&v<=32&&y>=g.gardenY-1e-5));boxes.push({id:panel.id,bounds:[0,1,2].map(k=>[Math.min(...points.map(p=>p[k])),Math.max(...points.map(p=>p[k]))])});}
+const distance=(p,b)=>Math.hypot(...[0,1].map(k=>Math.max(b.bounds[k][0]-p[k],0,p[k]-b.bounds[k][1])));let minimum=Infinity,count=0,maxGap=0;
+for(const w of walk.json.walks){assert(w.pass);for(let i=0;i<w.samples.length;i++){const feet=w.samples[i],p=local([feet.x,feet.y,-feet.z]);for(const b of boxes){minimum=Math.min(minimum,distance(p,b));count++;}if(i){const a=w.samples[i-1];maxGap=Math.max(maxGap,Math.hypot(feet.x-a.x,feet.z-a.z));}}}
+const lowerBound=minimum-maxGap/2;
+const result={parentNativeSha256:parent.sha256,assemblyNativeSha256:assembly.sha256,seatNativeSha256:seats.sha256,walkReportSha256:walk.sha256,preservedParentPanels:parent.json.panels.length,allMovingLanesUnchanged:true,allSeatVerticesSupportedByGarden:true,benchBoundsUVY:boxes,priorWalks:14,sampledBodyClearances:count,minimumSampledHorizontalClearanceM:minimum,maximumAdjacentWalkSampleGapM:maxGap,continuousPiecewiseLinearClearanceLowerBoundM:lowerBound,capsuleRadiusPlusSkinM:.265,pass:lowerBound>.265,meaning:lowerBound>.265?'Explicit reuse of previously verified walking paths because parent geometry is unchanged and new seats lie outside their swept capsule region. This is not a fresh furnished-assembly walk or whole-station acceptance.':'Previous walking paths intersect the new seating footprint. Their old passing results cannot validate the furnished assembly; fresh routes and native walks are required.'};await writeFile(out,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({...result,benchBoundsUVY:undefined},null,2));
+
+assert(result.pass,'New seats intersect previous walking paths; inspect saved clearance report and verify actual routes afresh');

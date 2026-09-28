@@ -1,0 +1,356 @@
+{
+  "reference": {
+    "localFile": "/Users/finbarr/code/games/kyoto/research/kyoto-station/photos/niwa-rurubu-frontage.jpg",
+    "url": "https://rurubu.jp/andmore/article/23413",
+    "date": "Published 2025-06-08; capture unknown; photo Ryota Fujii",
+    "sha256": "976e0428cd01e882288b27df0d272899882efb8b6120723cd47e76386dd7d5f5",
+    "size": [
+      1200,
+      800
+    ],
+    "viewId": "east-court-niwa-rurubu",
+    "displayTitle": "NIWA frontage / Rurubu"
+  },
+  "sourceGeometry": {
+    "sha256": "0df73fd383c265904711bf09e4a628d109f7792dc9e4be524d3f531666df06a1",
+    "file": "/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism/station-shell/municipal-station.glb"
+  },
+  "viewport": {
+    "width": 1200,
+    "height": 800
+  },
+  "initialCamera": {
+    "position": [
+      117.42894435473926,
+      33.7361007560119,
+      -13.117699342664435
+    ],
+    "target": [
+      187.30888008606084,
+      31.373777455411524,
+      58.375055610616
+    ],
+    "fov": 54.01811747061702,
+    "rollDegrees": 0.7174733526388207,
+    "viewport": {
+      "width": 1200,
+      "height": 800
+    }
+  },
+  "cameraBounds": {
+    "min": [
+      95,
+      28,
+      -30
+    ],
+    "max": [
+      123,
+      38,
+      0
+    ]
+  },
+  "anchors": [
+    {
+      "id": "black-left",
+      "name": "black-left",
+      "worldPoint": [
+        130.31201171875,
+        40.143917083740234,
+        11.06374454498291
+      ],
+      "imagePixel": [
+        837.5,
+        191
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 15971,
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "black-ridge",
+      "name": "black-ridge",
+      "worldPoint": [
+        123.69839477539062,
+        40.14377975463867,
+        11.18907642364502
+      ],
+      "imagePixel": [
+        1056.5,
+        154
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 15980,
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "black-right",
+      "name": "black-right",
+      "worldPoint": [
+        123.80748748779297,
+        40.1437873840332,
+        16.736230850219727
+      ],
+      "imagePixel": [
+        1100,
+        193
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 16105,
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "low-left",
+      "name": "low-left",
+      "worldPoint": [
+        132.805419921875,
+        38.00395965576172,
+        3.369485855102539
+      ],
+      "imagePixel": [
+        618,
+        232
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 16131,
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "low-ridge",
+      "name": "low-ridge",
+      "worldPoint": [
+        130.68223571777344,
+        38.003910064697266,
+        3.398038864135742
+      ],
+      "imagePixel": [
+        680,
+        222
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 16125,
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "low-right",
+      "name": "low-right",
+      "worldPoint": [
+        130.7645263671875,
+        38.0039176940918,
+        8.359261512756348
+      ],
+      "imagePixel": [
+        778,
+        248.5
+      ],
+      "use": "fit",
+      "imagePickUncertaintyPixels": 2,
+      "sourceObject": "Untitled203",
+      "sourceVertexIndex": 16117,
+      "confidence": "provisional-high"
+    },
+    {
+      "id": "hotel-window-c0r0",
+      "name": "Distant hotel window centre c0r0",
+      "use": "check",
+      "imagePixel": [
+        468.5,
+        131
+      ],
+      "imagePickUncertaintyPixels": 2,
+      "face": 4637,
+      "worldPoint": [
+        157.69422915062535,
+        49.66261790239513,
+        17.04982728300136
+      ],
+      "barycentric": [
+        0.1972557479367586,
+        0.6361342698965771,
+        0.16660998216666437
+      ],
+      "sourceObject": "Untitled203",
+      "sourceTexture": {
+        "imageIndex": 4,
+        "pixel": [
+          1882.75,
+          987.5
+        ],
+        "size": [
+          4096,
+          2048
+        ],
+        "sha256": "587647bdd6f96d9805ea580168a8a48ae7b7a931511939f74e6a8a0e8ec506e1",
+        "pickUncertaintyPixels": 1
+      },
+      "confidence": "Texture-derived check; approximate original image sampling, not a surveyed window coordinate"
+    },
+    {
+      "id": "hotel-window-c2r0",
+      "name": "Distant hotel window centre c2r0",
+      "use": "check",
+      "imagePixel": [
+        570.5,
+        96
+      ],
+      "imagePickUncertaintyPixels": 2,
+      "face": 4637,
+      "worldPoint": [
+        149.04512028208453,
+        49.66240428514122,
+        17.191033628876628
+      ],
+      "barycentric": [
+        0.4054034365424022,
+        0.5906414170283854,
+        0.003955146429212452
+      ],
+      "sourceObject": "Untitled203",
+      "sourceTexture": {
+        "imageIndex": 4,
+        "pixel": [
+          1926,
+          987.5
+        ],
+        "size": [
+          4096,
+          2048
+        ],
+        "sha256": "587647bdd6f96d9805ea580168a8a48ae7b7a931511939f74e6a8a0e8ec506e1",
+        "pickUncertaintyPixels": 1
+      },
+      "confidence": "Texture-derived check; approximate original image sampling, not a surveyed window coordinate"
+    },
+    {
+      "id": "hotel-window-c4r1",
+      "name": "Distant hotel window centre c4r1",
+      "use": "check",
+      "imagePixel": [
+        704.5,
+        121
+      ],
+      "imagePickUncertaintyPixels": 2,
+      "face": 4644,
+      "worldPoint": [
+        140.4463889529926,
+        46.445391893766924,
+        17.331734091810745
+      ],
+      "barycentric": [
+        0.04831955033234586,
+        0.4008256766638308,
+        0.5508547730038234
+      ],
+      "sourceObject": "Untitled203",
+      "sourceTexture": {
+        "imageIndex": 4,
+        "pixel": [
+          1969,
+          1005.5
+        ],
+        "size": [
+          4096,
+          2048
+        ],
+        "sha256": "587647bdd6f96d9805ea580168a8a48ae7b7a931511939f74e6a8a0e8ec506e1",
+        "pickUncertaintyPixels": 1
+      },
+      "confidence": "Texture-derived check; approximate original image sampling, not a surveyed window coordinate"
+    },
+    {
+      "id": "hotel-window-c5r2",
+      "name": "Distant hotel window centre c5r2",
+      "use": "check",
+      "imagePixel": [
+        786.5,
+        171
+      ],
+      "imagePickUncertaintyPixels": 2,
+      "face": 4644,
+      "worldPoint": [
+        136.14694676215282,
+        43.317840098334464,
+        17.40174876843203
+      ],
+      "barycentric": [
+        0.020386925413160895,
+        0.28973798363047487,
+        0.6898750909563642
+      ],
+      "sourceObject": "Untitled203",
+      "sourceTexture": {
+        "imageIndex": 4,
+        "pixel": [
+          1990.5,
+          1023
+        ],
+        "size": [
+          4096,
+          2048
+        ],
+        "sha256": "587647bdd6f96d9805ea580168a8a48ae7b7a931511939f74e6a8a0e8ec506e1",
+        "pickUncertaintyPixels": 1
+      },
+      "confidence": "Texture-derived check; approximate original image sampling, not a surveyed window coordinate"
+    }
+  ],
+  "lineConstraints": [
+    {
+      "id": "foreground-tower-edge",
+      "name": "Foreground tower right vertical corner, source face4723",
+      "use": "fit",
+      "imageEndpoints": [
+        [
+          345,
+          0
+        ],
+        [
+          345,
+          195
+        ]
+      ],
+      "worldPoints": [
+        [
+          126.86482238769531,
+          36,
+          -8.20324993133545
+        ],
+        [
+          126.86482238769531,
+          42,
+          -8.20324993133545
+        ]
+      ],
+      "imagePickUncertaintyPixels": 2,
+      "sourceEdge": [
+        [
+          126.86482238769531,
+          34.378807067871094,
+          -8.20324993133545
+        ],
+        [
+          126.86482238769531,
+          58.193817138671875,
+          -8.20324993133545
+        ]
+      ],
+      "method": "Two points interpolated along the exact source edge constrain the observed infinite line; heights are not point correspondences."
+    }
+  ],
+  "sensitivitySamples": 100,
+  "methodNote": "Six equipment-box roof vertices fit the camera with a foreground tower-edge line. Four distant hotel-window centres are withheld, derived from exact municipal texture UV triangles. Source texture is coarse: texture picks carry roughly one texel uncertainty. Neither the cafe nor the provisional court/seat geometry constrains this camera.",
+  "rejectedCorrespondences": [
+    "Initial freehand low-box ridge x657 was incorrect; enlarged photograph places ridge x680.",
+    "Initial freehand dark-box ridge x1042 was incorrect; enlarged photograph places ridge x1056.5.",
+    "An unconstrained six-box seed has no independent checks and is not accepted as a registration."
+  ]
+}

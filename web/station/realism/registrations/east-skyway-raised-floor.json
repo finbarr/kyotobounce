@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "templateLayoutSha256": "b60d9fe49f2e037be3fd27c69f21ee7d64eab86a7798f2a0ae9ca4af0e9e1976",
+  "centralSkywayNativeSha256": "7961e6bd3efa91c7ab9a3b214539ee5e55312f8bc5a44b79a79b4e0ed7d67489",
+  "sourceSha256": "0df73fd383c265904711bf09e4a628d109f7792dc9e4be524d3f531666df06a1",
+  "upperPublicEndS": 2.0,
+  "inclineDegrees": 30,
+  "arrivalApronLengthM": 3.2,
+  "references": [
+    "research/kyoto-station/maps/floor-10f.svg",
+    "research/kyoto-station/photos/zekkeikana-skyway4b.jpg",
+    "https://data.city.kyoto.lg.jp/resource/?id=21224"
+  ],
+  "limits": [
+    "The paired eastern escalators and courtyard arrival are documented by the official schematic and dated 2014 photograph; exact lane positions, incline and dimensions remain provisional.",
+    "The upper endpoint follows the current source-anchored central corridor. A 30 degree incline and retained 1m lanes are explicit construction assumptions.",
+    "The municipal source has a broad courtyard envelope near Y29.973m. It does not resolve the photographed garden and arrival level changes, furniture or exact lower landing. Those must be refined before station integration.",
+    "The current game uses an inferred Y33.5m arrival floor at a different northing. The new bank is an isolated construction candidate; do not join it to that retained floor or silently move the court furniture.",
+    "The short arrival apron is part of this component only; it does not substitute for the complete public courtyard and onward route.",
+    "Stationary casing and handrail geometry is derived from the working current-game bank, with its motion settings and lane widths retained. No survey precision is claimed.",
+    "The upper landing now uses the provisional western tenth-floor finish propagated through central corridor04; the lower source courtyard plane stays fixed."
+  ]
+}

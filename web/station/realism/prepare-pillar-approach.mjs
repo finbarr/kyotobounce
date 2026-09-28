@@ -1,0 +1,31 @@
+// Combine the verified Locker Loop finish with the new, unaccepted Pillar approach.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+import {applySurfaceRebindings} from './course-surface-rebindings.mjs';
+import {applyLaunchRevisions} from './course-launch-revisions.mjs';
+const [outArg,studyName='pillar-input-study-03',indexArg='10']=process.argv.slice(2),out=resolve(outArg),index=Number(indexArg);assert(/^pillar-input-study-\d+$/.test(studyName));assert(Number.isInteger(index));const inputName=studyName.replace('pillar-input-study','pillar-inputs')+'.json';assert(out.startsWith(resolve('.local')+'/'));
+const base='.local/station-realism/',sha=b=>createHash('sha256').update(b).digest('hex');
+const read=async p=>JSON.parse(await readFile(p));
+const ref=async p=>({path:resolve(p),sha256:sha(await readFile(p))});
+const lb=await readFile(base+'station-hall-basement-05/station-layout.json'),layout=sha(lb),cb=await readFile('web/starter-challenges.json'),original=JSON.parse(cb);
+const bindings=(await read(base+'hall-course-rebinding-02/proof-inputs.json')).waypointSurfaceRebindings;
+const rebound=await applySurfaceRebindings(original,bindings,JSON.parse(lb),layout,sha(cb));
+const old=original.find(c=>c.id==='kyoto-pillar-carom');
+const trace=await read(base+studyName+'/'+index+'.json'),study=await read(base+studyName+'/report.json'),row=study.results.find(r=>r.index===index);
+assert(row.fullClear&&row.rest);
+const pathLength=trace.poses.slice(1).reduce((s,p,i)=>s+Math.hypot(...['x','y','z'].map(k=>p.p[k]-trace.poses[i].p[k])),0);
+const revision={id:old.id,fromRevision:old.revision,toRevision:old.revision+1,fromStart:old.start,toStart:row.start,fromHint:old.hint,toHint:{...old.hint,yaw:row.shot.input.yaw,holdMs:(row.shot.speed-.5)/99.5*2800,note:old.hint.note.replace(/^\d+\.\d+ m\/s/,row.shot.speed.toFixed(2)+' m/s')},fromDistance:old.campaign.distance,toDistance:Number(pathLength.toFixed(1)),index,study:await ref(base+studyName+'/report.json'),inputs:await ref(base+inputName),nativeTrace:await ref(base+studyName+'/'+index+'.json'),beforeTrace:await ref(base+'hall-pillar-before-01/0-kyoto-pillar-carom.json'),reason:'Move the suggested launch 8m along the concourse and aim through the gap between the source-derived wells. Keep all three target centers, radii, normals, pillar face, pitch, spin and scoring. Refine the marked speed by at most0.25m/s to center the first floor contact. The measured approach must remain at least as long as the original; the trailing roll changes against the real well guard.'};
+const launched=await applyLaunchRevisions(rebound,original,[revision],layout);
+const locker=await read(base+'locker-finish-04/catalog.json');
+const catalog=launched.map(c=>c.id==='kyoto-cafe'?locker.find(l=>l.id===c.id):{...c,layout});
+const proof=await read(base+'locker-finish-04/proof-inputs.json');
+proof.waypointSurfaceRebindings=bindings;proof.courseLaunchRevisions=[revision];
+const p=proof.courses.find(c=>c.id===old.id);const oldSpeed=p.shot.speed;p.revision=revision.toRevision;p.shot.input={...row.shot.input};p.shot.speed=row.shot.speed;
+for(const n of p.neighbors){n.input.yaw=revision.toHint.yaw+(n.input.yaw-old.hint.yaw);n.speed=row.shot.speed+(n.speed-oldSpeed);}
+await mkdir(out,{recursive:false});
+await writeFile(out+'/catalog.json',JSON.stringify(catalog,null,2)+'\n');
+await writeFile(out+'/proof-inputs.json',JSON.stringify(proof,null,2)+'\n');
+await writeFile(out+'/repair.json',JSON.stringify({status:'Private proposed launch revision; repeated campaign proof required.',layout,revision},null,2)+'\n');
+console.log(out);

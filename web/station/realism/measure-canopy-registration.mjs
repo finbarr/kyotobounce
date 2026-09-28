@@ -1,0 +1,20 @@
+// Intersect the registered municipal shell with transverse vertical planes.
+// The municipal mesh is a geometric reference, not an independent survey.
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+import assert from 'node:assert/strict';
+import {readGLB} from '../../../tools/optimize-browser-assets.mjs';
+const [sourcePath,layoutPath,out,sectionXs]=process.argv.slice(2);assert(sourcePath&&layoutPath&&out);assert.ok(resolve(out).startsWith(resolve('.local')+'/'));await mkdir(out,{recursive:true});
+const source=await readFile(sourcePath),layoutBytes=await readFile(layoutPath),layout=JSON.parse(layoutBytes),{json:j,bin}=readGLB(source),hash=b=>createHash('sha256').update(b).digest('hex');
+const components={SCALAR:1,VEC2:2,VEC3:3,VEC4:4},bytes={5123:2,5125:4,5126:4};
+function accessor(i){const a=j.accessors[i],v=j.bufferViews[a.bufferView],count=components[a.type];assert.ok(!a.sparse);return Array.from({length:a.count},(_,n)=>Array.from({length:count},(_,c)=>{const at=(v.byteOffset||0)+(a.byteOffset||0)+n*(v.byteStride||count*bytes[a.componentType])+c*bytes[a.componentType];return a.componentType===5126?bin.readFloatLE(at):a.componentType===5125?bin.readUInt32LE(at):bin.readUInt16LE(at);}));}
+const xs=sectionXs?sectionXs.split(',').map(Number):[-40,0,30];assert.ok(xs.length&&xs.every(Number.isFinite)&&new Set(xs).size===xs.length);
+const sections=xs.map(x=>({x,segments:[]}));
+for(const n of j.nodes){assert.ok(!n.matrix&&!n.translation&&!n.rotation&&!n.scale,'Source world-frame assumption changed');if(n.mesh===undefined)continue;for(const p of j.meshes[n.mesh].primitives){const vs=accessor(p.attributes.POSITION),indices=accessor(p.indices).flat();for(let i=0;i<indices.length;i+=3){const tri=indices.slice(i,i+3).map(k=>vs[k]);for(const section of sections){const points=[];for(let k=0;k<3;k++){const a=tri[k],b=tri[(k+1)%3];if((a[0]<section.x)!==(b[0]<section.x)){const t=(section.x-a[0])/(b[0]-a[0]);points.push([a[2]+t*(b[2]-a[2]),a[1]+t*(b[1]-a[1])]);}}if(points.length===2&&points.some(p=>p[1]>14))section.segments.push({object:n.name,points});}}}}
+const profile=layout.architecture.westRootXYZ.map(p=>[-p[2],p[1]]),oldCrown=profile.reduce((a,b)=>a[1]>b[1]?a:b),profileSegments=profile.slice(1).map((p,i)=>[profile[i],p]);
+function crossings(segments,height){return segments.flatMap(([a,b])=>{if((a[1]<height)===(b[1]<height))return [];const t=(height-a[1])/(b[1]-a[1]);return [a[0]+t*(b[0]-a[0])];}).sort((a,b)=>a-b);}
+for(const s of sections){const roof=s.segments.filter(r=>r.object==='Untitled.203'&&r.points.every(p=>p[0]<4&&p[1]<53&&p[1]>20));assert.ok(roof.length>10);const crown=roof.flatMap(r=>r.points).reduce((a,b)=>a[1]>b[1]?a:b);
+ s.comparison={municipalCrownZY:crown,authoredCentralCrownZY:oldCrown,northwardCrownDifference:oldCrown[0]-crown[0],heightDifference:crown[1]-oldCrown[1],heightCuts:[25,35,45].map(y=>{const a=crossings(profileSegments,y),b=crossings(roof.map(r=>r.points),y);assert(a.length&&b.length);return {height:y,authoredFrontZ:a[0],sourceFrontZ:b[0],northwardFrontDifference:a[0]-b[0]};})};}
+const report={source:{file:sourcePath,sha256:hash(source)},layout:{file:layoutPath,sha256:hash(layoutBytes)},coordinates:'Renderer world metres: X east, Y up, Z south. Section points are [Z,Y].',method:'Exact triangle/plane intersections; compare with the repeated authored central profile at equal heights. Roof selection: Untitled.203, Z<4 and height 20..53 m.',limits:['Municipal geometry is coarse and is not an independent survey.','The source glazing-edge/balustrade at 15.44 m is a different feature from the roof toe; do not fit them as the same point.','Do not move the canopy without updating Skyway, wall/roof connections and their collision geometry.','Equal-height cuts do not establish a full deformation map or final correction.'],sections};
+await writeFile(out+'/sections.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(sections.map(s=>({x:s.x,...s.comparison})),null,2));
