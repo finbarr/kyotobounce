@@ -1,6 +1,6 @@
 # Parallel Codex development
 
-Start with **three implementation tasks and one integration task**. Increase concurrency only if work remains independent and your machine handles the native workers comfortably. Extra sessions help most when they do not all modify `game.js` or rebuild the station.
+Default to one active task and checkout. Finish, verify, commit and merge each task into local `main` before starting the next. Start parallel sessions only when the user explicitly requests them. The split below applies to that explicit parallel workflow.
 
 ## Suggested split
 
@@ -41,3 +41,7 @@ GitHub Actions runs the portable checks on pushes and PRs. It does not provide U
 - Only the integration task deploys, after merged source, relevant tests and the public worker/health checks agree. Avoid deploying directly from multiple feature branches.
 
 This arrangement is intended to improve throughput without turning every task into a station-wide redesign. A clear stopping condition is part of every assignment.
+
+## Disk retention
+
+Use `.local/v2/current/` for the current private station bundle and at most one temporary candidate. Delete superseded generated scenes, collision layouts, browser exports and compiled builds after verifying the replacement. Preserve editable source, original inputs, current player data and small provenance receipts. Stop obsolete preview servers. Before archiving a finished worktree, move or verify copies of required ignored assets: Git snapshots do not preserve ignored files. Reuse an existing suitable checkout for the next task.

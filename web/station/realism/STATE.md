@@ -1,3 +1,7 @@
+# Current checkout and storage
+
+Completed station work is merged into local `main`. The playable private bundle is `.local/v2/current/`, identified by `web/v2/assets.json`; run `npm run dev:v2`. Original inputs and small historical evidence now live under `.local/station-research-evidence/`. Superseded full-scene exports have been removed. Historical paths below describe prior experiments, not additional active station versions. Use the current bundle and one temporary candidate, merge each completed task before starting another, and delete replaced generated outputs after verification.
+
 ## V2 direction — 28 September 2026
 
 The user wants to retain the useful visual reconstruction and replace all existing levels. Follow `research/kyoto-station/V2-ITERATION-PLAN.md` for the replacement ongoing goal: finish one task, commit and deliver it, then continue; no overall time cap, before/after presentations or routine review pauses. Historical course failures and repair queues below are no longer v2 blockers; do not repair old targets, hints, starts or progression. Core movement, physics, collision and performance checks still apply. The replacement goal is active. The local v2 foundation is now integrated; current details follow.
