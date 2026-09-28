@@ -1,5 +1,7 @@
 # Remote readiness — 28 September 2026
 
+**Retired at user request:** `kyoto-seed` was destroyed and absence verified on 28 September. The sanitized transport snapshot is available as `kyoto-station-transport-20260928` (247458947, 69.45 GB). No GPU workers were created. The goal remains paused; the checks below describe the saved checkpoint.
+
 The reconstruction source and methods are committed on `codex/station-research`. Private assets were restored as 25,679 independent files on `kyoto-seed`, with every distinct content hash checked. The latest source commit is recorded in Git; this report does not claim the station itself is finished.
 
 ## Verified on the CPU seed

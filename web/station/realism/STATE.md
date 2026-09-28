@@ -1,3 +1,7 @@
+## V2 direction — 28 September 2026
+
+The user wants to retain the useful visual reconstruction and replace all existing levels. Follow `research/kyoto-station/V2-ITERATION-PLAN.md` for the replacement ongoing goal: finish one task, commit and deliver it, then continue; no overall time cap, before/after presentations or routine review pauses. Historical course failures and repair queues below are no longer v2 blockers; do not repair old targets, hints, starts or progression. Core movement, physics, collision and performance checks still apply. The old goal remains paused; drafting this plan does not start construction.
+
 ## Remote handoff checkpoint — 28 September 2026
 
 **Asset identity clarification:** root `runtime/station-layout.json` and `web/starter-challenges.json` match the original assets-v7 layout `232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8`. Older statements that courtyard life04 is active refer to its isolated local preview. The remote full-game smoke uses the root baseline; separate component/render checks use private gate bank02.

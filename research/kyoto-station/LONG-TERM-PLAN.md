@@ -1,5 +1,7 @@
 # A bounded plan for a more realistic Kyoto Station
 
+> **Superseded execution plan (28 September 2026):** use [V2-ITERATION-PLAN.md](V2-ITERATION-PLAN.md). The user has retired all existing levels as constraints. The architectural/reference scope below remains useful; its course-preservation requirements and all-at-once completion gates do not govern v2 iterations.
+
 ## Intended result
 
 A convincing reconstruction of the station's public architecture, northern and southern plazas, and immediately adjoining street frontages, with evidence for the visible details and stable play on this laptop in Chrome. Keep the current Three.js browser renderer and native authoritative physics unless a measured requirement demonstrates a need to change them.

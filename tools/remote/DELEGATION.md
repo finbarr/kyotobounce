@@ -1,5 +1,7 @@
 # Proposed delegation lanes
 
+> **Superseded by v2:** `research/kyoto-station/V2-ITERATION-PLAN.md` governs the proposed next run. Existing course preservation/repair work below is retired. The remote seed has been deleted; no fleet or delegation is planned for the ongoing local v2 goal.
+
 Prepared for the next user-set goal; no construction assignments have started.
 
 ## Shared starting point
