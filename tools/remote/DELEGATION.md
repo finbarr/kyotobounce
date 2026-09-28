@@ -4,7 +4,7 @@ Prepared for the next user-set goal; no construction assignments have started.
 
 ## Shared starting point
 
-Read `STATE.md` before older progress notes. Private full station: `station-gate-bank-02`; active game remains courtyard life04. The private station has eight known course issues and has not passed photographic or laptop-performance acceptance. Do not claim that infrastructure readiness resolves those failures.
+Read `STATE.md` before older progress notes. Private full station: `station-gate-bank-02`; the earlier private preview is courtyard life04 and the root runtime remains assets-v7. The private station has eight known course issues and has not passed photographic or laptop-performance acceptance. Do not claim that infrastructure readiness resolves those failures.
 
 Keep each ticket bounded to one observable improvement with assigned files, source references, explicit assumptions, native/browser checks and a candidate pack manifest. Each machine uses its own branch and output directories. Only the local integration session installs components into the shared full-station Blender source.
 

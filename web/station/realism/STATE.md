@@ -1,5 +1,7 @@
 ## Remote handoff checkpoint — 28 September 2026
 
+**Asset identity clarification:** root `runtime/station-layout.json` and `web/starter-challenges.json` match the original assets-v7 layout `232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8`. Older statements that courtyard life04 is active refer to its isolated local preview. The remote full-game smoke uses the root baseline; separate component/render checks use private gate bank02.
+
 The user stopped iterative local reconstruction to checkpoint the work and prepare three BoxHaven clones. Do not resume the unlimited local construction loop. The next delegation goal will be set separately. No reconstruction asset release is accepted or deployed.
 
 Latest investigation corrects the previous camera rejection: paired renders from the unchanged July 2026 fit show an open view in the original municipal model and foreground blockage in the inherited candidate. The blocking surfaces include the western lower escalator casing and the underside of `west-2f-landing`. This is a geometry discrepancy; lower/depth camera calibration remains unresolved.

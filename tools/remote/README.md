@@ -16,7 +16,7 @@ Each machine gets its own Git checkout, branch, asset files, worker logs and SQL
 
 Private assets are transferred with `checkpoint-pack.py`, which deduplicates file content for transport, verifies SHA-256 and restores separate copies. The archive includes source art, current runtime/browser assets, research media, native worker and reconstruction intermediates. It excludes logs, SQLite data, Python caches and disposable symlinks. Recreate isolated test workspaces with their generators.
 
-Start from `.local/station-realism/station-gate-bank-02`, paired with `gate-bank-browser-02` and `hall-basement-motion-02`. The root game's assets remain the earlier courtyard candidate. Do not silently mix those layouts and exports. Both remain subject to the documented unresolved visual/gameplay gates.
+Start from `.local/station-realism/station-gate-bank-02`, paired with `gate-bank-browser-02` and `hall-basement-motion-02`. The root game retains the original assets-v7 layout (`232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8`) and matching starter catalog. The earlier courtyard candidate is a separate private workspace (`station-court-life-04`); historic notes calling it active refer to that local preview, not the root runtime files. Do not silently mix those layouts and exports. Both remain subject to the documented unresolved visual/gameplay gates.
 
 ## Verification before snapshot and after cloning
 
