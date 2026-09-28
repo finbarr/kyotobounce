@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 sudo apt-get update -qq
-sudo apt-get install -y --no-install-recommends python3-venv python3-pip xvfb xauth libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1 libegl1 libgbm1 libnss3 libasound2t64 libxss1 libatk-bridge2.0-0 libgtk-3-0 libvulkan1 mesa-vulkan-drivers ffmpeg poppler-utils unzip jq zstd ripgrep
+sudo apt-get install -y --no-install-recommends python3-venv python3-pip xvfb xauth bubblewrap libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1 libegl1 libgbm1 libnss3 libasound2t64 libxss1 libatk-bridge2.0-0 libgtk-3-0 libvulkan1 mesa-vulkan-drivers ffmpeg poppler-utils unzip jq zstd ripgrep
 sudo install -d -o boxhaven -g boxhaven /opt/boxhaven/kyoto-python /opt/boxhaven/downloads /opt/boxhaven/kyoto-tools
 python3 -m venv /opt/boxhaven/kyoto-python
 /opt/boxhaven/kyoto-python/bin/pip install 'numpy==2.2.6' 'scipy==1.15.3' 'shapely==2.1.1' 'Pillow==11.2.1' 'requests==2.32.4' 'beautifulsoup4==4.13.4' 'opencv-python-headless==4.11.0.86'

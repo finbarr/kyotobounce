@@ -6,9 +6,9 @@ import assert from 'node:assert/strict';
 const output = resolve(process.env.KYOTO_EVIDENCE || 'artifacts/phase3/browser-foundation');
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath: process.env.CHROME_PATH || (process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome'),
   headless: true,
-  args: ['--enable-webgl', '--ignore-gpu-blocklist', '--use-angle=metal']
+  args: ['--enable-webgl', '--ignore-gpu-blocklist', ...(process.platform==='darwin'?['--use-angle=metal']:['--use-angle=swiftshader','--enable-unsafe-swiftshader'])]
 });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 const messages = [], states = [], errors = [];
