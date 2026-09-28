@@ -129,7 +129,17 @@ export function dressStation(renderer,scene,sun,station,data){
     child.traverse(o=>{const materials=Array.isArray(o.material)?o.material:[o.material];if(materials.some(m=>m&&/Brushed stainless hardware|Escalator yellow safety enamel|Daytime stair lens/.test(m.name)))hardware=true;});
     if(hardware||child.name==='Atrium signs and flush floor finishes')architecture.add(child);
   }
-  const reflections=createStationReflections(renderer,scene,architecture);
+  let canopy=false;
+  const courtyardMaterials=new Set();
+  const courtyardFinish=/^Registered courtyard \| court-fold-(upper-metal|mirror|dark-return|trim) \| Browser$/;
+  station.traverse(o=>{
+    for(const material of Array.isArray(o.material)?o.material:[o.material]){
+      if(!material)continue;
+      if(stationMaterialFamily(material.name)==='canopy')canopy=true;
+      if(courtyardFinish.test(material.name))courtyardMaterials.add(material);
+    }
+  });
+  const reflections=createStationReflections(renderer,scene,architecture,{canopy,courtyardMaterials:[...courtyardMaterials]});
   const done=new Set(),families={},preservedMaps=[],resampledMaps=[];
   for(const root of architecture)root.traverse(o=>{
     if(!o.isMesh)return;

@@ -7,6 +7,8 @@ export const STATION_PROBES=Object.freeze([
   {name:'west-gallery',position:[-57,10,18]},
   {name:'garden',position:[-156,57,20.4]}
 ]);
+const CANOPY_PROBE=Object.freeze({name:'north-exterior',position:[-5,30,-45]});
+const COURT_PROBE=Object.freeze({name:'east-court',position:[110,32,1],resolution:512});
 
 export function stationDaylightTexture(){
   const width=256,height=128,pixels=new Uint16Array(width*height*4);
@@ -36,17 +38,28 @@ export function configureStationDaylight(renderer,scene,sun){
   sun.color.set(0xfff1df);sun.intensity=2.15;sun.position.set(-55,110,-65);sun.target.position.set(-20,0,0);scene.add(sun.target);
 }
 
-export function createStationReflections(renderer,scene,architecture){
-  const uniforms={stationHall:{value:null},stationGallery:{value:null},stationGarden:{value:null}};
-  const stats={zones:STATION_PROBES,captures:0,resolution:256,pmremBytes:0,captureMilliseconds:0};
+export function createStationReflections(renderer,scene,architecture,{canopy=false,courtyardMaterials=[]}={}){
+  const uniforms={stationHall:{value:null},stationGallery:{value:null},stationGarden:{value:null},stationExterior:{value:null}};
+  const zones=[...STATION_PROBES,...(canopy?[CANOPY_PROBE]:[]),...(courtyardMaterials.length?[COURT_PROBE]:[])];
+  const stats={zones,captures:0,resolution:256,courtyardResolution:courtyardMaterials.length?512:0,courtyardMaterials:courtyardMaterials.map(m=>m.name),pmremBytes:0,captureMilliseconds:0};
   const targets=[];let captured=false,disposed=false;
-  function patch(shader){
+  function patch(shader,{canopy=false}={}){
     const functions=`
 #ifdef ENVMAP_TYPE_CUBE_UV
 uniform sampler2D stationHall;
 uniform sampler2D stationGallery;
 uniform sampler2D stationGarden;
+${canopy?'uniform sampler2D stationExterior;':''}
 vec4 stationRadiance(vec3 direction,float roughness){
+${canopy?`
+  // The exterior side sees the forecourt; the inner side keeps the hall probes.
+  // Correct source normals to the outward (north/up) hemisphere, independent
+  // of double-sided rasterization and triangle winding.
+  vec3 outward=normalize(vStationNormal);
+  if(dot(outward,vec3(0.0,1.0,-1.0))<0.0)outward=-outward;
+  if(dot(cameraPosition-vStationPosition,outward)>0.0)
+    return textureCubeUV(stationExterior,direction,roughness);
+`:''}
   // Smooth fixed boundaries also work on large export batches spanning floors.
   float garden=smoothstep(43.0,53.0,vStationPosition.y)*(1.0-smoothstep(-133.0,-111.0,vStationPosition.x));
   float gallery=(1.0-smoothstep(-43.0,-25.0,vStationPosition.x))*(1.0-smoothstep(31.0,43.0,vStationPosition.y));
@@ -77,18 +90,33 @@ vec4 stationRadiance(vec3 direction,float roughness){
     const pmrem=new THREE.PMREMGenerator(renderer);
     const cube=new THREE.WebGLCubeRenderTarget(256,{type:THREE.HalfFloatType,generateMipmaps:false,minFilter:THREE.LinearFilter});
     const probe=new THREE.CubeCamera(.3,360,cube);
+    // A one-time local probe preserves the authored palette and roughness. Its
+    // higher resolution serves the broad mirror panels; no frame loop is added.
+    const courtCube=courtyardMaterials.length?new THREE.WebGLCubeRenderTarget(512,{type:THREE.HalfFloatType,generateMipmaps:false,minFilter:THREE.LinearFilter}):null;
+    const courtProbe=courtCube?new THREE.CubeCamera(.3,180,courtCube):null;
     try{
-      for(const zone of STATION_PROBES){
-        probe.position.fromArray(zone.position);probe.update(renderer,scene);
-        const target=pmrem.fromCubemap(cube.texture);target.texture.name=`K026 ${zone.name} PMREM`;targets.push(target);stats.captures++;
+      for(const zone of zones){
+        const camera=zone===COURT_PROBE?courtProbe:probe,targetCube=zone===COURT_PROBE?courtCube:cube;
+        camera.position.fromArray(zone.position);camera.update(renderer,scene);
+        const target=pmrem.fromCubemap(targetCube.texture);target.texture.name=`K026 ${zone.name} PMREM`;targets.push(target);stats.captures++;
         stats.pmremBytes+=target.width*target.height*8;
       }
       uniforms.stationHall.value=targets[0].texture;uniforms.stationGallery.value=targets[1].texture;uniforms.stationGarden.value=targets[2].texture;
+      if(canopy)uniforms.stationExterior.value=targets[3].texture;
+      if(courtyardMaterials.length){
+        const local=targets[zones.indexOf(COURT_PROBE)].texture;
+        for(const material of courtyardMaterials){material.envMap=local;material.envMapIntensity=.85;material.needsUpdate=true;}
+      }
       scene.environment=targets[0].texture;scene.environmentIntensity=.85;
       old?.dispose();renderer.shadowMap.autoUpdate=false;
     }catch(error){targets.forEach(t=>t.dispose());targets.length=0;scene.environment=old;renderer.shadowMap.autoUpdate=previousShadowUpdate;throw error;}
-    finally{hidden.forEach(([o,visible])=>o.visible=visible);cube.dispose();pmrem.dispose();stats.captureMilliseconds=performance.now()-started;}
+    finally{hidden.forEach(([o,visible])=>o.visible=visible);cube.dispose();courtCube?.dispose();pmrem.dispose();stats.captureMilliseconds=performance.now()-started;}
   }
-  function dispose(){if(disposed)return;disposed=true;if(targets.some(t=>scene.environment===t.texture))scene.environment=null;targets.forEach(t=>t.dispose());targets.length=0;}
+  function dispose(){
+    if(disposed)return;disposed=true;
+    if(targets.some(t=>scene.environment===t.texture))scene.environment=null;
+    for(const material of courtyardMaterials)if(targets.some(t=>material.envMap===t.texture)){material.envMap=null;material.needsUpdate=true;}
+    targets.forEach(t=>t.dispose());targets.length=0;
+  }
   return {uniforms,patch,capture,dispose,stats};
 }

@@ -63,6 +63,7 @@ export function stationMaterialFamily(name){
   if(/^station-additions-glass/i.test(name))return 'guard';
   if(/^station-additions-oak/i.test(name))return 'wood';
   if(/tactile|nosing.*yellow|lettering|sign|indicator|diffuser|lens|lamp|poster|information/i.test(name))return null;
+  if(/^Canopy envelope glazing(?: \| Browser)?$/.test(name))return 'canopy';
   if(/Garden guard glazing|Shop window glazing|Glass -/i.test(name))return 'guard';
   if(/Reflective facade glazing|North courtyard coated glazing/i.test(name))return 'facade';
   if(/Stair stone|Stair nosing finish|East stair/i.test(name))return 'stair';
@@ -94,7 +95,7 @@ export function prepareGraniteMaps(material){
   return resized;
 }
 
-const roughness={floor:.32,wall:.56,stone:.4,paving:.65,stair:.6,stainless:.28,paint:.43,guard:.09,facade:.14,wood:.58};
+const roughness={floor:.32,wall:.56,stone:.4,paving:.65,stair:.6,stainless:.28,paint:.43,guard:.09,facade:.14,canopy:.08,wood:.58};
 export function applyStationMaterial(material,family,textures,reflections){
   const m=material; m.userData.stationFamily=family;
   const authored=/^station-additions-/.test(m.name),authoredColor=authored?m.color.clone():null,authoredRoughness=m.roughness;
@@ -113,9 +114,9 @@ export function applyStationMaterial(material,family,textures,reflections){
   if(family==='stair')m.color.set(0xc5cac3);
   if(family==='stainless')m.color.set(0xbfc5c6);
   if(family==='paint'&&/Canopy/.test(m.name))m.color.set(0x8e9b9d);
-  const glass=family==='guard'||family==='facade',mineral=['floor','wall','stone','paving','stair'].includes(family);
+  const glass=family==='guard'||family==='facade'||family==='canopy',mineral=['floor','wall','stone','paving','stair'].includes(family);
   if(glass){
-    m.color.set(family==='guard'?0xd0e3dd:0x789c9f);m.transparent=true;m.opacity=1;m.depthWrite=false;
+    m.color.set(family==='guard'?0xd0e3dd:family==='canopy'?0xa8b6b3:0x789c9f);m.transparent=true;m.opacity=1;m.depthWrite=false;
     m.side=THREE.DoubleSide;m.forceSinglePass=true;m.envMapIntensity=1;
     // Single-pass thin glass: Fresnel coverage below preserves reflections at
     // grazing angles without a screen-space transmission render of the station.
@@ -190,15 +191,20 @@ roughnessFactor=clamp(roughnessFactor+(micro.b-.5)*${family==='stainless'?'.18':
 vec2 grainSlope=(micro.rg*2.0-1.0)*${family==='stair'?'.35':'.8'};
 normal=normalize(stationFrame(-vViewPosition,normal,guv)*vec3(grainSlope,sqrt(max(.01,1.0-dot(grainSlope,grainSlope)))));`);
     }
-    reflections.patch(shader);
+    reflections.patch(shader,{canopy:family==='canopy'});
+    // Provisional coated-envelope appearance, isolated from clear guard glass.
+    // F0 and coverage are visual calibration values, not surveyed optical data.
+    if(family==='canopy')shader.fragmentShader=shader.fragmentShader.replace('#include <lights_physical_fragment>',
+      THREE.ShaderChunk.lights_physical_fragment.replace('material.specularColor = vec3( 0.04 );','material.specularColor = vec3( 0.12 );'));
     if(glass)shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',`
-// Schlick dielectric reflectance F0=.04 (IOR 1.5). Separate coverage from
+// Schlick reflectance: clear glass F0=.04, provisional canopy F0=.12.
+// Separate coverage from
 // specular energy; ordinary opacity would erase reflections on clear guards.
-float fresnel=.04+.96*pow(1.0-saturate(dot(normal,geometryViewDir)),5.0);
-float coverage=clamp(${family==='guard'?'.07':'.25'}+fresnel*.88,0.0,.97);
-outgoingLight=(totalDiffuse*${family==='guard'?'.045':'.17'}+totalSpecular)/max(coverage,.04)+totalEmissiveRadiance;
+float fresnel=${family==='canopy'?'.12+.88':'.04+.96'}*pow(1.0-saturate(dot(normal,geometryViewDir)),5.0);
+float coverage=clamp(${family==='guard'?'.07':family==='canopy'?'.38':'.25'}+fresnel*${family==='canopy'?'.62':'.88'},0.0,.97);
+outgoingLight=(totalDiffuse*${family==='guard'?'.045':family==='canopy'?'.04':'.17'}+totalSpecular)/max(coverage,.04)+totalEmissiveRadiance;
 diffuseColor.a=coverage;
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey=()=>`K032-pbr-2-${family}-${slabCourses}`;m.needsUpdate=true;
+  m.customProgramCacheKey=()=>`K032-pbr-3-${family}-${slabCourses}`;m.needsUpdate=true;
 }
