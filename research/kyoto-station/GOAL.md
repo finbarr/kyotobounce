@@ -1,0 +1,1 @@
+Reconstruct Kyoto Station’s public spaces, both station plazas, and immediately surrounding street frontages to the reference-backed visual standard in `research/kyoto-station/LONG-TERM-PLAN.md`, completing its architectural, material, lighting, vegetation, and exterior-detail milestones while preserving gameplay and passing the plan’s Chrome performance and runtime checks.
