@@ -53,6 +53,8 @@ tools/*
 !tools/pack-assets.mjs
 !tools/dev.mjs
 !tools/export_browser_art.py
+!tools/export_attributes.py
+!tools/test_export_attributes.py
 !tools/coplanar_surfaces.py
 !tools/export_atrium_layout.py
 !tools/build_atrium_detail.py
@@ -102,3 +104,18 @@ KyotoRicochet/Assets/Kyoto/Editor/ReflectionStudy17.meta
 !docs/LEVEL-DESIGN.md
 
 !docs/WAYPOINT-SCORING.md
+
+# Research source text and methods; downloaded media and evidence stay in private packs.
+!/research/
+research/*
+!research/kyoto-station/
+research/kyoto-station/*
+!research/kyoto-station/*.md
+!research/kyoto-station/sources.json
+!research/kyoto-station/scripts/
+research/kyoto-station/scripts/*
+!research/kyoto-station/scripts/*.py
+!research/kyoto-station/scripts/*.mjs
+!research/kyoto-station/notes/
+research/kyoto-station/notes/*
+!research/kyoto-station/notes/*.md
