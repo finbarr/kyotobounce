@@ -54,3 +54,70 @@ The small floor candidate uses the interior upper landing's 15.614658 m finished
 Candidate: `.local/v2/candidate/plaza/`, 312 triangles and one material batch. Its closed mesh has positive volume. Browser/native serialization agrees within 3.79 micrometres. `verify-west-plaza-join.mjs` exercises the isolated candidate, current upper floor and its guards at Z=−4, 4 and 16 m, in both directions. All six walks pass; the fixture and reports occupy under 0.5 MiB together with the component. No new full-station copy was created.
 
 This floor is **not installed**. The running game still uses the committed bundle. Continue by coordinating the first Grand Stairway flight and attached landing/facade/guard geometry with this floor, then reconcile the onward route before promotion. Reuse this candidate and its recorded fit; do not repeat the source search or generate another complete station for an isolated seam test.
+
+## Coordinated candidate and current integration issue
+
+28 September, continuation. The single private candidate now includes the plaza,
+all fourteen Grand Stairway flights, their shared landings, eight northern
+escalator lanes, attached guards and western facades. It uses the recorded rigid
+plan registration. Heights are interpolated between the source approach, plaza
+and retained 45.2 m Skyway datum; the upper flight allocation remains an explicit
+construction assumption, not a new survey result.
+
+Reproducible implementation:
+
+- `prepare-west-connected-layout.mjs` coordinates the collision records.
+- `install-west-connected-layout.py` rebuilds the corresponding editable meshes,
+  retains unrelated authored objects and incorporates the previously appended
+  NIWA and stair-guard components into the source scene.
+- `tools/build_atrium_detail.py` regenerates the complete hardware from that
+  layout; `prepare-west-connected-motion.mjs` preserves the component transfer
+  contracts and packages its delivery GLB.
+- `verify-west-connected-source.py` compares saved panel topology and rotated
+  box corners with native records and rejects duplicate native bindings.
+- `verify-west-grand-stairway.mjs` exercises the source upper approach through
+  every Grand Stairway flight in both directions.
+
+Current private receipts:
+
+| Item | Evidence |
+| --- | --- |
+| Candidate native layout | `26250ce9fa86725d7baf1319c2abfb6819a3529d624f16b752885d7d5429ea74` |
+| Saved Blender scene | `243448ba2a027bdab0924f535331d6c544071aebbe3032cdd32baece512a2984` |
+| Browser delivery GLB | `46acb8668c8f1ad00da8355a2ea35e0ed32c5b47cf324134b63547f6dba00975` |
+| Hardware delivery GLB | `30a66ac3bd020082731d57c2c7b8b4cd6e7f681b494d527ecc84159adbf02b61` |
+| Source comparison | 309 panels, 3,626 boxes; maximum corner error 0.0000142 m; exact panel triangle order; 46,020 unique native bindings |
+| Native traversal | Uphill 766 samples, downhill 767 samples; both pass, maximum sampled height deviation 0.182 m |
+| Gameplay runtime | Configured spawn/home, 1.38 m walk, full translation and spin rest, unsaved exploration result and recall forfeiture pass |
+| Chrome | Three fixed views, zero page errors; median frame interval 16.7 ms, sampled p95 at most 16.8 ms; brief views, not a long performance soak |
+
+The local review runs through `.local/v2/candidate/assets.json` on port 4426.
+The committed main asset manifest still selects the previous playable bundle.
+The candidate is **not accepted or merged into that bundle**.
+
+The upper-door inspection established a concrete remaining break. A native ray
+line perpendicular to the relocated 10F doorway hits the stair landing at
+45.2 m. At 2–20 m beyond the doorway it hits `west-south-floor-07` at 40.33665 m,
+then finds the old `skyway-circulation-floor` at 45.2 m at 22 m. This is a sampled
+4.86335 m drop behind the doorway, not proof about every possible alternate
+route. The Chrome doorway view agrees with the missing connection. Detailed
+rays and views are in `.local/v2/candidate/upper-interface.json` and `views/`.
+
+Continue this same task by integrating the already researched western restaurant
+and bridge component described in [WESTERN-APPROACH.md](WESTERN-APPROACH.md),
+reconciling its stair threshold and central Skyway endpoint with matching physics.
+Also check the southern lower approach and remove or update stale western route
+and datum metadata. Reuse the source, registration and candidate; do not restart
+reference collection. Main promotion requires those connected routes and the
+complete browser/runtime checks to pass.
+
+### Shorter build cycle
+
+A one-second sample of the slow Blender process found its main thread spending
+all samples inside `Text.write` / character insertion while embedding a 247 MB
+single-line layout. Loading the same file with `bpy.data.texts.load` let the
+candidate save successfully. The installer also uses a set for created-object
+membership and resolves repeated beam IDs using their actual geometry rather
+than stale ID-only indices. Render-only fixtures keep their meshes without
+invented colliders. The browser exporter now excludes zero-area source triangles
+before attribute interpolation, using its existing output-area threshold.

@@ -38,7 +38,7 @@ def visible_object(obj):
  return obj.type=='MESH' and not (obj.get('kyoto_dynamic') or obj.get('kyoto_lane') or obj.hide_render or obj.get('kyoto_authoring_helper') or obj.get('kyoto_auxiliary')=='walking surface' or obj.get('kyoto_motion_aux'))
 visible_objects=[obj for obj in source_scene.objects if visible_object(obj)]
 coplanar=CoplanarSurfaces(visible_objects,deps,records)
-groups={};counts={'sourceObjects':0,'triangles':0,'skippedDynamic':0,'skippedProxies':0}
+groups={};counts={'sourceObjects':0,'triangles':0,'skippedDynamic':0,'skippedProxies':0,'degenerateSourceTriangles':0}
 for obj in list(source_scene.objects):
  if obj.type!='MESH':continue
  if obj.get('kyoto_dynamic') or obj.get('kyoto_lane'):
@@ -82,6 +82,11 @@ for obj in list(source_scene.objects):
     uv=(pt.x/span,pt.y/span) if abs(n.z)>.5 else (pt.y/span,pt.z/span) if abs(n.x)>.5 else (pt.x/span,pt.z/span)
    else:uv=tuple(uv_layer.data[li].uv) if uv_layer else (pt.x/2.4,pt.y/2.4)
    vertices.append((pt,normal,uv))
+  # Float32 source coordinates can collapse tiny triangles to a line. Reject
+  # them before barycentric attribute interpolation divides by their area.
+  # The same area threshold already excludes degenerate output fragments.
+  if (vertices[1][0]-vertices[0][0]).cross(vertices[2][0]-vertices[0][0]).length<1e-10:
+   counts['degenerateSourceTriangles']+=1;continue
   for polygon in coplanar.fragments(obj.name,tri.polygon_index,vertices):
    if args.restore_attributes_prefix and any(label.startswith(p) for p in args.restore_attributes_prefix):polygon=interpolate_at_stored_positions(vertices,polygon)
    for i in range(1,len(polygon)-1):
