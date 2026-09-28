@@ -1,5 +1,5 @@
 """Private asset transfer with content deduplication; never publish this archive."""
-import hashlib,json,os,shutil,sys,tarfile,tempfile
+import hashlib,json,os,shutil,sys,tarfile,tempfile,subprocess
 from pathlib import Path
 
 def sha(p):
@@ -29,7 +29,12 @@ if mode=='pack':
 elif mode=='restore':
  root=Path(args[0]).resolve()
  with tempfile.TemporaryDirectory(prefix='kyoto-assets-',dir=root.parent) as temp:
-  with tarfile.open(archive,'r:gz') as tar:tar.extractall(temp,filter='data')
+  if archive.endswith('.zst'):
+   with subprocess.Popen(['zstd','-dc','--long=30',archive],stdout=subprocess.PIPE) as child:
+    with tarfile.open(fileobj=child.stdout,mode='r|') as tar:tar.extractall(temp,filter='data')
+    assert child.wait()==0,'Archive decompression failed'
+  else:
+   with tarfile.open(archive,'r:*') as tar:tar.extractall(temp,filter='data')
   records=json.loads((Path(temp)/'manifest.json').read_text());checked=set()
   for r in records:
    source=Path(temp)/'blobs'/r['sha256'];target=(root/r['path']).resolve();assert target.is_relative_to(root)
