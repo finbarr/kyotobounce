@@ -1,3 +1,4 @@
+import { chromeGraphicsArgs } from '../../../tools/chrome-graphics.mjs';
 // Capture the actual game at fixed review cameras, with asynchronous GPU queries.
 // Research photographs are referenced by the manifest, never bundled here.
 import {chromium} from 'playwright';
@@ -40,7 +41,7 @@ const readPower=()=>execFileSync('pmset',['-g','batt'],{encoding:'utf8'}).trim()
 const result={date:new Date().toISOString(),powerStart:readPower(),powerSettings:execFileSync('pmset',['-g','custom'],{encoding:'utf8'}).trim(),manifestHash:hash(manifestBytes),source:variant.receipt,fixtureHash:liveReview?null:hash(await readFile(fixturePath)),reviewMode:liveReview?'live native session; fixed camera; no replay fixture':'recorded fixture',viewport:manifest.viewport,views:[],errors:[],warnings:[]};
 const quantiles=xs=>{if(!xs.length)return null;xs.sort((a,b)=>a-b);const q=p=>xs[Math.min(xs.length-1,Math.floor(xs.length*p))];return {samples:xs.length,p50:q(.5),p95:q(.95),p99:q(.99),max:xs.at(-1)};};
 try{
- browser=await chromium.launch({executablePath:process.env.CHROME_PATH||(process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome'),headless:false,args:['--enable-webgl',...(process.platform==='darwin'?['--use-angle=metal']:['--use-angle=swiftshader','--enable-unsafe-swiftshader']),'--autoplay-policy=no-user-gesture-required']});
+ browser=await chromium.launch({executablePath:process.env.CHROME_PATH||(process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome'),headless:false,args:['--enable-webgl',...chromeGraphicsArgs(),'--autoplay-policy=no-user-gesture-required']});
  result.browser=browser.version();
  page=await browser.newPage({viewport:manifest.viewport,deviceScaleFactor:1});
  page.on('pageerror',e=>result.errors.push(String(e)));page.on('console',m=>{if(['error','warning'].includes(m.type()))result.warnings.push(m.text());});

@@ -1,3 +1,4 @@
+import { chromeGraphicsArgs } from '../../../tools/chrome-graphics.mjs';
 // Inspect the retained municipal station shell separately from playable geometry.
 import {chromium} from 'playwright';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -7,7 +8,7 @@ const source=await readFile('web/benchmarks/render.js','utf8'),bytes=await readF
 const views=[{id:'north',position:[-40,24,-280],target:[-45,25,0],fov:75},{id:'west-facade',position:[-190,8,-100],target:[-205,24,-12],fov:65},{id:'east-facade',position:[115,6,-100],target:[145,24,-10],fov:65},{id:'south',position:[-30,32,170],target:[-40,24,0],fov:90},{id:'west-roof',position:[-205,85,45],target:[-180,35,-15],fov:65}];
 const report={sourceSha256:createHash('sha256').update(bytes).digest('hex'),views,errors:[]};let browser;
 try{
- browser=await chromium.launch({executablePath:process.env.CHROME_PATH||(process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome'),headless:false,args:['--enable-webgl',...(process.platform==='darwin'?['--use-angle=metal']:['--use-angle=swiftshader','--enable-unsafe-swiftshader'])]});
+ browser=await chromium.launch({executablePath:process.env.CHROME_PATH||(process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome'),headless:false,args:['--enable-webgl',...chromeGraphicsArgs()]});
  const p=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});p.on('pageerror',e=>report.errors.push(String(e)));
  await p.route('**/evidence/municipal-station.glb',r=>r.fulfill({body:bytes,contentType:'model/gltf-binary'}));
  await p.route('**/bench/render.js',r=>r.fulfill({contentType:'text/javascript',body:source+`\nconst shell=await loader.loadAsync('/evidence/municipal-station.glb');\nfor(const o of scene.children)if(!o.isLight)o.visible=false;\nscene.add(shell.scene);shell.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});\nrenderer.shadowMap.needsUpdate=true;\nwindow.__shell={setView(value){view=value;render();},stats(){return {calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}}};\n`}));

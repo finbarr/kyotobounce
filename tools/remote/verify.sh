@@ -33,5 +33,6 @@ done
 export KYOTO_TEST_ORIGIN=http://127.0.0.1:4173 KYOTO_URL=http://127.0.0.1:4173 KYOTO_EVIDENCE="$out/browser-game"
 node --experimental-strip-types web/tests/level-entry-runtime.mjs
 node --experimental-strip-types web/tests/tutorial-runtime.mjs
-node web/tests/browser-smoke.mjs
+KYOTO_SMOKE_WIDTH=800 KYOTO_SMOKE_HEIGHT=600 node web/tests/browser-smoke.mjs
+curl -fsS http://127.0.0.1:4173/api/health > "$out/health.json"
 printf 'passed\n' > "$out/status.txt"

@@ -1,3 +1,4 @@
+import { chromeGraphicsArgs } from '../../../tools/chrome-graphics.mjs';
 // Static visual review. Timing here is diagnostic, not full-game acceptance.
 import {chromium} from 'playwright';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -15,7 +16,7 @@ const views=process.env.KYOTO_CITY_VIEWS?JSON.parse(await readFile(process.env.K
 const report={date:new Date().toISOString(),kind:'Static candidate inspection, not full-game benchmark',views:[],errors:[],warnings:[]};
 let browser;
 try{
- browser=await chromium.launch({executablePath:process.env.CHROME_PATH||(process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome'),headless:false,args:['--enable-webgl',...(process.platform==='darwin'?['--use-angle=metal']:['--use-angle=swiftshader','--enable-unsafe-swiftshader'])]});report.browser=browser.version();
+ browser=await chromium.launch({executablePath:process.env.CHROME_PATH||(process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome'),headless:false,args:['--enable-webgl',...chromeGraphicsArgs()]});report.browser=browser.version();
  const page=await browser.newPage({viewport:{width:1440,height:1100},deviceScaleFactor:1});
  page.on('pageerror',e=>report.errors.push(String(e)));page.on('console',m=>{if(['warning','error'].includes(m.type()))report.warnings.push(m.text());});
  await page.goto(origin+'/?variant=optimized&inspect',{waitUntil:'domcontentloaded'});

@@ -28,7 +28,7 @@ if mode=='pack':
  print('Packed',archive,Path(archive).stat().st_size,flush=True)
 elif mode=='restore':
  root=Path(args[0]).resolve()
- with tempfile.TemporaryDirectory(prefix='kyoto-assets-',dir=root.parent) as temp:
+ with tempfile.TemporaryDirectory(prefix='kyoto-assets-',dir=root) as temp:
   if archive.endswith('.zst'):
    with subprocess.Popen(['zstd','-dc','--long=30',archive],stdout=subprocess.PIPE) as child:
     with tarfile.open(fileobj=child.stdout,mode='r|') as tar:tar.extractall(temp,filter='data')

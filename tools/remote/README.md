@@ -6,7 +6,7 @@ Run commands from `/opt/boxhaven/project`. This checkpoint is unfinished researc
 
 `bootstrap.sh` installs Blender 5.2.1, Chrome, Xvfb, graphics libraries and a Python environment with NumPy, SciPy, Shapely, Pillow and OpenCV. Source `/etc/profile.d/kyoto-tools.sh` in non-login shells. Install Node dependencies with `npm ci`.
 
-Use `xvfb-run -a node ...` for headed Chrome research captures on Linux. These use software rendering; they establish functionality and geometry visibility, not laptop GPU frame-rate acceptance. Final performance acceptance stays on the user's Chrome laptop.
+Use `xvfb-run -a node ...` for headed Chrome research captures on Linux. CPU-only Linux defaults to software rendering. On a verified GPU machine set `KYOTO_CHROME_ANGLE=gl` (or `vulkan` with a working Vulkan driver). Set `KYOTO_REQUIRE_GPU=1` for the game smoke test to reject software rendering; the test saves `graphics.json`. These checks establish remote functionality, not laptop GPU frame-rate acceptance. Final performance acceptance stays on the user's Chrome laptop.
 
 The compatible Linux Dedicated Server worker is included privately at `Builds/PhysicsWorkerLinux/KyotoPhysicsWorker.x86_64`. Geometry and course tests use it without Unity Editor. Native C# changes require a compatible licensed Unity Editor and a rebuilt dedicated-server worker; this image does not claim native compiler readiness.
 
@@ -37,3 +37,12 @@ The verified agent launch uses the standard `bh run NAME codex ...` wrapper insi
 For a smaller transport archive, recompress the gzip tar stream using `gzip -dc checkpoint.tar.gz | zstd -3 --long=30 -T2 -o checkpoint.tar.zst`. Restoration supports both formats and verifies each distinct content hash. This does not discard reconstruction versions or evidence.
 
 Direct non-login SSH shells may resolve `/usr/bin/codex` instead of the BoxHaven wrapper. Use `/opt/boxhaven/bin/codex` explicitly for direct SSH launches; `bh run` supplies the normal login environment.
+
+
+Some source blends reference a Mac system font. Linux includes Noto CJK; load `tools/remote/font-fallback.py` before an authoring/export script to substitute missing editable text fonts in memory. It never saves the original blend. Existing mesh geometry stays intact, but new or edited text has different font metrics and needs visual review. Example: `blender --background --python tools/remote/font-fallback.py --python tools/export_browser_art.py -- ...`.
+
+Historical evidence receipts retain their original absolute file paths and hashes. The image includes two project-only aliases from the former Mac checkout paths to `/opt/boxhaven/project`, so those recorded photo/source paths remain readable without rewriting evidence.
+
+Run full-station Blender exports and full-game Chrome checks sequentially on the 16 GB machines. The seed export used about 13 GB at peak; parallel component authoring happens across machines, not as several heavy exports inside one VM.
+
+The requested GPU fleet targets RTX 4000 Ada machines in Toronto: 8 CPU, 32 GB RAM, 20 GB VRAM, 500 GB disk. BoxHaven listed $1.82/hour per machine during preparation. Provisioning and GPU verification are tracked separately from the completed CPU checks; an intermediate transport snapshot is not a verified final worker image.

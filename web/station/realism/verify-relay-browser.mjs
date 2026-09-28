@@ -1,3 +1,4 @@
+import { chromeGraphicsArgs } from '../../../tools/chrome-graphics.mjs';
 // Real Chrome controls against the isolated candidate; telemetry is read-only.
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
@@ -5,7 +6,7 @@ import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 const [outArg,catalogArg]=process.argv.slice(2),out=resolve(outArg);assert(out.startsWith(resolve('.local')+'/'));await mkdir(out,{recursive:false});
 const expected=JSON.parse(await readFile(catalogArg)).find(c=>c.id==='kyoto-cascade5');
-const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist',...(process.platform==='darwin'?['--use-angle=metal']:['--use-angle=swiftshader','--enable-unsafe-swiftshader'])]});
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist',...chromeGraphicsArgs()]});
 const page=await browser.newPage({viewport:{width:1280,height:720},deviceScaleFactor:1});
 const report={scope:'Actual Chrome start, hint and keyboard throw for unaccepted private Escalator Relay proposal; not a performance or all-course gate.',input:'DOM keyboard and button events. Game telemetry is read-only.',errors:[],pass:false};
 page.on('pageerror',e=>report.errors.push(e.message));

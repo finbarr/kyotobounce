@@ -28,7 +28,7 @@ Acceptance: an explicit geographic footprint, reference/date/license list, sourc
 
 Owner: `kyoto-surfaces`, branch `codex/remote-surfaces`.
 
-First ticket: identify the largest remaining material/lighting mismatches in one registered central-hall view, then improve a bounded material set using original textures. Work in `web/station/realism/surfaces/` with candidate material definitions; global `station-*.js` changes require coordination. Preserve geometry and physical materials.
+First ticket: identify the largest remaining material/lighting mismatches in one established photo registration, preferably the existing paired courtyard views, then improve a bounded material set using original textures. Work in `web/station/realism/surfaces/` with candidate material definitions; global `station-*.js` changes require coordination. Preserve geometry and physical materials.
 
 Acceptance: fixed-camera before/after captures, texture provenance, correct packed channels/normals, exported attribute parity, and measured texture/draw-call costs. Linux software-render timing is diagnostic only; the integration session runs Chrome performance/audio checks on the laptop.
 
