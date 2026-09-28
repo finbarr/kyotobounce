@@ -124,3 +124,6 @@ __pycache__/
 *.pyc
 !tools/remote/
 !tools/remote/**
+# Keep cache exclusions after directory allowlists.
+**/__pycache__/
+**/*.pyc

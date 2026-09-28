@@ -35,3 +35,5 @@ Research photos and compiled workers stay out of Git. Commit source and methods 
 The verified agent launch uses the standard `bh run NAME codex ...` wrapper inside the isolated VM. Explicit nested read-only/workspace bubblewrap modes failed on this Ubuntu image's AppArmor user-namespace policy. No host-wide AppArmor policy was disabled. Keep task prompts bounded and use the VM as the isolation boundary, as BoxHaven's default wrapper does.
 
 For a smaller transport archive, recompress the gzip tar stream using `gzip -dc checkpoint.tar.gz | zstd -3 --long=30 -T2 -o checkpoint.tar.zst`. Restoration supports both formats and verifies each distinct content hash. This does not discard reconstruction versions or evidence.
+
+Direct non-login SSH shells may resolve `/usr/bin/codex` instead of the BoxHaven wrapper. Use `/opt/boxhaven/bin/codex` explicitly for direct SSH launches; `bh run` supplies the normal login environment.
