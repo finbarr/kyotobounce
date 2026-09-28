@@ -2,7 +2,13 @@
 
 The user wants to retain the useful visual reconstruction and replace all existing levels. Follow `research/kyoto-station/V2-ITERATION-PLAN.md` for the replacement ongoing goal: finish one task, commit and deliver it, then continue; no overall time cap, before/after presentations or routine review pauses. Historical course failures and repair queues below are no longer v2 blockers; do not repair old targets, hints, starts or progression. Core movement, physics, collision and performance checks still apply. The replacement goal is active. The local v2 foundation is now integrated; current details follow.
 
-## Current delivery: NIWA service alcove closure — 28 September 2026
+## Current delivery: western circulation — 28 September 2026
+
+The v2 western connection now uses source-derived lower and upper escalator banks, intermediate and curved upper landings, 31 stair treads and source-shaped landing guards. Both complete moving routes and the staircase pass native traversals in both directions. See `research/kyoto-station/notes/WESTERN-CIRCULATION-V2.md`; current assets and hashes are selected by `web/v2/assets.json`.
+
+The café counter and alcove remain integrated. Next focused work is the surrounding western frontage/gallery and onward upper connection, whose inherited masses are still provisional. The source route reaches 15.6147 m; do not preserve the old 19.586 m escalator endpoint or old course targets.
+
+## Delivered: NIWA service alcove closure — 28 September 2026
 
 The v2 preview now closes the exposed service-room end with a plaster wall, dark plinth and rear floor seam. It joins the retained pier, canopy and backing while leaving the entrance and public frontage clear. The hidden depth is inferred. See `research/kyoto-station/notes/NIWA-ALCOVE-V2.md`.
 

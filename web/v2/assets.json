@@ -1,31 +1,40 @@
 {
-  "layout": ".local/v2/station-niwa-alcove-01/station-layout.json",
-  "layoutSha256": "17b6a4bad1997e2c36c88852824bf116d6fbb9e0e03ba8820934ceb3405c4ae0",
-  "station": ".local/v2/station-niwa-alcove-01/station.json",
-  "geometry": ".local/v2/station-niwa-alcove-01/atrium.runtime.glb",
-  "geometrySha256": "d3ade1b314101c821ede1eddce430ed8d095c4682afba1634851ade9c9edce47",
-  "detail": ".local/station-realism/hall-basement-motion-02/atrium-detail.json",
-  "motionLayout": ".local/station-realism/station-hall-basement-05/station-layout.json",
+  "layout": ".local/v2/station-west-complete-04/station-layout.json",
+  "layoutSha256": "deb67ce99da6d400b7bacb34dc2cada2417dd9d0e78c865a5198c286f652c211",
+  "station": ".local/v2/station-west-complete-04/station.json",
+  "geometry": ".local/v2/station-west-complete-04/atrium.runtime.glb",
+  "geometrySha256": "983f6cce1f1bf552e64ef6c27e3325a7cf6b26005df54b271e72359b13de839e",
+  "detail": ".local/v2/west-circulation-motion-04/atrium-detail.json",
+  "motionLayout": ".local/v2/station-west-circulation-04/station-layout.json",
   "spawn": {
     "x": 107.14205,
     "y": 30.80703,
     "z": 6.07587
   },
-  "sourceScene": ".local/station-realism/station-gate-bank-02/KyotoAtrium.blend",
+  "sourceScene": ".local/v2/station-west-circulation-04/KyotoAtrium.blend",
   "sourceComponents": [
     {
-      "directory": ".local/v2/niwa-service-02",
+      "directory": ".local/v2/west-circulation-component-03",
+      "builder": "web/station/realism/build-west-circulation-v2.mjs",
+      "builderSha256": "7ae66eff09d34db5a20ed4cc18a5913bb528f5549a0e36878f59fa325e32a6cd",
+      "glbSha256": "90a51e7f158387372d86627f857a24406efadce7d51f40fd3760354cd6805c79",
+      "nativeSha256": "56ce566113136eecc2e01e87ee4bde81ece0a5c9c7fbea0ec3ec909e03a76047"
+    },
+    {
+      "directory": ".local/v2/niwa-service-west-04",
       "builder": "web/station/realism/build-niwa-service.mjs",
       "builderSha256": "1e1bf616f753dcef9a16e957e908631e60f601c5f05b0c2f0dbe5bfb43ac2c7f",
       "glbSha256": "3a6d91cd10e5daa25beebe7673f79f528bf206c99794d0c007d33b7f39162117",
       "nativeSha256": "0e95ee79adcdd2f0c927a754780a6c42a3f06cf2a0db3d80d3a03adf98c74c9e"
     },
     {
-      "directory": ".local/v2/niwa-alcove-01",
+      "directory": ".local/v2/niwa-alcove-west-04",
       "builder": "web/station/realism/build-niwa-alcove.mjs",
       "builderSha256": "136fc33d3335abe4a278daca2032eb45c648a4f2de117e042ee731eaad0b72af",
       "glbSha256": "7ef4a72514bdd059385e7de5adf2806245ab98dcb41637c6438067508123b6b9",
       "nativeSha256": "05eca09081e11543ed80f63bd74511bdc14714c8d2abf0f5da68d3864cd5996e"
     }
-  ]
+  ],
+  "hardware": ".local/v2/west-circulation-motion-04/atrium-detail.runtime.glb",
+  "hardwareSha256": "5a7330e2f1830c22940b5b4c460c5616cbef40dd97e74ec48ef8d45088e912ec"
 }

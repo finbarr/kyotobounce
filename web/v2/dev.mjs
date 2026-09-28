@@ -15,12 +15,15 @@ const json=p=>readFile(resolve(p),'utf8').then(JSON.parse);
 const source=await readFile(config.layout);
 assert.equal(hash(source),config.layoutSha256,'V2 source layout changed; update its asset receipt');
 assert.equal(await hashFile(config.geometry),config.geometrySha256,'V2 station geometry changed; update its asset receipt');
+if(config.hardware)assert.equal(await hashFile(config.hardware),config.hardwareSha256,'V2 hardware geometry changed');
 const layout=JSON.parse(source),station=await json(config.station),detail=await json(config.detail),motionBytes=await readFile(config.motionLayout);
 assert.equal(station.layoutSha256,hash(source),'Visual and collision exports must match');
 assert.equal(hash(motionBytes),detail.candidateMotionIntegration.layoutSha256,'Unknown moving-step source');
 assert.deepEqual(layout.escalators,JSON.parse(motionBytes).escalators,'Moving escalators changed since their detail export');
 for(const support of layout.architecture.hallBasementIntegration.componentCombSupports)
  assert.deepEqual(detail.combSupports.find(s=>s.support===support.support),support,'Moving-step endpoints must match collision');
+for(const support of layout.architecture.westCirculationV2?.combSupports||[])
+ assert.deepEqual(detail.combSupports.find(s=>s.support===support.support),support,'Western moving-step endpoints must match collision');
 // Only the entry position changes. No geometry export or asset duplication is needed.
 layout.spawn=config.spawn;
 const layoutBytes=JSON.stringify(layout)+'\n',layoutSha256=hash(layoutBytes);
@@ -31,10 +34,16 @@ await mkdir(resolve(local,'data'),{recursive:true});
 await writeFile(resolve(local,'station-layout.json'),layoutBytes);
 await writeFile(resolve(overlay,'assets/station.json'),JSON.stringify(station)+'\n');
 const previous=await readFile(resolve(local,'asset-receipt.json'),'utf8').then(JSON.parse).catch(error=>{if(error.code==='ENOENT')return null;throw error;});
+if(!config.hardware&&previous?.hardware){
+ const destination=resolve(overlay,'assets/runtime/atrium-detail.glb');
+ const existing=await readlink(destination).catch(error=>{if(error.code==='ENOENT')return null;throw error;});
+ if(existing){assert.equal(existing,resolve(previous.hardware),'Refusing to remove untracked hardware');await unlink(destination);}
+}
 const replacements={'assets/runtime/atrium.glb':config.geometry,'assets/atrium-detail.json':config.detail};
+if(config.hardware)replacements['assets/runtime/atrium-detail.glb']=config.hardware;
 for(const [name,sourcePath] of Object.entries(replacements)){
  const destination=resolve(overlay,name),target=resolve(sourcePath);
- try{await symlink(target,destination);}catch(error){if(error.code!=='EEXIST')throw error;const existing=await readlink(destination);if(existing!==target){const managed=name==='assets/runtime/atrium.glb'?previous?.geometry:previous?.detail;assert(managed&&existing===resolve(managed),'Refusing to overwrite an untracked local asset');await unlink(destination);await symlink(target,destination);}}
+ try{await symlink(target,destination);}catch(error){if(error.code!=='EEXIST')throw error;const existing=await readlink(destination);if(existing!==target){const managed=name==='assets/runtime/atrium.glb'?previous?.geometry:name==='assets/runtime/atrium-detail.glb'?previous?.hardware:previous?.detail;assert(managed&&existing===resolve(managed),'Refusing to overwrite an untracked local asset');await unlink(destination);await symlink(target,destination);}}
 }
 const build=await json('web/public/browser-build.json');
 for(const name of ['assets/station.json',...Object.keys(replacements)]){
