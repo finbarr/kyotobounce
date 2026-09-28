@@ -10,6 +10,8 @@ The user wants to retain the useful visual reconstruction and replace all existi
 
 ## Current delivery: western lower-stair guards — 28 September 2026
 
+Upper connection remains in progress: a reproducible 136-ray native audit confirms an open sampled join and a 3.9713 m floor-height mismatch. The plan-to-source registration is still unresolved; no ramp or global relevel has been accepted. See `research/kyoto-station/notes/WESTERN-UPPER-CONNECTION-V2.md` and its compact measurement file. Continue this connection next; the following guards remain the latest geometry delivery.
+
 Both missing lower-stair handrails and their stone parapets are now appended to the current bundle. Rail geometry/normals and parapet caps come from the municipal source; hidden backing depth and finishes are inferred. The addition is 21 closed parts, 7,232 triangles and two render batches. Six native traversals and Chrome inspection pass; frame-time p95 is 16.7 ms. See `research/kyoto-station/notes/WESTERN-STAIR-GUARDS-V2.md`. Next remains the surrounding western frontage/gallery and onward upper connection.
 
 ## Current delivery: western circulation — 28 September 2026
