@@ -1,6 +1,6 @@
 from pathlib import Path
 import json,hashlib,math,html
-R=Path(__file__).resolve().parents[1];W=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism');O=R/'notes/paid-concourse-openings';O.mkdir(exist_ok=True);C=W/'central-gate-passage-03'
+R=Path(__file__).resolve().parents[1];W=Path('./.local/station-realism');O=R/'notes/paid-concourse-openings';O.mkdir(exist_ok=True);C=W/'central-gate-passage-03'
 files={n:C/n for n in ['report.json','serialization.json','normals.json','opening-proof.json']};files.update({'spec.json':W/'central-gate-passage-spec-03/spec.json','native-walks.json':W/'central-gate-passage-walk-05/report.json','existing-floor-walks.json':W/'central-gate-existing-floor-walk-01/report.json','floor-coverage.json':W/'gate-floor-integration-02/report.json','initial-floor-check.json':W/'gate-floor-integration-01/report.json','integration-component.json':W/'central-gate-integration-component-01/report.json','integration-serialization.json':W/'central-gate-integration-component-01/serialization.json','integration-normals.json':W/'central-gate-integration-component-01/normals.json'})
 for label,p in [('before',W/'central-gate-passage-02/reference'),('after',C/'reference'),('front',C/'front')]:files[label+'.png']=p/'source.png';files[label+'-receipt.json']=p/'projection.json'
 for n in ['native-walks.json','existing-floor-walks.json']:

@@ -2,7 +2,7 @@
 from pathlib import Path
 import json,hashlib,html,shutil
 R=Path(__file__).resolve().parents[1]
-W=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism')
+W=Path('./.local/station-realism')
 O=R/'notes/central-gate-registration';O.mkdir(exist_ok=True)
 files={'lower-checks.json':'central-gate-registration-01/lower-checks.json','lower-report.json':'central-gate-lower-check-01/report.json','candidate-correspondences.json':'central-gate-registration-01/correspondences-03.json','candidate-fit.json':'central-gate-registration-01/fit-03/fit.json','candidate-source-proof.json':'central-gate-registration-01/source-proof-03.json','candidate-visibility.json':'central-gate-registration-01/visibility-03.json','previous-fit.json':'central-hall-maeda-01/fit-02/fit.json'}
 receipts=[]

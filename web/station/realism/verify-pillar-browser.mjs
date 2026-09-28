@@ -5,7 +5,7 @@ import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 const [outArg,catalogArg]=process.argv.slice(2),out=resolve(outArg);assert(out.startsWith(resolve('.local')+'/'));await mkdir(out,{recursive:false});
 const expected=JSON.parse(await readFile(catalogArg)).find(c=>c.id==='kyoto-pillar-carom');
-const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']});
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist',...(process.platform==='darwin'?['--use-angle=metal']:['--use-angle=swiftshader','--enable-unsafe-swiftshader'])]});
 const page=await browser.newPage({viewport:{width:1280,height:720},deviceScaleFactor:1});
 const report={scope:'Actual Chrome start, hint and keyboard throw for private Pillar Carom revision; not a performance or all-course gate.',input:'DOM keyboard and button events. Game telemetry is read-only.',errors:[],pass:false};
 page.on('pageerror',e=>report.errors.push(e.message));

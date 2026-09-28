@@ -7,7 +7,7 @@ import math
 import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
-WORK = Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto')
+WORK = Path('.')
 LOCAL = WORK / '.local/station-realism'
 OUT = ROOT / 'notes/pillar-approach'
 

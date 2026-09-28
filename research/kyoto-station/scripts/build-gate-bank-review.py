@@ -2,7 +2,7 @@
 import json,hashlib,shutil,re
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
-w=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism')
+w=Path('./.local/station-realism')
 out=root/'notes/gate-bank-installed';out.mkdir(exist_ok=True)
 files={'before.png':'gate-installed-views-01/front/source.png','after.png':'gate-bank-installed-views-01/front/source.png','close.png':'gate-bank-installed-views-01/close/source.png','before-camera.json':'gate-installed-views-01/front/projection.json','after-camera.json':'gate-bank-installed-views-01/front/projection.json','close-camera.json':'gate-bank-installed-views-01/close/projection.json','spec.json':'central-gate-bank-spec-02/spec.json','install.json':'station-gate-bank-01/gate-bank-install.json','scope.json':'station-gate-bank-01/scope-proof.json','lanes.json':'full-station-gate-bank-lanes-03/report.json','route-diagnostics.json':'full-station-gate-bank-walk-01/report.json','course-placements.json':'gate-bank-all-course-support-01/report.json','crossstation-conflict.json':'gate-bank-all-course-support-01/crossstation-conflict.json','course-throws.json':'gate-bank-carried-courses-01/summary.json','attributes.json':'gate-bank-browser-01/attribute-proof.json','masks.json':'gate-bank-browser-01/mask-verification.json','textures.json':'gate-bank-browser-01/texture-parity.json','compression.json':'gate-bank-browser-01/compression.json'}
 for name,source in files.items():shutil.copyfile(w/source,out/name)

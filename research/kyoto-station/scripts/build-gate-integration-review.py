@@ -2,7 +2,7 @@
 import hashlib,json,shutil,html
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
-w=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto')
+w=Path('.')
 a=w/'.local/station-realism/central-gate-architecture-01'
 out=root/'notes/gate-integration-review';out.mkdir(exist_ok=True)
 layout=json.loads((w/'.local/station-realism/station-hall-basement-05/station-layout.json').read_text())

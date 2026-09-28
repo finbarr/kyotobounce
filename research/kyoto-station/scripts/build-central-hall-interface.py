@@ -2,7 +2,7 @@
 from pathlib import Path
 import json, hashlib, html, shutil
 R=Path(__file__).resolve().parents[1]
-W=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto')
+W=Path('.')
 D=W/'.local/station-realism'; O=R/'notes/central-hall-interface'; O.mkdir(exist_ok=True)
 def load(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()

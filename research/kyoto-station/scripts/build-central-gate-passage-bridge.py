@@ -1,6 +1,6 @@
 from pathlib import Path
 import hashlib,json
-R=Path(__file__).resolve().parents[1];W=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism');C=W/'central-gate-passage-02';O=R/'notes/central-gate-passage-bridge';O.mkdir(exist_ok=True)
+R=Path(__file__).resolve().parents[1];W=Path('./.local/station-realism');C=W/'central-gate-passage-02';O=R/'notes/central-gate-passage-bridge';O.mkdir(exist_ok=True)
 files={n:C/n for n in ['report.json','serialization.json','normals.json']}
 files.update({'spec.json':W/'central-gate-passage-spec-02/spec.json','observation.json':W/'central-gate-passage-spec-02/observation.json','native-walks.json':W/'central-gate-passage-walk-04/report.json','first-draft-report.json':W/'central-gate-passage-01/report.json','first-draft-walks.json':W/'central-gate-passage-walk-03/report.json','first-reference.png':W/'central-gate-passage-01/reference/source.png','first-reference-receipt.json':W/'central-gate-passage-01/reference/projection.json'})
 for view in ['front','under','inside','reference']:files[view+'.png']=C/view/'source.png';files[view+'-receipt.json']=C/view/'projection.json'

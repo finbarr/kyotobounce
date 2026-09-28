@@ -2,7 +2,7 @@
 from pathlib import Path
 import json,hashlib,shutil,sys,re
 ROOT=Path(__file__).resolve().parents[1]
-WORK=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism')
+WORK=Path('./.local/station-realism')
 assembly,wall,native,wallnative=sys.argv[1:]
 OUT=ROOT/'notes/hall-basement-enclosure';OUT.mkdir(exist_ok=True)
 load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()

@@ -119,3 +119,8 @@ research/kyoto-station/scripts/*
 !research/kyoto-station/notes/
 research/kyoto-station/notes/*
 !research/kyoto-station/notes/*.md
+
+__pycache__/
+*.pyc
+!tools/remote/
+!tools/remote/**

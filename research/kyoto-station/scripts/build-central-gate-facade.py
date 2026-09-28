@@ -1,6 +1,6 @@
 from pathlib import Path
 import json,hashlib
-R=Path(__file__).resolve().parents[1];W=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism');C=W/'central-gate-facade-01';O=R/'notes/central-gate-facade';O.mkdir(exist_ok=True)
+R=Path(__file__).resolve().parents[1];W=Path('./.local/station-realism');C=W/'central-gate-facade-01';O=R/'notes/central-gate-facade';O.mkdir(exist_ok=True)
 files={n:C/n for n in ['report.json','serialization.json','normals.json','scope-and-recess-proof.json']};files['spec.json']=W/'central-gate-facade-spec-01/spec.json'
 for name in ['recess-source.json','depth-audit.json','rear-plane.json']:files[name]=W/'central-gate-bridge-study-01'/name
 for v in ['before','after','close']:files[v+'.png']=C/v/'source.png';files[v+'-receipt.json']=C/v/'projection.json'

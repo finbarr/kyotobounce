@@ -3,7 +3,7 @@ from pathlib import Path
 import json, shutil
 
 root = Path(__file__).resolve().parents[1]
-work = Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism')
+work = Path('./.local/station-realism')
 assembly = work/'hall-descents-assembly-23'
 native = work/'hall-b1-west-return-native-02/report.json'
 walks = work/'hall-b1-west-return-walks-02/report.json'

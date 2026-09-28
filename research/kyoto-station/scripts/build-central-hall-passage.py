@@ -1,7 +1,7 @@
 """Publish the corrected floor, gate returns and isolated native passage proof."""
 from pathlib import Path
 import json,shutil,hashlib,html
-R=Path(__file__).resolve().parents[1];W=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto');D=W/'.local/station-realism';O=R/'notes/central-hall-passage';O.mkdir(exist_ok=True)
+R=Path(__file__).resolve().parents[1];W=Path('.');D=W/'.local/station-realism';O=R/'notes/central-hall-passage';O.mkdir(exist_ok=True)
 def load(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 files={'spec.json':'central-hall-bay-spec-03/spec.json','source-floor.json':'central-hall-floor-source-01/audit.json','component.json':'central-hall-bay-07/report.json','floor-proof.json':'central-hall-bay-07/floor-proof.json','serialization.json':'central-hall-bay-07/serialization.json','normals.json':'central-hall-bay-07/normals.json','walks.json':'central-hall-passage-walk-02/report.json','native.json':'central-hall-bay-native-07/report.json','overview.png':'central-hall-bay-07/render-overview/source.png','passage.png':'central-hall-bay-07/render-passage/source.png','render-overview.json':'central-hall-bay-07/render-overview/projection.json','render-passage.json':'central-hall-bay-07/render-passage/projection.json','rejected-walk.json':'central-hall-passage-walk-01/report.json','rejected-floor.json':'central-hall-bay-05/floor-proof-failure.json'}

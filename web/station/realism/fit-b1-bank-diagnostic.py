@@ -5,7 +5,7 @@ from scipy.optimize import least_squares
 from scipy.spatial.transform import Rotation
 root=Path('.local/station-realism/hall-b1-registration-03');root.mkdir(exist_ok=False)
 src=Path('.local/station-realism/hall-bank-profiles-spec-08/spec.json');spec=json.loads(src.read_bytes());bank=next(x for x in spec['meshes'] if x['id']=='hall-basement-west-source-bank-body');v=np.array(bank['vertices']);indices=[4,12,9,1];points=v[indices];obs=np.array([[228,18],[379,29],[285,256],[222,249]],float)
-ref=Path('/Users/finbarr/code/games/kyoto/research/kyoto-station/photos/porta-b2-route-05.jpg')
+ref=Path('research/kyoto-station/photos/porta-b2-route-05.jpg')
 center=np.array([336,224]);C=np.array([-14,-3.3,-7.1]);F=np.array([0,-2.7,-4.7])-C;F/=np.linalg.norm(F);R=np.cross(F,[0,1,0]);R/=np.linalg.norm(R);U=np.cross(R,F);rv=Rotation.from_matrix(np.array([R,-U,F])).as_rotvec();base=np.r_[C,rv,np.log(500)]
 lo=np.r_[[-25,-3.6,-12],[-np.inf]*3,np.log(200)];hi=np.r_[[-10,-2.9,-3], [np.inf]*3,np.log(1000)]
 def project(x):

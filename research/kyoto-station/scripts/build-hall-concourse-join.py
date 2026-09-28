@@ -1,6 +1,6 @@
 from pathlib import Path
 import json,shutil,html
-r=Path(__file__).resolve().parents[1];w=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto');a=w/'.local/station-realism/hall-concourse-assembly-02';out=r/'notes/hall-concourse-join';out.mkdir(exist_ok=True)
+r=Path(__file__).resolve().parents[1];w=Path('.');a=w/'.local/station-realism/hall-concourse-assembly-02';out=r/'notes/hall-concourse-join';out.mkdir(exist_ok=True)
 for name in ['overview','north']:shutil.copy2(a/name/'source.png',out/(name+'.png'))
 for name in ['interface-proof.json','serialization.json','course-summary.json','source-depth.json']:shutil.copy2(a/name,out/name)
 s=json.loads((w/'.local/station-realism/hall-concourse-join-spec-02/spec.json').read_text());c=json.loads((a/'course-summary.json').read_text());names={q['id']:q['name']for q in json.loads((w/'web/starter-challenges.json').read_text())}

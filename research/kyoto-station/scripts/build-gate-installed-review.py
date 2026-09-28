@@ -2,7 +2,7 @@
 import json,hashlib,shutil
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
-w=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism')
+w=Path('./.local/station-realism')
 out=root/'notes/gate-installed';out.mkdir(exist_ok=True)
 files={
 'before.png':w/'gate-installed-views-01/before/source.png',

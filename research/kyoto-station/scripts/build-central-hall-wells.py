@@ -5,7 +5,7 @@ import json
 import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
-WORK = Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto/.local/station-realism')
+WORK = Path('./.local/station-realism')
 OUT = ROOT / 'notes/central-hall-wells'
 OUT.mkdir(exist_ok=True)
 load = lambda p: json.loads(p.read_text())

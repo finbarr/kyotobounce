@@ -2,7 +2,7 @@
 from pathlib import Path
 import json, shutil, html, hashlib
 R=Path(__file__).resolve().parents[1]
-W=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto')
+W=Path('.')
 D=W/'.local/station-realism';O=R/'notes/central-hall-construction';O.mkdir(parents=True,exist_ok=True)
 files={
  'fit.json':'central-hall-maeda-01/fit-02/fit.json',

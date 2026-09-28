@@ -9,7 +9,7 @@ out=Path(sys.argv[1]);assert not out.exists() and Path('.local').resolve() in ou
 L=Path('.local/station-realism');read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();g=read(L/'east-court-04/report.json')['geometry'];O=np.array(g['originRenderer']);D=np.array(g['forwardRenderer']);A=np.array(g['southRenderer']);Y=g['gardenY']
 refs={}
 for v,name in [('jr','niwa-jr-02a.jpg'),('rurubu','niwa-rurubu-frontage.jpg')]:
- d=L/'niwa-frontage-joint-01'/v;camera=read(d/'camera.json');proj=read(d/'render/projection.json');size=[816,544] if v=='jr' else [1200,800];refs[v]={'camera':camera,'quaternion':proj['camera']['quaternion'],'size':size,'cameraSha256':sha(d/'camera.json'),'photoSha256':sha(Path('/Users/finbarr/code/games/kyoto/research/kyoto-station/photos')/name)}
+ d=L/'niwa-frontage-joint-01'/v;camera=read(d/'camera.json');proj=read(d/'render/projection.json');size=[816,544] if v=='jr' else [1200,800];refs[v]={'camera':camera,'quaternion':proj['camera']['quaternion'],'size':size,'cameraSha256':sha(d/'camera.json'),'photoSha256':sha(Path('research/kyoto-station/photos')/name)}
 def ground(view,pixel,height):
  r=refs[view];c=np.array(r['camera']['position']);w,h=r['size'];f=h/(2*np.tan(np.deg2rad(r['camera']['fov']/2)));ray=Rotation.from_quat(r['quaternion']).apply([(pixel[0]-w/2)/f,-(pixel[1]-h/2)/f,-1]);t=(Y+height-c[1])/ray[1];assert t>0;point=c+t*ray;return [float((point-O)@D),float((point-O)@A)]
 # Visible front runs at assumed stair levels. Hidden rear extents meet the

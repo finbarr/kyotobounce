@@ -1,8 +1,8 @@
 """Publish private full-station basement integration evidence to the research library."""
 from pathlib import Path
 import json,shutil,html,hashlib
-root=Path('/Users/finbarr/code/games/kyoto/research/kyoto-station')
-work=Path('/Users/finbarr/.codex/worktrees/performance-audit/kyoto');local=work/'.local/station-realism';out=root/'notes/hall-full-integration';out.mkdir(exist_ok=True)
+root=Path('research/kyoto-station')
+work=Path('.');local=work/'.local/station-realism';out=root/'notes/hall-full-integration';out.mkdir(exist_ok=True)
 receipts={
  'native-scope.json':'station-hall-basement-04/scope-proof.json',
  'physics-equivalence.json':'station-hall-basement-04/physics-equivalence.json',
