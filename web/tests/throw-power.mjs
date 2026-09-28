@@ -13,14 +13,14 @@ try{
  assert.throws(()=>throwSpeed(.5,'full','retired-model'),/Unsupported/);
  const sent=[],worker={ready:false,send:m=>sent.push(m),request:async()=>({ok:true})};
  const competition=new Competition(store,worker,()=>{}),guest=store.guest();
- // Launch inputs use the automatically selected first course.
+ // Free exploration uses the same authoritative launch inputs.
  const member=await competition.add(guest,'power-fixture');
- member.restoring=false;worker.ready=true;worker.capabilities=['waypoint-v3'];competition.layout=member.selected.layout;competition.physics=PHYSICS_VERSION;
- const intent={type:'charge',challengeId:member.selected.id,revision:member.selected.revision,layout:competition.layout,physics:competition.physics};
+ member.restoring=false;worker.ready=true;worker.capabilities=['waypoint-v3'];competition.layout="free-play-layout";competition.physics=PHYSICS_VERSION;
+ const intent={type:'charge',challengeId:null,revision:null,layout:competition.layout,physics:competition.physics};
  await assert.rejects(competition.command(member,{...intent,powerRange:'turbo'}),/Choose precision/);
  await competition.command(member,{...intent,powerRange:'precision'});
  assert.equal(sent.at(-1).powerRange,'precision');
  await assert.rejects(competition.command(member,{type:'release',powerRange:'full'}),/intent only/,'A range cannot change on release');
  competition.clearAttempt(member);
- console.log('PASS current starter hints, linear launch ranges and charge-time locking');
+ console.log('PASS free-exploration launch ranges and authoritative charge-time locking');
 }finally{store.close();}

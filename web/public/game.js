@@ -517,7 +517,7 @@ function animate(now){
   if(['Aim','Charging'].includes(phase))returnRequested=false;
   const inFlight=(replaying?['Flight','Result'].includes(phase):liveThrow.follows(snapshot,phase))&&!returnRequested;
   document.body.classList.toggle('is-ball-camera',inFlight&&!fly.active);
-  setText($('connection'),replaying||sharedReplayId?'REPLAY VIEWER':workerReady?'Online · shared scores':workerStatus==='recovering'?'Restoring physics':workerStatus==='failed'?'Physics stopped':connectionStatus==='reconnecting'?'Reconnecting…':connectionStatus==='replaced'?'Session moved':'Physics starting');$('connection-dot').classList.toggle('ready',workerReady);
+  setText($('connection'),replaying||sharedReplayId?'REPLAY VIEWER':workerReady?ui.state.selected?'Online · shared scores':'Online · exploring':workerStatus==='recovering'?'Restoring physics':workerStatus==='failed'?'Physics stopped':connectionStatus==='reconnecting'?'Reconnecting…':connectionStatus==='replaced'?'Session moved':'Physics starting');$('connection-dot').classList.toggle('ready',workerReady);
   ball.visible=!!snapshot;
   if(!snapshot){setHidden($('throw-panel'),true);setHidden($('flight-panel'),true);$('reticle').style.display='none';}
   if(snapshot){
@@ -559,10 +559,10 @@ function animate(now){
       const release=aimOrigin(p,aimYaw);guide.geometry.setFromPoints([release,release.clone().addScaledVector(aim,2)]);
 
     }
-    if(phase!==lastPhase){if(phase==='Flight'){trailCount=0;}if(phase==='Aim'){trailCount=0;trailGeometry.setDrawRange(0,0);}if(phase==='Result'&&!replaying&&ui.state.mode==='play')notice('Score locked · R to retry · Esc for replay and menus');lastPhase=phase;}
+    if(phase!==lastPhase){if(phase==='Flight'){trailCount=0;}if(phase==='Aim'){trailCount=0;trailGeometry.setDrawRange(0,0);}if(phase==='Result'&&!replaying&&ui.state.mode==='play')notice(ui.state.selected?'Score locked · R to retry · Esc for replay and menus':'Ball stopped · R to recall · Hold Space to throw again');lastPhase=phase;}
     setText($('flight-label'),phase==='Result'?'BALL AT REST':snapshot.diagnostics?.supported?'STILL ROLLING':'IN FLIGHT');
     setHidden($('throw-panel'),inFlight);setHidden($('flight-panel'),!inFlight||!!ui.state.selected);setText($('surfaces'),snapshot.surfaces);
-    setText($('phase-label'),phase==='Charging'?'WINDING UP':phase==='Release'?'RELEASING':ui.state.mode==='design'?'DESIGN BALL':ui.state.selected?'READY TO THROW':'CHOOSE A LEVEL');
+    setText($('phase-label'),phase==='Charging'?'WINDING UP':phase==='Release'?'RELEASING':ui.state.mode==='design'?'DESIGN BALL':ui.state.selected?'READY TO THROW':'EXPLORE KYOTO');
     const power=chargeMeter.sample(now,phase);
     const model=ui.state.selected?.throwModel||THROW_MODEL,speed=throwSpeed(power,powerRange,model),maximum=throwSpeed(1,powerRange,model);
     setStyle($('power-fill'),'width',`${power*100}%`);

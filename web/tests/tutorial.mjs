@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import {TutorialGuide,isTutorial} from '../public/tutorial.js';
 import {nextCampaignCourse} from '../public/level-progress.js';
-import {readFile} from 'node:fs/promises';
-const courses=JSON.parse(await readFile('web/starter-challenges.json','utf8')),c=courses[0],g=new TutorialGuide();
+const courses=[{id:'kyoto-tutorial',creator:'station',order:-1,campaign:{chapter:0}},{id:'test-next',creator:'station',order:0,campaign:{chapter:1}}],c=courses[0],g=new TutorialGuide();
 assert.ok(isTutorial(c));assert.equal(nextCampaignCourse(courses,c).order,0);
 g.enter(c);g.update({phase:'Aim',feet:{x:0,z:0}});assert.equal(g.step,'move');g.update({phase:'Aim',feet:{x:.5,z:0}});assert.equal(g.step,'aim');
 g.action('aim');assert.equal(g.step,'charge');g.update({phase:'Flight'});assert.equal(g.step,'flight');g.update({phase:'Aim'});assert.equal(g.step,'charge','Recall returns to throw coaching without granting completion');

@@ -6,7 +6,7 @@ Continue over a long period with no overall time cap or single-milestone endpoin
 
 All existing levels are disposable, including targets, hints, starts, progression and the private Locker/Pillar repairs. They impose no constraints on v2 architecture. Stop investigating or repairing their failures. Design fresh levels around completed areas later.
 
-This supersedes the previous iteration pilot and the old plan's course-preservation requirements, time limits and repair queues. It does not authorize deleting production scores or deploying changes. The old goal remains paused until replaced; editing this specification alone does not activate a replacement goal.
+This supersedes the previous iteration pilot and the old plan's course-preservation requirements, time limits and repair queues. It does not authorize deleting production scores or deploying changes. The replacement goal is active.
 
 ## Replacement goal
 
@@ -28,6 +28,10 @@ Establish a playable local v2 foundation from the best existing reconstruction, 
 Remove old levels/progression from the v2 entry flow and provide free exploration with walking, throwing and recall. Use separate local v2 data while developing. Keep the current published game/data untouched until an explicitly authorized release. Preserve required engine behavior without preserving old level fixtures or migration compatibility.
 
 Done when the build opens directly into the v2 experience, the improved station is visible, the player can walk and throw through complete physical rest, recall works, and relevant browser/runtime checks pass. Commit and deliver that foundation before starting further station improvements.
+
+## Delivered foundation
+
+The first task is integrated in the local v2 build. `npm run dev:v2` uses the latest complete gate bank02 station, courtyard spawn, free walking/throwing/recall and a separate database. Asset identities are in `web/v2/assets.json`; launch instructions and verification commands are in `docs/LOCAL_PLAY.md`. Native and Chrome play-loop checks pass. The next task is the first courtyard/café improvement below.
 
 ## Subsequent priorities
 

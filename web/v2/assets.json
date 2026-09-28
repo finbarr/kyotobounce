@@ -1,0 +1,15 @@
+{
+  "layout": ".local/station-realism/station-gate-bank-02/station-layout.json",
+  "layoutSha256": "dd3806b2164e06ddd1f5ff404046d21ff59b127c2285a2e065d07fd7eec285f7",
+  "station": ".local/station-realism/gate-bank-browser-02/station.json",
+  "geometry": ".local/station-realism/gate-bank-browser-02/atrium.runtime.glb",
+  "geometrySha256": "30a0eda6eb24ff842306a47cb8b166c507b138f9f6b210124ff4c5ae309d58ef",
+  "detail": ".local/station-realism/hall-basement-motion-02/atrium-detail.json",
+  "motionLayout": ".local/station-realism/station-hall-basement-05/station-layout.json",
+  "spawn": {
+    "x": 107.14205,
+    "y": 30.80703,
+    "z": 6.07587
+  },
+  "sourceScene": ".local/station-realism/station-gate-bank-02/KyotoAtrium.blend"
+}

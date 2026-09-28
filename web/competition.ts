@@ -197,7 +197,6 @@ export class Competition {
    return {type:'replay',replay};
   }
   if(m.type==='charge'){
-   if(!member.selected&&!member.designing)throw new Error('Choose a level before throwing.');
    if(m.character!==undefined&&!['ori','koma','don'].includes(m.character))throw new Error('Unknown robot character');
    if(m.powerRange!==undefined&&!['precision','full'].includes(m.powerRange))throw new Error('Choose precision or full power');
    if(member.attempt||member.selecting)throw new Error('Your attempt or level change is already active');

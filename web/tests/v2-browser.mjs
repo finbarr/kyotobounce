@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {chromium} from 'playwright';
+const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4425';
+assert(['localhost','127.0.0.1'].includes(new URL(origin).hostname),'Use an isolated local server');
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']});
+try{
+ const page=await browser.newPage({viewport:{width:1280,height:800}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));await page.goto(origin);
+ await page.locator('#loading-name input[name="player"]').fill('V2 browser check',{timeout:120000});
+ await page.getByRole('button',{name:'LET’S PLAY →'}).click();
+ await page.waitForFunction(()=>window.kyotoState?.ready&&!document.body.classList.contains('is-loading'),null,{timeout:120000});
+ assert.equal(await page.evaluate(()=>kyotoState.challenge),null);
+ assert.equal(await page.locator('#course-list button').count(),0);
+ const initial=await page.evaluate(()=>kyotoState.feet);
+ await page.locator('canvas').first().click();
+ await page.keyboard.down('w');await page.waitForTimeout(900);await page.keyboard.up('w');await page.waitForTimeout(300);
+ const walked=await page.evaluate(()=>kyotoState.feet);assert(Math.hypot(walked.x-initial.x,walked.z-initial.z)>.7,'WASD moves the player');
+ await page.keyboard.down('Space');await page.waitForTimeout(150);await page.keyboard.up('Space');
+ await page.waitForFunction(()=>kyotoState.phase==='Flight',null,{timeout:15000});
+ await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result,null,{timeout:60000});
+ const result=await page.evaluate(()=>({result:kyotoState.result,velocity:kyotoState.velocity,spin:kyotoState.spin,feet:kyotoState.feet,frames:kyotoState.render.frameMs}));
+ assert.equal(result.result.saved,false);assert.equal(await page.locator('#result-card').isVisible(),false,'No empty score card');
+ await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim');
+ await page.keyboard.down('Space');await page.waitForTimeout(500);await page.keyboard.up('Space');
+ await page.waitForFunction(()=>kyotoState.phase==='Flight');await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim');
+ assert.equal(await page.evaluate(()=>kyotoState.result),null);
+ await page.keyboard.press('Escape');
+ await page.getByRole('button',{name:'↶ Start',exact:true}).click();await page.waitForTimeout(300);
+ const home=await page.evaluate(()=>kyotoState.feet);assert(Math.hypot(home.x-initial.x,home.z-initial.z)<.1);
+ await page.getByRole('button',{name:'Close levels'}).click();
+ await mkdir('.local/v2/browser',{recursive:true});await page.screenshot({path:'.local/v2/browser/current.png'});
+ assert.deepEqual(errors,[]);
+ await writeFile('.local/v2/browser/receipt.json',JSON.stringify({origin,initial,walked,home,result,errors},null,2)+'\n');
+ console.log('PASS Chrome v2 entry, visible station, WASD, full throw, result presentation, recall during flight, menu and home');
+}finally{await browser.close();}

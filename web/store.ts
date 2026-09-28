@@ -42,7 +42,7 @@ export class Store {
  // Replace changed development courses and remove their scores atomically;
  // player-created courses and unchanged campaign scores remain available.
  syncCampaign(courses:Challenge[]){
-  if(!courses.length||new Set(courses.map(c=>c.id)).size!==courses.length||courses.some(c=>c.creator!=='station'))throw new Error('Invalid station campaign');
+  if(new Set(courses.map(c=>c.id)).size!==courses.length||courses.some(c=>c.creator!=='station'))throw new Error('Invalid station campaign');
   const invalidated=new Set<string>();
   this.db.exec('BEGIN IMMEDIATE');try{
    const desired=new Map(courses.map(c=>[c.id,withChallengeRules(c)]));

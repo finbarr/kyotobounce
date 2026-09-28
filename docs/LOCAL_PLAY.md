@@ -27,15 +27,27 @@ The build script currently supports macOS development and `npm run build:worker 
 
 Use Chrome for captured-pointer playtesting. Escape releases the mouse. The in-app browser can be useful for viewing menus, but its pointer-lock support may differ.
 
-Fresh players enter Level 0, “Welcome to Kyoto”, with movement, aim, charge and scoring prompts. It has its own authoritative leaderboard and leads into Level 1 on Space. Returning players keep their selected course. To repeat the prompts on a completed tutorial, select Level 0 and choose **Show tutorial tips**.
+V2 starts in free exploration. The retired campaign is empty; fresh levels will be built around completed station areas. Walking, throws and recall use the authoritative native worker. Free throws do not create ranked scores.
 
 The loading bar weights the five station/model downloads by decoded byte size from `browser-build.json`; rebuild browser assets after changing art. Missing size metadata shows indeterminate progress until downloads finish. The splash and robot/name setup remain available while downloads and scene preparation run.
 
-With an isolated game running, `KYOTO_TEST_ORIGIN=http://127.0.0.1:4174 node web/tests/tutorial-browser.mjs` checks the keyboard flow and desktop/mobile layouts. `web/tests/loading-browser.mjs` checks the real loader through a slow compressed response without Content-Length. Both use local Google Chrome; neither should target production.
-
 `GET /api/health` reports service/worker status. Read the checkout's worker log if physics is unavailable. `web/public/debug.js` implements the development inspection surface. Production blocks `/api/debug/*` at the proxy.
 
-`npm test` needs no assets or worker. `npm run test:runtime` needs a running game and writes its receipt under ignored `artifacts/`; it exercises full native throws, score/replay agreement and client score-spoof rejection. It creates persistent test records, so keep its database disposable.
+`npm test` needs no worker. `npm run test:runtime` checks the v2 courtyard spawn, walking, full translation/spin rest, free results, recall and home against an isolated local server. `npm run test:v2:browser` checks the playable Chrome controls. Set `KYOTO_TEST_ORIGIN` for a different local port.
+
+## Current reconstructed v2 station
+
+From this worktree, run `npm run build:web`, then:
+
+```sh
+KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
+```
+
+Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
+
+`web/v2/assets.json` identifies the current private reconstruction. Its layout and GLB hashes are checked before launch, along with escalator and comb-support correspondence. Only the spawn metadata changes; large geometry stays symlinked. The launch command creates a public asset overlay, matching browser manifest, native layout and asset receipt under `.local/v2/PORT/`. It also keeps the database and worker log there, separate from published saves.
+
+The private asset files must already be present at the manifest paths; this candidate has not been published as a release pack. Browser source changes require a reload. Metadata or service changes require restarting this command. When geometry changes, update the manifest to matching exported assets and rerun the relevant checks.
 
 ## Useful overrides
 

@@ -16,6 +16,8 @@ import {ConnectionMetrics,clientPerformance} from './performance.ts';
 import {ShotStream,RequestBudget} from './shot-stream.ts';
 
 const root = resolve('web/public');
+// Private v2 assets overlay the normal browser files; URLs still stay inside a public root.
+const overlay = process.env.KYOTO_PUBLIC_OVERLAY ? resolve(process.env.KYOTO_PUBLIC_OVERLAY) : null;
 const port = Number(process.env.KYOTO_PORT || 4173);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid KYOTO_PORT');
 const publicOrigin=process.env.KYOTO_PUBLIC_ORIGIN;
@@ -66,8 +68,12 @@ const server = createServer(async (request,response) => {
     if(serveLevel(request,response,url.pathname,store,replayShell))return;
     let base=root, relative=decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
     for (const [prefix,path] of vendors) if (url.pathname.startsWith(prefix!)) {base=path!;relative=decodeURIComponent(url.pathname.slice(prefix!.length));break;}
-    const path=resolve(base,relative);
+    let path=resolve(base,relative);
     if (!path.startsWith(base+sep)) {response.writeHead(403);response.end();return;}
+    if(overlay&&base===root){
+      const candidate=resolve(overlay,relative);
+      if(candidate.startsWith(overlay+sep)&&(await stat(candidate).catch(()=>null))?.isFile())path=candidate;
+    }
     const info=await stat(path).catch(()=>null);
     if (!info?.isFile()) {response.writeHead(404);response.end('Not found');return;}
     const etag=`"${info.size}-${info.mtimeMs}"`;

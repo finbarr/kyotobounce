@@ -43,11 +43,14 @@ try{
  assert.equal(store.replay('current-shot').score,10000,'Player-created courses survive campaign replacement');
  store.syncCampaign([station,replacement,added]);
  assert.equal(store.replay(station.id).score,10000,'Restart preserves unchanged campaign scores');
- assert.throws(()=>store.syncCampaign([]),/Invalid/);
+ assert.throws(()=>store.syncCampaign([{...station,creator:'invalid'}]),/Invalid/);
  assert.equal(store.challenge(station.id).name,station.name,'Invalid campaign fails without deleting data');
  const collision={...added,id:current.id,revision:current.revision};
  assert.throws(()=>store.syncCampaign([collision]),/belongs to a player/);
  assert.equal(store.challenge(station.id).name,station.name,'A failed replacement rolls back removals');
+ store.syncCampaign([]);
+ assert.equal(store.list().filter(c=>c.creator==='station').length,0,'An empty v2 catalog retires the old campaign');
+ assert.equal(store.replay('current-shot').score,10000,'Unrelated current scores stay authoritative');
  console.log('PASS retired layout/rules/revision cleanup, current score retention, replay, guest selection and restart');
 }finally{store.close();}
 
