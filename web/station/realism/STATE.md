@@ -1,6 +1,8 @@
 # Current checkout and storage
 
-Completed station work is merged into local `main`. The playable private bundle is `.local/v2/current/`, identified by `web/v2/assets.json`; run `npm run dev:v2`. Original inputs and small historical evidence now live under `.local/station-research-evidence/`. Superseded full-scene exports have been removed. Historical paths below describe prior experiments, not additional active station versions. Use the current bundle and one temporary candidate, merge each completed task before starting another, and delete replaced generated outputs after verification.
+Completed station work is merged into local `main`. The playable private bundle is `.local/v2/current/`, identified by `web/v2/assets.json`; run `npm run dev:v2`. Original inputs and historical evidence live under `.local/station-research-evidence/`. Historical paths below describe prior experiments, not additional active station versions. Use the current bundle and one temporary candidate, merge each completed task before starting another, and delete replaced generated outputs after verification.
+
+Storage follow-up, 28 September: removed another 30,594,402,522 bytes across 4,595 obsolete files: 15 graphical Phase 2 checkpoint builds, historical test-layout copies and large full-scene diagnostic previews/layouts. The explicit file receipt is `.local/disk-cleanup/2026-09-28-remaining-outputs.json`. Current layout, geometry, hardware, source scene, moving-layout, detail and station metadata hashes were unchanged before/after removal; the local service and native worker remain ready. Checkout usage fell from 106 GiB to 78 GiB. Original art/research, reports, player data, release staging and other sessions' worktrees remain. This is scoped cleanup, not a claim that every remaining historical file is necessary.
 
 ## V2 direction — 28 September 2026
 

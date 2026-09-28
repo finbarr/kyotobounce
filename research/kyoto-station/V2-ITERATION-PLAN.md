@@ -10,7 +10,7 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 ## Replacement goal
 
-Continuously develop Kyoto Bounce v2 from the best existing station reconstruction, finishing one focused improvement at a time, committing it and updating the playable v2 build before starting the next, discarding all existing levels as constraints and creating new ones around the improved station while preserving reliable movement, ball physics, audio and Chrome performance, following `research/kyoto-station/V2-ITERATION-PLAN.md` without an overall time cap, before/after presentations or routine review pauses.
+Continuously improve Kyoto Bounce v2’s station and surroundings to match real life more closely, using research to guide each focused task; finish, test, commit, and merge each improvement into the playable main build before starting the next, reusing one checkout, removing superseded generated assets, and preserving smooth gameplay and reliable physics.
 
 ## Working loop
 
@@ -68,5 +68,7 @@ For each delivery, inspect the actual local game in Chrome and exercise the affe
 ## Commits, assets and publication
 
 Make a bounded local commit for each completed task, with a concise explanation and validation. Keep original art and generated binaries/media out of Git as required by `docs/ASSETS.md`; record the current asset manifest/hash and retain the editable source. Keep the current bundle in `.local/v2/current/` and at most one temporary candidate. After the candidate passes, promote it and remove superseded full-scene exports, layouts and compiled builds. Keep original research, editable sources and small build receipts. Git holds source history; do not retain a full station export per commit. Merge each completed task into local `main` before beginning another. Reuse a suitable checkout; archive finished worktrees after preserving their required ignored assets and stopping their services.
+
+This retention rule also covers diagnostic copies such as `layout-used.json`, `probe-layout.json` and `preview.glb`, and graphical checkpoint builds under `artifacts/`. Moving them to an evidence folder does not make them necessary history. Retain the small report and source identity; remove the large superseded input/export once the current result is verified. Check checkout disk usage at delivery so duplication is caught during the task that creates it.
 
 “Deliver” means an integrated, checked, locally playable improvement and its commit. Local merges are authorized by the user’s iteration workflow. Push and production deployment require their own authorization. Do not pause for permission to continue ordinary implementation and local delivery within this goal.
