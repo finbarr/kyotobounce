@@ -15,8 +15,10 @@ if(!['127.0.0.1','localhost'].includes(new URL(origin).hostname))throw Error('Us
 if(!/^[a-z0-9-]+$/.test(label)||!Number.isFinite(cpu)||cpu<1||cpu>10)throw Error('Invalid benchmark label or CPU rate');
 const variant=await browserVariant(ref),sourceHashes=variant.receipt;
 const out='.local/stability';await mkdir(out,{recursive:true});
+const viewport={width:Number(process.env.KYOTO_BENCH_WIDTH||1440),height:Number(process.env.KYOTO_BENCH_HEIGHT||900)};
+if(!Object.values(viewport).every(n=>Number.isInteger(n)&&n>=320&&n<=3840))throw Error('Invalid benchmark viewport');
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH||(process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome'),headless:false,args:['--enable-webgl','--ignore-gpu-blocklist',...(process.platform==='darwin'?['--use-angle=metal']:[]),'--autoplay-policy=no-user-gesture-required']});
-const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
+const context=await browser.newContext({viewport,deviceScaleFactor:1});
 const page=await context.newPage(),cdp=await context.newCDPSession(page),errors=[],reports=[],consoleMessages=[],failedRequests=[],socketErrors=[];
 page.on('pageerror',e=>{errors.push(String(e));console.log('PAGE ERROR',String(e));});
 page.on('console',m=>{if(['error','warning'].includes(m.type())){consoleMessages.push({type:m.type(),text:m.text()});console.log('BROWSER',m.text());}});
@@ -41,7 +43,7 @@ await page.addInitScript(({dom})=>{
 },{dom:process.env.KYOTO_BENCH_DOM==='1'});
 const summary=rows=>{const q=(xs,p)=>xs.toSorted((a,b)=>a-b)[Math.min(xs.length-1,Math.floor(xs.length*p))]||0;const metric=k=>({p50:q(rows.map(x=>x[k]),.5),p95:q(rows.map(x=>x[k]),.95),p99:q(rows.map(x=>x[k]),.99),max:Math.max(...rows.map(x=>x[k]))});return {frames:rows.length,fps:rows.length*1000/rows.reduce((s,x)=>s+x.dt,0),over33:rows.filter(x=>x.dt>33.4).length,over50:rows.filter(x=>x.dt>50).length,over100:rows.filter(x=>x.dt>100).length,over200:rows.filter(x=>x.dt>200).length,hidden:rows.filter(x=>x.hidden).length,dt:metric('dt'),full:metric('full'),pose:metric('pose'),camera:metric('camera'),shadows:metric('shadows'),render:metric('render'),calls:metric('calls'),triangles:metric('triangles'),ratios:[...new Set(rows.map(x=>x.ratio))],phases:[...new Set(rows.map(x=>x.phase))]};};
 const harnessHashes={};for(const file of ['stability.mjs','source-variant.mjs','fixture-hook.js'])harnessHashes[file]=hash(await readFile('web/benchmarks/'+file));
-const result={label,fixtureHash:fixture?hash(await readFile(fixturePath)):null,harnessHashes,sourceRef:ref||'working-copy',sourceHashes,date:new Date().toISOString(),browser:browser.version(),machine:{model:os.cpus()[0].model,cpus:os.cpus().length,memory:os.totalmem(),platform:os.platform()},viewport:{width:1440,height:900,dpr:1},profile,fixture:fixturePath||null,fixtureCapture:capture,stallTrace,cpuThrottle:cpu,stages:[],errors,consoleMessages,failedRequests,socketErrors,reports};
+const result={label,fixtureHash:fixture?hash(await readFile(fixturePath)):null,harnessHashes,sourceRef:ref||'working-copy',sourceHashes,date:new Date().toISOString(),browser:browser.version(),machine:{model:os.cpus()[0].model,cpus:os.cpus().length,memory:os.totalmem(),platform:os.platform()},viewport:{...viewport,dpr:1},profile,fixture:fixturePath||null,fixtureCapture:capture,stallTrace,cpuThrottle:cpu,stages:[],errors,consoleMessages,failedRequests,socketErrors,reports};
 let traceLag=null;
 async function stage(name,ms,action=async()=>{},cleanup=async()=>{}){
  await page.evaluate(continuous=>{if(!continuous||!window.__measuring){window.__samples=[];window.__long=[];window.__loaf=[];window.__mutations=0;}window.__measuring=true;},!!soakMinutes);

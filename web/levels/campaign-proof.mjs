@@ -6,17 +6,41 @@ import {createHash,randomUUID} from 'node:crypto';
 import {resolve} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 import {PhysicsWorker} from '../worker.ts';
+import {applySurfaceRebindings} from '../station/realism/course-surface-rebindings.mjs';
+import {applyLaunchRevisions} from '../station/realism/course-launch-revisions.mjs';
 const out=resolve(process.argv[2]||`.local/campaign-proof-${Date.now()}`);
 if(!out.startsWith(resolve('.local')+'/'))throw Error('Proof output must be under this worktree .local/');
 if(!process.env.KYOTO_WORKER_EXECUTABLE)throw Error('Select a compatible KYOTO_WORKER_EXECUTABLE explicitly');
 await mkdir(resolve('.local'),{recursive:true});await mkdir(out,{recursive:false});process.env.KYOTO_WORKER_LOG=resolve(out,'worker.log');
-const bytes=await readFile('runtime/station-layout.json'),layout=createHash('sha256').update(bytes).digest('hex');
-const campaignBytes=await readFile('web/starter-challenges.json'),courses=JSON.parse(campaignBytes);
+const candidateLayout=process.env.KYOTO_PROOF_LAYOUT,candidateCatalog=process.env.KYOTO_PROOF_CATALOG;
+assert.equal(Boolean(candidateLayout),Boolean(candidateCatalog),'Select both candidate layout and catalog');
+if(candidateLayout){for(const p of [candidateLayout,candidateCatalog])assert.ok(resolve(p).startsWith(resolve('.local')+'/'),'Candidate inputs must be isolated under .local');process.env.KYOTO_LAYOUT=resolve(candidateLayout);}
+const bytes=await readFile(candidateLayout||'runtime/station-layout.json'),layout=createHash('sha256').update(bytes).digest('hex');
+const campaignBytes=await readFile(candidateCatalog||'web/starter-challenges.json'),courses=JSON.parse(campaignBytes);
+const proofPath=process.env.KYOTO_PROOF_INPUTS||'web/levels/proof-inputs.json';
+if(process.env.KYOTO_PROOF_INPUTS){assert.ok(candidateLayout,'New proof inputs require an isolated candidate');assert.ok(resolve(proofPath).startsWith(resolve('.local')+'/'));}
+const proofBytes=await readFile(proofPath),fixture=JSON.parse(proofBytes),canonicalLayout=createHash('sha256').update(await readFile('runtime/station-layout.json')).digest('hex');
+assert.equal(fixture.sourceLayout||fixture.layout,canonicalLayout);
+if(process.env.KYOTO_PROOF_INPUTS)assert.equal(fixture.layout,layout);
+if(candidateLayout){
+ const original=JSON.parse(await readFile('web/starter-challenges.json')),adjustments=process.env.KYOTO_PROOF_INPUTS?(fixture.courseAdjustments||[]):[];
+ const bindings=process.env.KYOTO_PROOF_INPUTS?(fixture.waypointSurfaceRebindings||[]):[];
+ assert(bindings.every(b=>!adjustments.some(a=>a.id===b.id)),'Separate surface rebinding from destination revisions');
+ const rebound=await applySurfaceRebindings(original,bindings,JSON.parse(bytes),layout,createHash('sha256').update(await readFile('web/starter-challenges.json')).digest('hex'));
+ assert.equal(new Set(adjustments.map(a=>a.id)).size,adjustments.length,'Duplicate course adjustments');
+ for(const a of adjustments){const old=original.find(c=>c.id===a.id);assert.ok(old);assert.equal(a.fromRevision,old.revision);assert.equal(a.toRevision,old.revision+1);assert.deepEqual(a.fromGoal,old.goal);assert.ok(a.reason&&a.evidence);assert.ok(a.toGoal);assert.equal(a.toGoal.radius,old.goal.radius,'Keep destination difficulty radius');
+  if(a.toDistance!==undefined){assert.equal(a.fromDistance,old.campaign.distance);assert.ok(resolve(a.nativeTrace.path).startsWith(resolve('.local')+'/'));const traceBytes=await readFile(a.nativeTrace.path);assert.equal(createHash('sha256').update(traceBytes).digest('hex'),a.nativeTrace.sha256);const trace=JSON.parse(traceBytes);assert.equal(trace.layout,layout);assert.equal(trace.challenge.id,a.id);const length=trace.poses.slice(1).reduce((sum,p,i)=>sum+Math.hypot(...['x','y','z'].map(k=>p.p[k]-trace.poses[i].p[k])),0);assert.equal(a.toDistance,Number(length.toFixed(1)));}
+ }
+ const launches=process.env.KYOTO_PROOF_INPUTS?(fixture.courseLaunchRevisions||[]):[];
+ assert(launches.every(l=>!adjustments.some(a=>a.id===l.id)),'Keep launch revisions separate from destination revisions');
+ const launched=await applyLaunchRevisions(rebound,original,launches,layout);
+ const expected=launched.map(c=>{const a=adjustments.find(a=>a.id===c.id);return {...c,layout,...(a?{revision:a.toRevision,goal:a.toGoal,...(a.toDistance===undefined?{}:{campaign:{...c.campaign,distance:a.toDistance}})}:{})};});
+ assert.deepEqual(courses,expected,'Candidate must preserve course IDs, waypoints, scoring and hints; only recorded destination revisions, evidenced surface rebindings, evidenced launch revisions and measured display distances are allowed');
+}
 const selectedIds=process.argv[3]?.split(',');
 if(selectedIds)for(const id of selectedIds)assert.ok(courses.some(c=>c.id===id),`Unknown stage ${id}`);
 await writeFile(resolve(out,'catalog.json'),campaignBytes);
-const fixture=JSON.parse(await readFile('web/levels/proof-inputs.json'));
-assert.equal(fixture.layout,layout);
+if(!candidateLayout)assert.equal(fixture.layout,layout);
 const worker=new PhysicsWorker(),states=new Map(),events=new Map();let ready;
 const accelerated=new Set();
 worker.on('message',m=>{if(m.type==='ready')ready=m;if(['state','shot-frame'].includes(m.type))states.set(m.id,m);if(m.type==='shot-frame'&&!accelerated.has(m.attempt)){accelerated.add(m.attempt);worker.send({type:'playback-rate',id:m.id,request:m.attempt,rate:2});}if(['result','notice'].includes(m.type))events.set(m.id,m);});
@@ -78,7 +102,7 @@ async function run(slot){
 }
 for(const sig of ['SIGINT','SIGTERM'])process.on(sig,()=>{worker.stop();process.exit(130);});
 try{await worker.start();await until(()=>worker.ready,65000);assert.ok(worker.capabilities.includes('waypoint-v3'));await Promise.all(Array.from({length:4},(_,i)=>run(i)));}
-finally{worker.stop();await writeFile(resolve(out,'summary.json'),JSON.stringify({layout,physics:ready?.physics,executable:process.env.KYOTO_WORKER_EXECUTABLE,campaignHash:createHash('sha256').update(campaignBytes).digest('hex'),receipts:receipts.sort((a,b)=>a.index-b.index)},null,2));}
+finally{worker.stop();await writeFile(resolve(out,'summary.json'),JSON.stringify({layout,proofInputLayout:fixture.layout,proofInputSha256:createHash('sha256').update(proofBytes).digest('hex'),courseAdjustments:fixture.courseAdjustments||[],courseLaunchRevisions:fixture.courseLaunchRevisions||[],waypointSurfaceRebindings:fixture.waypointSurfaceRebindings||[],candidateLayout:candidateLayout||null,physics:ready?.physics,executable:process.env.KYOTO_WORKER_EXECUTABLE,campaignHash:createHash('sha256').update(campaignBytes).digest('hex'),receipts:receipts.sort((a,b)=>a.index-b.index)},null,2));}
 assert.equal(receipts.length,jobs.length);
 // Exact authored solutions prove feasibility. Nearby shots separately expose
 // sensitivity; a partial neighbor is never presented as a completed route.

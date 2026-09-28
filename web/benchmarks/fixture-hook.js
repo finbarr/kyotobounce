@@ -1,5 +1,6 @@
 // Appended to game.js by the loopback benchmark only; never shipped as a hook.
 let fixtureCapture=null,fixturePlayback=null,reviewView=null,imageResolve=null,soakTimer=null;
+const reviewBaseNear=camera.near;
 const soakStats={cycles:0,walkMetres:0,savedShots:0,forfeits:0,recallsIssued:0,recallsReturned:0,replays:0,seeks:0,rateChanges:0};
 const fixtureIds=new Map();
 window.__bench={sound,ui,briefing,startCharge,release,recall,setFastForward,renderer,scene,station:()=>station,camera:()=>camera,stationLook:()=>stationLook,motion:()=>motion,shotPlayback,send,
@@ -37,9 +38,9 @@ window.__bench={sound,ui,briefing,startCharge,release,recall,setFastForward,rend
   ({yaw,pitch,azimuth,elevation,distance,manualCamera,powerRange}=frame.view);livePlaybackRate=frame.rate;
   if(f.state!==frame.after){ui.message(after);f.state=frame.after;}
  },
- reviewView(value){reviewView=value;},
+ reviewView(value){reviewView=value;if(!value){camera.near=reviewBaseNear;camera.updateProjectionMatrix();}},
  captureImage(){return new Promise(resolve=>{imageResolve=resolve;});},
- applyCamera(view){if(reviewView){view.position.fromArray(reviewView.position);view.lookAt(new THREE.Vector3(...reviewView.target));view.updateMatrixWorld();return;}if(!fixturePlayback?.frame)return;const frame=fixturePlayback.frame;view.position.fromArray(frame.camera.position);view.quaternion.fromArray(frame.camera.quaternion);view.updateMatrixWorld();lookTarget.fromArray(frame.camera.target);},
+ applyCamera(view){if(reviewView){view.position.fromArray(reviewView.position);view.lookAt(new THREE.Vector3(...reviewView.target));view.near=reviewView.near??reviewBaseNear;if(reviewView.fov!==undefined)view.fov=reviewView.fov;view.updateProjectionMatrix();if(reviewView.rollDegrees)view.rotateZ(THREE.MathUtils.degToRad(reviewView.rollDegrees));if(view.view?.enabled)view.clearViewOffset();view.updateMatrixWorld();return;}if(!fixturePlayback?.frame)return;const frame=fixturePlayback.frame;view.position.fromArray(frame.camera.position);view.quaternion.fromArray(frame.camera.quaternion);view.updateMatrixWorld();lookTarget.fromArray(frame.camera.target);},
  startSoak(){
   const began=performance.now(),seenResults=new Set();let cycle=-1,done=new Set(),opened=false,waitingRecall=false,walkStart=null;
   const act=(key,at,t,fn)=>{if(t>=at&&!done.has(key)){done.add(key);fn();}};

@@ -3,6 +3,7 @@ import {Client,delay} from './api-client.mjs';
 import {PhysicsWorker} from '../worker.ts';
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
+import {createHash} from 'node:crypto';
 import {scoreAttempt} from '../scoring.ts';
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173';
 assert.ok(['127.0.0.1','localhost','[::1]'].includes(new URL(origin).hostname),'Record-creating campaign checks require an isolated local service');
@@ -31,11 +32,14 @@ await Promise.all(['kyoto-konbinidirect','kyoto-garden','kyoto-skyway'].map(asyn
 // charge timing can miss that route by milliseconds under concurrent test load.
 // Prove that fixed input through the trusted worker protocol; the shorter courses
 // above cover the real client charge/release, scoring, persistence and replay path.
-const finale=JSON.parse(await readFile('web/starter-challenges.json','utf8')).find(c=>c.id==='kyoto-crossstation');
+// Keep the authored route and launch unchanged while validating a local layout candidate.
+const layoutHash=createHash('sha256').update(await readFile(process.env.KYOTO_LAYOUT||'runtime/station-layout.json')).digest('hex');
+const finale={...JSON.parse(await readFile('web/starter-challenges.json','utf8')).find(c=>c.id==='kyoto-crossstation'),layout:layoutHash};
 process.env.KYOTO_WORKER_LOG=resolve(`.local/campaign-runtime-${process.pid}.log`);
-const worker=new PhysicsWorker();let state,result;
+const worker=new PhysicsWorker();let state,result,failure;
+worker.on('failure',message=>{failure=new Error(message);});
 worker.on('message',m=>{if(m.type==='state')state=m;if(m.type==='result'||m.type==='notice')result=m;});
-const until=async(test,ms=65000)=>{const end=performance.now()+ms;while(!test()){if(performance.now()>end)throw Error('Native finale proof timed out');await delay(10);}};
+const until=async(test,ms=65000)=>{const end=performance.now()+ms;while(!test()){if(failure)throw failure;if(performance.now()>end)throw Error('Native finale proof timed out');await delay(10);}};
 try{
  await worker.start();await until(()=>worker.ready);
  const id='campaign-finale';worker.send({type:'join',id});await until(()=>state?.players?.length);
