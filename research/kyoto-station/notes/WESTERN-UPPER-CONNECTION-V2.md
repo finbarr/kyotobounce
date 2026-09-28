@@ -40,3 +40,17 @@ node web/station/realism/audit-west-upper-connection.mjs \
 Establish the correspondence between the plan's northern arrival bank, the source upper landing and the plaza edge using a view that includes all three. Then replace the affected plaza/stair/facade connection coherently, with matching visual and collision geometry. Check a complete walk from the upper escalator exit onto the plaza and first Grand Stairway flight in both directions, then inspect the installed game in Chrome. An arbitrary connecting ramp would conceal the unresolved placement rather than follow the reference architecture.
 
 No additional full-scene export is needed for this investigation. Keep the current playable bundle until the corrected candidate passes those checks.
+
+## Registration and floor candidate
+
+The next pass found a useful correspondence in the coarse municipal exterior. Its curved lower landing boundary at approximately 14.5974 m can be fitted to the dimensioned first-stair contour without changing plan scale. The source boundary has a side-route notch; the fit bridges that notch and its endpoint correspondence remains a modeling assumption.
+
+`prepare-west-plaza-v2.mjs` now reproduces the fit from the original GLB vertices and current layout. In native X/Z coordinates it rotates by −6.08545 degrees and translates by `(2.96050, 5.92016)` m. The resampled contour residual is 0.3515 m RMS, with a 0.7060 m maximum. These residuals describe agreement between models, not survey accuracy.
+
+As a separate check, the transformed plan's northeastern plaza corner lands 0.3667 m from the source upper landing's northwestern corner. That corner was not part of the contour fit. This supports the correspondence, but does not establish the stage, sculpture, side-bank or upper-storey positions. An exploratory comparison of the second flight still showed roughly metre-scale departures from the coarse landing boundary; do not apply this transform blindly to every upper floor.
+
+The small floor candidate uses the interior upper landing's 15.614658 m finished height. The exterior boundary is about 1.0172 m lower, so shared floor height is an explicit construction choice. The east side of the candidate extends to the interior floor's straight cut edge, with up to 2.9346 m of added width. This hidden join is inferred. The original 0.35 m slab thickness is retained; the finish is temporary.
+
+Candidate: `.local/v2/candidate/plaza/`, 312 triangles and one material batch. Its closed mesh has positive volume. Browser/native serialization agrees within 3.79 micrometres. `verify-west-plaza-join.mjs` exercises the isolated candidate, current upper floor and its guards at Z=−4, 4 and 16 m, in both directions. All six walks pass; the fixture and reports occupy under 0.5 MiB together with the component. No new full-station copy was created.
+
+This floor is **not installed**. The running game still uses the committed bundle. Continue by coordinating the first Grand Stairway flight and attached landing/facade/guard geometry with this floor, then reconcile the onward route before promotion. Reuse this candidate and its recorded fit; do not repeat the source search or generate another complete station for an isolated seam test.
