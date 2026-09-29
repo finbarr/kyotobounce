@@ -1,6 +1,6 @@
 # Western restaurant and Skyway approach
 
-27 September 2026. Status: **verified construction component, not installed in the full station**. [Visual review](western-approach/index.html).
+Initial component study: 27 September 2026. **Integrated into the playable station** on 28 September; see [the delivered western connection](WESTERN-UPPER-CONNECTION-V2.md). The measurements below describe the original construction study. The [restaurant entrance finish](RESTAURANT-ENTRY-FRAME-V2.md) is the latest addition.
 
 ## Evidence
 
@@ -19,7 +19,7 @@ The threshold follows the actual skewed source landing rather than a perpendicul
 
 ## Construction and checks
 
-The component contains the ten shop boundaries, public floor/ceiling, doorway frame and held-open glass leaves, the oblique vestibule, preliminary fixtures and a guarded escalator opening. Door collision follows the visible leaves. Shop interiors, text, signs and material finishes are unfinished; the escalator bank and lower connection are absent.
+The component contains the ten shop boundaries, public floor/ceiling, doorway frame and held-open glass leaves, the oblique vestibule, preliminary fixtures and a guarded escalator opening. Door collision follows the visible leaves. Shop interiors, text, signs and most material finishes remain unfinished. The subsequent integration connected the escalator banks and lower approach.
 
 The floor triangulator originally generated a triangle only **0.110 mm** high over a long span. One native ray then returned a point **0.213 m** away from the requested ray. Improving internal diagonals preserved every vertex, outline and horizontal area, while raising the floor's minimum triangle altitude to **0.61945 m**. Closed mesh/positive-volume checks still pass.
 
@@ -30,9 +30,9 @@ The floor triangulator originally generated a triangle only **0.110 mm** high ov
 - **523 panels, 18,076 triangles, 10 material batches**. Every serialized vertex/index and winding matches the native component; maximum coordinate quantization error **0.000007124 m**.
 - Five Chrome construction views captured without page errors. The first corridor pose was partly obstructed by a shop corner; the gallery uses a second pose farther along the aisle. These are isolated geometry views, not photo matches or game-performance benchmarks.
 
-## Next integration work
+## Current work
 
-The full-station candidate remains `station-inner-roof-01` unchanged. Before installation, align the central Skyway and eastern connection to the chosen floor datum, resolve the existing stairs/restaurant/facade replacement inventory, and connect the escalator and lower landing. Full gameplay, the outstanding Skyway Trapdoor course, Chrome paired trials and the music/context soak remain open. No architectural, material, lighting or exterior milestone is marked complete here.
+The component is installed in the editable scene and playable v2 station. The Grand Stairway, restaurant, central Skyway and lower routes have passed native traversal checks; their current receipts and modeling limits are in [WESTERN-UPPER-CONNECTION-V2.md](WESTERN-UPPER-CONNECTION-V2.md). Continue refining the connected route using the current [iteration plan](../V2-ITERATION-PLAN.md). Retired course fixtures impose no constraints.
 
 ## Receipts
 

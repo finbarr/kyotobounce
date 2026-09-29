@@ -35,7 +35,9 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
-Latest delivery: the western interior landing, Muromachi Square, fourteen Grand
+Latest finish: the [restaurant entrance lantern frame](notes/RESTAURANT-ENTRY-FRAME-V2.md) adds the photographed cream diffusers, dark crossbars and kickplates. Six native doorway walks and Chrome views pass. Its source is integrated into the same editable station.
+
+The western interior landing, Muromachi Square, fourteen Grand
 Stairway flights, northern banks, southern approach, restaurant and central
 Skyway are integrated into the current editable scene and playable bundle.
 Native route checks pass in both directions; source correspondence, Chrome
