@@ -8,9 +8,24 @@ All existing levels are disposable, including targets, hints, starts, progressio
 
 This supersedes the previous iteration pilot and the old plan's course-preservation requirements, time limits and repair queues. It does not authorize deleting production scores or deploying changes. The replacement goal is active.
 
+## Current structural priority — 28 September 2026
+
+The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
+
+Latest structural delivery: reconnect the east 4F terrace to the rebuilt 7F East Square through its actual modeled stair opening. Acceptance: retire the old flight from visual and native geometry; walk the complete connection both ways at normal speed; inspect the joined floors and stairs in Chrome; integrate the editable source, commit and merge.
+
+Next priorities:
+
+1. Repair the remaining lower east circulation and corridor obstructions found during the same inspection.
+2. Connect both ends of the bridge above Central Gate and audit the north–south free passage.
+3. Add the railway platforms/tracks and the Hachijo side with coherent connecting routes.
+4. Resume material/detail work as each area becomes structurally usable.
+
+Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).
+
 ## Replacement goal
 
-Continuously improve Kyoto Bounce v2’s station and surroundings to match real life more closely, using research to guide each focused task; finish, test, commit, and merge each improvement into the playable main build before starting the next, reusing one checkout, removing superseded generated assets, and preserving smooth gameplay and reliable physics.
+Continuously repair and complete Kyoto Bounce v2’s station interior, railway and Hachijo side using research, prioritizing broken stairs, blocked hallways and missing connections; finish, test, commit and merge each improvement into the playable local main build before starting the next, while preserving smooth gameplay, reliable physics and a single reusable checkout.
 
 ## Working loop
 
@@ -35,7 +50,7 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
-Latest delivery: [Daruma ceiling and room illumination](notes/DARUMA-CEILING-V2.md) adds the pale shop ceiling, fitted equipment and a static capture lit by the authored shop fixtures. The realtime light pool stays at two. Next, develop the restaurant corridor’s exposed overhead services from the Kyoto photographs.
+Latest delivery: [Daruma ceiling and room illumination](notes/DARUMA-CEILING-V2.md) adds the pale shop ceiling, fitted equipment and a static capture lit by the authored shop fixtures. The realtime light pool stays at two. The corridor overhead task is deferred while the structural repair queue above is active.
 
 The [Daruma wall fittings](notes/DARUMA-WALL-FITTINGS-V2.md) adds the two photographed historical prints, dark dado, kickplate and upper service-wall joins.
 
@@ -66,16 +81,7 @@ are in [WESTERN-UPPER-CONNECTION-V2.md](notes/WESTERN-UPPER-CONNECTION-V2.md).
 Continue with the new upper route's finishes and lighting, inspecting exposed
 approach edges and railings before adding small decorations.
 
-Maintain a short ordered queue. Prefer visible impact, confidence in the evidence and low integration cost. Initial priorities after the foundation:
-
-- Finish conspicuous courtyard/café material, lighting and architectural joins using the existing work.
-- Refine the connected western route's materials, lighting and source-supported edge details.
-- Improve the central hall/gate passage as connected, usable architecture.
-- Complete canopy/Skyway connections, then north and south approaches in focused tasks.
-- Introduce fresh v2 levels as individual areas become stable and interesting to play; develop navigation/progression around those new levels.
-- Continue materials, lighting, planting, frontage detail, atmosphere and performance improvements across the station and immediate surroundings.
-
-This queue can be reordered between tasks. It is not permission to abandon the task in progress. The entire station and both plazas remain the long-term ambition, but unfinished distant areas do not prevent delivering a completed local improvement.
+The structural repair queue above supersedes the earlier finish/detail priorities. Record unrelated defects briefly and keep the current repair focused until it is delivered.
 
 ## Keep iteration inexpensive
 
