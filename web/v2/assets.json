@@ -1,47 +1,18 @@
 {
   "layout": ".local/v2/current/station/station-layout.json",
-  "layoutSha256": "03f075a5406af5f283cff979304e0398c5ad2ad6a50195016f3e102cdaee2055",
-  "station": ".local/v2/current/station/station.json",
+  "layoutSha256": "55c24681d4a4fd77180c7b941f4261dc217b8711f56b1361144ab5001b85caa3",
   "geometry": ".local/v2/current/station/atrium.runtime.glb",
-  "geometrySha256": "e23a7f5649ffd70032eabd638860c903cc97b604543965415fef09adcf4f449b",
+  "geometrySha256": "9f5735a0e543fe8ca0dd37e50478f1a3b9db4e0ab2f52cca7b05892521f7c0c2",
+  "station": ".local/v2/current/station/station.json",
   "detail": ".local/v2/current/motion/atrium-detail.json",
   "motionLayout": ".local/v2/current/source/station-layout.json",
-  "spawn": {
-    "x": 107.14205,
-    "y": 30.80703,
-    "z": 6.07587
-  },
-  "sourceScene": ".local/v2/current/source/KyotoAtrium.blend",
-  "sourceComponents": [
-    {
-      "directory": ".local/v2/current/components/west-circulation",
-      "builder": "web/station/realism/build-west-circulation-v2.mjs",
-      "builderSha256": "7ae66eff09d34db5a20ed4cc18a5913bb528f5549a0e36878f59fa325e32a6cd",
-      "glbSha256": "90a51e7f158387372d86627f857a24406efadce7d51f40fd3760354cd6805c79",
-      "nativeSha256": "56ce566113136eecc2e01e87ee4bde81ece0a5c9c7fbea0ec3ec909e03a76047"
-    },
-    {
-      "directory": ".local/v2/current/components/niwa-service",
-      "builder": "web/station/realism/build-niwa-service.mjs",
-      "builderSha256": "1e1bf616f753dcef9a16e957e908631e60f601c5f05b0c2f0dbe5bfb43ac2c7f",
-      "glbSha256": "3a6d91cd10e5daa25beebe7673f79f528bf206c99794d0c007d33b7f39162117",
-      "nativeSha256": "0e95ee79adcdd2f0c927a754780a6c42a3f06cf2a0db3d80d3a03adf98c74c9e"
-    },
-    {
-      "directory": ".local/v2/current/components/niwa-alcove",
-      "builder": "web/station/realism/build-niwa-alcove.mjs",
-      "builderSha256": "136fc33d3335abe4a278daca2032eb45c648a4f2de117e042ee731eaad0b72af",
-      "glbSha256": "7ef4a72514bdd059385e7de5adf2806245ab98dcb41637c6438067508123b6b9",
-      "nativeSha256": "05eca09081e11543ed80f63bd74511bdc14714c8d2abf0f5da68d3864cd5996e"
-    },
-    {
-      "directory": ".local/v2/current/components/west-stair-handrails",
-      "builder": "web/station/realism/build-west-stair-handrails.mjs",
-      "builderSha256": "7214689d9d64b89d7de299f3c6d0bf8f7a43413f0914905c2e4ff8078952e4d9",
-      "glbSha256": "015dde7a1184da92913626350082a2d68f92c3a88875210175b87d1b5121d9f5",
-      "nativeSha256": "6592681aaf3e10e25e7e6ffcc52a0a45d270f9cd0dce82adb0dfc58e6eff9508"
-    }
-  ],
   "hardware": ".local/v2/current/motion/atrium-detail.runtime.glb",
-  "hardwareSha256": "5a7330e2f1830c22940b5b4c460c5616cbef40dd97e74ec48ef8d45088e912ec"
+  "hardwareSha256": "ef0116ea90c801d28b81e0aa2d73c21ebd5bb8d0e21792ffecf957252224fe26",
+  "sourceScene": ".local/v2/current/source/KyotoAtrium.blend",
+  "sourceComponents": [],
+  "spawn": {
+    "x": -56,
+    "y": 15.6146583557,
+    "z": 10
+  }
 }

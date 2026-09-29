@@ -7,11 +7,20 @@ from pathlib import Path
 from mathutils import Vector
 import numpy as np
 root=Path.cwd();args=sys.argv[sys.argv.index('--')+1:];manifest_path,layout_path,out=map(Path,args)
-assert Path('.local').resolve() in out.resolve().parents and not (out/'KyotoAtrium.blend').exists()
-config=json.loads(manifest_path.read_text());parent_bytes=Path(config['layout']).read_bytes();parent=json.loads(parent_bytes);target_bytes=layout_path.read_bytes();target=json.loads(target_bytes)
+assert Path('.local').resolve() in out.resolve().parents
 sha=lambda b:hashlib.sha256(b).hexdigest()
+if (out/'KyotoAtrium.blend').exists():
+ receipt_path=out/'geometry-check.json'
+ assert receipt_path.exists(),'Existing candidate needs a verified source receipt before replacement'
+ receipt=json.loads(receipt_path.read_text())
+ assert sha((out/'KyotoAtrium.blend').read_bytes())==receipt['sourceSha256'],'Preserve edited candidate source'
+ assert sha((out/'station-layout.json').read_bytes())==receipt['layoutSha256'],'Preserve edited candidate layout'
+config=json.loads(manifest_path.read_text());parent_bytes=Path(config['layout']).read_bytes();parent=json.loads(parent_bytes);target_bytes=layout_path.read_bytes();target=json.loads(target_bytes)
 assert sha(parent_bytes)==target['architecture']['westPlazaRegistration']['parentLayoutSha256']
 changed=target['architecture']['westPlazaRegistration']['changed'];selected={s for ids in changed.values()for s in ids}|{'muromachi-square'}
+integration=target['architecture'].get('westUpperConnectionIntegration',{})
+selected.update(s for ids in integration.get('retiredByKind',{}).values()for s in ids)
+retired_prefixes=tuple(integration.get('retiredPrefixes',[]))
 bpy.ops.wm.open_mainfile(filepath=str(Path(config['sourceScene']).resolve()));scene=bpy.context.scene
 scene.frame_set(1);bpy.context.view_layer.update()
 def B(p):return Vector((p['x'],p['z'],p['y']))
@@ -20,7 +29,7 @@ def signature(o):
  return sha(v.tobytes()+t.tobytes()+np.array(o.matrix_world,dtype=np.float32).tobytes())
 indexes={k:{}for k in ('panels','boxes','beams','flights')}
 for kind in indexes:
- for i,p in enumerate(parent[kind]):indexes[kind].setdefault(p['id'],[]).append(i)
+ for i,p in enumerate(target[kind]):indexes[kind].setdefault(p['id'],[]).append(i)
 represented=set();removed=[]
 old_materials={o.name:list(o.data.materials)for o in bpy.data.objects if o.type=='MESH'}
 # Retire the selected authoring objects and their auxiliaries/animation, retaining
@@ -29,7 +38,7 @@ visual_only=[]
 for o in list(scene.objects):
  name=o.get('kyoto_surface',o.name);owner=o.get('kyoto_owner','');motion=o.get('kyoto_motion_aux','')
  selected_name=any(o.name.startswith(e+' ')for e in changed['escalators'])
- if name in selected or owner in selected or motion in selected or selected_name or o.name=='k028-shukobu':removed.append(o);continue
+ if name in selected or owner in selected or motion in selected or selected_name or o.name=='k028-shukobu' or name.startswith(retired_prefixes) or o.name.startswith(retired_prefixes):removed.append(o);continue
  if o.type!='MESH' or o.get('kyoto_dynamic')or o.get('kyoto_authoring_helper'):continue
  if owner:
   # Edited stairs were baked to panels, including their walking/foundation
@@ -52,11 +61,11 @@ for o in list(scene.objects):
   # Earlier ID-only reindexing could bind every repeated beam ID to its first
   # record. The authored mesh position, not that stale index, identifies it.
   center=o.matrix_world@(sum((Vector(v)for v in o.bound_box),Vector())/8)
-  possible=[i for i in possible if (center-(B(parent[kind][i]['a'])+B(parent[kind][i]['b']))/2).length<.001]
+  possible=[i for i in possible if (center-(B(target[kind][i]['a'])+B(target[kind][i]['b']))/2).length<.001]
   if len(possible)>1:
    ends=[o.matrix_world@Vector((0,0,z))for z in (min(v[2]for v in o.bound_box),max(v[2]for v in o.bound_box))]
    def fits(i):
-    a,b=B(parent[kind][i]['a']),B(parent[kind][i]['b'])
+    a,b=B(target[kind][i]['a']),B(target[kind][i]['b'])
     return min(max((ends[0]-a).length,(ends[1]-b).length),max((ends[0]-b).length,(ends[1]-a).length))<.001
    possible=[i for i in possible if fits(i)]
  assert len(possible)==1,(o.name,kind,possible)
@@ -177,7 +186,9 @@ out.mkdir(parents=True,exist_ok=True);(out/'station-layout.json').write_bytes(ta
 # Loading the same bytes directly avoids repeated copying of that whole line.
 bpy.data.texts.remove(bpy.data.texts['Kyoto runtime seed.json'])
 seed=bpy.data.texts.load(str((out/'station-layout.json').resolve()),internal=True);seed.name='Kyoto runtime seed.json'
-(out/'textures').symlink_to((root/'.local/v2/current/source/textures').resolve(),target_is_directory=True)
+textures=(root/'.local/v2/current/source/textures').resolve()
+if (out/'textures').exists():assert (out/'textures').resolve()==textures,'Preserve candidate texture edits'
+else:(out/'textures').symlink_to(textures,target_is_directory=True)
 bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str((out/'KyotoAtrium.blend').resolve()))
 (out/'installation.json').write_text(json.dumps({'parentLayoutSha256':sha(parent_bytes),'layoutSha256':sha(target_bytes),'removedObjects':len(removed),'createdStaticObjects':len(created),'movingLanes':len(lanes),'status':'Private authoring candidate; export and complete runtime/browser checks required'},indent=2)+'\n')
 print('WEST_CONNECTED_SOURCE_SAVED',out,flush=True)

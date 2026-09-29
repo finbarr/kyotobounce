@@ -18,7 +18,7 @@ const thirdY=15.5+(topY-baseY),anchors=[[0,0],[7.35,secondY],[15.5,thirdY],[base
 function height(y){let i=1;while(i<anchors.length-1&&y>anchors[i][0])i++;const [a,b]=[anchors[i-1],anchors[i]];return a[1]+(y-a[0])*(b[1]-a[1])/(b[0]-a[0]);}
 const horizontal=(x,z)=>({x:c*x-s*z+dx,z:s*x+c*z+dz});
 const point=(p,sculpture=false)=>({...horizontal(p.x,p.z),y:sculpture?p.y+topY-baseY:height(p.y)});
-const selected=id=>/^(daikaidan-|north-side-|north-circulation-|north-escalator-|tactile-north-escalator-|south-approach-|west-north-|west-south-|k028-shukobu-)/.test(id)||id==='west-3f-landing';
+const selected=id=>/^(daikaidan-|north-side-|north-circulation-|north-escalator-|tactile-north-escalator-|south-approach-|west-north-|west-south-|k028-shukobu-)/.test(id)||id==='west-3f-landing'||id==='muromachi-south-connection';
 const changed={};
 for(const kind of ['panels','boxes','beams','flights','escalators']){
  changed[kind]=[];

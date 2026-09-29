@@ -35,10 +35,19 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
+Latest delivery: the western interior landing, Muromachi Square, fourteen Grand
+Stairway flights, northern banks, southern approach, restaurant and central
+Skyway are integrated into the current editable scene and playable bundle.
+Native route checks pass in both directions; source correspondence, Chrome
+controls and core gameplay checks pass. Evidence and remaining modeling limits
+are in [WESTERN-UPPER-CONNECTION-V2.md](notes/WESTERN-UPPER-CONNECTION-V2.md).
+Continue with the new upper route's finishes and lighting, inspecting exposed
+approach edges and railings before adding small decorations.
+
 Maintain a short ordered queue. Prefer visible impact, confidence in the evidence and low integration cost. Initial priorities after the foundation:
 
 - Finish conspicuous courtyard/café material, lighting and architectural joins using the existing work.
-- Correct the source-supported western landing/escalator discrepancy and its public connections, without considering retired course targets.
+- Refine the connected western route's materials, lighting and source-supported edge details.
 - Improve the central hall/gate passage as connected, usable architecture.
 - Complete canopy/Skyway connections, then north and south approaches in focused tasks.
 - Introduce fresh v2 levels as individual areas become stable and interesting to play; develop navigation/progression around those new levels.

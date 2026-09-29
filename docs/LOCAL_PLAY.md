@@ -33,7 +33,7 @@ The loading bar weights the five station/model downloads by decoded byte size fr
 
 `GET /api/health` reports service/worker status. Read the checkout's worker log if physics is unavailable. `web/public/debug.js` implements the development inspection surface. Production blocks `/api/debug/*` at the proxy.
 
-`npm test` needs no worker. `npm run test:runtime` checks the v2 courtyard spawn, walking, full translation/spin rest, free results, recall and home against an isolated local server. `npm run test:v2:browser` checks the playable Chrome controls. Set `KYOTO_TEST_ORIGIN` for a different local port.
+`npm test` needs no worker. `npm run test:runtime` checks the configured v2 spawn, walking, full translation/spin rest, free results, recall and home against an isolated local server. `npm run test:v2:browser` checks the playable Chrome controls. Set `KYOTO_TEST_ORIGIN` for a different local port.
 
 ## Current reconstructed v2 station
 
@@ -45,9 +45,13 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
+The current spawn is on Muromachi Square. The western approach, Grand Stairway,
+restaurant and central Skyway are connected; see the [geometry and verification
+notes](../research/kyoto-station/notes/WESTERN-UPPER-CONNECTION-V2.md).
+
 `web/v2/assets.json` identifies the current private reconstruction under `.local/v2/current/`. Its layout and GLB hashes are checked before launch, along with escalator and comb-support correspondence. An optional hardware GLB is also hash-checked. Only the spawn metadata changes; large geometry stays symlinked. The launch command creates a public asset overlay, matching browser manifest, native layout and asset receipt under `.local/v2/PORT/`. It also keeps the database and worker log there, separate from published saves.
 
-To validate the single temporary candidate without changing the current manifest, run `KYOTO_V2_ASSETS=.local/v2/candidate/station/assets.json npm run dev:v2 -- 4426`. Stop that preview after promotion and remove its generated overlay/layout; keep only useful small receipts.
+To validate the single temporary candidate without changing the current manifest, run `KYOTO_V2_ASSETS=.local/v2/candidate/assets.json npm run dev:v2 -- 4426`. Stop that preview after promotion and remove its generated overlay/layout; keep only useful small receipts.
 
 Small v2 additions can be emitted by their checked-in component builder and appended with `web/v2/compose-component.mjs`. `sourceComponents` in the asset manifest identifies the editable components. Major replacements can be installed in the base Blender scene; small additions can remain appended. Use their installation or composition receipts when rebuilding. The composition receipt preserves the parent manifest, original encoded buffers and matching native panels.
 
