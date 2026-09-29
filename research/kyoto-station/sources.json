@@ -12022,5 +12022,34 @@
     "note": "Linked by the current official station map page. The filename contains 260420; the diagram itself has no publication date. Inspected to locate the central Shinkansen entrance, concourse, tracks 11–14 and their relation to the public north–south passage.",
     "rights": "Research reference only; not a game texture. JR Central retains rights.",
     "retrieved_at": "2026-09-29T07:03:46.012116+00:00"
+  },
+  {
+    "id": "jr-central-kyoto-platform-gates-2014",
+    "title": "Kyoto Shinkansen platform-door installation notice",
+    "publisher": "JR Central",
+    "category": "railway architecture",
+    "url": "https://jr-central.co.jp/news/release/_pdf/000024986.pdf",
+    "source_date": "2014-12-03",
+    "note": "Kyoto platform 12 use from 15 January 2015, with 11 and 13/14 installation plans. Pipe-door/pocket diagram is used as a barrier-type reference. The example photograph is explicitly Shin-Osaka platform 27, not Kyoto. Does not establish exact Kyoto module spacing or current equipment state. Saved page rendered and visually inspected.",
+    "rights": "Reference copy only; imagery is not shipped in the game.",
+    "format": "pdf",
+    "status": "downloaded",
+    "local_file": "plans/shinkansen-platform-gates-2014.pdf",
+    "bytes": 98202,
+    "sha256": "89dedb2ea3b46ab9f37a140a1387e83bcf738d2dda1394749e79b50aaa7801a8",
+    "retrieved_at": "2026-09-29T07:16:34.260355+00:00"
+  },
+  {
+    "id": "mlit-railway-technical-standards-gauge",
+    "title": "Technical Regulatory Standards on Japanese Railways",
+    "publisher": "MLIT Railway Bureau",
+    "category": "railway technical reference",
+    "url": "https://www.mlit.go.jp/english/2006/h_railway_bureau/Laws_concerning/14.pdf",
+    "source_date": null,
+    "note": "Consulted printed page 13 / PDF page 21, Approved Model Specifications III-1 related to Article 12: Shinkansen railway gauge 1.435 m. Used only for nominal rail gauge, not surveyed Kyoto elevations or platform dimensions.",
+    "rights": "Reference only.",
+    "format": "pdf",
+    "status": "consulted online",
+    "retrieved_at": "2026-09-29T07:30:09.975590+00:00"
   }
 ]

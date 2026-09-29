@@ -2,6 +2,8 @@
 
 29 September 2026. Replace the lower passage’s blank side walls with the opposing Kintetsu and Shinkansen ticket fronts.
 
+The subsequent [Shinkansen connection](SHINKANSEN-V2.md) opens one Shinkansen lane and replaces its receiving-room end with the paid concourse and elevated platforms. The Kintetsu bank still awaits its terminal. The verification below describes this original gate-front delivery.
+
 ## Change and limits
 
 The lower public route now has two named entrance banks, recessed ticket machines and staffed windows. Four columns that occupied the openings are replaced with portal columns. The north–south route remains continuous; both ticket and information recesses have level floors joining the original hall. A tactile branch leads across the hall to a gate lane. The photographed alternating floor pattern and ceiling divisions distinguish the transfer area.

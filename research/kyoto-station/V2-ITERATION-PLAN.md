@@ -12,11 +12,11 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: [the southern operator entrances](notes/SOUTHERN-GATES-V2.md) replaces the lower passage’s blank side walls with Shinkansen and Kintetsu ticket fronts and usable public recesses. The gates remain closed until the paid routes are built. [Platform 0](notes/PLATFORM-ZERO-V2.md), [the other conventional platforms](notes/CONVENTIONAL-RAILWAY-V2.md), [the public passage](notes/PUBLIC-PASSAGE-SOUTH-V2.md), both Central Gate bridge connections and the east 4F–7F repair are integrated.
+Latest structural delivery: [the Shinkansen connection](notes/SHINKANSEN-V2.md) opens a central gate lane into the paid concourse, with two working stair routes to islands 11–12 and 13–14, four tracks and the elevated deck and canopies. [The southern operator entrances](notes/SOUTHERN-GATES-V2.md), [platform 0](notes/PLATFORM-ZERO-V2.md), [the other conventional platforms](notes/CONVENTIONAL-RAILWAY-V2.md), [the public passage](notes/PUBLIC-PASSAGE-SOUTH-V2.md), both Central Gate bridge connections and the east 4F–7F repair are integrated.
 
 Next priorities:
 
-1. Build the southern railway and paid connections behind the new Shinkansen/Kintetsu gates, replacing the provisional room ends; continue the Hachijo building, terrace and forecourt.
+1. Build Kintetsu's terminal behind its gate, replacing the remaining provisional receiving-room end; continue the Hachijo building, terrace and forecourt, and missing Shinkansen transfer/entrance routes.
 2. Complete the western 30–34 platforms and eastern transfer connection.
 3. Repair other interior obstructions, then refine railway alignment, enclosures and finishes.
 
