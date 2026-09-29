@@ -9,7 +9,24 @@ export const STATION_PROBES=Object.freeze([
 ]);
 const CANOPY_PROBE=Object.freeze({name:'north-exterior',position:[-5,30,-45]});
 const RESTAURANT_PROBE=Object.freeze({name:'restaurant-entry',position:[-133.3,46.3,24]});
+const DINING_PROBE=Object.freeze({name:'daruma-dining',position:[-90.45,46.73,17.12]});
 const COURT_PROBE=Object.freeze({name:'east-court',position:[110,32,1],resolution:512});
+
+// Fixed authored sources illuminate the dining capture independently of the
+// camera-selected live pool. These lights exist only during its six cube faces.
+export function createDiningCaptureLighting(authoredLights){
+  const group=new THREE.Group();group.name='Temporary Daruma capture lighting';
+  for(const fixture of authoredLights.filter(l=>l.id.startsWith('restaurant-practical-daruma-pendant-lens-')||l.id==='restaurant-practical-daruma-kitchen-strip')){
+    const light=new THREE.SpotLight();light.name=fixture.id;
+    light.color.setRGB(fixture.linearColor.r,fixture.linearColor.g,fixture.linearColor.b);
+    light.intensity=Math.min(180,fixture.intensity*8);light.distance=fixture.range;
+    light.angle=THREE.MathUtils.degToRad(fixture.spotAngle/2);light.penumbra=1-fixture.innerSpotAngle/fixture.spotAngle;
+    light.position.set(fixture.position.x,fixture.position.y-.08,-fixture.position.z);
+    light.target.position.copy(light.position).add(new THREE.Vector3(fixture.direction.x,fixture.direction.y,-fixture.direction.z));
+    group.add(light,light.target);
+  }
+  return group;
+}
 
 export function stationDaylightTexture(){
   const width=256,height=128,pixels=new Uint16Array(width*height*4);
@@ -39,10 +56,10 @@ export function configureStationDaylight(renderer,scene,sun){
   sun.color.set(0xfff1df);sun.intensity=2.15;sun.position.set(-55,110,-65);sun.target.position.set(-20,0,0);scene.add(sun.target);
 }
 
-export function createStationReflections(renderer,scene,architecture,{canopy=false,courtyardMaterials=[],restaurantMaterials=[]}={}){
+export function createStationReflections(renderer,scene,architecture,{canopy=false,courtyardMaterials=[],restaurantMaterials=[],diningMaterials=[],authoredLights=[]}={}){
   const uniforms={stationHall:{value:null},stationGallery:{value:null},stationGarden:{value:null},stationExterior:{value:null}};
-  const zones=[...STATION_PROBES,...(canopy?[CANOPY_PROBE]:[]),...(courtyardMaterials.length?[COURT_PROBE]:[]),...(restaurantMaterials.length?[RESTAURANT_PROBE]:[])];
-  const stats={zones,captures:0,resolution:256,courtyardResolution:courtyardMaterials.length?512:0,courtyardMaterials:courtyardMaterials.map(m=>m.name),restaurantMaterials:restaurantMaterials.map(m=>m.name),pmremBytes:0,captureMilliseconds:0};
+  const zones=[...STATION_PROBES,...(canopy?[CANOPY_PROBE]:[]),...(courtyardMaterials.length?[COURT_PROBE]:[]),...(restaurantMaterials.length?[RESTAURANT_PROBE]:[]),...(diningMaterials.length?[DINING_PROBE]:[])];
+  const stats={zones,captures:0,resolution:256,courtyardResolution:courtyardMaterials.length?512:0,courtyardMaterials:courtyardMaterials.map(m=>m.name),restaurantMaterials:restaurantMaterials.map(m=>m.name),diningMaterials:diningMaterials.map(m=>m.name),diningCaptureLights:0,pmremBytes:0,captureMilliseconds:0};
   const targets=[];let captured=false,disposed=false;
   function patch(shader,{canopy=false}={}){
     const functions=`
@@ -98,7 +115,13 @@ ${canopy?`
     try{
       for(const zone of zones){
         const camera=zone===COURT_PROBE?courtProbe:probe,targetCube=zone===COURT_PROBE?courtCube:cube;
-        camera.position.fromArray(zone.position);camera.update(renderer,scene);
+        camera.position.fromArray(zone.position);
+        if(zone===DINING_PROBE){
+          const lighting=createDiningCaptureLighting(authoredLights);scene.add(lighting);
+          stats.diningCaptureLights=lighting.children.filter(o=>o.isLight).length;
+          try{camera.update(renderer,scene);}
+          finally{scene.remove(lighting);for(const light of lighting.children)if(light.isLight)light.dispose();}
+        }else camera.update(renderer,scene);
         const target=pmrem.fromCubemap(targetCube.texture);target.texture.name=`K026 ${zone.name} PMREM`;targets.push(target);stats.captures++;
         stats.pmremBytes+=target.width*target.height*8;
       }
@@ -113,6 +136,10 @@ ${canopy?`
         const local=targets[zones.indexOf(RESTAURANT_PROBE)].texture;
         for(const material of restaurantMaterials){material.envMap=local;material.envMapIntensity=.85;material.needsUpdate=true;}
       }
+      if(diningMaterials.length){
+        const local=targets[zones.indexOf(DINING_PROBE)].texture;
+        for(const material of diningMaterials){material.envMap=local;material.envMapIntensity=1;material.needsUpdate=true;}
+      }
       scene.environment=targets[0].texture;scene.environmentIntensity=.85;
       old?.dispose();renderer.shadowMap.autoUpdate=false;
     }catch(error){targets.forEach(t=>t.dispose());targets.length=0;scene.environment=old;renderer.shadowMap.autoUpdate=previousShadowUpdate;throw error;}
@@ -121,7 +148,7 @@ ${canopy?`
   function dispose(){
     if(disposed)return;disposed=true;
     if(targets.some(t=>scene.environment===t.texture))scene.environment=null;
-    for(const material of [...courtyardMaterials,...restaurantMaterials])if(targets.some(t=>material.envMap===t.texture)){material.envMap=null;material.needsUpdate=true;}
+    for(const material of [...courtyardMaterials,...restaurantMaterials,...diningMaterials])if(targets.some(t=>material.envMap===t.texture)){material.envMap=null;material.needsUpdate=true;}
     targets.forEach(t=>t.dispose());targets.length=0;
   }
   return {uniforms,patch,capture,dispose,stats};

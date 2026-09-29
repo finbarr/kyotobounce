@@ -1,6 +1,6 @@
 import {staticRayQueries} from './static-ray-queries.js';
 import * as THREE from 'three';
-import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture, usesCourtyardReflection, applyNiwaServicePlaster } from './station-materials.js';
+import { createStationTextures, stationMaterialFamily, applyStationMaterial, prepareGraniteMaps, isAuthoredStationFixture, usesCourtyardReflection, usesDiningReflection, applyNiwaServicePlaster } from './station-materials.js';
 import { configureStationDaylight, createStationReflections } from './station-lighting.js';
 import {createStationInstallations} from './station-installations.js';
 
@@ -139,16 +139,17 @@ export function dressStation(renderer,scene,sun,station,data){
     if(hardware||child.name==='Atrium signs and flush floor finishes')architecture.add(child);
   }
   let canopy=false;
-  const courtyardMaterials=new Set(),restaurantMaterials=new Set();
+  const courtyardMaterials=new Set(),restaurantMaterials=new Set(),diningMaterials=new Set();
   station.traverse(o=>{
     for(const material of Array.isArray(o.material)?o.material:[o.material]){
       if(!material)continue;
       if(stationMaterialFamily(material.name)==='canopy')canopy=true;
       if(usesCourtyardReflection(material.name))courtyardMaterials.add(material);
+      if(usesDiningReflection(material.name))diningMaterials.add(material);
       if(material.name==='Registered West restaurant | dark stone floor | Browser')restaurantMaterials.add(material);
     }
   });
-  const reflections=createStationReflections(renderer,scene,architecture,{canopy,courtyardMaterials:[...courtyardMaterials],restaurantMaterials:[...restaurantMaterials]});
+  const reflections=createStationReflections(renderer,scene,architecture,{canopy,courtyardMaterials:[...courtyardMaterials],restaurantMaterials:[...restaurantMaterials],diningMaterials:[...diningMaterials],authoredLights:data.authoredLights});
   const done=new Set(),families={},preservedMaps=[],resampledMaps=[];
   for(const root of architecture)root.traverse(o=>{
     if(!o.isMesh)return;

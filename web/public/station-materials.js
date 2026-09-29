@@ -58,6 +58,9 @@ export const isAuthoredStationFixture=name=>/^k02[5789][- ]/i.test(name);
 // Use the existing courtyard capture for both glass and adjacent metalwork.
 export const usesCourtyardReflection=name=>/^Registered courtyard \| (court-fold-(upper-metal|mirror|dark-return|trim)|niwa-(glass|aluminium|dark-metal|service-steel)) \| Browser$/.test(name);
 
+// Daruma's stainless fittings and pale ceiling see the enclosed dining room.
+export const usesDiningReflection=name=>/^Daruma(?: (?:kitchen|wall|ceiling))? \|/.test(name);
+
 // Ordered, explicit recognition covers current exports AND retained old names.
 export function stationMaterialFamily(name){
   if(name==='Registered courtyard | niwa-glass | Browser')return 'guard';
@@ -199,7 +202,7 @@ normal=normalize(stationFrame(-vViewPosition,normal,guv)*vec3(grainSlope,sqrt(ma
     // Local courtyard materials use their own assigned PMREM through Three's
     // standard environment sampler. The station-wide blend would replace it
     // with hall radiance even though the material has a local envMap.
-    if(!usesCourtyardReflection(m.name))reflections.patch(shader,{canopy:family==='canopy'});
+    if(!usesCourtyardReflection(m.name)&&!usesDiningReflection(m.name))reflections.patch(shader,{canopy:family==='canopy'});
     // Provisional coated-envelope appearance, isolated from clear guard glass.
     // F0 and coverage are visual calibration values, not surveyed optical data.
     if(family==='canopy')shader.fragmentShader=shader.fragmentShader.replace('#include <lights_physical_fragment>',
@@ -214,7 +217,7 @@ outgoingLight=(totalDiffuse*${family==='guard'?'.045':family==='canopy'?'.04':'.
 diffuseColor.a=coverage;
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey=()=>`K032-pbr-4-${family}-${slabCourses}-${usesCourtyardReflection(m.name)}`;m.needsUpdate=true;
+  m.customProgramCacheKey=()=>`K032-pbr-5-${family}-${slabCourses}-${usesCourtyardReflection(m.name)||usesDiningReflection(m.name)}`;m.needsUpdate=true;
 }
 
 // The stationary cove's warm wall wash is encoded on its plaster finish. This

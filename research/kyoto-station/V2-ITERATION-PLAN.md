@@ -35,7 +35,9 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
-Latest delivery: [Daruma wall fittings](notes/DARUMA-WALL-FITTINGS-V2.md) adds the two photographed historical prints, dark dado, kickplate and upper service-wall joins. Next, inspect and improve the restaurant ceiling and illumination against the Kyoto references.
+Latest delivery: [Daruma ceiling and room illumination](notes/DARUMA-CEILING-V2.md) adds the pale shop ceiling, fitted equipment and a static capture lit by the authored shop fixtures. The realtime light pool stays at two. Next, develop the restaurant corridor’s exposed overhead services from the Kyoto photographs.
+
+The [Daruma wall fittings](notes/DARUMA-WALL-FITTINGS-V2.md) adds the two photographed historical prints, dark dado, kickplate and upper service-wall joins.
 
 The [Daruma central table and circulation](notes/DARUMA-CENTRAL-TABLE-V2.md) adds the photographed communal table and a fitted eighteen-seat arrangement, moves the rear service area into the deeper footprint, and verifies a full native walking loop.
 
