@@ -12113,5 +12113,31 @@
     "retrieved_at": "2026-09-29T08:48:11.497309+00:00",
     "rights": "Reference only. Photographs are not shipped in the game.",
     "inspection": "Pages 3 and 4 rendered and visually inspected: covered forecourt, eastern entrance, public corridor alongside the Shinkansen gate and shop frontage, descent to subway. Used for circulation and material character; dimensions are fitted."
+  },
+  {
+    "id": "subway-platform-nesnad-2022",
+    "title": "Kyoto subway island platform and doors, 2 January 2022",
+    "publisher": "Nesnad / Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Kyoto_station_platforms_with_platform_doors_-_Karasuma_line_Jan_02_2022_09-22AM.jpeg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Kyoto_station_platforms_with_platform_doors_-_Karasuma_line_Jan_02_2022_09-22AM.jpeg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+    "category": "photos",
+    "local_file": "photos/subway-platform-nesnad-2022.jpg",
+    "bytes": 2227215,
+    "sha256": "8e1eb84eb2a62f98ff7f350cdd326ffd56f25b11ed857569e8b2094fddf91009",
+    "source_date": "2022-01-02",
+    "rights": "CC BY 4.0. Reference only; not shipped in the game.",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "inspection": "Visually inspected on 29 September 2026: one island, two rows of cream circular columns, pale square floor tiles, metal-panel ceiling, blue bilingual platform signs and half-height white sliding platform doors. Used for arrangement and material character; dimensions are fitted."
+  },
+  {
+    "id": "subway-kyoto-facilities-2026",
+    "title": "Kyoto Municipal Subway Kyoto station facilities",
+    "url": "https://www.city.kyoto.lg.jp/kotsu/page/0000009812.html",
+    "publisher": "Kyoto Municipal Transportation Bureau",
+    "category": "website",
+    "source_date": "Page marked 17 October 2014; facility text states April 2021 snapshot",
+    "retrieved_at": "2026-09-29",
+    "rights": "Reference only.",
+    "inspection": "Read for four gate names, separate concourse/platform access and platform-door presence. Current K11 station page checked separately for platform 1 Takeda/Nara and platform 2 Kokusaikaikan directions."
   }
 ]
