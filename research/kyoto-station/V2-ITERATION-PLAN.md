@@ -22,7 +22,7 @@ The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) con
 
 Next priorities:
 
-1. Complete the remaining west Porta aisles and Isetan approach, street exits and Kotochika surroundings. The central elevator's five stops and receiving routes are delivered; keep the distinct floor levels explicit.
+1. Complete the Isetan approaches, remaining street exits and Kotochika surroundings. The [western Porta loop and forecourt stair](notes/PORTA-WEST-V2.md) replace the isolated receiving room and connect both shopping streets. Keep the distinct floor levels explicit.
 2. Complete the southern shopping streets, building frontage, terrace and forecourt.
 3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 

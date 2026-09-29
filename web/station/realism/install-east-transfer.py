@@ -14,7 +14,9 @@ modified_paving=report['geometry'].get('modifiedPaving');assert not modified_pav
 modified_ids=report['geometry'].get('modifiedPanelIds',[]);assert not modified_ids or report.get('componentPrefix')=='central-lift-' and modified_ids==['concourse']
 replaced=[p for p in new['panels']if p['id']==modified_paving or p['id']in modified_ids];replaced_by_id={p['id']:p for p in replaced}
 retained=[replaced_by_id.get(p['id'],p) for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
-for key in ('boxes','beams','flights','escalators'):assert old[key]==new[key]
+retired_boxes=report['geometry'].get('retiredBoxIds',[]);assert not retired_boxes or report.get('componentPrefix')=='porta-west-'
+assert new['boxes']==[p for p in old['boxes']if p['id']not in retired_boxes]
+for key in ('beams','flights','escalators'):assert old[key]==new[key]
 retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
 assert not retired_lift_ids or report.get('componentPrefix')=='hachijo-crossing-' and retired_lift_ids==['subway-hachijo-east-lift']
 old_lifts=[l for l in old.get('lifts',[])if l['id']not in retired_lift_ids];lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
@@ -26,6 +28,7 @@ prefix=report.get('componentPrefix','east-transfer-')
 added=new['panels'][len(retained):];assert len(added)==report['geometry']['panels'] and all(p['id'].startswith(prefix)for p in added)
 bpy.ops.wm.open_mainfile(filepath=str(Path(base['sourceScene']).resolve()));assert bpy.data.texts['Kyoto runtime seed.json'].as_string()==old_raw.decode()
 by_id={p['id']:i for i,p in enumerate(new['panels'])}
+box_ids={p['id']:i for i,p in enumerate(new['boxes'])}
 assert not (set(by_id) & {r['id'] for r in new['authoredLights'] if r['id'].startswith(prefix)})
 removed=[];retired_lift_parts=[]
 for o in list(bpy.data.objects):
@@ -33,6 +36,8 @@ for o in list(bpy.data.objects):
  if o.name in report['geometry']['retiredLights']:bpy.data.objects.remove(o,do_unlink=True);continue
  if o.get('kyoto_surface',o.name) in report['geometry']['retiredIds']:removed.append(o.get('kyoto_surface',o.name));bpy.data.objects.remove(o,do_unlink=True);continue
  key=o.get('kyoto_seed','')
+ if key.startswith('boxes/'):
+  id=old['boxes'][int(key.split('/')[1])]['id'];assert id in box_ids;o['kyoto_seed']='boxes/'+str(box_ids[id])
  if key.startswith('panels/'):
   id=old['panels'][int(key.split('/')[1])]['id'];assert id in by_id;o['kyoto_seed']='panels/'+str(by_id[id])
 assert set(removed)==set(report['geometry']['retiredIds'])
