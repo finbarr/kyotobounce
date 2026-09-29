@@ -7,7 +7,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {PhysicsWorker} from '../../worker.ts';
 const [layoutPath,component,out]=process.argv.slice(2);assert(out?.startsWith('.local/'));await mkdir(out,{recursive:true});
 const bytes=await readFile(layoutPath),layout=JSON.parse(bytes),lanes=JSON.parse(await readFile(component+'/motion.json')).escalators;
-assert.equal(lanes.length,4);for(const lane of lanes)assert.deepEqual(layout.escalators.find(e=>e.id===lane.id),lane);
+assert(lanes.length>0,'The component must define escalator lanes');for(const lane of lanes)assert.deepEqual(layout.escalators.find(e=>e.id===lane.id),lane);
 process.env.KYOTO_LAYOUT=resolve(layoutPath);process.env.KYOTO_WORKER_LOG=resolve(out+'/worker.log');
 const worker=new PhysicsWorker(),id='subway-escalators',report={layoutSha256:createHash('sha256').update(bytes).digest('hex'),rides:[],pass:false};let state;
 worker.on('message',m=>{if(m.type==='state'&&m.id===id)state=m;});

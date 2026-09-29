@@ -75,27 +75,11 @@ The [Hachijo ground entrance](HACHIJO-ENTRANCE-V2.md) now links the public terra
 
 The [Hachijo East entrance](HACHIJO-EAST-V2.md) adds a public hall with connections through the Shinkansen gate and stairs and through the JR gate to platform 10.
 
-The [public underground passage](SUBWAY-PASSAGE-V2.md) connects Hachijo East to a northern street exit with two usable stairs. The [subway platform connection](SUBWAY-PLATFORMS-V2.md) opens southern and central gate halls to two stairs, one island platform and both tracks. The [Porta connection](PORTA-CONNECTION-V2.md) joins the central B1 deck to B2 by four moving lanes, with public aisles, stairs and a ramp to the subway passage. It also removes floating tactile bars that prevented descent on the eastern upper lane. Later gates, plaza aisles, platform escalators and the first passenger lift are recorded below.
-
 The [eastern railway underpass](EAST-TRANSFER-V2.md) connects all six conventional-platform areas to the eastern Shinkansen transfer stair and Underground East gate. Its route is below the tracks; the Porta link moves north to keep public and paid circulation separate.
-
-The [Central 2 subway gate](SUBWAY-CENTRAL-TWO-V2.md) now connects the public passage to the shared island platform, with a complete stair well and clear platform aisles.
-
-The [North subway gate](SUBWAY-NORTH-V2.md) adds the fourth entrance, its paid hall and stairs, and the northern platform extension. The public street-exit route remains alongside it.
 
 The [Porta plaza B1 connection](PORTA-PLAZA-V2.md) now opens the public subway hall and the B2 north cross-passage into a connected two-aisle loop, with a fitted stair between the retained floor levels. It covers the first part of the west area; the rest of the plaza mall remains unfinished.
 
-The [four platform escalators](SUBWAY-ESCALATORS-V2.md) now run upward beside the South, Central 2, Central 1 and North stairs. Their fitted pits, combs and floor openings connect both levels, while the four-metre stairs and both platform aisles remain usable.
-
-The [Central 1 passenger lift](SUBWAY-LIFT-V2.md) now operates between the platform and paid concourse, with moving-car support, protected landing doors and a usable vestibule.
-
-The [Porta East connection](PORTA-EAST-V2.md) opens the West North Street endpoint and public North-gate hall, joining the east-area aisles, cross-passages and usable shop entrances. The crossing stays outside the paid concourse, and the existing street stair remains clear.
-
-The [Exit 5 street lift](EXIT-FIVE-LIFT-V2.md) now connects the public passage to the northeast forecourt, with a sloped threshold fitted to the retained paving. The route through Central 1 joins it to the existing platform lift.
-
 The [Hachijo Street crossing](HACHIJO-CROSSING-V2.md) extends the South subway lobby route under the road to both street lifts, the sunken garden and its stair. It corrects the northern lift's provisional indoor placement using operator photographs, with the retained stair, JR bypass and ticket machines still accessible.
-
-The [South subway platform lift](SUBWAY-SOUTH-LIFT-V2.md) connects the second platform lift shown in the city diagram to the South paid gate hall. Both platform aisles, the South stair approach and earlier shaft openings remain clear.
 
 The [Porta west public lift](PORTA-WEST-LIFT-V2.md) connects the western cross-passage to the station forecourt. The fitted upper threshold follows the original paving slope; both shopping streets and the B2 stair approach remain available.
 
@@ -107,11 +91,11 @@ The [Isetan basement connections](ISETAN-BASEMENT-V2.md) now open B1 and both B2
 
 The [retained Porta pavilion stair](PORTA-PAVILION-V2.md) connects the forecourt to North Street through two stair lanes and a middle landing. The surrounding shop bays are rebuilt, and the existing exterior is preserved. Its exact numbered street exit remains unconfirmed.
 
-The [Kotochika western public rooms and plaza](KOTOCHIKA-V2.md) open five previously blank-fronted spaces beside the North/Central 1 passage, while retaining the B2 approach and gate access. The [eastern public connection](KOTOCHIKA-EAST-V2.md) now links the plaza around the protected Central 1 lift to Porta East and the southern public passage. The [Central 1 eastern gate](CENTRAL-ONE-EAST-V2.md) opens the missing entrance from that passage to the existing western gate, platform stair and lift; the public bypass remains outside the paid hall.
+The [connected subway reconstruction](SUBWAY-REBUILD-V2.md) replaces the misplaced gate halls with four connected stair cores, one shared island, three street stairs, two platform lifts and the Exit 5 street lift. Its public routes join the retained Porta floors, JR gate and Hachijo lobby. Northern placement follows the registered city plan; southern dimensions remain fitted and documented. The complete station, editable source, 46 route walks and moving hardware checks are integrated into the local playable build.
 
-1. **Subway placement and public connections:** the [city-plan registration](SUBWAY-CITY-CONTROL-V2.md) now locates the northern stair outlines, street openings and public passage against the retained exterior, with independent checks and explicit uncertainty. Build the connected replacement from those anchors, including old shaft closures and the Porta/southern joins. The North, Central 1 and Exit 5 corrections differ; a uniform translation is wrong. Keep separate floor levels explicit.
-2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
-3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
+1. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt, prioritizing missing public routes.
+2. **Other connections and enclosures:** western platforms 30–34 and remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
+3. **Subway receiving halls:** add the missing public-room openings and verify interior boundaries against the operator diagrams before adding fixtures and tenant detail.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.
 
