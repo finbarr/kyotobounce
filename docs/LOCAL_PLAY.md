@@ -45,10 +45,10 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is beside the North subway gate in the public underground
-passage. Its hall and stairs connect to the extended island platform, alongside
-the existing street-exit turn; see the
-[North gate notes](../research/kyoto-station/notes/SUBWAY-NORTH-V2.md).
+The current spawn is on the subway island platform beside the Central 1
+stairs and escalator. Four upward escalators now connect the platform to the
+four gate halls, with the stairs usable alongside them; see the
+[escalator notes](../research/kyoto-station/notes/SUBWAY-ESCALATORS-V2.md).
 Six conventional-platform stairs, the eastern Shinkansen transfer gate and the
 public Underground East gate remain connected. The neighboring Porta stairs and
 ramp remain public; see the [eastern connection notes](../research/kyoto-station/notes/EAST-TRANSFER-V2.md).

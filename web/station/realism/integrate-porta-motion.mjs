@@ -18,11 +18,13 @@ for(const lane of motion.escalators){
  }
 }
 layout.escalators.push(...motion.escalators);station.escalators=layout.escalators;
-layout.architecture.portaConnectionV2={scope:report.scope,combSupports:motion.combSupports,limits:report.limits};
+const architectureKey=report.motionArchitecture||'portaConnectionV2';
+assert(!layout.architecture[architectureKey]);
+layout.architecture[architectureKey]={scope:report.scope,combSupports:motion.combSupports,limits:report.limits};
 const bytes=JSON.stringify(layout)+'\n';station.layoutSha256=sha(bytes);
 detail.combSupports.push(...motion.combSupports);
-detail.candidateMotionIntegration={...detail.candidateMotionIntegration,layoutSha256:sha(bytes),portaLowerBanks:4};
+detail.candidateMotionIntegration={...detail.candidateMotionIntegration,layoutSha256:sha(bytes),[report.motionArchitecture||'portaLowerBanks']:motion.escalators.length};
 // sourceLayoutSha256 remains the provenance of the unchanged hardware GLB.
-const directory=manifest.slice(0,manifest.lastIndexOf('/'));m.layoutSha256=sha(bytes);m.motionLayout=m.layout;m.detail=directory+'/atrium-detail.json';m.spawn={x:1.2,y:report.geometry.B2,z:3};
+const directory=manifest.slice(0,manifest.lastIndexOf('/'));m.layoutSha256=sha(bytes);m.motionLayout=m.layout;m.detail=directory+'/atrium-detail.json';m.spawn=report.geometry.spawn||{x:1.2,y:report.geometry.B2,z:3};
 await writeFile(m.layout,bytes);await writeFile(m.station,JSON.stringify(station)+'\n');await writeFile(m.detail,JSON.stringify(detail)+'\n');await writeFile(manifest,JSON.stringify(m,null,2)+'\n');
 console.log({layoutSha256:m.layoutSha256,lanes:layout.escalators.length,added:4});

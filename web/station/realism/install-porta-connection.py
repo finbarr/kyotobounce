@@ -8,6 +8,7 @@ assert Path('.local').resolve() in out.resolve().parents
 assert not (out/'KyotoAtrium.blend').exists()
 sha=lambda b:hashlib.sha256(b).hexdigest()
 base=json.loads(base_path.read_text());candidate=json.loads(candidate_path.read_text());report=json.loads((component/'report.json').read_text())
+prefix=report.get('componentPrefix','porta-connection-')
 old_raw=Path(base['layout']).read_bytes();new_raw=Path(candidate['layout']).read_bytes();old=json.loads(old_raw);new=json.loads(new_raw)
 assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha256']
 retained=[p for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
@@ -15,10 +16,10 @@ for key in ('boxes','beams','flights'):assert old[key]==new[key]
 assert new['authoredLights'][:len(old['authoredLights'])]==old['authoredLights']
 lanes=json.loads((component/'motion.json').read_text())['escalators']
 assert new['escalators']==old['escalators']+lanes
-added=new['panels'][len(retained):];assert len(added)==report['geometry']['panels'] and all(p['id'].startswith('porta-connection-')for p in added)
+added=new['panels'][len(retained):];assert len(added)==report['geometry']['panels'] and all(p['id'].startswith(prefix)for p in added)
 bpy.ops.wm.open_mainfile(filepath=str(Path(base['sourceScene']).resolve()));assert bpy.data.texts['Kyoto runtime seed.json'].as_string()==old_raw.decode()
 by_id={p['id']:i for i,p in enumerate(new['panels'])}
-assert not (set(by_id) & {r['id'] for r in new['authoredLights'] if r['id'].startswith('porta-connection-')})
+assert not (set(by_id) & {r['id'] for r in new['authoredLights'] if r['id'].startswith(prefix)})
 removed=[]
 for o in list(bpy.data.objects):
  if o.get('kyoto_surface',o.name) in report['geometry']['retiredIds']:removed.append(o.get('kyoto_surface',o.name));bpy.data.objects.remove(o,do_unlink=True);continue
@@ -39,7 +40,7 @@ def material(key):
  if r.get('albedo'):
   image=bpy.data.images.load(str((component/report['texture']['file']).resolve()),check_existing=True);image.pack();tex=m.node_tree.nodes.new('ShaderNodeTexImage');tex.image=image;tex.extension='EXTEND';m.node_tree.links.new(tex.outputs['Color'],bs.inputs['Base Color'])
  created[key]=m;return m
-collection=bpy.data.collections.new('Porta B2 and subway connection');bpy.context.scene.collection.children.link(collection)
+collection=bpy.data.collections.new(report.get('sourceCollection','Porta B2 and subway connection'));bpy.context.scene.collection.children.link(collection)
 def signature(o):
  vertices=np.empty(len(o.data.vertices)*3,dtype=np.float32);o.data.vertices.foreach_get('co',vertices);loops=np.empty(len(o.data.loops),dtype=np.int32);o.data.loops.foreach_get('vertex_index',loops)
  return sha(vertices.tobytes()+loops.tobytes()+np.array(o.matrix_world,dtype=np.float32).tobytes())
