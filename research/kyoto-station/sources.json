@@ -12328,5 +12328,39 @@
     "bytes": 114918,
     "sha256": "9537f5623d4f512a4ec7774ad8de2407e3736d3ba31ee63a5e24377eef681edd",
     "retrieved_at": "2026-09-29T17:22:20.109426+00:00"
+  },
+  {
+    "id": "isetan-b1-floor-plan-20260916",
+    "title": "JR Kyoto Isetan B1 food hall plan",
+    "publisher": "JR Kyoto Isetan",
+    "category": "circulation",
+    "url": "https://www.mistore.jp/content/dam/isetan_mitsukoshi/site/wjri/shops/floormap/japan/floor_b1f.png",
+    "final_url": "https://www.isetan.mistore.jp/content/dam/isetan_mitsukoshi/site/wjri/shops/floormap/japan/floor_b1f.png",
+    "source_date": "2026-09-16",
+    "note": "Official floor guide image, date from page alt text. Visually inspected. Main eastern entry on B1; two eastern entries on B2; perimeter and cross aisles, counter islands and internal stairs. Plan orientation checked against the station operator B1/B2 maps. No surveyed dimensions.",
+    "rights": "Reference copy only; not a game texture.",
+    "format": "png",
+    "status": "downloaded",
+    "local_file": "maps/isetan-b1-2026.png",
+    "bytes": 805930,
+    "sha256": "d6d4c725815b259c23af87f0bd08b1b55d59765f5c9fb0f5fe0b3eed9caa51b5",
+    "retrieved_at": "2026-09-29T18:08:15.625Z"
+  },
+  {
+    "id": "isetan-b2-floor-plan-20260916",
+    "title": "JR Kyoto Isetan B2 food hall plan",
+    "publisher": "JR Kyoto Isetan",
+    "category": "circulation",
+    "url": "https://www.mistore.jp/content/dam/isetan_mitsukoshi/site/wjri/shops/floormap/japan/floor_b2f.png",
+    "final_url": "https://www.isetan.mistore.jp/content/dam/isetan_mitsukoshi/site/wjri/shops/floormap/japan/floor_b2f.png",
+    "source_date": "2026-09-16",
+    "note": "Official floor guide image, date from page alt text. Visually inspected. Main eastern entry on B1; two eastern entries on B2; perimeter and cross aisles, counter islands and internal stairs. Plan orientation checked against the station operator B1/B2 maps. No surveyed dimensions.",
+    "rights": "Reference copy only; not a game texture.",
+    "format": "png",
+    "status": "downloaded",
+    "local_file": "maps/isetan-b2-2026.png",
+    "bytes": 532445,
+    "sha256": "1745d7fc7d917ab5dbdd2f4cbcf6b5c4e33b8bd632e60416c12ef8997422f665",
+    "retrieved_at": "2026-09-29T18:08:15.626Z"
   }
 ]

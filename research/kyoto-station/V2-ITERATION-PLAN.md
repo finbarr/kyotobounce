@@ -20,9 +20,11 @@ The [Porta west public lift](notes/PORTA-WEST-LIFT-V2.md) connects the western c
 
 The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) connect all five stops: parking B3, Porta B2, the western B1 hall, the recessed ground entrance and the upper north–south passage. Fourteen native route walks and 34 Chrome lift checks pass. The parking receiving area is established; ramps and further building connections remain unfinished.
 
+The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both B2 food-hall entrances, connect aisle loops and add a guarded internal stair. The central lift remains reachable from both levels. Detailed shop fitouts and further store-floor connections remain unfinished.
+
 Next priorities:
 
-1. Complete the Isetan approaches, remaining street exits and Kotochika surroundings. The [western Porta loop and forecourt stair](notes/PORTA-WEST-V2.md) replace the isolated receiving room and connect both shopping streets. Keep the distinct floor levels explicit.
+1. Complete the remaining street exits and Kotochika surroundings. The [western Porta loop and forecourt stair](notes/PORTA-WEST-V2.md) replace the isolated receiving room and connect both shopping streets. Keep the distinct floor levels explicit.
 2. Complete the southern shopping streets, building frontage, terrace and forecourt.
 3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 

@@ -112,3 +112,7 @@ Finish one connection, verify it in the complete station, integrate the editable
 ## Hachijo Street crossing
 
 The [public crossing](HACHIJO-CROSSING-V2.md) now continues from the subway South lobby beneath Hachijo Street into an open-air garden with a usable street stair, southern lift and Avanti receiving lobby. The northern lift moves out to the station frontage, as shown by the operator's photographed route; its old indoor shaft openings are restored. Both lower portals have retaining headers and guards above them. The full Avanti building, shopping floor and bus terminal remain in the queue.
+
+## Isetan basement entrances and internal stair
+
+The [Isetan repair](ISETAN-BASEMENT-V2.md) removes the sealed western B1/B2 walls, opens both B2 entrances from the Porta aisles, and adds connected food-hall loops and a guarded B1–B2 stair. Ten native routes, two Chrome keyboard routes, matching source/exports and stair headroom checks pass. Store fitouts, further lifts/escalators and connections to other Isetan floors remain unfinished.
