@@ -12362,5 +12362,38 @@
     "bytes": 532445,
     "sha256": "1745d7fc7d917ab5dbdd2f4cbcf6b5c4e33b8bd632e60416c12ef8997422f665",
     "retrieved_at": "2026-09-29T18:08:15.626Z"
+  },
+  {
+    "id": "porta-west-east-evacuation-2024",
+    "title": "Porta west and east area plan, revised April 2024",
+    "publisher": "Kyoto Station Building / Kyoto Porta",
+    "category": "map",
+    "url": "https://www.porta.co.jp/common/pdf/company/hinankeikaku.pdf",
+    "source_date": "2024-04-01",
+    "format": "pdf",
+    "local_file": "maps/porta-west-east-evacuation-2024.pdf",
+    "rights": "Reference copy only; operator copyright.",
+    "note": "Page 7 visually inspected for street-exit topology and stairs beside West Street. No engineering dimensions inferred.",
+    "status": "downloaded",
+    "bytes": 1394616,
+    "sha256": "87d15123a3a0f4368bacbdcc76b2384f3aa1a8481d2cfcc909516210f7875937",
+    "retrieved_at": "2026-09-29T18:42:32.403Z"
+  },
+  {
+    "id": "porta-c2-entrance-2013",
+    "title": "Kyoto Porta entrance C2, January 2013",
+    "publisher": "KishujiRapid / Wikimedia Commons",
+    "category": "photograph",
+    "url": "https://commons.wikimedia.org/wiki/File:Kyoto_Porta_Entrance.JPG",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Kyoto_Porta_Entrance.JPG",
+    "source_date": "2013-01-19",
+    "format": "jpg",
+    "local_file": "photos/porta-c2-entrance.jpg",
+    "rights": "CC BY-SA 3.0; KishujiRapid. Reference only, not a shipped game texture.",
+    "note": "Historic photo of C2 tile walls, glazed doors and curved canopy; visually inspected. It does not establish that the separate retained municipal pavilion is C2.",
+    "status": "downloaded",
+    "bytes": 770968,
+    "sha256": "9333e2129897b07c53ad15282e1e4351061a058d9802ee2d977fe5fdb2b6c3bf",
+    "retrieved_at": "2026-09-29T18:42:32.404Z"
   }
 ]

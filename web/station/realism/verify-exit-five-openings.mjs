@@ -15,9 +15,10 @@ const paving=verifyPaving(readGLB(await readFile(parent.geometry)),readGLB(await
 // The approach sill starts on the original paving and ends at the car floor.
 const sill=next.panels.find(p=>p.id===(spec.componentPrefix||'exit-five-')+'upper-sill');
 for(const [x,y]of [[opening.minX,spec.frontEdge[0]],[opening.maxX,spec.frontEdge[1]]]){
- const ys=sill.vertices.filter(v=>Math.abs(v.x-x)<1e-5&&Math.abs(v.z-opening.minZ)<1e-5).map(v=>v.y);
+ const ys=sill.vertices.filter(v=>Math.abs(v.x-x)<1e-5&&Math.abs(v.z-(spec.frontZ??opening.minZ))<1e-5).map(v=>v.y);
  assert(ys.length&&Math.abs(Math.max(...ys)-y)<1e-6&&Math.abs(Math.min(...ys)-(y-.12))<1e-6);
 }
+if(spec.approachSurfaceId){const support=old.boxes.find(p=>p.id===spec.approachSurfaceId);assert(support?.yaw===0&&support.collision!==false);assert(spec.frontEdge.every(y=>Math.abs(y-(support.center.y+support.size.y/2))<1e-7));assert.equal(support.center.z+support.size.z/2,opening.minZ);assert(eq(support,next.boxes.find(p=>p.id===support.id)));}
 const proof={pass:true,layoutSha256:candidate.layoutSha256,geometrySha256:candidate.geometrySha256,paving,upperLanding:spec.upper,slopedThresholdMatches:true};
 await writeFile(out,JSON.stringify(proof,null,2)+'\n');console.log(proof);
 function decoded(glb,ai){

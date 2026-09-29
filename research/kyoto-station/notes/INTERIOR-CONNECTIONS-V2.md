@@ -103,7 +103,11 @@ The [central elevator and western receiving halls](CENTRAL-LIFT-V2.md) now conne
 
 The [western Porta loop and forecourt stair](PORTA-WEST-V2.md) replace the old sealed stair room at the wrong level with a complete descent to the mall. Both shopping streets connect around the missing western block, with the earlier lift and B2 stair approach retained.
 
-1. **Underground public connections:** complete the Isetan approaches, remaining street exits and Kotochika surroundings. Keep the separate floor levels explicit.
+The [Isetan basement connections](ISETAN-BASEMENT-V2.md) now open B1 and both B2 entrances into usable food-hall loops, with an internal stair and access to the central elevator.
+
+The [retained Porta pavilion stair](PORTA-PAVILION-V2.md) connects the forecourt to North Street through two stair lanes and a middle landing. The surrounding shop bays are rebuilt, and the existing exterior is preserved. Its exact numbered street exit remains unconfirmed.
+
+1. **Underground public connections:** complete Kotochika surroundings and the remaining street exits. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

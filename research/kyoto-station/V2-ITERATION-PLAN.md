@@ -22,6 +22,8 @@ The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) con
 
 The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both B2 food-hall entrances, connect aisle loops and add a guarded internal stair. The central lift remains reachable from both levels. Detailed shop fitouts and further store-floor connections remain unfinished.
 
+The [retained Porta pavilion stair](notes/PORTA-PAVILION-V2.md) restores the forecourt entrance and opens both stair lanes onto North Street. Adjacent shop bays, the west cross-passage and lift approach remain usable. Its exact exit number remains unconfirmed.
+
 Next priorities:
 
 1. Complete the remaining street exits and Kotochika surroundings. The [western Porta loop and forecourt stair](notes/PORTA-WEST-V2.md) replace the isolated receiving room and connect both shopping streets. Keep the distinct floor levels explicit.
