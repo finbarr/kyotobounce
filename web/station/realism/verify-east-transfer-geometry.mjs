@@ -8,12 +8,13 @@ import {readGLB} from '../../../tools/optimize-browser-assets.mjs';
 const [manifest,prepared,candidate,component,out]=process.argv.slice(2),read=async p=>JSON.parse(await readFile(p)),sha=b=>createHash('sha256').update(b).digest('hex');
 const parent=await read(manifest),old=await read(parent.layout),a=await read(prepared),b=await read(candidate),base=await read(a.layout),next=await read(b.layout),report=await read(component+'/report.json');
 const retiredIds=report.geometry.retiredIds;
-assert(eq(base.panels,old.panels.filter(p=>!retiredIds.includes(p.id))));assert(eq(base.authoredLights,old.authoredLights.filter(r=>!report.geometry.retiredLights.includes(r.id))));assert(eq({...base,panels:old.panels,authoredLights:old.authoredLights},old));
+const modifiedPaving=report.geometry.modifiedPaving;assert(!modifiedPaving||modifiedPaving==='municipal-plaza-642152272');
+const expectedPanels=old.panels.filter(p=>!retiredIds.includes(p.id)).map(p=>p.id===modifiedPaving?base.panels.find(q=>q.id===p.id):p);assert(eq(base.panels,expectedPanels));assert(eq(base.authoredLights,old.authoredLights.filter(r=>!report.geometry.retiredLights.includes(r.id))));assert(eq({...base,panels:old.panels,authoredLights:old.authoredLights},old));
 const added=next.panels.slice(base.panels.length);assert.equal(added.length,report.geometry.panels);
 const native=await read(component+'/native-panels.json');assert(eq(next.authoredLights.slice(0,base.authoredLights.length),base.authoredLights));assert(eq(next.authoredLights.slice(base.authoredLights.length),native.authoredLights));
 assert(eq(next.panels.slice(0,base.panels.length),base.panels));
 const retainedNext={...next,panels:base.panels,authoredMaterials:base.authoredMaterials,authoredLights:base.authoredLights,architecture:base.architecture};
-if(report.componentPrefix==='subway-lift-'){
+if(['subway-lift-','exit-five-'].includes(report.componentPrefix)){
  const lift=await read(component+'/lift-spec.json');
  for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;
  assert(eq(next.lifts,[...(base.lifts||[]),lift]));assert(eq((await read(b.station)).lifts,next.lifts));

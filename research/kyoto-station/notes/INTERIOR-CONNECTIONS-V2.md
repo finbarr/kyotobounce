@@ -91,7 +91,9 @@ The [Central 1 passenger lift](SUBWAY-LIFT-V2.md) now operates between the platf
 
 The [Porta East connection](PORTA-EAST-V2.md) opens the West North Street endpoint and public North-gate hall, joining the east-area aisles, cross-passages and usable shop entrances. The crossing stays outside the paid concourse, and the existing street stair remains clear.
 
-1. **Underground public connections:** add onward accessible lifts toward Exit 5, Porta and Hachijo. Complete remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
+The [Exit 5 street lift](EXIT-FIVE-LIFT-V2.md) now connects the public passage to the northeast forecourt, with a sloped threshold fitted to the retained paving. The route through Central 1 joins it to the existing platform lift.
+
+1. **Underground public connections:** add the remaining accessible lifts toward Porta and Hachijo. Complete remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

@@ -10,11 +10,13 @@ sha=lambda b:hashlib.sha256(b).hexdigest()
 base=json.loads(base_path.read_text());candidate=json.loads(candidate_path.read_text());report=json.loads((component/'report.json').read_text())
 old_raw=Path(base['layout']).read_bytes();new_raw=Path(candidate['layout']).read_bytes();old=json.loads(old_raw);new=json.loads(new_raw)
 assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha256']
-retained=[p for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
+modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
+replaced=[p for p in new['panels']if p['id']==modified_paving]
+retained=[replaced[0]if p['id']==modified_paving else p for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
 for key in ('boxes','beams','flights','escalators'):assert old[key]==new[key]
 old_lifts=old.get('lifts',[]);lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
 added_lifts=lifts[len(old_lifts):]
-assert not added_lifts or report.get('componentPrefix')=='subway-lift-'
+assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-')
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')
@@ -47,7 +49,10 @@ collection=bpy.data.collections.new(report.get('sourceCollection','East undergro
 def signature(o):
  vertices=np.empty(len(o.data.vertices)*3,dtype=np.float32);o.data.vertices.foreach_get('co',vertices);loops=np.empty(len(o.data.loops),dtype=np.int32);o.data.loops.foreach_get('vertex_index',loops)
  return sha(vertices.tobytes()+loops.tobytes()+np.array(o.matrix_world,dtype=np.float32).tobytes())
-for index,p in enumerate(added,start=len(retained)):
+for p in replaced:
+ o=next(o for o in bpy.data.objects if o.get('kyoto_surface',o.name)==p['id']);bpy.data.objects.remove(o,do_unlink=True)
+for p in replaced+added:
+ index=by_id[p['id']]
  mesh=bpy.data.meshes.new(p['id']);mesh.from_pydata([(v['x'],v['z'],v['y'])for v in p['vertices']],[],[p['triangles'][i:i+3][::-1]for i in range(0,len(p['triangles']),3)]);mesh.update();o=bpy.data.objects.new(p['id'],mesh);collection.objects.link(o);mesh.materials.append(material(p['appearance']))
  if p.get('uv'):
   uv=mesh.uv_layers.new(name='UVMap')
@@ -84,7 +89,7 @@ for o in bpy.data.objects:
  key=o.get('kyoto_seed','')
  if key.startswith('boxes/'):
   assert new['boxes'][int(key.split('/')[1])]['id']==o.get('kyoto_surface',o.name)
-for p in added:
+for p in replaced+added:
  o=objects[p['id']];mesh=o.data;assert o['kyoto_seed']=='panels/'+str(by_id[p['id']]);assert signature(o)==o['kyoto_geometry_signature'];assert mesh.materials[0].name==materials[p['appearance']]['label'];assert [i for f in mesh.polygons for i in reversed(f.vertices)]==p['triangles'];assert max((v.co-Vector((q['x'],q['z'],q['y']))).length for v,q in zip(mesh.vertices,p['vertices']))<2e-5
  for l in mesh.loops:
   if p.get('uv'):assert max(abs(mesh.uv_layers.active.data[l.index].uv[i]-p['uv'][l.vertex_index][k])for i,k in enumerate(('x','y')))<1e-5
@@ -96,5 +101,5 @@ for part,position,size in lift_objects:
 for r in lights:
  o=bpy.data.objects[r['id']];assert abs(o.data.energy-r['intensity'])<1e-6;assert o['kyoto_range_m']==r['range']
 proof={'pass':True,'parentSourceSha256':sha(Path(base['sourceScene']).read_bytes()),'sourceSha256':sha((out/'KyotoAtrium.blend').read_bytes()),'layoutSha256':sha(new_raw),'addedPanels':len(added),'retiredObjects':removed,'savedGeometryUVsNormalsMatch':True,'retainedBindingsMatch':True}
-proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects)
+proof['modifiedPaving']=modified_paving;proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects)
 (out/'installation.json').write_text(json.dumps(proof,indent=2)+'\n');print('EAST_TRANSFER_SOURCE_READY',json.dumps(proof),flush=True)

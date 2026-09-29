@@ -1,6 +1,6 @@
 // Fitted car dimensions; the operator plan establishes the two connected levels.
-export function subwayLift(){
- const id='subway-central-one-lift',parts=[];
+export function subwayLift({id='subway-central-one-lift',origin={x:177,y:-11.2,z:6.3},height=5}={}){
+ const parts=[];
  const part=(name,center,size,motion='car',doorSide=0,appearance='steel')=>parts.push({id:id+'-'+name,center:{x:center[0],y:center[1],z:center[2]},size:{x:size[0],y:size[1],z:size[2]},material:'steel',appearance:'Subway lift | '+appearance,motion,doorSide});
  part('floor',[0,-.09,0],[2.4,.18,2.4],'car',0,'dark floor');
  part('ceiling',[0,2.48,0],[2.4,.12,2.4],'car',0,'ceiling');
@@ -16,7 +16,7 @@ export function subwayLift(){
  part('lintel',[0,2.31,-1.10],[2.4,.22,.1]);
  part('back-rail',[0,1,1.07],[2.12,.05,.04]);
  part('button',[1.10,1.15,-.50],[.025,.13,.13],'car',0,'button');
- const height=5,speed=.8,acceleration=.8,ramp=speed/acceleration,duration=height/speed+ramp,travel=[];
+ const speed=.8,acceleration=.8,ramp=speed/acceleration,duration=height/speed+ramp,travel=[];
  const n=Math.ceil(duration*30);for(let i=0;i<=n;i++){const t=i/n*duration,y=t<ramp?.5*acceleration*t*t:t>duration-ramp?height-.5*acceleration*(duration-t)**2:speed*(t-ramp/2);travel.push({x:t,y});}
- return{id,origin:{x:177,y:-11.2,z:6.3},height,width:2.4,depth:2.4,doorWidth:1.4,doorZ:-1.4,doorTravel:.72,doorSeconds:1.6,waitSeconds:1.2,travel,parts};
+ return{id,origin,height,width:2.4,depth:2.4,doorWidth:1.4,doorZ:-1.4,doorTravel:.72,doorSeconds:1.6,waitSeconds:1.2,travel,parts};
 }
