@@ -9856,7 +9856,7 @@
     "status": "downloaded",
     "bytes": 10249733,
     "sha256": "fc1a9f3a20860dc11deeafd33d0a29a834ae688fe3e80b0d89006adb782b54de",
-    "inspection": "All five pages rendered and visually inspected. Page 2 B2F and schematic section; page 3 station B1F. No measured height inferred."
+    "inspection": "All five pages rendered and visually inspected. Page 2 B2F and schematic section; page 3 station B1F. No measured height inferred. Page 1 re-inspected on 29 September 2026 for the western cross-passage lift beside C3. The map establishes its relative position; model dimensions and pavilion finishes remain fitted."
   },
   {
     "id": "porta-b2-route-01",
@@ -12231,5 +12231,14 @@
     "sha256": "97280a4bad374b0e74c6dd3ac3df788bf73c7b6adef0b70e7441f2ee08faea07",
     "rights": "Reference only. No research imagery is shipped in the game.",
     "inspection": "Visually inspected: subway/JR passage and gate/stair arrangement. This is an interior approach photograph, not a street exterior. Undated image in a 2017 upload path."
+  },
+  {
+    "id": "porta-accessibility-facilities",
+    "title": "Porta accessibility facilities and panorama index",
+    "url": "https://omoiyarimap.jp/pages/kyoto-porta/index_hanrei.html",
+    "type": "accessibility-guide",
+    "retrieved_at": "2026-09-29",
+    "rights": "Reference only.",
+    "inspection": "Read the explicit lift listings for the west underground area and separate B2 South area. The toilet panoramas were not used for this lift. The operator floor guide supplies its relative C3 location."
   }
 ]

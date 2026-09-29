@@ -6,7 +6,7 @@ const parent=await read(parentPath),m=await read(manifest),old=await read(parent
 assert.deepEqual(old.escalators,next.escalators);assert(!next.lifts?.some(l=>l.id===lift.id));
 for(const p of lift.parts){const appearance=next.authoredMaterials.find(a=>a.label===p.appearance);assert(appearance,p.appearance);p.appearance=appearance.id;}
 next.lifts=[...(next.lifts||[]),lift];station.lifts=next.lifts;
-const architectureKey={'hachijo-lift-':'hachijoLiftV2','exit-five-':'exitFiveLiftV2','subway-lift-':'subwayLiftV2','subway-south-lift-':'subwaySouthLiftV2'}[report.componentPrefix];assert(architectureKey,'Recognized lift component');
+const architectureKey={'hachijo-lift-':'hachijoLiftV2','exit-five-':'exitFiveLiftV2','subway-lift-':'subwayLiftV2','subway-south-lift-':'subwaySouthLiftV2','porta-west-lift-':'portaWestLiftV2'}[report.componentPrefix];assert(architectureKey,'Recognized lift component');
 next.architecture[architectureKey]={scope:report.scope,limits:report.limits};
 const raw=JSON.stringify(next)+'\n';m.layoutSha256=sha(raw);station.layoutSha256=m.layoutSha256;detail.candidateMotionIntegration.layoutSha256=m.layoutSha256;
 m.motionLayout=m.layout;m.detail=manifest.slice(0,manifest.lastIndexOf('/'))+'/atrium-detail.json';m.spawn=report.geometry.spawn;

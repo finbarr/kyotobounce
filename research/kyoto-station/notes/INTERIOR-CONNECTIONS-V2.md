@@ -97,7 +97,9 @@ The [Hachijo Street crossing](HACHIJO-CROSSING-V2.md) extends the South subway l
 
 The [South subway platform lift](SUBWAY-SOUTH-LIFT-V2.md) connects the second platform lift shown in the city diagram to the South paid gate hall. Both platform aisles, the South stair approach and earlier shaft openings remain clear.
 
-1. **Underground public connections:** add the remaining accessible lifts toward Porta. Complete remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
+The [Porta west public lift](PORTA-WEST-LIFT-V2.md) connects the western cross-passage to the station forecourt. The fitted upper threshold follows the original paving slope; both shopping streets and the B2 stair approach remain available.
+
+1. **Underground public connections:** complete the Porta B2 lift, remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

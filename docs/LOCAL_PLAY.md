@@ -45,9 +45,12 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn faces the South subway platform lift. Walk inside and press
-**E** to reach the South paid gate hall, then walk through the gates into the
-public passage; see the [South lift notes](../research/kyoto-station/notes/SUBWAY-SOUTH-LIFT-V2.md).
+The current spawn faces the Porta west lift beside the cross-passage. Walk
+inside and press **E** to reach the station forecourt. Both shopping streets
+and the B2 stair remain accessible beside it; see the
+[Porta west lift notes](../research/kyoto-station/notes/PORTA-WEST-LIFT-V2.md).
+The South subway lift connects the platform and paid gate hall; see the
+[South lift notes](../research/kyoto-station/notes/SUBWAY-SOUTH-LIFT-V2.md).
 The northern Hachijo Street lift connects the underpass to the station forecourt.
 Follow the underpass
 south to the open-air garden, southern street lift, stair and Avanti entrance

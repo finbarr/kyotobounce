@@ -13,9 +13,11 @@ assert(eq({...plaza,vertices:oldPlaza.vertices,triangles:oldPlaza.triangles,uv:o
 assert(eq(plaza.finishes.map((f,i)=>({...f,triangles:oldPlaza.finishes[i].triangles})),oldPlaza.finishes));
 const paving=verifyPaving(readGLB(await readFile(parent.geometry)),readGLB(await readFile(candidate.geometry)));
 // The approach sill starts on the original paving and ends at the car floor.
-const sill=next.panels.find(p=>p.id==='exit-five-upper-sill'),ys=sill.vertices.filter(v=>Math.abs(v.z-opening.minZ)<1e-5).map(v=>v.y);
-assert(Math.abs(Math.max(...ys)-spec.frontEdge[0])<1e-6);
-assert(Math.abs(Math.min(...ys)-(spec.frontEdge[1]-.12))<1e-6);
+const sill=next.panels.find(p=>p.id===(spec.componentPrefix||'exit-five-')+'upper-sill');
+for(const [x,y]of [[opening.minX,spec.frontEdge[0]],[opening.maxX,spec.frontEdge[1]]]){
+ const ys=sill.vertices.filter(v=>Math.abs(v.x-x)<1e-5&&Math.abs(v.z-opening.minZ)<1e-5).map(v=>v.y);
+ assert(ys.length&&Math.abs(Math.max(...ys)-y)<1e-6&&Math.abs(Math.min(...ys)-(y-.12))<1e-6);
+}
 const proof={pass:true,layoutSha256:candidate.layoutSha256,geometrySha256:candidate.geometrySha256,paving,upperLanding:spec.upper,slopedThresholdMatches:true};
 await writeFile(out,JSON.stringify(proof,null,2)+'\n');console.log(proof);
 function decoded(glb,ai){

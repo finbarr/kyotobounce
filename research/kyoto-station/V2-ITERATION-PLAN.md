@@ -16,9 +16,11 @@ Latest structural delivery: the [Hachijo Street crossing](notes/HACHIJO-CROSSING
 
 The [South subway platform lift](notes/SUBWAY-SOUTH-LIFT-V2.md) adds the second platform lift shown in the city's station diagram. It connects the southern paid hall and island platform with guarded landing doors, preserving both platform aisles and the existing stair approach.
 
+The [Porta west public lift](notes/PORTA-WEST-LIFT-V2.md) connects the western cross-passage to the forecourt, with a fitted opening through the retained paving and protected landing doors. Both shopping streets and the B2 stair approach remain clear.
+
 Next priorities:
 
-1. Add the remaining accessible lifts toward Porta, reusing the verified lift mechanics. Complete the remaining west Porta area, street exits and Kotochika surroundings.
+1. Complete the Porta B2 lift and remaining west Porta area, street exits and Kotochika surroundings.
 2. Complete the southern shopping streets, building frontage, terrace and forecourt.
 3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 
