@@ -33,7 +33,7 @@ try{
  }
  if(!process.env.KYOTO_PREFLIGHT)for(const row of (construction.geometry.blocked||[]).filter(r=>!process.env.KYOTO_ROUTE_FILTER||r.label.includes(process.env.KYOTO_ROUTE_FILTER))){
   await start(row.start);const samples=[];
-  for(let i=0;i<60;i++){worker.send({type:'input',id,x:0,z:1,yaw:row.yaw,pitch:0,fast:false});await delay(60);const p=feet();samples.push({...p});assert((p[row.axis]-row.limit)*row.sign>=0,row.label+' crossed');assert(Math.abs(p.y-row.start.y)<.06,row.label+' lost floor');}
+  for(let i=0;i<60;i++){worker.send({type:'input',id,x:0,z:1,yaw:row.yaw,pitch:0,fast:false});await delay(60);const p=feet();samples.push({...p});assert((p[row.axis]-row.limit)*row.sign>=0,row.label+' crossed '+JSON.stringify({feet:p,axis:row.axis,limit:row.limit}));assert(Math.abs(p.y-row.start.y)<.06,row.label+' lost floor');}
   worker.send({type:'input',id,x:0,z:0,fast:false});assert(state.players.find(p=>p.id===id).grounded,row.label+' must remain grounded');assert(Math.abs(feet()[row.axis]-row.start[row.axis])>.2,row.label+' never approached barrier');report.boundaries.push({...row,samples,pass:true});await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log('PASS',row.label);
  }
  report.pass=true;

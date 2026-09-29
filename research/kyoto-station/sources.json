@@ -12139,5 +12139,41 @@
     "retrieved_at": "2026-09-29",
     "rights": "Reference only.",
     "inspection": "Read for four gate names, separate concourse/platform access and platform-door presence. Current K11 station page checked separately for platform 1 Takeda/Nara and platform 2 Kokusaikaikan directions."
+  },
+  {
+    "id": "porta-west-arrival-2026",
+    "title": "Porta official navigation photograph: porta west arrival",
+    "publisher": "Kyoto Porta",
+    "category": "interior circulation",
+    "url": "https://www.porta.co.jp/common/img/navigation/img_c_b2fw_05.jpg",
+    "source_date": null,
+    "note": "Official west-area arrival: glass portal, pale tile, dark transverse bands and yellow tactile route. Visually inspected 29 September 2026; used as finish and circulation reference.",
+    "rights": "Reference only; no imagery included in game assets.",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "photos/porta-west-arrival-2026.jpg",
+    "bytes": 238974,
+    "sha256": "b4026ccccd18d7edb247420a1efebc2b439765ef19d5c034194e50dcace487b3",
+    "content_type": "image/jpeg",
+    "final_url": "https://www.porta.co.jp/common/img/navigation/img_c_b2fw_05.jpg",
+    "retrieved_at": "2026-09-29T12:28:53.194523+00:00"
+  },
+  {
+    "id": "porta-east-route-2026",
+    "title": "Porta official navigation photograph: porta east route",
+    "publisher": "Kyoto Porta",
+    "category": "interior circulation",
+    "url": "https://www.porta.co.jp/common/img/navigation/img_c_b2fe_06.jpg",
+    "source_date": null,
+    "note": "Official west-to-east route: pale framed shopfronts, dark recessed ceiling grilles, transverse floor bands and hanging directions. Arrows are website annotations, not physical fixtures. Visually inspected 29 September 2026; used as finish and circulation reference.",
+    "rights": "Reference only; no imagery included in game assets.",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "photos/porta-east-route-2026.jpg",
+    "bytes": 245483,
+    "sha256": "bb217abe3a819c495a014df939a6225430b14ce14978993707334b52d0cc5a82",
+    "content_type": "image/jpeg",
+    "final_url": "https://www.porta.co.jp/common/img/navigation/img_c_b2fe_06.jpg",
+    "retrieved_at": "2026-09-29T12:28:53.195023+00:00"
   }
 ]
