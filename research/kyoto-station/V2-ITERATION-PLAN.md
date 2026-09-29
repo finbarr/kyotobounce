@@ -35,7 +35,9 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
-Latest delivery: [Daruma Kyoto kitchen and counter](notes/DARUMA-KITCHEN-V2.md) uses a newly located firsthand Kyoto interior photograph to correct the counter finish and add pitchers, condiment pots, notices and serving-hatch equipment. Next, correct the missing central communal table and circulation from the same photograph.
+Latest delivery: [Daruma central table and circulation](notes/DARUMA-CENTRAL-TABLE-V2.md) adds the photographed communal table and a fitted eighteen-seat arrangement, moves the rear service area into the deeper footprint, and verifies a full native walking loop. Next, finish the photographed wall fittings and interior joins.
+
+The [Daruma Kyoto kitchen and counter](notes/DARUMA-KITCHEN-V2.md) uses a newly located firsthand Kyoto interior photograph to correct the counter finish and add pitchers, condiment pots, notices and serving-hatch equipment. The subsequent table pass corrects the communal dining area and circulation from the same photograph.
 
 The [Restaurant timber, counters and stools](notes/RESTAURANT-MATERIALS-V2.md) replaces flat shop finishes with aligned grain and upholstery, smooths the existing stool cylinders, and corrects Daruma’s washed-out local illumination. Geometry remains unchanged. The subsequent Kyoto-specific kitchen pass develops the serving opening and counter fittings; wall photographs remain unfinished.
 
