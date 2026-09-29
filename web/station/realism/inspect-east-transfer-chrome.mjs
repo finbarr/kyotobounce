@@ -28,6 +28,9 @@ try{
  await page.route('**/game.js',async route=>{const source=await readFile('web/public/game.js','utf8');await route.fulfill({contentType:'text/javascript',body:source+`
 window.__eastInspection={view(p,t){setFly(true,false);fly.camera.position.set(p[0],p[1],-p[2]);fly.camera.lookAt(t[0],t[1],-t[2]);},read(){return{textures:renderer.info.memory.textures,draws:renderer.info.render.calls,triangles:renderer.info.render.triangles,captures:stationLook.stats.reflection.captures};}};`});});
  await page.goto(origin);await page.locator('#loading-name input[name="player"]').fill('East transfer inspection',{timeout:120000});await page.getByRole('button',{name:'LET’S PLAY →'}).click();await page.waitForFunction(()=>window.kyotoState?.ready&&!document.body.classList.contains('is-loading'),null,{timeout:120000});
+ // Upload each view's first-use textures before checking resource stability.
+ for(const [,p,t]of views){await page.evaluate(([p,t])=>__eastInspection.view(p,t),[p,t]);await page.waitForTimeout(200);}
+ await page.waitForTimeout(1200);
  const first=await page.evaluate(()=>__eastInspection.read());
  for(const [id,p,t]of views){
   await page.evaluate(([p,t])=>__eastInspection.view(p,t),[p,t]);await page.waitForTimeout(900);

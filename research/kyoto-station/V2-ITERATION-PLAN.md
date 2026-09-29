@@ -12,11 +12,11 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: the [Central 1 passenger lift](notes/SUBWAY-LIFT-V2.md) connects the subway platform and paid concourse with an operating car, protected landing doors and a usable vestibule. The [four subway platform escalators](notes/SUBWAY-ESCALATORS-V2.md) add operating upward lanes beside the four usable stairways. The [Porta plaza connection](notes/PORTA-PLAZA-V2.md) opens the subway hall and B2 cross-passage into connected plaza B1 aisles, with a fitted stair between levels. The [North subway gate](notes/SUBWAY-NORTH-V2.md) supplies the fourth gate connection, its paid hall, stairs and extended platform end. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
+Latest structural delivery: the [Porta East connection](notes/PORTA-EAST-V2.md) opens West North Street and the public North-gate hall into connected east-area aisles, cross-passages and shop entrances. The [Central 1 passenger lift](notes/SUBWAY-LIFT-V2.md) connects the subway platform and paid concourse with an operating car, protected landing doors and a usable vestibule. The [four subway platform escalators](notes/SUBWAY-ESCALATORS-V2.md) add operating upward lanes beside the four usable stairways. The [Porta plaza connection](notes/PORTA-PLAZA-V2.md) opens the subway hall and B2 cross-passage into connected plaza B1 aisles, with a fitted stair between levels. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
 
 Next priorities:
 
-1. Extend the connected Porta plaza aisles into the remaining west/east areas and Kotochika surroundings. Add the onward accessible lifts toward Exit 5, Porta and Hachijo, reusing the verified platform lift mechanics.
+1. Add onward accessible lifts toward Exit 5, Porta and Hachijo, reusing the verified platform lift mechanics. Complete the remaining west Porta area, street exits and Kotochika surroundings.
 2. Complete the southern shopping streets, building frontage, terrace and forecourt.
 3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 

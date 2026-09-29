@@ -45,8 +45,11 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is on the subway island platform facing the Central 1
-passenger lift. Walk inside and press **E** to ride, or use its nearby button
+The current spawn is at the East Porta arrival, connected westward to North
+Street and the public subway hall. Both east-area aisles, their cross-passages
+and shop entrances are usable; see the [Porta East notes](../research/kyoto-station/notes/PORTA-EAST-V2.md).
+The Central 1 passenger lift remains available on the subway island platform.
+Walk inside and press **E** to ride, or use its nearby button
 with the mouse released. The lift connects the platform and Central 1 concourse;
 its landing doors remain closed while the car is elsewhere. This requires a
 worker rebuilt with `lifts-v1` support; see the
