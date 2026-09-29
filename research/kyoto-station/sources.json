@@ -12006,5 +12006,21 @@
     "note": "Geometric platform numbers. Preserve the local authoring file with the asset pack; license reproduced in notes/PLATFORM-NUMBER-FONT.md.",
     "rights": "MAGENTA font license embedded in upstream JSON; redistribution with copyright and permission notice allowed.",
     "retrieved_at": "2026-09-29T06:14:28.296Z"
+  },
+  {
+    "id": "jr-central-kyoto-plan-20260420",
+    "title": "JR Central Kyoto station map, April 2026 asset",
+    "publisher": "JR Central",
+    "category": "station-map",
+    "url": "https://railway.jr-central.co.jp/station-guide/shinkansen/kyoto/_img/kyoto_260420.gif",
+    "source_date": null,
+    "format": "gif",
+    "status": "downloaded",
+    "local_file": "maps/jr-central-kyoto-20260420.gif",
+    "bytes": 68571,
+    "sha256": "8335182e1fbb775a741750f558a3c135ec1e8e5bf0b5e61c689bcbb7f86be6d1",
+    "note": "Linked by the current official station map page. The filename contains 260420; the diagram itself has no publication date. Inspected to locate the central Shinkansen entrance, concourse, tracks 11–14 and their relation to the public north–south passage.",
+    "rights": "Research reference only; not a game texture. JR Central retains rights.",
+    "retrieved_at": "2026-09-29T07:03:46.012116+00:00"
   }
 ]

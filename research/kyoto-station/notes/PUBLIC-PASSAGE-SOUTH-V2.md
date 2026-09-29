@@ -28,6 +28,6 @@ The editable scene saves and reopens with matching geometry, normals, materials,
 
 Rebuild in order with `extract-public-passage-exit.py`, `prepare-public-passage.mjs`, `build-public-passage.mjs` and `web/v2/compose-component.mjs` against the parent manifest. Verify with `verify-public-passage-geometry.mjs` and `verify-public-passage.mjs`, then integrate with `install-public-passage.py`. These tools assert their expected parent geometry.
 
-## Next work
+## Subsequent work and remaining connections
 
-Build the conventional railway's tracks, platforms and roofs from the registered footprint and operator plan. Connect the paid concourse and platform stairs coherently with the retained JR West gate. Then complete the lower hall's Shinkansen/Kintetsu fronts and the southern building/terrace. Keep smaller finish work behind these missing structures.
+The [conventional railway](CONVENTIONAL-RAILWAY-V2.md), [platform 0](PLATFORM-ZERO-V2.md) and [southern operator fronts](SOUTHERN-GATES-V2.md) are integrated. Next, build the southern paid concourses and railway behind the closed operator gates, followed by the remaining Hachijo building, terrace and forecourt. Keep smaller finish work behind these missing structures.
