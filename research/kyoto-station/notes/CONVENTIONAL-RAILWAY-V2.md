@@ -33,9 +33,10 @@ The first complete walk suite covers approximately 958 m at normal speed and tak
 
 ## Remaining work
 
-1. Platform 0 and the north rear-floor boundary. The old rectangular concourse ends at Z−41; the provisional sloped track 0 approaches that footprint toward its eastern end. Reconcile these together with the platform 0 access, rather than treating the current northern track edge as finished.
-2. Shinkansen and Kintetsu railway, ticket halls and the southern station building around the completed public passage.
-3. Western 30–34 bay platforms and the eastern transfer route; closer alignment, curvature and roof-profile refinement; lifts, escalators, platform barriers and operational railway detail.
+Platform 0 and the north rear-floor boundary are now connected and repaired in the [subsequent platform 0 delivery](PLATFORM-ZERO-V2.md).
+
+1. Shinkansen and Kintetsu railway, ticket halls and the southern station building around the completed public passage.
+2. Western 30–34 bay platforms and the eastern transfer route; closer alignment, curvature and roof-profile refinement; lifts, escalators, platform barriers and operational railway detail.
 
 This pass establishes usable structure. It does not complete the full railway or claim photorealistic finishes.
 

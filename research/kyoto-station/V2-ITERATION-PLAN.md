@@ -12,13 +12,13 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: open the JR West gate into a paid concourse with stairs to platforms 2–3, 4–5, 6–7, 8–9 and 10, plus conventional tracks, canopies and continuous railway ground. See [the railway reconstruction](notes/CONVENTIONAL-RAILWAY-V2.md). The [longer public passage](notes/PUBLIC-PASSAGE-SOUTH-V2.md), both Central Gate bridge connections and the east 4F–7F repair are integrated.
+Latest structural delivery: [platform 0 and the north railway edge](notes/PLATFORM-ZERO-V2.md) connects the paid concourse to platform 0, removes the artificial room behind Central Gate and keeps the rear floor clear of the track. The [other conventional platforms](notes/CONVENTIONAL-RAILWAY-V2.md), [longer public passage](notes/PUBLIC-PASSAGE-SOUTH-V2.md), both Central Gate bridge connections and the east 4F–7F repair are integrated.
 
 Next priorities:
 
-1. Complete platform 0 access and reconcile its track with the retained rectangular north concourse boundary.
-2. Add the lower hall's Shinkansen/Kintetsu fronts and southern railway/building around the public route; continue the Hachijo terrace and forecourt.
-3. Complete the western 30–34 platforms and eastern transfer connection, repair other interior obstructions, then refine railway alignment and finishes.
+1. Add the lower hall's Shinkansen/Kintetsu fronts and southern railway/building around the public route; continue the Hachijo terrace and forecourt.
+2. Complete the western 30–34 platforms and eastern transfer connection.
+3. Repair other interior obstructions, then refine railway alignment, enclosures and finishes.
 
 Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).
 
