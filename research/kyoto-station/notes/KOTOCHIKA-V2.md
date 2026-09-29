@@ -8,7 +8,7 @@ The [operator's current Kyoto page](https://kotochika.kyoto/kyoto/) links the [c
 
 The existing model has a long blank public passage west of the paid cores. Their spacing and exit registration do not precisely match the diagram. This increment opens five generic rooms and a plaza on that western public route. Floor Y−6.2 m and ceiling Y−2.8 m match the existing passage. The western extension stops at X138.2 m, beyond the lower B2 ceiling; the eastern extension uses the retained paid-deck edge without overlapping its floor.
 
-Room dimensions, placement, materials and fitouts are fitted approximations. Signs describe generic retail categories; no surveyed tenant assignment is claimed. The missing eastern bypass and complete public loop around the cores remain a separate structural task.
+Room dimensions, placement, materials and fitouts are fitted approximations. Signs describe generic retail categories; no surveyed tenant assignment is claimed. The subsequent [eastern public connection](KOTOCHIKA-EAST-V2.md) completes the bypass and connects this plaza to Porta East and the southern public passage. More exact core and street-exit registration remains unfinished.
 
 ## Acceptance
 
