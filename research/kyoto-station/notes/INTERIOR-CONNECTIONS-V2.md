@@ -71,7 +71,9 @@ The [north–south passage repair](PUBLIC-PASSAGE-SOUTH-V2.md) replaces the misp
 
 The [central transfer connection](CENTRAL-TRANSFER-V2.md) joins the JR bridge to the Shinkansen paid concourse through two stair flights and an open gate lane, with the original conventional-platform access retained.
 
-1. **Southern halls and Hachijo side:** complete the southern building, ground shopping/public routes, terrace/forecourt and ground-level Shinkansen entrances.
+The [Hachijo ground entrance](HACHIJO-ENTRANCE-V2.md) now links the public terrace stair landing to the paid Shinkansen concourse through the forecourt, foyer, gate and an actual stair opening.
+
+1. **Southern halls and Hachijo side:** complete the eastern entrance and public routes, then the southern shopping streets, building frontage, terrace and forecourt.
 2. **Other connections and enclosures:** western platforms 30–34, the eastern transfer connection, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.

@@ -12080,5 +12080,22 @@
     "retrieved_at": "2026-09-29T07:47:31.250414+00:00",
     "note": "Kyoto to Yamato-Saidaiji is listed as standard gauge. Used for the nominal 1.435 m Kintetsu track gauge.",
     "rights": "Reference only."
+  },
+  {
+    "id": "hachijo-gate-mister0124-2022",
+    "title": "Shinkansen Hachijo Gate photograph",
+    "publisher": "Mister0124 / Wikimedia Commons",
+    "category": "photos",
+    "url": "https://commons.wikimedia.org/wiki/File:JR_Central_Ky%C5%8Dto_Station_Shinkansen_Hachij%C5%8D_Gate.jpg",
+    "source_date": "2022-12-10",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "photos/hachijo-gate-mister0124-2022.jpg",
+    "bytes": 2079319,
+    "sha256": "a794c49bb9c84358609119ffc6d4e3341fbfe4ac990d041bb16923dff258448b",
+    "retrieved_at": "2026-09-29T08:22:28.128223+00:00",
+    "rights": "Mister0124, CC BY-SA 4.0. Reference only; image is not shipped in the game.",
+    "inspection": "Photograph visually inspected: warm stone walls, blue gate hoods, staffed window, bilingual fascia, panel ceiling and dark floor band. Used for independently authored geometry and labels; equipment count and dimensions remain fitted.",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/"
   }
 ]
