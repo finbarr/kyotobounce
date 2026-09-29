@@ -35,7 +35,7 @@ Five Chrome views cover the ground approach, intermediate landings and 4F arriva
 
 The western end of the retained M3F glazed bridge stopped at X−7.876 with no connection to the public passage. It now joins a 2.3 m wide enclosed corridor, a turning landing and thirteen stairs down from Y9.589 to the retained passage floor at Y7.35. The entrance comes around the north end of the passage, beside the existing Heart-in shop gallery. The gallery and shop geometry remain intact, and the new entrance slab ends at the existing gallery floor rather than overlapping it.
 
-The saved [Granvia operator floor guide](https://jrwest-hotels.jp/granvia-kyoto/floor/) establishes the west-end connection to the north–south passage and the M3F level change. The saved bridge-entry photograph guides the opaque warm walls, dark floor and pale ceiling. Neither source supplies surveyed dimensions: corridor length, the entrance jog, 0.172264 m stair rise, 0.30 m going, finishes and fixtures are provisional fits to the current model. The eastern hotel-lobby connection remains unfinished.
+The saved [Granvia operator floor guide](https://jrwest-hotels.jp/granvia-kyoto/floor/) establishes the west-end connection to the north–south passage and the M3F level change. The saved bridge-entry photograph guides the opaque warm walls, dark floor and pale ceiling. Neither source supplies surveyed dimensions: corridor length, the entrance jog, 0.172264 m stair rise, 0.30 m going, finishes and fixtures are provisional fits to the current model. The eastern hotel-lobby connection is covered below.
 
 ### Checks and cost
 
@@ -47,11 +47,28 @@ The saved [Granvia operator floor guide](https://jrwest-hotels.jp/granvia-kyoto/
 
 Rebuild with `build-gate-west-access.mjs`, then `web/v2/compose-component.mjs` against the parent manifest. `verify-gate-west-geometry.mjs` checks added geometry and retained data. `verify-gate-west-access.mjs` walks both connections in the complete native station. `install-gate-west-access.py` adds the verified component to the editable scene and validates it after reopening. Private receipts live under `.local/v2/current/components/gate-west-access/` after delivery.
 
+## Central Gate bridge: eastern connection
+
+The eastern bridge end stopped at X10.723 without a route into the hotel side. It now connects through a 2.3 m wide enclosed corridor, a turning landing and 24 stairs from M3F at Y9.589 to the retained 2F floor at Y5.5. The lower landing joins the hotel receiving room and the existing theatre approach. A solid 6.8 × 19.55 m placeholder has been replaced with perimeter walls and a doorway, exposing the existing room floor and ceiling.
+
+The first complete walk reached the lobby but stopped against its sealed north-facing glass bay. That bay and its raised base are now replaced with a level entrance. The nearby supporting column and public-landing guard remain; the route passes around them and reaches the public stair landing.
+
+Pages 2–3 of the saved [Granvia floor plans](https://jrwest-hotels.jp/granvia-kyoto/files/pdf/floormap.pdf) show the M3F corridor, northward descent and 2F receiving lobby. The saved station 2F map establishes the public landing and adjacent theatre. These establish connections, not surveyed construction dimensions. The corridor alignment, room boundaries, 0.170393 m rise, 0.30 m going and finishes are provisional fits. Hotel counters, shops, lifts and detailed lobby finishes remain unfinished.
+
+### Checks and cost
+
+- Four normal-speed native walks pass: bridge to public landing and back, then a loop through the opened room in both directions. All 3,146 position samples meet the floor-height checks; endpoint floor heights are within 0.06 m.
+- Three old native panels and their 115 clipped browser triangles are retired. All 82 added panels, 2,952 vertices and 984 triangles match between native and browser exports. Retained native records and browser buffer bytes remain unchanged.
+- Net browser increase: 869 triangles, four material batches and 88,264 bytes. Fourteen added fixtures use at most two active lights.
+- The editable Blender scene saves and reopens with matching geometry, normals, materials, lights and retained object bindings. Native and Chrome gameplay checks pass, including full translation/spin rest, recall and home. `npm run build:web` passes.
+- Eight actual Chrome views cover the bridge join, turning landing, stairs, room and public entrance with no page errors. Short 1440×900 samples record a 16.7 ms median and approximately 16.8 ms p99. These are short checks, not a performance soak.
+
+Rebuild in order with `prepare-gate-east-access.mjs`, `build-gate-east-access.mjs` and `web/v2/compose-component.mjs` against the parent manifest. The preparation tool checks material, boundary planes and clipped-face coverage before removing the old surfaces. `verify-gate-east-geometry.mjs` checks replacement scope and geometry correspondence; `verify-gate-east-access.mjs` walks the routes in the complete native station. `install-gate-east-access.py` integrates the verified component into the editable scene. Private receipts live under `.local/v2/current/components/gate-east-access/` after delivery.
+
 ## Ordered remaining defects
 
-1. **Central Gate bridge, eastern end:** connect the bridge to the hotel-lobby route shown in the operator's map. Preserve the distinct M3F and 2F levels and verify the complete connection both ways.
-2. **North–south free passage:** the northern connection now reaches the bridge and shop gallery, but the older corridor's south termination and relationship to the eventual platforms still need an end-to-end audit.
-3. **Railway and Hachijo side:** the rear overview shows the station building over a largely empty railway-side area. Conventional platforms/tracks, connecting paid concourses, the Shinkansen/Kintetsu relationships and the south building/forecourt require substantial construction. Use the saved [JR West schematic](https://www.jr-odekake.net/station/img/premises/0610116.pdf) and operator maps for topology, and photographs for structure.
-4. **Interior enclosures:** inspect remaining stairs, floor openings and abrupt hall ends through actual walking routes. Refine visible enclosures after each route is usable.
+1. **North–south free passage:** the northern connection now reaches the bridge and shop gallery, but the older corridor's south termination and relationship to the eventual platforms still need an end-to-end audit.
+2. **Railway and Hachijo side:** the rear overview shows the station building over a largely empty railway-side area. Conventional platforms/tracks, connecting paid concourses, the Shinkansen/Kintetsu relationships and the south building/forecourt require substantial construction. Use the saved [JR West schematic](https://www.jr-odekake.net/station/img/premises/0610116.pdf) and operator maps for topology, and photographs for structure.
+3. **Interior enclosures:** inspect remaining stairs, floor openings and abrupt hall ends through actual walking routes. Refine visible enclosures after each route is usable.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.
