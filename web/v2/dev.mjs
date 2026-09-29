@@ -24,6 +24,8 @@ for(const support of layout.architecture.hallBasementIntegration.componentCombSu
  assert.deepEqual(detail.combSupports.find(s=>s.support===support.support),support,'Moving-step endpoints must match collision');
 for(const support of layout.architecture.westCirculationV2?.combSupports||[])
  assert.deepEqual(detail.combSupports.find(s=>s.support===support.support),support,'Western moving-step endpoints must match collision');
+for(const support of layout.architecture.portaConnectionV2?.combSupports||[])
+ assert.deepEqual(detail.combSupports.find(s=>s.support===support.support),support,'Porta moving-step endpoints must match collision');
 // Only the entry position changes. No geometry export or asset duplication is needed.
 layout.spawn=config.spawn;
 const layoutBytes=JSON.stringify(layout)+'\n',layoutSha256=hash(layoutBytes);

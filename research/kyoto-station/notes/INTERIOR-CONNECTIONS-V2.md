@@ -75,9 +75,9 @@ The [Hachijo ground entrance](HACHIJO-ENTRANCE-V2.md) now links the public terra
 
 The [Hachijo East entrance](HACHIJO-EAST-V2.md) adds a public hall with connections through the Shinkansen gate and stairs and through the JR gate to platform 10.
 
-The [public underground passage](SUBWAY-PASSAGE-V2.md) connects Hachijo East to a northern street exit with two usable stairs. The [subway platform connection](SUBWAY-PLATFORMS-V2.md) now opens southern and central gate halls to two stairs, one island platform and both tracks. The other subway gates, lifts, escalators and central B2/Porta connection remain unfinished.
+The [public underground passage](SUBWAY-PASSAGE-V2.md) connects Hachijo East to a northern street exit with two usable stairs. The [subway platform connection](SUBWAY-PLATFORMS-V2.md) opens southern and central gate halls to two stairs, one island platform and both tracks. The [Porta connection](PORTA-CONNECTION-V2.md) joins the central B1 deck to B2 by four moving lanes, with public aisles, stairs and a ramp to the subway passage. It also removes floating tactile bars that prevented descent on the eastern upper lane. Other subway gates, lifts, platform escalators and the onward plaza Porta B1 connection remain unfinished.
 
-1. **Underground and eastern connections:** connect the separate central B1 deck to B2/Porta and the public subway passage; then connect the eastern JR/Shinkansen transfer route and remaining subway gates. Keep the separate floor levels explicit.
+1. **Underground and eastern connections:** connect the eastern JR/Shinkansen transfer route and remaining subway gates; add missing accessible routes and the onward plaza Porta B1 connection. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

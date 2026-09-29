@@ -12,13 +12,13 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: [the Hachijo East entrance](notes/HACHIJO-EAST-V2.md) joins the forecourt to a public hall, a Shinkansen stair and the JR platform-10 connection. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
+Latest structural delivery: [the Porta connection](notes/PORTA-CONNECTION-V2.md) joins the central hall through B1 and four lower moving lanes to B2, then to the public subway passage by stairs and a ramp. It also removes retained tactile bars that obstructed the eastern upper escalator. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
 
 Next priorities:
 
-1. Connect the eastern public hall to the subway passage, then complete the southern shopping streets, building frontage, terrace and forecourt.
-2. Complete the western 30–34 platforms and eastern transfer connection.
-3. Repair other interior obstructions, then refine railway alignment, enclosures and finishes.
+1. Connect the eastern JR/Shinkansen transfer route and remaining subway gates. Add missing accessible connections and the onward route to plaza Porta B1.
+2. Complete the southern shopping streets, building frontage, terrace and forecourt.
+3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 
 Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).
 
