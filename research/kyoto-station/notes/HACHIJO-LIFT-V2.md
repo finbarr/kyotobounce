@@ -1,5 +1,7 @@
 # Hachijo East: public lift
 
+Location superseded by the [Hachijo crossing](HACHIJO-CROSSING-V2.md). The operator's photographed route places this lift outside on the station frontage. The current build restores the provisional indoor shaft openings and moves the car to X166, Z−189.8. The construction and test details below describe the earlier provisional increment.
+
 29 September 2026. Add a working lift between the subway South public lobby and the Hachijo East ground entrance.
 
 ## Evidence and construction

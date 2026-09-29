@@ -14,6 +14,11 @@ const added=next.panels.slice(base.panels.length);assert.equal(added.length,repo
 const native=await read(component+'/native-panels.json');assert(eq(next.authoredLights.slice(0,base.authoredLights.length),base.authoredLights));assert(eq(next.authoredLights.slice(base.authoredLights.length),native.authoredLights));
 assert(eq(next.panels.slice(0,base.panels.length),base.panels));
 const retainedNext={...next,panels:base.panels,authoredMaterials:base.authoredMaterials,authoredLights:base.authoredLights,architecture:base.architecture};
+if(report.componentPrefix==='hachijo-crossing-'){
+ const lifts=await read(component+'/lift-specs.json');assert.deepEqual(report.geometry.retiredLiftIds,['subway-hachijo-east-lift']);
+ for(const lift of lifts)for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;
+ assert(eq(next.lifts,[...base.lifts.filter(l=>!report.geometry.retiredLiftIds.includes(l.id)),...lifts]));assert(eq((await read(b.station)).lifts,next.lifts));retainedNext.lifts=base.lifts;
+}
 if(['subway-lift-','exit-five-','hachijo-lift-'].includes(report.componentPrefix)){
  const lift=await read(component+'/lift-spec.json');
  for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;

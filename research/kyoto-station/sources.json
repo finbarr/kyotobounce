@@ -12175,5 +12175,61 @@
     "content_type": "image/jpeg",
     "final_url": "https://www.porta.co.jp/common/img/navigation/img_c_b2fe_06.jpg",
     "retrieved_at": "2026-09-29T12:28:53.195023+00:00"
+  },
+  {
+    "id": "kintetsu-subway-step-free-2026",
+    "title": "Kintetsu Kyoto step-free route to subway",
+    "publisher": "Kintetsu",
+    "url": "https://www.kintetsu.co.jp/station/station_info/pdf/Kyoto_BF_03.pdf",
+    "local_file": "maps/kintetsu-subway-step-free-2026.pdf",
+    "category": "interior circulation",
+    "source_date": "2026-01-20",
+    "retrieved_at": "2026-09-29T15:04:38.032770+00:00",
+    "bytes": 3365757,
+    "sha256": "86fa9ec7612c218ba39dff8705eb38b9db67675c3d9ee6f7ff57cde505d2dde9",
+    "rights": "Reference only. No research imagery is shipped in the game.",
+    "inspection": "Pages 2 and 3 rendered and visually inspected. The subway passage lift is outside on the station frontage; the route continues about 50 m underground before turning to the subway gate. Pale wall panels, ribbed ceiling, linear lights and a curved metal lift surround inform the fitted reconstruction."
+  },
+  {
+    "id": "avanti-b1-2026",
+    "title": "Kyoto Avanti current B1 floor plan",
+    "publisher": "Kyoto Avanti",
+    "url": "https://www.kyoto-avanti.com/guide/img/sp_floor_map_b1f.jpg",
+    "local_file": "maps/avanti-b1-2026.jpg",
+    "category": "interior circulation",
+    "source_date": null,
+    "retrieved_at": "2026-09-29T15:04:38.034246+00:00",
+    "bytes": 59002,
+    "sha256": "e9a60c9ae2b6058371c5c768cdb1421956bf38fe8f937966877be98ba4a2fbc7",
+    "rights": "Reference only. No research imagery is shipped in the game.",
+    "inspection": "Visually inspected for station-facing entrances, public circulation and lift/stair relationships. No measured dimensions inferred."
+  },
+  {
+    "id": "avanti-sunken-entrance-clabo",
+    "title": "Avanti underground entrance reference",
+    "publisher": "Card Labo",
+    "url": "https://www.c-labo.jp/wordpress/wp-content/uploads/2017/02/kyotoaccess2.jpg",
+    "local_file": "photos/avanti-sunken-entrance-clabo.jpg",
+    "category": "interior circulation",
+    "source_date": null,
+    "retrieved_at": "2026-09-29T15:04:38.034352+00:00",
+    "bytes": 262982,
+    "sha256": "b05c28821fb8b50f26dc88cedd56bc83111a010730f818db1ae764b0c70a1cca",
+    "rights": "Reference only. No research imagery is shipped in the game.",
+    "inspection": "Visually inspected: stair descent, tiled corridor, handrails and Avanti direction. Undated image in a 2017 upload path; use for general architectural character, not current tenants."
+  },
+  {
+    "id": "avanti-approach-clabo",
+    "title": "Station underground approach to Avanti",
+    "publisher": "Card Labo",
+    "url": "https://www.c-labo.jp/wordpress/wp-content/uploads/2017/02/kyotoaccess1.jpg",
+    "local_file": "photos/avanti-approach-clabo.jpg",
+    "category": "interior circulation",
+    "source_date": null,
+    "retrieved_at": "2026-09-29T15:04:38.034549+00:00",
+    "bytes": 245454,
+    "sha256": "97280a4bad374b0e74c6dd3ac3df788bf73c7b6adef0b70e7441f2ee08faea07",
+    "rights": "Reference only. No research imagery is shipped in the game.",
+    "inspection": "Visually inspected: subway/JR passage and gate/stair arrangement. This is an interior approach photograph, not a street exterior. Undated image in a 2017 upload path."
   }
 ]

@@ -14,9 +14,11 @@ modified_paving=report['geometry'].get('modifiedPaving');assert not modified_pav
 replaced=[p for p in new['panels']if p['id']==modified_paving]
 retained=[replaced[0]if p['id']==modified_paving else p for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
 for key in ('boxes','beams','flights','escalators'):assert old[key]==new[key]
-old_lifts=old.get('lifts',[]);lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
+retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
+assert not retired_lift_ids or report.get('componentPrefix')=='hachijo-crossing-' and retired_lift_ids==['subway-hachijo-east-lift']
+old_lifts=[l for l in old.get('lifts',[])if l['id']not in retired_lift_ids];lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
 added_lifts=lifts[len(old_lifts):]
-assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-')
+assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-')
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')
@@ -24,14 +26,16 @@ added=new['panels'][len(retained):];assert len(added)==report['geometry']['panel
 bpy.ops.wm.open_mainfile(filepath=str(Path(base['sourceScene']).resolve()));assert bpy.data.texts['Kyoto runtime seed.json'].as_string()==old_raw.decode()
 by_id={p['id']:i for i,p in enumerate(new['panels'])}
 assert not (set(by_id) & {r['id'] for r in new['authoredLights'] if r['id'].startswith(prefix)})
-removed=[]
+removed=[];retired_lift_parts=[]
 for o in list(bpy.data.objects):
+ if o.get('kyoto_lift')in retired_lift_ids:retired_lift_parts.append(o['kyoto_lift_part']);bpy.data.objects.remove(o,do_unlink=True);continue
  if o.name in report['geometry']['retiredLights']:bpy.data.objects.remove(o,do_unlink=True);continue
  if o.get('kyoto_surface',o.name) in report['geometry']['retiredIds']:removed.append(o.get('kyoto_surface',o.name));bpy.data.objects.remove(o,do_unlink=True);continue
  key=o.get('kyoto_seed','')
  if key.startswith('panels/'):
   id=old['panels'][int(key.split('/')[1])]['id'];assert id in by_id;o['kyoto_seed']='panels/'+str(by_id[id])
 assert set(removed)==set(report['geometry']['retiredIds'])
+assert set(retired_lift_parts)=={p['id']for l in old.get('lifts',[])if l['id']in retired_lift_ids for p in l['parts']}
 materials={m['id']:m for m in new['authoredMaterials']};created={}
 def material(key):
  if key in created:return created[key]
@@ -81,7 +85,9 @@ for r in lights:
  lamp=bpy.data.lights.new(r['id'],'SPOT');lamp.color=tuple(r['linearColor'][k]for k in 'rgb');lamp.energy=r['intensity'];lamp.spot_size=math.radians(r['spotAngle']);lamp.spot_blend=1-r['innerSpotAngle']/r['spotAngle'];o=bpy.data.objects.new(r['id'],lamp);collection.objects.link(o);p=r['position'];o.location=(p['x'],p['z'],p['y']);o['kyoto_fixture']=True;o['kyoto_unity_intensity']=r['intensity'];o['kyoto_range_m']=r['range']
 out.mkdir(parents=True,exist_ok=True);(out/'station-layout.json').write_bytes(new_raw)
 bpy.data.texts.remove(bpy.data.texts['Kyoto runtime seed.json']);seed=bpy.data.texts.load(str((out/'station-layout.json').resolve()),internal=True);seed.name='Kyoto runtime seed.json'
-(out/'textures').symlink_to((Path(base['sourceScene']).parent/'textures').resolve(),target_is_directory=True)
+textures=(out/'textures');texture_source=(Path(base['sourceScene']).parent/'textures').resolve()
+if textures.is_symlink():assert textures.resolve()==texture_source
+else:textures.symlink_to(texture_source,target_is_directory=True)
 bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str((out/'KyotoAtrium.blend').resolve()))
 bpy.ops.wm.open_mainfile(filepath=str((out/'KyotoAtrium.blend').resolve()));assert bpy.data.texts['Kyoto runtime seed.json'].as_string()==new_raw.decode();objects={o.get('kyoto_surface',o.name):o for o in bpy.data.objects}
 assert not any(id in objects for id in report['geometry']['retiredIds'])
@@ -101,5 +107,5 @@ for part,position,size in lift_objects:
 for r in lights:
  o=bpy.data.objects[r['id']];assert abs(o.data.energy-r['intensity'])<1e-6;assert o['kyoto_range_m']==r['range']
 proof={'pass':True,'parentSourceSha256':sha(Path(base['sourceScene']).read_bytes()),'sourceSha256':sha((out/'KyotoAtrium.blend').read_bytes()),'layoutSha256':sha(new_raw),'addedPanels':len(added),'retiredObjects':removed,'savedGeometryUVsNormalsMatch':True,'retainedBindingsMatch':True}
-proof['modifiedPaving']=modified_paving;proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects)
+proof['modifiedPaving']=modified_paving;proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects);proof['retiredLiftParts']=retired_lift_parts
 (out/'installation.json').write_text(json.dumps(proof,indent=2)+'\n');print('EAST_TRANSFER_SOURCE_READY',json.dumps(proof),flush=True)

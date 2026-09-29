@@ -2,16 +2,19 @@ import assert from 'node:assert/strict';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {chromium} from 'playwright';
 import {Client,delay} from '../../tests/api-client.mjs';
-const [origin,manifest,component,out]=process.argv.slice(2);
+const [origin,manifest,component,out,liftId]=process.argv.slice(2);
 assert(['localhost','127.0.0.1'].includes(new URL(origin).hostname));assert(out.startsWith('.local/'));await mkdir(out,{recursive:true});
-const config=JSON.parse(await readFile(manifest)),spec=JSON.parse(await readFile(component+'/lift-spec.json')),L=spec.origin.y,H=L+spec.height,Z=spec.origin.z,report={pass:false,layoutSha256:config.layoutSha256,geometrySha256:config.geometrySha256,checks:[],errors:[]};
-const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']}),other=new Client(origin.replace(/^http/,'ws'));
+const config=JSON.parse(await readFile(manifest)),spec=liftId?JSON.parse(await readFile(component+'/lift-specs.json')).find(l=>l.id===liftId):JSON.parse(await readFile(component+'/lift-spec.json'));
+assert(spec,'Requested lift must exist');
+const L=spec.origin.y,H=L+spec.height,Z=spec.origin.z,report={pass:false,lift:spec.id,spawn:config.spawn,layoutSha256:config.layoutSha256,geometrySha256:config.geometrySha256,checks:[],errors:[]};
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']});let other;
 try{
  const page=await browser.newPage({viewport:{width:1280,height:800}});page.on('pageerror',e=>report.errors.push(e.message));
  await page.route('**/game.js',async route=>route.fulfill({contentType:'text/javascript',body:await readFile('web/public/game.js','utf8')+`
 window.__liftInspection={aim(y){yaw=y;pitch=0;centerOnAim();},read(){return{lifts:snapshot?.lifts.filter(p=>p.id==='${spec.id}'),feet:self()?.feet,grounded:self()?.grounded,parts:lifts.parts.map(p=>({id:p.part.id,position:p.mesh.position.toArray()})),render:kyotoState.render};}};`}));
  await page.goto(origin);await page.locator('#loading-name input[name="player"]').fill('Public lift inspection',{timeout:120000});await page.getByRole('button',{name:'LET’S PLAY →'}).click();await page.waitForFunction(()=>window.kyotoState?.ready&&!document.body.classList.contains('is-loading'),null,{timeout:120000});
- await other.join();await delay(200);assert.equal(other.state.lifts.find(p=>p.id===spec.id).height,0);
+ // Connect the second session after first-use textures load, within the hello timeout.
+ other=new Client(origin.replace(/^http/,'ws'));await other.join();await delay(200);assert.equal(other.state.lifts.find(p=>p.id===spec.id).height,0);
  const read=()=>page.evaluate(()=>__liftInspection.read());
  async function walk(z,yaw){await page.evaluate(y=>__liftInspection.aim(y),yaw);await page.keyboard.down('w');try{await page.waitForFunction(([z,yaw])=>yaw===0?kyotoState.feet.z>=z:kyotoState.feet.z<=z,[z,yaw],{timeout:15000});}finally{await page.keyboard.up('w');}await page.waitForTimeout(180);}
  await page.evaluate(()=>__liftInspection.aim(0));await page.screenshot({path:out+'/passage.png'});
@@ -38,4 +41,4 @@ window.__liftInspection={aim(y){yaw=y;pitch=0;centerOnAim();},read(){return{lift
  await page.waitForFunction(()=>__liftInspection.read().lifts[0].lowerDoor>.99,null,{timeout:20000});await walk(Z-2.95,180);
  s=await read();assert(s.grounded&&Math.abs(s.feet.y-L)<.06);report.lower=s;report.checks.push('Return trip and exit to public passage');
  assert.deepEqual(report.errors,[]);report.pass=true;console.log('PASS',report.checks);
-}catch(error){report.error=String(error);throw error;}finally{await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');other.close();await browser.close();}
+}catch(error){report.error=String(error);throw error;}finally{await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');other?.close();await browser.close();}

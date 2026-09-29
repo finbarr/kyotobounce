@@ -93,10 +93,14 @@ The [Porta East connection](PORTA-EAST-V2.md) opens the West North Street endpoi
 
 The [Exit 5 street lift](EXIT-FIVE-LIFT-V2.md) now connects the public passage to the northeast forecourt, with a sloped threshold fitted to the retained paving. The route through Central 1 joins it to the existing platform lift.
 
-The [Hachijo East public lift](HACHIJO-LIFT-V2.md) now connects the South subway lobby to the station's ground entrance. The route continues to the southern forecourt, with the existing stair, JR bypass and ticket-machine access retained. The crossing beneath Hachijo Street and south-side lift remain unfinished.
+The [Hachijo Street crossing](HACHIJO-CROSSING-V2.md) extends the South subway lobby route under the road to both street lifts, the sunken garden and its stair. It corrects the northern lift's provisional indoor placement using operator photographs, with the retained stair, JR bypass and ticket machines still accessible.
 
-1. **Underground public connections:** add the remaining accessible lifts toward Porta and the Hachijo Street crossing. Complete remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
+1. **Underground public connections:** add the remaining accessible lifts toward Porta. Complete remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.
+
+## Hachijo Street crossing
+
+The [public crossing](HACHIJO-CROSSING-V2.md) now continues from the subway South lobby beneath Hachijo Street into an open-air garden with a usable street stair, southern lift and Avanti receiving lobby. The northern lift moves out to the station frontage, as shown by the operator's photographed route; its old indoor shaft openings are restored. Both lower portals have retaining headers and guards above them. The full Avanti building, shopping floor and bus terminal remain in the queue.

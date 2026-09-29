@@ -25,15 +25,20 @@ async function walk(points,label){const row={label,points,samples:[],pass:false}
 try{
  await worker.start();await until(()=>worker.ready);worker.send({type:'join',id});await until(()=>state?.players?.length);
  const construction=JSON.parse(await readFile(component+'/report.json'));
- const previous=process.env.KYOTO_SKIP_REPORT?JSON.parse(await readFile(process.env.KYOTO_SKIP_REPORT)):null;if(previous)assert.equal(previous.layoutSha256,report.layoutSha256);
+ const previous=process.env.KYOTO_SKIP_REPORT?JSON.parse(await readFile(process.env.KYOTO_SKIP_REPORT)):null;if(previous){assert.equal(previous.layoutSha256,report.layoutSha256);report.reusedFrom=process.env.KYOTO_SKIP_REPORT;}
  for(const row of construction.geometry.routes.filter(r=>!process.env.KYOTO_ROUTE_FILTER||r.label.includes(process.env.KYOTO_ROUTE_FILTER))){
-  const passed=previous?.walks.find(w=>w.label===row.label&&w.pass);if(passed){assert.deepEqual(passed.points,row.points);continue;}
+  const passed=previous?.walks.find(w=>w.label===row.label&&w.pass);if(passed){assert.deepEqual(passed.points,row.points);report.walks.push(passed);continue;}
   try{await start(row.points[0]);}catch(e){throw Error(row.label+' entry: '+e.message);}
   if(process.env.KYOTO_PREFLIGHT){report.entries.push({label:row.label,point:row.points[0],pass:true});console.log('ENTRY',row.label);continue;}await walk(row.points,row.label);
  }
  if(!process.env.KYOTO_PREFLIGHT)for(const row of (construction.geometry.blocked||[]).filter(r=>!process.env.KYOTO_ROUTE_FILTER||r.label.includes(process.env.KYOTO_ROUTE_FILTER))){
   await start(row.start);const samples=[];
-  for(let i=0;i<60;i++){worker.send({type:'input',id,x:0,z:1,yaw:row.yaw,pitch:0,fast:false});await delay(60);const p=feet();samples.push({...p});assert((p[row.axis]-row.limit)*row.sign>=0,row.label+' crossed '+JSON.stringify({feet:p,axis:row.axis,limit:row.limit}));assert(Math.abs(p.y-row.start.y)<.06,row.label+' lost floor');}
+  // A declared low ledge may raise the capsule while the enclosing wall still blocks it.
+  const ledge=row.contactLedge?layout.panels.find(p=>p.id===row.contactLedge):null;
+  if(row.contactLedge)assert(ledge?.collision!==false&&ledge,'Missing contact ledge');
+  const maxRise=ledge?Math.max(...ledge.vertices.map(v=>v.y))-row.start.y:0;
+  assert(maxRise>=0&&maxRise<=.25,'Contact ledge must fit the normal step height');
+  for(let i=0;i<60;i++){worker.send({type:'input',id,x:0,z:1,yaw:row.yaw,pitch:0,fast:false});await delay(60);const p=feet();samples.push({...p});assert((p[row.axis]-row.limit)*row.sign>=0,row.label+' crossed '+JSON.stringify({feet:p,axis:row.axis,limit:row.limit}));assert(p.y>=row.start.y-.06&&p.y<=row.start.y+maxRise+.06,row.label+' lost floor '+JSON.stringify({feet:p,start:row.start}));}
   worker.send({type:'input',id,x:0,z:0,fast:false});assert(state.players.find(p=>p.id===id).grounded,row.label+' must remain grounded');assert(Math.abs(feet()[row.axis]-row.start[row.axis])>.2,row.label+' never approached barrier');report.boundaries.push({...row,samples,pass:true});await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log('PASS',row.label);
  }
  report.pass=true;
