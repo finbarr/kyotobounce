@@ -1,5 +1,7 @@
 # Exit 5: public street lift
 
+**Placement correction pending:** the [subway registration audit](SUBWAY-REGISTRATION-V2.md) finds that this working lift sits beside the wrong core and uses a generic pavilion that differs from street photographs. The route verification below demonstrates the fitted connection, not its real-world registration. Correct the subway/public-route placement before relocating this shaft.
+
 29 September 2026. Connect the public subway passage to the northeast station forecourt with a second operating passenger lift.
 
 ## Evidence and construction
