@@ -8,6 +8,7 @@ export const STATION_PROBES=Object.freeze([
   {name:'garden',position:[-156,57,20.4]}
 ]);
 const CANOPY_PROBE=Object.freeze({name:'north-exterior',position:[-5,30,-45]});
+const RESTAURANT_PROBE=Object.freeze({name:'restaurant-entry',position:[-133.3,46.3,24]});
 const COURT_PROBE=Object.freeze({name:'east-court',position:[110,32,1],resolution:512});
 
 export function stationDaylightTexture(){
@@ -38,10 +39,10 @@ export function configureStationDaylight(renderer,scene,sun){
   sun.color.set(0xfff1df);sun.intensity=2.15;sun.position.set(-55,110,-65);sun.target.position.set(-20,0,0);scene.add(sun.target);
 }
 
-export function createStationReflections(renderer,scene,architecture,{canopy=false,courtyardMaterials=[]}={}){
+export function createStationReflections(renderer,scene,architecture,{canopy=false,courtyardMaterials=[],restaurantMaterials=[]}={}){
   const uniforms={stationHall:{value:null},stationGallery:{value:null},stationGarden:{value:null},stationExterior:{value:null}};
-  const zones=[...STATION_PROBES,...(canopy?[CANOPY_PROBE]:[]),...(courtyardMaterials.length?[COURT_PROBE]:[])];
-  const stats={zones,captures:0,resolution:256,courtyardResolution:courtyardMaterials.length?512:0,courtyardMaterials:courtyardMaterials.map(m=>m.name),pmremBytes:0,captureMilliseconds:0};
+  const zones=[...STATION_PROBES,...(canopy?[CANOPY_PROBE]:[]),...(courtyardMaterials.length?[COURT_PROBE]:[]),...(restaurantMaterials.length?[RESTAURANT_PROBE]:[])];
+  const stats={zones,captures:0,resolution:256,courtyardResolution:courtyardMaterials.length?512:0,courtyardMaterials:courtyardMaterials.map(m=>m.name),restaurantMaterials:restaurantMaterials.map(m=>m.name),pmremBytes:0,captureMilliseconds:0};
   const targets=[];let captured=false,disposed=false;
   function patch(shader,{canopy=false}={}){
     const functions=`
@@ -107,6 +108,11 @@ ${canopy?`
         const local=targets[zones.indexOf(COURT_PROBE)].texture;
         for(const material of courtyardMaterials){material.envMap=local;material.envMapIntensity=.85;material.needsUpdate=true;}
       }
+      // Capture the real doorway frame once for the polished restaurant floor.
+      if(restaurantMaterials.length){
+        const local=targets[zones.indexOf(RESTAURANT_PROBE)].texture;
+        for(const material of restaurantMaterials){material.envMap=local;material.envMapIntensity=.85;material.needsUpdate=true;}
+      }
       scene.environment=targets[0].texture;scene.environmentIntensity=.85;
       old?.dispose();renderer.shadowMap.autoUpdate=false;
     }catch(error){targets.forEach(t=>t.dispose());targets.length=0;scene.environment=old;renderer.shadowMap.autoUpdate=previousShadowUpdate;throw error;}
@@ -115,7 +121,7 @@ ${canopy?`
   function dispose(){
     if(disposed)return;disposed=true;
     if(targets.some(t=>scene.environment===t.texture))scene.environment=null;
-    for(const material of courtyardMaterials)if(targets.some(t=>material.envMap===t.texture)){material.envMap=null;material.needsUpdate=true;}
+    for(const material of [...courtyardMaterials,...restaurantMaterials])if(targets.some(t=>material.envMap===t.texture)){material.envMap=null;material.needsUpdate=true;}
     targets.forEach(t=>t.dispose());targets.length=0;
   }
   return {uniforms,patch,capture,dispose,stats};
