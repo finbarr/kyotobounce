@@ -219,6 +219,16 @@ for lane in seed['escalators']:
                     raise ValueError('Moving-lane auxiliary does not follow its shared frame: '+q.name)
         x['escalators'].append(lane)
         x['flights'].extend(f for f in seed['flights'] if f['id']==lane['id'])
+for lift in x.get('lifts',[]):
+    for part in lift['parts']:
+        o=objects.get(part['id'])
+        if not o or o.get('kyoto_lift')!=lift['id'] or not o.get('kyoto_dynamic'):
+            raise ValueError('Missing editable lift part: '+part['id'])
+        # Motion is defined by the shared native path. Fail explicitly if an
+        # edit changes that geometry without updating its matching definition.
+        if o.modifiers or signature(o)!=o.get('kyoto_geometry_signature'):
+            raise ValueError('Lift geometry changed; update its shared part definition: '+part['id'])
+        part['appearance']=appearance(o.data.materials[0],part['material'])
 x['authoredMaterials']=list(material_records.values())
 x['authoredLights']=[]
 for o in sorted(s.objects,key=lambda o:o.name):

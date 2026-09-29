@@ -1,4 +1,5 @@
 import {setText,setHidden,setAttribute} from './dom-updates.js';
+import {replayLiftPoses,liftRiderFeet} from './lifts.js';
 import {isTutorial} from './tutorial.js';
 import {startMarker} from './start-marker.js';
 import {completedCourse,nextCampaignCourse} from './level-progress.js';
@@ -11,7 +12,7 @@ import {arcadeFeedback} from './arcade-feedback.js';
 import {waypointTargets} from './waypoint-targets.js';
 import {scoreAt,collectedIds,allWaypointsCollected} from './waypoint-score.js';
 const $=id=>document.getElementById(id),v=p=>new THREE.Vector3(p.x,p.y,-p.z);
-export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
+export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLifts=()=>[],getLayout=()=>null}){
  const feedback=arcadeFeedback(sound);
  const host=document.createElement('aside');host.id='competition';host.innerHTML=`
  <div id="course-view"><div class="panel-top"><span class="eyebrow">STAGE SELECT / 選択</span><button id="new-challenge">＋ Create</button></div><h2 id="course-title">EXPLORE KYOTO.</h2><div id="turn-status"></div><label class="campaign-picker" id="campaign-picker" hidden><span id="campaign-count"></span><select id="campaign-chapter" aria-label="Campaign chapter"></select></label><div id="course-list"></div><div id="challenge-detail" hidden><p id="challenge-description"></p><button id="show-overview">◎ View course overview</button><button id="use-hint" hidden>Set suggested aim <kbd>H</kbd></button><p id="hint-note"></p><div id="timing-hint" hidden><span class="eyebrow">ESCALATOR RELEASE TIMING</span><div class="timing-track"><i id="timing-window"></i><b id="timing-cursor"></b></div><p id="timing-caption"></p></div><div class="actions"><button id="share-challenge">Copy level link ↗</button><button id="edit-challenge" hidden>Revise</button></div><details id="score-guide"><summary>HOW TO SCORE</summary><p><strong>10,000 base × (1 + 0.5 per distinct bank) × landing accuracy.</strong> Banks add to the multiplier; impact speed does not multiply it.</p><p>Keep 100% inside the gold bullseye. The outer rings show 75%, 50% and 25%, fading to zero at the edge. Height counts too. Tagging the target guarantees 25% even if it rolls out.</p><p>Spaced banks count once per surface; a flight of treads counts as one. Movement adds 100 points per second outside every multiplier. Waiting and spinning in place add nothing. Banks freeze at the first target hit. A far miss still banks its movement points.</p><p>The score locks only when the ball stops moving and spinning. Recall forfeits the shot.</p></details></div></div>
@@ -368,6 +369,8 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
    const player={...r.thrower,power:t<-.12?THREE.MathUtils.clamp((r.releaseTime+t-r.chargeTime)/(r.challenge.allowedInputs?.chargeSeconds||1.2),0,1):r.thrower.power};
    const velocity={x:(b.p.x-a.p.x)/(b.t-a.t||1),y:(b.p.y-a.p.y)/(b.t-a.t||1),z:(b.p.z-a.p.z)/(b.t-a.t||1)};
    const base={attempt:r.attempt,diagnostics:{sleeping:t>=r.duration},owner:player.id,players:[player],phase,releaseTime:r.releaseTime,chargeTime:r.chargeTime,launchPosition:r.launchPosition,velocity:t>=r.duration?{x:0,y:0,z:0}:velocity,spin:t>=r.duration?{x:0,y:0,z:0}:r.spin,challenge:r.challenge,layout:r.layout,physics:r.physics,surfaces:r.surfaces,impacts:r.impacts,flightTime:Math.max(0,t),power:player.power};
+   base.lifts=replayLiftPoses(r.liftFrames,t);
+   player.feet=liftRiderFeet(getLifts(),replayLiftPoses(r.liftFrames,0),base.lifts,player.feet);
    return {before:{...base,stationTime:r.releaseTime+a.t,ball:a.p,rotation:a.q},after:{...base,stationTime:r.releaseTime+b.t,ball:b.p,rotation:b.q},alpha,time:r.releaseTime+t,phase};
   }
  };

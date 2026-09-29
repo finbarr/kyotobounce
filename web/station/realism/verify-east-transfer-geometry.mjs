@@ -12,7 +12,14 @@ assert(eq(base.panels,old.panels.filter(p=>!retiredIds.includes(p.id))));assert(
 const added=next.panels.slice(base.panels.length);assert.equal(added.length,report.geometry.panels);
 const native=await read(component+'/native-panels.json');assert(eq(next.authoredLights.slice(0,base.authoredLights.length),base.authoredLights));assert(eq(next.authoredLights.slice(base.authoredLights.length),native.authoredLights));
 assert(eq(next.panels.slice(0,base.panels.length),base.panels));
-assert(eq({...next,panels:base.panels,authoredMaterials:base.authoredMaterials,authoredLights:base.authoredLights,architecture:base.architecture},base));
+const retainedNext={...next,panels:base.panels,authoredMaterials:base.authoredMaterials,authoredLights:base.authoredLights,architecture:base.architecture};
+if(report.componentPrefix==='subway-lift-'){
+ const lift=await read(component+'/lift-spec.json');
+ for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;
+ assert(eq(next.lifts,[...(base.lifts||[]),lift]));assert(eq((await read(b.station)).lifts,next.lifts));
+ if(base.lifts)retainedNext.lifts=base.lifts;else delete retainedNext.lifts;
+}
+assert(eq(retainedNext,base));
 const bytes=await readFile(b.geometry);assert.equal(sha(bytes),b.geometrySha256);assert.equal(sha(await readFile(b.layout)),b.layoutSha256);
 const before=readGLB(await readFile(a.geometry)),after=readGLB(bytes),{json:j,bin}=after;
 assert(bin.subarray(0,before.bin.length).equals(before.bin));

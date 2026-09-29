@@ -4,7 +4,7 @@
 
 ## Evidence and construction
 
-The [city's Kyoto station page](https://www2.city.kyoto.lg.jp/kotsu/tikadia/menu0221.htm) links the K11 diagram dated 7 August 2026. The saved `maps/subway-kyoto-plan.pdf` was rendered and inspected: it shows an upward escalator beside each of the four platform stairways. The diagram establishes the connections and direction. It does not provide surveyed widths, rises or casing dimensions. The saved `photos/subway-platform-nesnad-2022.jpg` supplies platform finish context but no close-up measurement of the escalators.
+The [city's Kyoto station page](https://www2.city.kyoto.lg.jp/kotsu/tikadia/hyperdia/menu0221.htm) links the K11 diagram dated 7 August 2026. The saved `maps/subway-kyoto-plan.pdf` was rendered and inspected: it shows an upward escalator beside each of the four platform stairways. The diagram establishes the connections and direction. It does not provide surveyed widths, rises or casing dimensions. The saved `photos/subway-platform-nesnad-2022.jpg` supplies platform finish context but no close-up measurement of the escalators.
 
 Each fitted lane rises five metres from the current Y−11.2 m platform to the Y−6.2 m concourse. The lanes use the existing hall escalator chassis, 0.985 m tread width, 1.234 m flat landings and a fitted 8.932 m sloping run. Each chain has 70 steps and runs upward at 0.5 m/s. Its eased closed path is shared by the browser, native physics and editable Blender animation.
 

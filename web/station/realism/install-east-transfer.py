@@ -12,6 +12,9 @@ old_raw=Path(base['layout']).read_bytes();new_raw=Path(candidate['layout']).read
 assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha256']
 retained=[p for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
 for key in ('boxes','beams','flights','escalators'):assert old[key]==new[key]
+old_lifts=old.get('lifts',[]);lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
+added_lifts=lifts[len(old_lifts):]
+assert not added_lifts or report.get('componentPrefix')=='subway-lift-'
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')
@@ -55,6 +58,18 @@ for index,p in enumerate(added,start=len(retained)):
   mesh.normals_split_custom_set(normals);exact=mesh.attributes.new('kyoto_authored_normal','FLOAT_VECTOR','CORNER')
   for i,n in enumerate(normals):exact.data[i].vector=n
  o['kyoto_surface']=p['id'];o['kyoto_seed']='panels/'+str(index);o['kyoto_physical']=p['material'];o['kyoto_role']=p['role'];o['kyoto_collision']=p.get('collision',True);o['kyoto_geometry_signature']=signature(o)
+# Lift cars are editable boxes, excluded from static exports. The embedded
+# native seed holds their movement definition; source geometry shows floor 0.
+lift_objects=[]
+for lift in added_lifts:
+ for part in lift['parts']:
+  center=part['center'];origin=lift['origin'];size=part['size'];upper=part['motion']=='upper'
+  position=(origin['x']+center['x']+part['doorSide']*lift['doorTravel']*(0 if upper else 1),origin['z']+center['z'],origin['y']+center['y']+(lift['height'] if upper else 0))
+  bpy.ops.mesh.primitive_cube_add(size=1,location=position);o=bpy.context.object;o.name=part['id'];o.dimensions=(size['x'],size['z'],size['y'])
+  bpy.context.view_layer.update()
+  for c in list(o.users_collection):c.objects.unlink(o)
+  collection.objects.link(o);o.data.materials.append(material(part['appearance']));o['kyoto_dynamic']=True;o['kyoto_lift']=lift['id'];o['kyoto_lift_part']=part['id'];o['kyoto_physical']=part['material'];o['kyoto_geometry_signature']=signature(o)
+  lift_objects.append((part,position,tuple(o.dimensions)))
 lights=new['authoredLights'][len(retained_lights):]
 assert len(lights)==len(json.loads((component/'native-panels.json').read_text())['authoredLights'])
 for r in lights:
@@ -76,7 +91,10 @@ for p in added:
   if p.get('normals'):assert max(abs(mesh.corner_normals[l.index].vector[i]-p['normals'][l.vertex_index][k])for i,k in enumerate(('x','z','y')))<.001
 for p in retained:
  o=objects.get(p['id']);assert o and o['kyoto_seed']=='panels/'+str(by_id[p['id']])
+for part,position,size in lift_objects:
+ o=bpy.data.objects[part['id']];assert o['kyoto_dynamic'] and o['kyoto_lift_part']==part['id'];assert (o.location-Vector(position)).length<2e-5;assert (o.dimensions-Vector(size)).length<2e-5;assert o.data.materials[0].name==materials[part['appearance']]['label'];assert signature(o)==o['kyoto_geometry_signature']
 for r in lights:
  o=bpy.data.objects[r['id']];assert abs(o.data.energy-r['intensity'])<1e-6;assert o['kyoto_range_m']==r['range']
 proof={'pass':True,'parentSourceSha256':sha(Path(base['sourceScene']).read_bytes()),'sourceSha256':sha((out/'KyotoAtrium.blend').read_bytes()),'layoutSha256':sha(new_raw),'addedPanels':len(added),'retiredObjects':removed,'savedGeometryUVsNormalsMatch':True,'retainedBindingsMatch':True}
+proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects)
 (out/'installation.json').write_text(json.dumps(proof,indent=2)+'\n');print('EAST_TRANSFER_SOURCE_READY',json.dumps(proof),flush=True)

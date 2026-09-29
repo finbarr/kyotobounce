@@ -11,7 +11,7 @@ namespace Kyoto
     {
         [Serializable] public class Command
         {
-            public string type,id,request,powerRange,scoring;
+            public string type,id,request,powerRange,scoring,lift;
             public float x,z,yaw,pitch,top,kick,power,rate;
             public bool fast;
             public Vector3 origin,direction;public float radius;public string slot;
@@ -44,6 +44,7 @@ namespace Kyoto
             public int impacts,surfaces;public float goalDwell;
             public bool trajectoryEnd;
             public PlayerState[] players;
+            public LiftPose[] lifts;
             public ReplayPose[] scorePoses;
             public BallDiagnostics diagnostics=new BallDiagnostics();
         }
@@ -106,13 +107,14 @@ namespace Kyoto
         {
             layout=station;fallLimitY=station.FallLimitY();output=send;state.layout=hash;state.id=id;
             gameObject=new GameObject("Private attempt "+id);
+            CreateLiftStates();
             var obj=new GameObject("Authoritative ball");obj.transform.SetParent(gameObject.transform);
             obj.AddComponent<SphereCollider>();obj.AddComponent<Rigidbody>();ball=obj.AddComponent<BallBody>();
             ball.SetProfile(BallProfile.Phase2Default);state.profile=ball.Profile.id;state.radius=ball.Profile.radius_m;
             ball.Impact+=RecordImpact;ball.Contact+=RecordWaypointContact;ball.SetPose(layout.spawn+Vector3.up*1.5f,Quaternion.identity);
             Handle(new Command{type="join",id=id});
         }
-        void ActivateClock()=>StationMotion.SetAnalyticTime(gameObject.scene,stationTime);
+        void ActivateClock(){StationMotion.UseLifts(gameObject.scene,liftStates);StationMotion.SetAnalyticTime(gameObject.scene,stationTime);}
         void Send(object data)=>output(data);
         void Note(string id,string message)=>Send(new Notice{id=id,message=message,attempt=attempt});
         public void Handle(Command c)
@@ -137,6 +139,7 @@ namespace Kyoto
             {if(owner==p){Reset();}UnityEngine.Object.Destroy(p.walker.gameObject);players.Remove(c.id);return;}
             switch(c.type)
             {
+                case "lift":RequestLift(c,p);break;
                 case "playback-rate":
                     // Change presentation only. Fixed-step physics and scoring time stay intact.
                     if(owner==p&&ahead&&c.request==attempt&&(c.rate==1||c.rate==2))
@@ -181,6 +184,7 @@ namespace Kyoto
         public void Step()
         {
             ActivateClock();
+            HoldLiftDoors();
             if(state.phase=="Release"&&Time.realtimeSinceStartupAsDouble>=releaseAt)
             {
                 if(owner.walker.TryRelease(owner.state.yaw,owner.state.pitch,out var release,state.radius))
@@ -196,6 +200,7 @@ namespace Kyoto
             if(state.phase=="Flight")
             {
                 ball.BeforeStep(BallBody.Step);
+                RecordLiftPoses();
                 replayPoses.Add(new ReplayPose{t=ball.Clock,p=ball.Body.position,q=ball.Body.rotation});
                 bool stopped=ball.Sleeping&&ball.Velocity.sqrMagnitude<1e-10f&&ball.AngularVelocity.sqrMagnitude<1e-10f;
                 sleepDwell=stopped?sleepDwell+BallBody.Step:0;
@@ -219,12 +224,13 @@ namespace Kyoto
                 if(p.walker.Grounded&&move.sqrMagnitude>.001f)p.state.walked+=travelled.magnitude;
             }
             stationTime=StationMotion.Time(gameObject.scene);
+            if(state.phase!="Flight")RecordLiftPoses();
         }
         void Reset()
         {
             if(ahead){
                 double elapsed=PlaybackElapsed;
-                stationTime=Math.Min(stationTime,shotStationTime+elapsed);ActivateClock();
+                stationTime=Math.Min(stationTime,shotStationTime+elapsed);RewindLifts(stationTime);ActivateClock();
                 for(int i=walkerPoses.Count-1;i>=0;i--)if(walkerPoses[i].t<=elapsed){owner?.walker.Place(walkerPoses[i].p);break;}
             }
             ahead=false;playbackRate=1;playbackElapsed=0;pendingResult=null;pendingNotice=null;walkerPoses.Clear();
@@ -247,6 +253,7 @@ namespace Kyoto
             if(ahead&&!trajectory)return;
             ActivateClock();
             state.stationTime=StationMotion.Time(gameObject.scene);state.challenge=activeChallenge;state.attempt=attempt;state.goalDwell=goalDwell;
+            state.lifts=StationMotion.LiftPoses(gameObject.scene);
             state.players=new PlayerState[players.Count];int i=0;
             foreach(var p in players.Values)
             {

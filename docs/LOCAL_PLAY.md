@@ -45,8 +45,13 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is on the subway island platform beside the Central 1
-stairs and escalator. Four upward escalators now connect the platform to the
+The current spawn is on the subway island platform facing the Central 1
+passenger lift. Walk inside and press **E** to ride, or use its nearby button
+with the mouse released. The lift connects the platform and Central 1 concourse;
+its landing doors remain closed while the car is elsewhere. This requires a
+worker rebuilt with `lifts-v1` support; see the
+[lift notes](../research/kyoto-station/notes/SUBWAY-LIFT-V2.md).
+Four upward escalators connect the platform to the
 four gate halls, with the stairs usable alongside them; see the
 [escalator notes](../research/kyoto-station/notes/SUBWAY-ESCALATORS-V2.md).
 Six conventional-platform stairs, the eastern Shinkansen transfer gate and the

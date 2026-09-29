@@ -13,6 +13,7 @@ namespace Kyoto
         public Box[] boxes;
         public Flight[] flights;
         public Escalator[] escalators;
+        public Lift[] lifts;
         public Beam[] beams;
         public Panel[] panels;
         public Route[] routes;
@@ -74,6 +75,21 @@ namespace Kyoto
             public int stepCount,publicPointCount;
         }
         [Serializable] public sealed class Beam {public string id,material,profile,appearance;public Vector3 a,b;public float radius;public bool collision;}
+        [Serializable] public sealed class Lift
+        {
+            public string id;
+            public Vector3 origin;
+            public float height,width,depth,doorWidth,doorZ,doorTravel,doorSeconds,waitSeconds;
+            // Seconds and height above the lower floor. Linear spans permit exact CCD.
+            public Vector2[] travel;
+            public LiftPart[] parts;
+        }
+        [Serializable] public sealed class LiftPart
+        {
+            public string id,material,motion;
+            public Vector3 center,size;
+            public int doorSide;
+        }
         [Serializable] public sealed class Panel
         {
             public string id,material,role,appearance;

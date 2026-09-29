@@ -23,6 +23,7 @@ import { createAvatar as makeAvatar, disposeAvatar, poseAvatar, setAvatarCharact
 import { createCharacterPicker, readCharacterChoice } from './character-picker.js';
 import { computeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
 import { createEscalators } from './escalators.js';
+import { createLifts } from './lifts.js';
 import { competitionUI } from './competition.js';
 import { arcadeAudio } from './arcade-audio.js';
 import { challengeBriefing } from './briefing.js';
@@ -59,7 +60,7 @@ const trailPositions=new Float32Array(180*3),trailGeometry=new THREE.BufferGeome
 const trail=new THREE.Line(trailGeometry,new THREE.LineBasicMaterial({color:0xf49368,transparent:true,opacity:.35,depthWrite:false}));trail.frustumCulled=false;scene.add(trail);let trailCount=0;
 const heat=ballHeat({scene,ball,trail}),blur=speedBlur(renderer);
 let heatPresentationKey='',heatPresentationTime=null;
-let station,robotAsset,motion,loaded=false,guestId='',identityId=localStorage.getItem('kyoto-guest-id')||'',snapshot=null,previous=null,received=0,workerReady=false;
+let station,robotAsset,motion,lifts,liftAction=null,loaded=false,guestId='',identityId=localStorage.getItem('kyoto-guest-id')||'',snapshot=null,previous=null,received=0,workerReady=false;
 const history=[],ballRotations=new BallRotationBuffer();
 const shotPlayback=new ShotPlayback();
 const liveThrow=new LiveThrow();
@@ -107,6 +108,9 @@ function setFly(active,capture=false){
  if(capture)captureMouse();canvas.focus();
 }
 $('toggle-fly').onclick=()=>setFly(!fly.active,true);
+const liftControl=document.createElement('button');liftControl.id='lift-control';liftControl.hidden=true;document.body.append(liftControl);
+function useLift(){if(liftAction){send('lift',{lift:liftAction.id});canvas.focus();}}
+liftControl.onclick=useLift;
 function designerView(mode){if(mode!=='play')briefing?.dismiss();setFly(mode==='editor');if(mode==='play'){aimOrbit=null;ballCameraActive=false;robotResultCamera=false;flightManual=false;centerOnAim();}if(mode==='replay'){returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;manualCamera=false;aimOrbit=null;}if(mode==='design'){liveThrow.reset();discardThrowMotion();returnRequested=true;flightPending=false;lastThrowAim=null;centerOnAim();}}
 function focusDesignTarget(target){setFly(true);fly.focus(target);canvas.focus();}
 
@@ -343,6 +347,7 @@ window.addEventListener('keydown',e=>{
   if(briefing?.blocked)return;
   if(levelMenuOpen()){if(e.code==='Escape'){e.preventDefault();closeLevelMenu();}else ui.navigateLevels(e);return;}
   if(editing)return;
+  if(!modified&&!fly.active&&e.code==='KeyE'&&liftAction){e.preventDefault();if(!e.repeat)useLift();return;}
   if(!modified&&['design','editor'].includes(ui.state.mode)&&e.code==='Escape'){e.preventDefault();cancel();ui.exitDesign();return;}
   if(!modified&&ui.state.mode==='editor'&&e.code==='KeyR'){e.preventDefault();if(!e.repeat)ui.retryDesign();return;}
   if(!modified&&e.code==='KeyR'&&['play','design'].includes(ui.state.mode)){e.preventDefault();if(!e.repeat){recall();canvas.focus();}return;}
@@ -401,6 +406,8 @@ async function load(){
     fly.setStationBounds(new THREE.Box3().setFromObject(station));
     cameraObstacles=new CameraObstacles(station);
     motion=createEscalators(scene,data.escalators,detailData.combSupports);motion(0);
+    lifts=createLifts(scene,data.lifts,data.authoredMaterials);
+    cameraObstacles.addDynamicMeshes(lifts.parts.map(p=>p.mesh));
     startup.progress(90,'Lighting the glass, stone and steel…');await yieldLoadingUI();
     stationLook=dressStation(renderer,scene,sun,station,data);
     await yieldLoadingUI();stationLook.updateLights(camera.position,0);
@@ -459,7 +466,7 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   applyLevelAim(ui.state.selected);
   if(capture)captureMouse();else{briefing.dismiss();openLevelMenu();}
 }});
-ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:(c,{automatic=false}={})=>{if(!startup?.active&&(!automatic||!isTutorial(c)))briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,getLifts:()=>lifts?.specs||[],sharedReplay:!!sharedReplayId,overview:(c,{automatic=false}={})=>{if(!startup?.active&&(!automatic||!isTutorial(c)))briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 $('replay-free').onclick=()=>setFly(true);
 for(const id of ['replay-play','replay-restart','replay-recenter','replay-free'])$(id).addEventListener('click',()=>canvas.focus());
 names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});
@@ -510,6 +517,11 @@ function animate(now){
   if(heatKey!==heatPresentationKey||(heatPresentationTime!==null&&scorePresentation.time<heatPresentationTime-.0001)){trailCount=0;trailGeometry.setDrawRange(0,0);heatPresentationKey=heatKey;}heatPresentationTime=scorePresentation.time;
   const timeline=ui.timeline()||renderTimeline(now),snapshot=timeline.after,previous=timeline.before;
   const p=replaying?snapshot?.players[0]:snapshot?.players.find(p=>p.id===(snapshot?.owner||guestId)),phase=replaying?timeline.phase:liveThrow.phase(snapshot,timeline.phase),alpha=timeline.alpha;
+  if(snapshot){
+    const poses=lifts.update(previous?.lifts,snapshot.lifts,alpha);
+    liftAction=!fly.active&&!replaying&&phase==='Aim'&&!levelMenuOpen()&&!names.active&&!briefing.blocked?lifts.button(poses,p?.feet):null;
+    setHidden(liftControl,!liftAction);if(liftAction)setText(liftControl,liftAction.text);
+  }
   mobile.update({mode:ui.state.mode,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked,charging:chargeMeter.charging,fastForward:fastForwardHeld,resultVisible:!$('result-card').hidden});
   setHidden(speedIndicator,(!replaying&&phase!=='Flight')||briefing.blocked);speedIndicator.disabled=replaying&&!ui.state.replayPlaying;
   setData(speedIndicator,'rate',String(presentationRate));setData(speedIndicator,'audioRate',String(sound.state.playbackRate));setData(speedIndicator,'musicBpm',String(sound.state.bpm));

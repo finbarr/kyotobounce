@@ -154,6 +154,7 @@ for (label,cell),g in groups.items():
 bpy.ops.export_scene.gltf(filepath=str(OUT/'atrium.glb'),export_format='GLB',use_active_scene=True,export_yup=True,export_animations=False,export_cameras=False,export_lights=False,export_extras=True,export_materials='EXPORT')
 if args.restore_attributes_prefix:counts['authoredAttributeRestore']=restore_glb_attributes(OUT/'atrium.glb',groups,args.restore_attributes_prefix)
 public={k:layout[k] for k in ['spawn','escalators','authoredLights','authoredMaterials']}
+public['lifts']=layout.get('lifts',[])
 if 'concourseDetails' in layout:public['concourseDetails']=layout['concourseDetails']
 for key in ['stationInstallations','stationAdditions']:
  if key in layout:public[key]=layout[key]

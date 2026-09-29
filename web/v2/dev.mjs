@@ -18,6 +18,7 @@ assert.equal(await hashFile(config.geometry),config.geometrySha256,'V2 station g
 if(config.hardware)assert.equal(await hashFile(config.hardware),config.hardwareSha256,'V2 hardware geometry changed');
 const layout=JSON.parse(source),station=await json(config.station),detail=await json(config.detail),motionBytes=await readFile(config.motionLayout);
 assert.equal(station.layoutSha256,hash(source),'Visual and collision exports must match');
+assert.deepEqual(station.lifts||[],layout.lifts||[],'Lift visuals and native collision must share their parts and travel path');
 assert.equal(hash(motionBytes),detail.candidateMotionIntegration.layoutSha256,'Unknown moving-step source');
 assert.deepEqual(layout.escalators,JSON.parse(motionBytes).escalators,'Moving escalators changed since their detail export');
 for(const support of layout.architecture.hallBasementIntegration.componentCombSupports)
@@ -58,7 +59,7 @@ await writeFile(resolve(local,'asset-receipt.json'),JSON.stringify(receipt,null,
 const worker=process.env.KYOTO_WORKER_EXECUTABLE;
 if(worker)await access(worker);
 console.log(`Kyoto Bounce v2: http://127.0.0.1:${port}\nAsset receipt: ${local}/asset-receipt.json`);
-const child=spawn(process.execPath,['web/server.ts'],{stdio:'inherit',env:{...process.env,KYOTO_PORT:port,KYOTO_PUBLIC_OVERLAY:overlay,KYOTO_LAYOUT:resolve(local,'station-layout.json'),KYOTO_DATA_DIR:resolve(local,'data'),KYOTO_WORKER_LOG:resolve(local,'worker.log')}});
+const child=spawn(process.execPath,['web/server.ts'],{stdio:'inherit',env:{...process.env,KYOTO_PORT:port,KYOTO_PUBLIC_OVERLAY:overlay,KYOTO_LAYOUT:resolve(local,'station-layout.json'),KYOTO_REQUIRE_LIFTS:layout.lifts?.length?'1':'0',KYOTO_DATA_DIR:resolve(local,'data'),KYOTO_WORKER_LOG:resolve(local,'worker.log')}});
 child.on('error',error=>{console.error(error);process.exitCode=1;});
 child.on('exit',code=>{process.exitCode=code??1;});
 for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>child.kill(signal));

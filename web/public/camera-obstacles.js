@@ -1,7 +1,7 @@
 import {Box3,Line3,Matrix4,Ray,Vector3} from 'three';
-import {ExtendedTriangle} from 'three-mesh-bvh';
+import {ExtendedTriangle,computeBoundsTree} from 'three-mesh-bvh';
 
-// Static station geometry only. Queries use both triangle sides without changing
+// Static station geometry and registered moving parts. Queries use both triangle sides without changing
 // rendering materials, and test a camera volume rather than just its centre ray.
 export class CameraObstacles {
   constructor(root){
@@ -20,6 +20,14 @@ export class CameraObstacles {
     this.hit=new Vector3();this.closest=new Vector3();this.onSegment=new Vector3();this.point=new Vector3();
   }
 
+  addDynamicMeshes(meshes){
+    for(const mesh of meshes){
+      if(!mesh.geometry.boundsTree)computeBoundsTree.call(mesh.geometry);
+      if(!mesh.geometry.boundingBox)mesh.geometry.computeBoundingBox();
+      this.meshes.push({source:mesh,tree:mesh.geometry.boundsTree,world:new Matrix4(),inverse:new Matrix4(),bounds:new Box3()});
+    }
+  }
+
   clearance(origin,desired,radius=.16,padding=.01){
     const {ray,segment,triangle,sweepBounds,localBounds,hit,closest,onSegment,point}=this;
     const length=origin.distanceTo(desired);
@@ -29,6 +37,7 @@ export class CameraObstacles {
     sweepBounds.setFromPoints([origin,desired]).expandByScalar(radius);
     let nearest=length,blocked=false;
     for(const mesh of this.meshes){
+      if(mesh.source){mesh.source.updateWorldMatrix(true,false);mesh.world.copy(mesh.source.matrixWorld);mesh.inverse.copy(mesh.world).invert();mesh.bounds.copy(mesh.source.geometry.boundingBox).applyMatrix4(mesh.world);}
       if(!sweepBounds.intersectsBox(mesh.bounds))continue;
       localBounds.copy(sweepBounds).applyMatrix4(mesh.inverse);
       mesh.tree.shapecast({
