@@ -18,7 +18,7 @@ retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
 assert not retired_lift_ids or report.get('componentPrefix')=='hachijo-crossing-' and retired_lift_ids==['subway-hachijo-east-lift']
 old_lifts=[l for l in old.get('lifts',[])if l['id']not in retired_lift_ids];lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
 added_lifts=lifts[len(old_lifts):]
-assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-')
+assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-')
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')

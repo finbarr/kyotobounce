@@ -19,7 +19,7 @@ if(report.componentPrefix==='hachijo-crossing-'){
  for(const lift of lifts)for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;
  assert(eq(next.lifts,[...base.lifts.filter(l=>!report.geometry.retiredLiftIds.includes(l.id)),...lifts]));assert(eq((await read(b.station)).lifts,next.lifts));retainedNext.lifts=base.lifts;
 }
-if(['subway-lift-','exit-five-','hachijo-lift-'].includes(report.componentPrefix)){
+if(['subway-lift-','exit-five-','hachijo-lift-','subway-south-lift-'].includes(report.componentPrefix)){
  const lift=await read(component+'/lift-spec.json');
  for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;
  assert(eq(next.lifts,[...(base.lifts||[]),lift]));assert(eq((await read(b.station)).lifts,next.lifts));

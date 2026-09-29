@@ -2072,7 +2072,7 @@
       "https://www.city.kyoto.lg.jp/kotsu/main/css/img/onload_ku_sub.js?20260729",
       "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495"
     ],
-    "inspection": "catalogued; not individually visually inspected"
+    "inspection": "Rechecked on 29 September 2026. Equipment text explicitly identifies platform lifts inside both Central 1 and South gates, corroborating the current linked station diagram. The page states an April 2021 equipment snapshot; it does not provide shaft dimensions."
   },
   {
     "id": "porta-floor",
@@ -7668,7 +7668,7 @@
     "content_type": "application/pdf",
     "final_url": "https://www2.city.kyoto.lg.jp/kotsu/tikadia/img/map/sta/pdf/k11map.pdf",
     "retrieved_at": "2026-09-27T05:42:44.984244+00:00",
-    "inspection": "Rendered and visually inspected on 29 September 2026 for the public underground passage. The current city station page still links this plan. Corridor alignment, stair dimensions, exit placement and floor height are fitted to the model, not measured from the diagram."
+    "inspection": "Rendered and visually inspected on 29 September 2026 for the public underground passage. The current city station page still links this plan. Corridor alignment, stair dimensions, exit placement and floor height are fitted to the model, not measured from the diagram. Re-inspected the southern platform end on 29 September 2026: a separate lift connects the platform to the South paid gate hall. This is distinct from the public Hachijo street lifts."
   },
   {
     "id": "bus-navi-map-2026",
@@ -12138,7 +12138,7 @@
     "source_date": "Page marked 17 October 2014; facility text states April 2021 snapshot",
     "retrieved_at": "2026-09-29",
     "rights": "Reference only.",
-    "inspection": "Read for four gate names, separate concourse/platform access and platform-door presence. Current K11 station page checked separately for platform 1 Takeda/Nara and platform 2 Kokusaikaikan directions."
+    "inspection": "Read for four gate names, separate concourse/platform access and platform-door presence. Current K11 station page checked separately for platform 1 Takeda/Nara and platform 2 Kokusaikaikan directions. Rechecked on 29 September 2026. Equipment text explicitly identifies platform lifts inside both Central 1 and South gates, corroborating the current linked station diagram. The page states an April 2021 equipment snapshot; it does not provide shaft dimensions."
   },
   {
     "id": "porta-west-arrival-2026",

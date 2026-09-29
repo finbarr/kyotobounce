@@ -95,6 +95,8 @@ The [Exit 5 street lift](EXIT-FIVE-LIFT-V2.md) now connects the public passage t
 
 The [Hachijo Street crossing](HACHIJO-CROSSING-V2.md) extends the South subway lobby route under the road to both street lifts, the sunken garden and its stair. It corrects the northern lift's provisional indoor placement using operator photographs, with the retained stair, JR bypass and ticket machines still accessible.
 
+The [South subway platform lift](SUBWAY-SOUTH-LIFT-V2.md) connects the second platform lift shown in the city diagram to the South paid gate hall. Both platform aisles, the South stair approach and earlier shaft openings remain clear.
+
 1. **Underground public connections:** add the remaining accessible lifts toward Porta. Complete remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.

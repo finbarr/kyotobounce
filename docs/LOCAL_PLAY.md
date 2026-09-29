@@ -45,8 +45,11 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn faces the northern Hachijo Street lift in the public underpass.
-Walk inside and press **E** to reach the station forecourt. Follow the underpass
+The current spawn faces the South subway platform lift. Walk inside and press
+**E** to reach the South paid gate hall, then walk through the gates into the
+public passage; see the [South lift notes](../research/kyoto-station/notes/SUBWAY-SOUTH-LIFT-V2.md).
+The northern Hachijo Street lift connects the underpass to the station forecourt.
+Follow the underpass
 south to the open-air garden, southern street lift, stair and Avanti entrance
 lobby; see the [Hachijo crossing notes](../research/kyoto-station/notes/HACHIJO-CROSSING-V2.md).
 The Exit 5 lift remains available at the north end of the public passage,
