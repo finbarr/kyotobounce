@@ -87,7 +87,7 @@ namespace Kyoto
                 Layout=StationLayout.Load(source);
                 using(var hash=System.Security.Cryptography.SHA256.Create())LayoutSha256=BitConverter.ToString(hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(source.text))).Replace("-","").ToLowerInvariant();
                 StationWorld.Create(geometry.transform,Layout);
-                Walker=new GameObject("Walking player").AddComponent<FirstPersonWalker>();Walker.Place(Layout.spawn+Vector3.up*.03f);
+                Walker=new GameObject("Walking player").AddComponent<FirstPersonWalker>();Walker.FallLimitY=Layout.FallLimitY();Walker.Place(Layout.spawn+Vector3.up*.03f);
                 observerAnchor=Walker.Eye;
             }
             else StationGeometry.Create(geometry.transform);
@@ -224,7 +224,7 @@ namespace Kyoto
                 SaveRecording();return;
             }
             quietTime=Ball.Velocity.sqrMagnitude<.005f?quietTime+Time.fixedDeltaTime:0;
-            if(FlightTime>18||body.position.y < -1||quietTime>1.2f)
+            if(FlightTime>18||body.position.y < (Walker?Walker.FallLimitY:-1)||quietTime>1.2f)
             {Phase=GamePhase.Miss;Tell("SO CLOSE · R to retry, P to replay");SaveRecording();return;}
         }
         void OnImpact(Surface surface,Vector3 point,float speed)

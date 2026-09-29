@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 
 export class FlyCamera {
- constructor(camera){this.camera=camera.clone();this.camera.rotation.order='YXZ';this.active=false;this.speed=18;}
+ constructor(camera){this.camera=camera.clone();this.camera.rotation.order='YXZ';this.active=false;this.speed=18;this.bounds=new THREE.Box3(new THREE.Vector3(-240,-8,-240),new THREE.Vector3(240,150,240));}
+ setStationBounds(bounds){this.bounds.union(bounds.clone().expandByScalar(5));}
  enter(source){this.camera.position.copy(source.position);this.camera.quaternion.copy(source.quaternion);this.camera.rotation.order='YXZ';this.camera.rotation.z=0;this.active=true;}
  leave(){this.active=false;}
  look(dx,dy){this.camera.rotation.y-=dx*.0025;this.camera.rotation.x=THREE.MathUtils.clamp(this.camera.rotation.x-dy*.0025,-Math.PI*.49,Math.PI*.49);}
@@ -12,7 +13,7 @@ export class FlyCamera {
   direction.y+=(movement.y||0)+Number(keys.has('KeyE')||(spaceAscends&&keys.has('Space')))-Number(keys.has('KeyQ')||keys.has('ControlLeft')||keys.has('ControlRight'));
   this.speed=movement.fast||keys.has('ShiftLeft')||keys.has('ShiftRight')?60:keys.has('AltLeft')||keys.has('AltRight')?4:18;
   this.camera.position.addScaledVector(direction.clampLength(0,1),this.speed*Math.min(.1,Math.max(0,dt)));
-  this.camera.position.clamp(new THREE.Vector3(-240,-8,-240),new THREE.Vector3(240,150,240));this.camera.updateMatrixWorld();
+  this.camera.position.clamp(this.bounds.min,this.bounds.max);this.camera.updateMatrixWorld();
  }
  focus(target){const p=new THREE.Vector3(target.center.x,target.center.y,-target.center.z),n=target.normal?new THREE.Vector3(target.normal.x,target.normal.y,-target.normal.z):new THREE.Vector3(0,1,0);this.camera.position.copy(p).addScaledVector(n,Math.max(3,target.radius*4));if(n.y>.9)this.camera.position.z+=3;this.camera.lookAt(p);this.camera.rotation.z=0;this.camera.updateMatrixWorld();}
 }

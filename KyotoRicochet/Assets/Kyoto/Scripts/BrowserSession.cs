@@ -68,6 +68,7 @@ namespace Kyoto
         readonly Action<object> output;
         readonly GameObject gameObject;
         readonly StationLayout layout;
+        readonly float fallLimitY;
         readonly BallBody ball;
         readonly Snapshot state=new Snapshot();
         double releaseAt,chargeAt,stationTime;
@@ -103,7 +104,7 @@ namespace Kyoto
 
         public BrowserSession(StationLayout station,string hash,string id,Action<object> send)
         {
-            layout=station;output=send;state.layout=hash;state.id=id;
+            layout=station;fallLimitY=station.FallLimitY();output=send;state.layout=hash;state.id=id;
             gameObject=new GameObject("Private attempt "+id);
             var obj=new GameObject("Authoritative ball");obj.transform.SetParent(gameObject.transform);
             obj.AddComponent<SphereCollider>();obj.AddComponent<Rigidbody>();ball=obj.AddComponent<BallBody>();
@@ -125,6 +126,7 @@ namespace Kyoto
             {
                 if(players.ContainsKey(c.id)||players.Count>=4)return;
                 var walker=new GameObject("Guest "+c.id).AddComponent<FirstPersonWalker>();
+                walker.FallLimitY=fallLimitY;
                 walker.transform.SetParent(gameObject.transform);
                 walker.Place((activeChallenge==null?layout.spawn:activeChallenge.start.center)+Vector3.up*.03f);
                 players.Add(c.id,new Player{walker=walker,state=new PlayerState{id=c.id,feet=walker.transform.position}});
@@ -199,7 +201,7 @@ namespace Kyoto
                 sleepDwell=stopped?sleepDwell+BallBody.Step:0;
                 if(GoalStep())Finish(true,"Target settled");
                 else if(sleepDwell>.6f)Finish(false,activeChallenge?.goal==null?"Ball stopped":"Ball stopped outside the goal");
-                else if(ball.Body.position.y < -5)
+                else if(ball.Body.position.y < fallLimitY)
                 {pendingNotice=new Notice{id=owner.state.id,attempt=attempt,message="Ball left the station. Attempt cancelled; no score awarded."};}
             }
             // A result is issued only after physical rest. Keep the station clock

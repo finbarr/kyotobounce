@@ -24,6 +24,23 @@ namespace Kyoto
         public string[] limitations;
         public AuthoredMaterial[] authoredMaterials;
         public AuthoredLight[] authoredLights;
+        // Keep the recovery plane below all authored collision, including basement floors.
+        // Evaluate once when a world/session is created, never during a physics step.
+        public float FallLimitY()
+        {
+            float lowest=spawn.y;
+            if(boxes!=null)foreach(var b in boxes)if(b.collision)lowest=Mathf.Min(lowest,b.center.y-b.size.y*.5f);
+            if(panels!=null)foreach(var p in panels)if(p.collision&&p.vertices!=null)
+                foreach(var v in p.vertices)lowest=Mathf.Min(lowest,v.y);
+            if(beams!=null)foreach(var b in beams)if(b.collision)lowest=Mathf.Min(lowest,Mathf.Min(b.a.y,b.b.y)-b.radius);
+            if(flights!=null)foreach(var f in flights)lowest=Mathf.Min(lowest,f.baseElevation-.31f-Mathf.Max(0,f.foundationDepth));
+            if(escalators!=null)foreach(var e in escalators)
+            {
+                lowest=Mathf.Min(lowest,e.lowerCenter.y-1);
+                if(e.path!=null)foreach(var p in e.path)lowest=Mathf.Min(lowest,e.lowerCenter.y+p.y-1);
+            }
+            return lowest-5;
+        }
         [Serializable] public sealed class AuthoredLight
         {
             public string id,source,note;

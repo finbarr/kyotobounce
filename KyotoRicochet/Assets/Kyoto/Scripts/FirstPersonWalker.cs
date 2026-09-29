@@ -8,6 +8,7 @@ namespace Kyoto
     public sealed class FirstPersonWalker : MonoBehaviour
     {
         public float EyeHeight=1.65f,WalkSpeed=1.4f,TravelSpeed=4.2f;
+        public float FallLimitY=-5;
         public CharacterController Capsule {get;private set;}
         public Vector3 Eye => transform.position+Vector3.up*EyeHeight;
         public bool Grounded {get;private set;}
@@ -64,7 +65,7 @@ namespace Kyoto
             }
             if((LastCollision&CollisionFlags.Above)!=0&&fallingSpeed>0)fallingSpeed=0;
             if(Grounded){fallingSpeed=-2;LastSafeFeet=transform.position;}
-            if(transform.position.y < -5)Place(LastSafeFeet);
+            if(transform.position.y < FallLimitY)Place(LastSafeFeet);
         }
         public bool TryRelease(float yaw,float pitch,out Vector3 release,float ballRadius=BallBody.Radius)
         {

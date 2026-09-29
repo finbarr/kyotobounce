@@ -398,6 +398,7 @@ async function load(){
     const meshes=[];station.traverse(object=>{if(object.isMesh)meshes.push(object);});let slice=performance.now();
     for(const [i,object]of meshes.entries()){object.geometry.computeBoundsTree();object.matrixAutoUpdate=false;object.updateMatrix();if(performance.now()-slice>12){startup.progress(80+i/meshes.length*8,'Preparing surfaces and camera…');await yieldLoadingUI();slice=performance.now();}}
     station.updateMatrixWorld(true);scene.add(station);
+    fly.setStationBounds(new THREE.Box3().setFromObject(station));
     cameraObstacles=new CameraObstacles(station);
     motion=createEscalators(scene,data.escalators,detailData.combSupports);motion(0);
     startup.progress(90,'Lighting the glass, stone and steel…');await yieldLoadingUI();

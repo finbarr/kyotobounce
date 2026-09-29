@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {PerspectiveCamera,Vector3} from 'three';
+import {Box3,PerspectiveCamera,Vector3} from 'three';
 import {FlyCamera} from '../public/fly-camera.js';
 import {designGeometry} from '../public/design-geometry.js';
 const source=new PerspectiveCamera();source.position.set(0,10,0);source.lookAt(0,10,-20);
@@ -24,6 +24,15 @@ assert.ok(Math.abs(fly.camera.position.y-source.position.y-1.8)<1e-6,'Space stil
 fly.enter(source);fly.move(new Set(),.1,{movement:{z:.5}});assert.ok(Math.abs(fly.camera.position.z+.9)<1e-6,'Analog touch movement preserves half speed');
 fly.enter(source);fly.move(new Set(),.1,{movement:{x:1,z:1,y:1,fast:true}});assert.ok(Math.abs(fly.camera.position.distanceTo(source.position)-6)<1e-6,'Touch fly boost and three-axis movement remain normalized');
 fly.leave();const stopped=fly.camera.position.clone();fly.move(new Set(['KeyW']),.1);assert.deepEqual(stopped,fly.camera.position);
+const stationBounds=new Box3(new Vector3(-300,-30,-350),new Vector3(320,160,280)),originalBounds=stationBounds.clone();
+fly.setStationBounds(stationBounds);assert.deepEqual(stationBounds,originalBounds,'Camera padding cannot mutate station bounds');
+const underground=new PerspectiveCamera();underground.position.set(177,-28.35,100);fly.enter(underground);fly.move(new Set(),.1);
+assert.deepEqual(fly.camera.position,underground.position,'Entering an underground view must preserve its eye height');
+fly.move(new Set(['KeyQ']),.1);assert(Math.abs(fly.camera.position.y+30.15)<1e-6,'Scout can descend below the old altitude cutoff');
+for(let i=0;i<30;i++)fly.move(new Set(['KeyQ','ShiftLeft']),.1);
+assert.equal(fly.camera.position.y,-35,'Recovery boundary follows the lowest station surface plus padding');
+underground.position.set(310,10,0);fly.enter(underground);fly.move(new Set(),.1);
+assert.equal(fly.camera.position.x,310,'Expanded exterior geometry remains reachable');
 const disk={center:{x:0,y:0,z:0},radius:.5,surface:'floor'},course={start:disk,goal:disk,waypoints:[],scoring:'waypoint-v3'};
 assert.equal(designGeometry(course),designGeometry({...course,start:{...disk,normal:{x:0,y:1,z:0}}}));
 assert.notEqual(designGeometry(course),designGeometry({...course,goal:{...disk,radius:.6}}));

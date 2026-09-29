@@ -19,8 +19,10 @@ namespace Kyoto
         public readonly BallBody Ball;
         public readonly Transform Root;
         GameObject cup;
+        readonly float fallLimitY;
         public ShotSimulation(bool station=true,StationLayout layout=null,BallProfile profile=null)
         {
+            fallLimitY=layout?.FallLimitY()??-2;
             Scene=SceneManager.CreateScene("Prediction "+Guid.NewGuid(),new CreateSceneParameters(LocalPhysicsMode.Physics3D));
             Physics=Scene.GetPhysicsScene();
             var root=new GameObject("Collision world");SceneManager.MoveGameObjectToScene(root,Scene);Root=root.transform;
@@ -51,7 +53,7 @@ namespace Kyoto
                 if(i%3==0)poses.Add(new PoseSample(Ball.Body.position,Ball.Body.rotation,(i+1)*step));
                 sample?.Invoke(Ball);
                 sleepingTime=Ball.Sleeping?sleepingTime+step:0;
-                if(Ball.Body.position.y < -2 || sleepingTime>.8f)break;
+                if(Ball.Body.position.y < fallLimitY || sleepingTime>.8f)break;
             }
             return poses;
         }
