@@ -77,7 +77,9 @@ The [Hachijo East entrance](HACHIJO-EAST-V2.md) adds a public hall with connecti
 
 The [public underground passage](SUBWAY-PASSAGE-V2.md) connects Hachijo East to a northern street exit with two usable stairs. The [subway platform connection](SUBWAY-PLATFORMS-V2.md) opens southern and central gate halls to two stairs, one island platform and both tracks. The [Porta connection](PORTA-CONNECTION-V2.md) joins the central B1 deck to B2 by four moving lanes, with public aisles, stairs and a ramp to the subway passage. It also removes floating tactile bars that prevented descent on the eastern upper lane. Other subway gates, lifts, platform escalators and the onward plaza Porta B1 connection remain unfinished.
 
-1. **Underground and eastern connections:** connect the eastern JR/Shinkansen transfer route and remaining subway gates; add missing accessible routes and the onward plaza Porta B1 connection. Keep the separate floor levels explicit.
+The [eastern railway underpass](EAST-TRANSFER-V2.md) connects all six conventional-platform areas to the eastern Shinkansen transfer stair and Underground East gate. Its route is below the tracks; the Porta link moves north to keep public and paid circulation separate.
+
+1. **Underground public connections:** complete remaining subway gate halls and the onward plaza Porta B1 connection; add missing accessible vertical routes. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

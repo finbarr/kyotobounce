@@ -10,7 +10,7 @@ The new foyer joins the existing pavement. Its west gate opens into a paid lobby
 
 The ground level is Y0, the upper concourse Y3.675 m. The fitted stair occupies X124–130 m and Z−163 to −154.16 m. The original-text signs, ticket machines, counter, glazed entrance and ceiling lights provide initial interior structure. All new lights share the existing limit of two active lights.
 
-These are fitted dimensions and provisional finishes, not an as-built survey. Gate and door leaves are static. The shop bay is a simple stand-in for the photographed commercial frontage. The subway descent, eastern JR transfer bridge, lifts, escalators and complete southern frontage remain unfinished. The public subway route is the next circulation priority.
+These are fitted dimensions and provisional finishes, not an as-built survey. Gate and door leaves are static. The shop bay is a simple stand-in for the photographed commercial frontage. The subway descent, eastern JR underground transfer route, lifts, escalators and complete southern frontage remain unfinished. The public subway route is the next circulation priority.
 
 ## Verification
 
@@ -27,3 +27,5 @@ The local playable build on port 4425 serves the verified geometry and matching 
 ## Rebuild
 
 Against the Hachijo ground-entrance parent, run `prepare-hachijo-east.mjs`, `build-hachijo-east.mjs`, and `web/v2/compose-component.mjs`. `hachijo-east-scope.mjs` defines the exact two retired surfaces. `verify-hachijo-east-geometry.mjs` checks the retained data and matching geometry; `verify-hachijo-east.mjs` walks the forecourt, both operator routes, concourse connection, shop approach and stair bypass in both directions. `install-hachijo-east.py` integrates and reopens the editable Blender scene.
+
+The subsequent [eastern transfer delivery](EAST-TRANSFER-V2.md) connects the paid B2 railway underpass to the eastern Shinkansen concourse. It retains this public foyer and both operator entrances. The crossing is underground, correcting the earlier bridge description.

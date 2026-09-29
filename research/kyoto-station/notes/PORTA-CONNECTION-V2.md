@@ -39,3 +39,7 @@ Use `prepare-porta-connection.py` with Shapely to extract the B1 deck and cut th
 The current source layout is `14242d6e61a0998f7ed3c746c6750d42fe65b8eff3bfa65897c1b44b3d23173a`; the browser geometry is `62cc8734c6ef0484a01dc88df196c90d2902bd09fb0edda7da2b0f7f8b74298f`. The Blender source is `6b0059717d5fd7fa9b48aa0e449e1b209b618a497f06e54738d2b49a90e6eb72`. The dev launcher changes only the entry position, so its overlay layout has a separate hash.
 
 Private receipts live under `.local/v2/current/components/porta-connection/`. Current assets were replaced in place. Superseded full candidate scenes and the stopped candidate preview's generated overlay were removed after launch verification. The playable entry is now the B2 escalator arrival. Shops and dimensions remain fitted approximations; lifts and the onward plaza B1 connection remain on the defect list.
+
+## Junction alignment update
+
+The [eastern transfer delivery](EAST-TRANSFER-V2.md) subsequently moves the fitted subway stair/ramp junction 14 m north, clearing the separate paid JR underpass. It shortens both mall approach corridors while retaining their entrances, elevations and slopes. New route checks cover the relocated stairs and ramp in both directions. The coordinates and hashes above record the original delivery; `web/v2/assets.json` identifies the current integrated station.

@@ -12,11 +12,11 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: [the Porta connection](notes/PORTA-CONNECTION-V2.md) joins the central hall through B1 and four lower moving lanes to B2, then to the public subway passage by stairs and a ramp. It also removes retained tactile bars that obstructed the eastern upper escalator. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
+Latest structural delivery: [the eastern railway underpass](notes/EAST-TRANSFER-V2.md) connects six conventional-platform areas to the eastern Shinkansen transfer stair and Underground East gate. The fitted Porta junction moves north to clear the paid crossing. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
 
 Next priorities:
 
-1. Connect the eastern JR/Shinkansen transfer route and remaining subway gates. Add missing accessible connections and the onward route to plaza Porta B1.
+1. Complete the remaining subway gate halls and the onward route to plaza Porta B1. Add missing accessible vertical connections.
 2. Complete the southern shopping streets, building frontage, terrace and forecourt.
 3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 
