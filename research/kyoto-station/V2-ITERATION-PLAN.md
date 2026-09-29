@@ -12,12 +12,12 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: connect the eastern Central Gate M3F bridge through a corridor and 24 stairs to the 2F hotel receiving room and public landing. Replace the solid room placeholder and open the sealed entrance. Both directions and the room loop pass native walking checks. The western bridge connection and east 4F–7F repair are integrated; the lower ground-to-4F route also passes its audit in both directions.
+Latest structural delivery: replace the premature southern exit with the longer north–south public passage, its descent to the lower transfer hall, and a southern deck with two ground connections. See [the public passage repair](notes/PUBLIC-PASSAGE-SOUTH-V2.md). The Central Gate bridge's eastern/western connections and east 4F–7F repair are integrated; the lower ground-to-4F route also passes its audit in both directions.
 
 Next priorities:
 
-1. Audit the north–south free passage through its south termination.
-2. Add the railway platforms/tracks and the Hachijo side with coherent connecting routes.
+1. Build conventional tracks, platforms and roofs from registered footprints and the operator plan; connect their stairs to the paid concourse and JR West gate.
+2. Add the lower hall's Shinkansen/Kintetsu fronts and complete the southern building and Hachijo terrace/forecourt.
 3. Repair further interior obstructions as encountered, then resume materials and detail in structurally usable areas.
 
 Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).

@@ -67,8 +67,10 @@ Rebuild in order with `prepare-gate-east-access.mjs`, `build-gate-east-access.mj
 
 ## Ordered remaining defects
 
-1. **North–south free passage:** the northern connection now reaches the bridge and shop gallery, but the older corridor's south termination and relationship to the eventual platforms still need an end-to-end audit.
-2. **Railway and Hachijo side:** the rear overview shows the station building over a largely empty railway-side area. Conventional platforms/tracks, connecting paid concourses, the Shinkansen/Kintetsu relationships and the south building/forecourt require substantial construction. Use the saved [JR West schematic](https://www.jr-odekake.net/station/img/premises/0610116.pdf) and operator maps for topology, and photographs for structure.
+The [north–south passage repair](PUBLIC-PASSAGE-SOUTH-V2.md) replaces the misplaced early exit with a longer railway crossing, intermediate descent, lower public hall and southern ground connections. It retains the northern shop/bridge branches. The railway and side ticket halls remain missing.
+
+1. **Conventional railway:** build platforms, tracks and roofs, then connect the paid concourse and platform stairs to the retained JR West gate. Use registered municipal footprints and the saved [JR West schematic](https://www.jr-odekake.net/station/img/premises/0610116.pdf).
+2. **Southern halls and Hachijo side:** build the Shinkansen/Kintetsu gate fronts, southern building and full terrace/forecourt around the new public route. The new deck and ground pavement establish a connection, not the complete southern scene.
 3. **Interior enclosures:** inspect remaining stairs, floor openings and abrupt hall ends through actual walking routes. Refine visible enclosures after each route is usable.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.

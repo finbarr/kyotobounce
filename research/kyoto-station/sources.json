@@ -11943,5 +11943,39 @@
       "https://commons.wikimedia.org/w/resources/assets/mediawiki_compact.svg"
     ],
     "inspection": "Saved metadata page inspected; image not downloaded or used for current cabinet count."
+  },
+  {
+    "id": "kintetsu-jr-west-route-2026",
+    "title": "Kintetsu to JR West gate route",
+    "publisher": "Kintetsu Railway",
+    "category": "maps",
+    "url": "https://www.kintetsu.co.jp/station/station_info/pdf/Kyoto_02.pdf",
+    "source_date": "2026-01-20",
+    "note": "Two operator pages inspected: 20 m approach to the level change, stairs/escalators, and about 50 m from the upper landing to the JR West gate. Photographs establish the arched upper corridor and lower hall.",
+    "rights": "Reference only. No permission to redistribute photographs as game textures is implied.",
+    "format": "pdf",
+    "status": "downloaded",
+    "local_file": "maps/kintetsu-jr-west-route-2026.pdf",
+    "bytes": 1862891,
+    "sha256": "a06160fcd2a68ea58aa6a0aae5bcb16aa2fd42a7ace6c2dbb9805c7b5be0f260",
+    "retrieved_at": "2026-09-29T05:45:54.161708+00:00",
+    "inspection": "Both pages rendered and visually inspected."
+  },
+  {
+    "id": "kintetsu-shinkansen-route-2026",
+    "title": "Kintetsu to Shinkansen Central gate route",
+    "publisher": "Kintetsu Railway",
+    "category": "maps",
+    "url": "https://www.kintetsu.co.jp/station/station_info/pdf/Kyoto_01.pdf",
+    "source_date": "2026-01-20",
+    "note": "Two operator pages inspected: opposing Kintetsu and Shinkansen gates about 10 m apart, public hall finishes and floor relationships.",
+    "rights": "Reference only. No permission to redistribute photographs as game textures is implied.",
+    "format": "pdf",
+    "status": "downloaded",
+    "local_file": "maps/kintetsu-shinkansen-route-2026.pdf",
+    "bytes": 1501455,
+    "sha256": "b9625825a76cccc39e79c9c418eebc274a1c78742dc44e54459d5efcc23826bb",
+    "retrieved_at": "2026-09-29T05:45:54.163426+00:00",
+    "inspection": "Both pages rendered and visually inspected."
   }
 ]
