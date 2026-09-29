@@ -12097,5 +12097,21 @@
     "rights": "Mister0124, CC BY-SA 4.0. Reference only; image is not shipped in the game.",
     "inspection": "Photograph visually inspected: warm stone walls, blue gate hoods, staffed window, bilingual fascia, panel ceiling and dark floor band. Used for independently authored geometry and labels; equipment count and dimensions remain fitted.",
     "license_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+    "id": "kintetsu-subway-route-2026",
+    "title": "Kyoto Kintetsu to subway route via Hachijo East entrance",
+    "publisher": "Kintetsu Railway",
+    "category": "maps",
+    "url": "https://www.kintetsu.co.jp/station/station_info/pdf/Kyoto_03.pdf",
+    "source_date": "2026-01-20",
+    "format": "pdf",
+    "status": "downloaded",
+    "local_file": "maps/kintetsu-subway-route-2026.pdf",
+    "bytes": 3017944,
+    "sha256": "e4f6d2c46baf5fcda267d38545e68e6136344335db83fc8af81094b788d4dad2",
+    "retrieved_at": "2026-09-29T08:48:11.497309+00:00",
+    "rights": "Reference only. Photographs are not shipped in the game.",
+    "inspection": "Pages 3 and 4 rendered and visually inspected: covered forecourt, eastern entrance, public corridor alongside the Shinkansen gate and shop frontage, descent to subway. Used for circulation and material character; dimensions are fitted."
   }
 ]

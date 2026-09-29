@@ -10,7 +10,7 @@ An attributed [Hachijo gate photograph by Mister0124](https://commons.wikimedia.
 
 The receiving pavement now extends east from the existing public-passage stair landing. It meets a covered foyer with open sliding-door leaves, ticket machines and an information window. One gate lane leads into the paid lower lobby. Two eleven-step flights, separated by a 1.8 m landing, rise through a matching floor opening to the existing concourse. Side walls support the stair enclosure; guards protect the opening. Both side aisles and the westward concourse connection remain usable.
 
-The fitted entrance is at X46.4 m; ground is Y0 and the upper floor is Y3.675 m. The stair extends from Z−169 to Z−160.16 m. These positions, floor elevations, dimensions, equipment count and finishes remain approximations. Gate and door leaves are static. Moving escalators, lifts, the eastern entrance, detailed shops and the complete Hachijo building/forecourt remain unfinished.
+The fitted entrance is at X46.4 m; ground is Y0 and the upper floor is Y3.675 m. The stair extends from Z−169 to Z−160.16 m. These positions, floor elevations, dimensions, equipment count and finishes remain approximations. Gate and door leaves are static. The subsequent [Hachijo East entrance](HACHIJO-EAST-V2.md) adds the eastern foyer and its rail connections. Moving escalators, lifts, the subway connection, detailed shops and the complete Hachijo building/forecourt remain unfinished.
 
 ## Matching exports and cost
 
