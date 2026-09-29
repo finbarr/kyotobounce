@@ -69,7 +69,9 @@ Rebuild in order with `prepare-gate-east-access.mjs`, `build-gate-east-access.mj
 
 The [north–south passage repair](PUBLIC-PASSAGE-SOUTH-V2.md) replaces the misplaced early exit with a longer railway crossing, intermediate descent, lower public hall and southern ground connections. The [conventional railway pass](CONVENTIONAL-RAILWAY-V2.md) opens the JR West gate and adds the paid concourse, five platform stairs, tracks and roofs. The [platform 0 repair](PLATFORM-ZERO-V2.md) adds its missing stair, aligns the north rear floor with track 0 and removes the artificial room behind Central Gate. The [southern gate fronts](SOUTHERN-GATES-V2.md) add both operator entrances and public ticket recesses. The [Shinkansen connection](SHINKANSEN-V2.md) now opens its central gate to the paid concourse and two stair routes to elevated islands 11–12 and 13–14, with four tracks, deck and canopies. The [Kintetsu terminal](KINTETSU-TERMINAL-V2.md) now connects its gate to all four platform strips and terminating tracks, and removes the conflicting western JR10 extension.
 
-1. **Southern halls and Hachijo side:** connect the JR and Shinkansen paid concourses through the missing central transfer route. Continue the southern building, ground shopping/public routes, terrace/forecourt and other Shinkansen entrances.
+The [central transfer connection](CENTRAL-TRANSFER-V2.md) joins the JR bridge to the Shinkansen paid concourse through two stair flights and an open gate lane, with the original conventional-platform access retained.
+
+1. **Southern halls and Hachijo side:** complete the southern building, ground shopping/public routes, terrace/forecourt and ground-level Shinkansen entrances.
 2. **Other connections and enclosures:** western platforms 30–34, the eastern transfer connection, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.

@@ -10,7 +10,7 @@ The railway has four tracks, sleepers, profiled rails, an elevated deck and bear
 
 The paid floor is Y3.675 m, platform floor Y9.975 m and rail head Y8.725 m in the current game frame. The two islands run 410 m along X; track/deck geometry runs 495 m. These elevations, lengths, widths, stair locations, curves, support positions and concourse boundary are fitted approximations. The 1.435 m nominal rail gauge follows the technical reference below.
 
-The subsequent [Kintetsu terminal](KINTETSU-TERMINAL-V2.md) completes its initial gate and platform connection. JR transfer gates, eastern and ground-level entrances, lifts, escalators, shops and the complete Hachijo frontage remain unfinished. Platform doors are static barriers. The source establishes the barrier type; it does not establish exact module spacing. Large surfaces have simple provisional finishes. This delivery makes the route and railway usable before those refinements.
+The subsequent [Kintetsu terminal](KINTETSU-TERMINAL-V2.md) completes its initial gate and platform connection. The [central JR transfer route](CENTRAL-TRANSFER-V2.md) now joins the paid concourses. The eastern transfer gate, eastern and ground-level entrances, lifts, escalators, shops and the complete Hachijo frontage remain unfinished. Platform doors are static barriers. The source establishes the barrier type; it does not establish exact module spacing. Large surfaces have simple provisional finishes. This delivery makes the route and railway usable before those refinements.
 
 ## Evidence
 

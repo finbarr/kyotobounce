@@ -10,6 +10,8 @@ The existing western extension of JR platform 10 and its canopy passed through t
 
 The Kintetsu floor remains at Y3.675 m, level with the gate. Platforms extend 136 m from X−242 to X−106; the concourse joins the receiving room at X−81. Ceiling underside is Y7.175 m and rail head Y2.61 m. These dimensions, curves, columns, shafts and finishes are fitted approximations. The hotel's upper building, lower shopping streets, shops, detailed accessible routes and railway operations remain unfinished. The lift shafts are static enclosed structures, without working lift access.
 
+The subsequent [central transfer connection](CENTRAL-TRANSFER-V2.md) shortens the remaining JR10 track extension farther east, clearing the space beneath the new transfer route while retaining the platform and its stair.
+
 ## Evidence
 
 - [Kintetsu's current station plan](https://www.kintetsu.co.jp/soukatsu/kounai/kyoto.html), dated 14 March 2026, establishes the level gate-to-platform route and boarding/alighting arrangement.
