@@ -107,7 +107,9 @@ The [Isetan basement connections](ISETAN-BASEMENT-V2.md) now open B1 and both B2
 
 The [retained Porta pavilion stair](PORTA-PAVILION-V2.md) connects the forecourt to North Street through two stair lanes and a middle landing. The surrounding shop bays are rebuilt, and the existing exterior is preserved. Its exact numbered street exit remains unconfirmed.
 
-1. **Underground public connections:** complete Kotochika surroundings and the remaining street exits. Keep the separate floor levels explicit.
+The [Kotochika western public rooms and plaza](KOTOCHIKA-V2.md) open five previously blank-fronted spaces beside the North/Central 1 passage, while retaining the B2 approach and gate access. The eastern bypass and complete loop around the paid cores remain missing.
+
+1. **Underground public connections:** connect Kotochika’s eastern bypass and remaining street exits. Resolve the paid-core spacing against the operator map before cutting a crossing; keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 
