@@ -7659,7 +7659,7 @@
     "format": "pdf",
     "publisher": "Kyoto Municipal Transportation Bureau",
     "source_date": "Undated unless printed in file; retrieved 2026-09-27 UTC",
-    "note": "Reference map; verify whether schematic or measured before modeling.",
+    "note": "Operator circulation schematic, not a surveyed plan. Establishes the public north-south concourse, Hachijo connection, northern exits and separate paid platform level. The retained The CUBE label is historical.",
     "rights": "Reference only; no redistribution permission assumed.",
     "status": "downloaded",
     "local_file": "maps/subway-kyoto-plan.pdf",
@@ -7668,7 +7668,7 @@
     "content_type": "application/pdf",
     "final_url": "https://www2.city.kyoto.lg.jp/kotsu/tikadia/img/map/sta/pdf/k11map.pdf",
     "retrieved_at": "2026-09-27T05:42:44.984244+00:00",
-    "inspection": "catalogued; not individually visually inspected"
+    "inspection": "Rendered and visually inspected on 29 September 2026 for the public underground passage. The current city station page still links this plan. Corridor alignment, stair dimensions, exit placement and floor height are fitted to the model, not measured from the diagram."
   },
   {
     "id": "bus-navi-map-2026",

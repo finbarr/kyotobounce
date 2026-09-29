@@ -75,7 +75,10 @@ The [Hachijo ground entrance](HACHIJO-ENTRANCE-V2.md) now links the public terra
 
 The [Hachijo East entrance](HACHIJO-EAST-V2.md) adds a public hall with connections through the Shinkansen gate and stairs and through the JR gate to platform 10.
 
-1. **Southern halls and Hachijo side:** connect the eastern public hall to the subway passage, then complete the southern shopping streets, building frontage, terrace and forecourt.
-2. **Other connections and enclosures:** western platforms 30–34, the eastern transfer connection, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
+The [public underground passage](SUBWAY-PASSAGE-V2.md) connects Hachijo East to a northern street exit with two usable stairs. Its separate paid subway concourse and the central B2/Porta connection remain unfinished.
+
+1. **Underground and eastern connections:** complete the subway paid concourse/platform access and the B2/Porta connection; then connect the eastern JR/Shinkansen transfer route. Keep the separate floor levels explicit.
+2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
+3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.
