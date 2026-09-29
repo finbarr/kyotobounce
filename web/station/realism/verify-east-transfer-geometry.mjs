@@ -14,7 +14,7 @@ const added=next.panels.slice(base.panels.length);assert.equal(added.length,repo
 const native=await read(component+'/native-panels.json');assert(eq(next.authoredLights.slice(0,base.authoredLights.length),base.authoredLights));assert(eq(next.authoredLights.slice(base.authoredLights.length),native.authoredLights));
 assert(eq(next.panels.slice(0,base.panels.length),base.panels));
 const retainedNext={...next,panels:base.panels,authoredMaterials:base.authoredMaterials,authoredLights:base.authoredLights,architecture:base.architecture};
-if(['subway-lift-','exit-five-'].includes(report.componentPrefix)){
+if(['subway-lift-','exit-five-','hachijo-lift-'].includes(report.componentPrefix)){
  const lift=await read(component+'/lift-spec.json');
  for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;
  assert(eq(next.lifts,[...(base.lifts||[]),lift]));assert(eq((await read(b.station)).lifts,next.lifts));

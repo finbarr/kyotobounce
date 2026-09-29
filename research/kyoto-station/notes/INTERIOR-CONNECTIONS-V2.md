@@ -93,7 +93,9 @@ The [Porta East connection](PORTA-EAST-V2.md) opens the West North Street endpoi
 
 The [Exit 5 street lift](EXIT-FIVE-LIFT-V2.md) now connects the public passage to the northeast forecourt, with a sloped threshold fitted to the retained paving. The route through Central 1 joins it to the existing platform lift.
 
-1. **Underground public connections:** add the remaining accessible lifts toward Porta and Hachijo. Complete remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
+The [Hachijo East public lift](HACHIJO-LIFT-V2.md) now connects the South subway lobby to the station's ground entrance. The route continues to the southern forecourt, with the existing stair, JR bypass and ticket-machine access retained. The crossing beneath Hachijo Street and south-side lift remain unfinished.
+
+1. **Underground public connections:** add the remaining accessible lifts toward Porta and the Hachijo Street crossing. Complete remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

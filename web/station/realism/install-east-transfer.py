@@ -16,7 +16,7 @@ retained=[replaced[0]if p['id']==modified_paving else p for p in old['panels'] i
 for key in ('boxes','beams','flights','escalators'):assert old[key]==new[key]
 old_lifts=old.get('lifts',[]);lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
 added_lifts=lifts[len(old_lifts):]
-assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-')
+assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-')
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')

@@ -45,8 +45,11 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn faces the Exit 5 lift in the public subway passage. Walk
-inside and press **E** to reach the northeast forecourt; see the
+The current spawn faces the Hachijo East lift in the subway South public lobby.
+Walk inside and press **E** to reach the ground entrance and southern forecourt;
+see the [Hachijo lift notes](../research/kyoto-station/notes/HACHIJO-LIFT-V2.md).
+The Exit 5 lift remains available at the north end of the public passage,
+connecting to the northeast forecourt; see the
 [Exit 5 notes](../research/kyoto-station/notes/EXIT-FIVE-LIFT-V2.md).
 The public passage also connects to North Street and both East Porta aisles;
 see the [Porta East notes](../research/kyoto-station/notes/PORTA-EAST-V2.md).
