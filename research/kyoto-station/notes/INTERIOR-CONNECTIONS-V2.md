@@ -67,10 +67,10 @@ Rebuild in order with `prepare-gate-east-access.mjs`, `build-gate-east-access.mj
 
 ## Ordered remaining defects
 
-The [north–south passage repair](PUBLIC-PASSAGE-SOUTH-V2.md) replaces the misplaced early exit with a longer railway crossing, intermediate descent, lower public hall and southern ground connections. It retains the northern shop/bridge branches. The railway and side ticket halls remain missing.
+The [north–south passage repair](PUBLIC-PASSAGE-SOUTH-V2.md) replaces the misplaced early exit with a longer railway crossing, intermediate descent, lower public hall and southern ground connections. The [conventional railway pass](CONVENTIONAL-RAILWAY-V2.md) opens the JR West gate and adds the paid concourse, five platform stairs, tracks and roofs. The side ticket halls and southern railway remain missing.
 
-1. **Conventional railway:** build platforms, tracks and roofs, then connect the paid concourse and platform stairs to the retained JR West gate. Use registered municipal footprints and the saved [JR West schematic](https://www.jr-odekake.net/station/img/premises/0610116.pdf).
-2. **Southern halls and Hachijo side:** build the Shinkansen/Kintetsu gate fronts, southern building and full terrace/forecourt around the new public route. The new deck and ground pavement establish a connection, not the complete southern scene.
-3. **Interior enclosures:** inspect remaining stairs, floor openings and abrupt hall ends through actual walking routes. Refine visible enclosures after each route is usable.
+1. **Platform 0 and north rear boundary:** connect the platform and reconcile the provisional northern track with the retained rectangular concourse floor. See the railway note for the specific interface.
+2. **Southern halls and Hachijo side:** build the Shinkansen/Kintetsu gate fronts, southern railway/building and full terrace/forecourt around the public route.
+3. **Other connections and enclosures:** western platforms 30–34, the eastern transfer connection, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.

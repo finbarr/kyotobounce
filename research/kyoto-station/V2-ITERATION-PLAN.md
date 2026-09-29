@@ -12,13 +12,13 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: replace the premature southern exit with the longer north–south public passage, its descent to the lower transfer hall, and a southern deck with two ground connections. See [the public passage repair](notes/PUBLIC-PASSAGE-SOUTH-V2.md). The Central Gate bridge's eastern/western connections and east 4F–7F repair are integrated; the lower ground-to-4F route also passes its audit in both directions.
+Latest structural delivery: open the JR West gate into a paid concourse with stairs to platforms 2–3, 4–5, 6–7, 8–9 and 10, plus conventional tracks, canopies and continuous railway ground. See [the railway reconstruction](notes/CONVENTIONAL-RAILWAY-V2.md). The [longer public passage](notes/PUBLIC-PASSAGE-SOUTH-V2.md), both Central Gate bridge connections and the east 4F–7F repair are integrated.
 
 Next priorities:
 
-1. Build conventional tracks, platforms and roofs from registered footprints and the operator plan; connect their stairs to the paid concourse and JR West gate.
-2. Add the lower hall's Shinkansen/Kintetsu fronts and complete the southern building and Hachijo terrace/forecourt.
-3. Repair further interior obstructions as encountered, then resume materials and detail in structurally usable areas.
+1. Complete platform 0 access and reconcile its track with the retained rectangular north concourse boundary.
+2. Add the lower hall's Shinkansen/Kintetsu fronts and southern railway/building around the public route; continue the Hachijo terrace and forecourt.
+3. Complete the western 30–34 platforms and eastern transfer connection, repair other interior obstructions, then refine railway alignment and finishes.
 
 Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).
 

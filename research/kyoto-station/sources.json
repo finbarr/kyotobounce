@@ -11977,5 +11977,34 @@
     "sha256": "b9625825a76cccc39e79c9c418eebc274a1c78742dc44e54459d5efcc23826bb",
     "retrieved_at": "2026-09-29T05:45:54.163426+00:00",
     "inspection": "Both pages rendered and visually inspected."
+  },
+  {
+    "id": "jr-nara-platform-widening-2015",
+    "title": "Kyoto Station platform 8 widening and elevated-concourse access",
+    "publisher": "JR West",
+    "category": "circulation",
+    "url": "https://www.westjr.co.jp/press/article/2015/12/page_8090.html",
+    "source_date": "2015-12-21",
+    "format": "html",
+    "status": "reviewed-online",
+    "note": "Historical primary construction notice: 9.4 m platform width and 126 m platform length, with later access to the elevated station building. Used with the saved 2026 operator plan and municipal roof outlines; not a current as-built dimensional survey.",
+    "rights": "Reference only; no source photographs incorporated in game assets.",
+    "retrieved_at": "2026-09-29T06:14:28.295Z"
+  },
+  {
+    "id": "helvetiker-platform-number-font",
+    "title": "Helvetiker Regular example font, pinned Three.js r179",
+    "publisher": "MAGENTA Ltd / Three.js",
+    "category": "authoring-resource",
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/r179/examples/fonts/helvetiker_regular.typeface.json",
+    "source_date": null,
+    "format": "json",
+    "status": "downloaded",
+    "local_file": "fonts/helvetiker_regular.typeface.json",
+    "bytes": 63182,
+    "sha256": "d5c5467690f74061179a292af83bd85c4c551e0f106b2af99714f11184c96981",
+    "note": "Geometric platform numbers. Preserve the local authoring file with the asset pack; license reproduced in notes/PLATFORM-NUMBER-FONT.md.",
+    "rights": "MAGENTA font license embedded in upstream JSON; redistribution with copyright and permission notice allowed.",
+    "retrieved_at": "2026-09-29T06:14:28.296Z"
   }
 ]
