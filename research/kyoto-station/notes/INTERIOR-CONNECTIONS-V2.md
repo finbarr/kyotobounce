@@ -25,11 +25,33 @@ Private receipts are retained under `.local/v2/current/components/east-access/`.
 
 Use `extract-east-court-stair.py` with the parent asset manifest to extract the obsolete source triangles. Then run `prepare-east-court-access.mjs`, `build-east-court-access.mjs`, and `web/v2/compose-component.mjs` in order. `verify-east-access-geometry.mjs` checks replacement scope; `verify-east-court-access.mjs` exercises the complete native station. `install-east-court-access.py` integrates the verified result into the editable scene. These are one-time replacement tools and assert the expected parent geometry.
 
+## Lower east route audit
+
+The retained ground-to-4F route passes at normal walking speed in both directions: 967 outward samples and 964 return samples. Its final floor heights are within 0.06 m of the route endpoints. The test starts at X18.4 on the ground floor; the earlier X17.8 placement straddled a floor seam and was rejected by the start-circle validator. That rejected placement was not a broken staircase.
+
+Five Chrome views cover the ground approach, intermediate landings and 4F arrival. This route needs no blocking-geometry repair from this audit. Its enclosures and finishes can be refined after missing connections. The recorded walk labels came from the reused east-court harness; the actual route points and endpoints identify this as ground-to-4F.
+
+## Central Gate bridge: western connection
+
+The western end of the retained M3F glazed bridge stopped at X−7.876 with no connection to the public passage. It now joins a 2.3 m wide enclosed corridor, a turning landing and thirteen stairs down from Y9.589 to the retained passage floor at Y7.35. The entrance comes around the north end of the passage, beside the existing Heart-in shop gallery. The gallery and shop geometry remain intact, and the new entrance slab ends at the existing gallery floor rather than overlapping it.
+
+The saved [Granvia operator floor guide](https://jrwest-hotels.jp/granvia-kyoto/floor/) establishes the west-end connection to the north–south passage and the M3F level change. The saved bridge-entry photograph guides the opaque warm walls, dark floor and pale ceiling. Neither source supplies surveyed dimensions: corridor length, the entrance jog, 0.172264 m stair rise, 0.30 m going, finishes and fixtures are provisional fits to the current model. The eastern hotel-lobby connection remains unfinished.
+
+### Checks and cost
+
+- Four normal-speed native walks pass: public passage to bridge and back, and public passage to the retained shop and back. The test records 2,376 position samples and checks both endpoint floor heights.
+- All 57 added panels, 2,100 vertices and 700 triangles match between the browser and native exports. Existing native geometry, materials and encoded browser geometry remain unchanged.
+- Five added material batches and about 63 KB of browser geometry. Eleven ceiling fixtures use the existing pool of at most two active lights.
+- The editable Blender scene saves and reopens with matching geometry, normals, materials and eleven distinct light emitters. The core native play loop and Chrome controls pass, including full translation/spin rest, recall and home. `npm run build:web` passes.
+- Seven actual Chrome views cover the entrance, shop, stair, turning landing, corridor and both views of the bridge join, with no page errors. Short 1440×900 frame samples have a 16.7 ms median and approximately 16.8 ms p99; this is not a long performance soak.
+
+Rebuild with `build-gate-west-access.mjs`, then `web/v2/compose-component.mjs` against the parent manifest. `verify-gate-west-geometry.mjs` checks added geometry and retained data. `verify-gate-west-access.mjs` walks both connections in the complete native station. `install-gate-west-access.py` adds the verified component to the editable scene and validates it after reopening. Private receipts live under `.local/v2/current/components/gate-west-access/` after delivery.
+
 ## Ordered remaining defects
 
-1. **Lower eastern circulation:** inspect the ground-to-4F route end to end. Existing lower enclosures and additional stairs still use older geometry. The first Chrome inspection shows abrupt slabs and wall returns around this area. Identify the next blocking surface through native walking before altering it.
-2. **Central Gate bridge:** both bridge-end connections remain incomplete. Inspect the west connection to the free passage and the east hotel-lobby connection against the operator's floor plan; preserve their distinct floor levels.
-3. **North–south free passage:** an older corridor exists around native X−63, Y7.35, Z−12.5 to −79. Its presence is not proof of a complete station crossing. Audit the entrance, south termination and relationship to the eventual platforms.
-4. **Railway and Hachijo side:** the current rear overview shows the station building over a largely empty railway-side area. Conventional platforms/tracks, connecting paid concourses, the Shinkansen/Kintetsu relationships and the south building/forecourt require substantial construction. Use the saved [JR West schematic](https://www.jr-odekake.net/station/img/premises/0610116.pdf), municipal geometry and site plans to establish the full layout before detailing it.
+1. **Central Gate bridge, eastern end:** connect the bridge to the hotel-lobby route shown in the operator's map. Preserve the distinct M3F and 2F levels and verify the complete connection both ways.
+2. **North–south free passage:** the northern connection now reaches the bridge and shop gallery, but the older corridor's south termination and relationship to the eventual platforms still need an end-to-end audit.
+3. **Railway and Hachijo side:** the rear overview shows the station building over a largely empty railway-side area. Conventional platforms/tracks, connecting paid concourses, the Shinkansen/Kintetsu relationships and the south building/forecourt require substantial construction. Use the saved [JR West schematic](https://www.jr-odekake.net/station/img/premises/0610116.pdf) and operator maps for topology, and photographs for structure.
+4. **Interior enclosures:** inspect remaining stairs, floor openings and abrupt hall ends through actual walking routes. Refine visible enclosures after each route is usable.
 
-Unfinished restaurant overhead source is safely shelved in Git. Decorative work remains deferred while these structural connections are being repaired.
+Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.

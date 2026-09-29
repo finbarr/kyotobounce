@@ -12,14 +12,14 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: reconnect the east 4F terrace to the rebuilt 7F East Square through its actual modeled stair opening. Acceptance: retire the old flight from visual and native geometry; walk the complete connection both ways at normal speed; inspect the joined floors and stairs in Chrome; integrate the editable source, commit and merge.
+Latest structural delivery: connect the western Central Gate M3F bridge to the north–south public passage with an enclosed corridor, turning landing and thirteen stairs. Both directions and the retained shop branch pass native walking checks. The earlier east 4F–7F repair is integrated, and the lower ground-to-4F route now passes its audit in both directions.
 
 Next priorities:
 
-1. Repair the remaining lower east circulation and corridor obstructions found during the same inspection.
-2. Connect both ends of the bridge above Central Gate and audit the north–south free passage.
+1. Connect the eastern end of the bridge above Central Gate to the hotel-lobby route.
+2. Audit the north–south free passage through its south termination.
 3. Add the railway platforms/tracks and the Hachijo side with coherent connecting routes.
-4. Resume material/detail work as each area becomes structurally usable.
+4. Repair further interior obstructions as encountered, then resume materials and detail in structurally usable areas.
 
 Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).
 
