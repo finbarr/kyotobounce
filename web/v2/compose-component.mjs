@@ -34,6 +34,17 @@ for(const p of native.panels){assert(!names.has(p.id),'Duplicate component panel
  if(report.texture?.material===material.name){assert(material.pbrMetallicRoughness?.baseColorTexture);appearance.albedo='AtriumTextures/'+parse(report.texture.file).name;}
  const {browserMaterial,...panel}=p;layout.panels.push({...panel,appearance:appearance.id,vertices:panel.vertices.map(v=>Object.fromEntries(Object.entries(v).map(([k,n])=>[k,Math.fround(n)])))});
 }
+const lightNames=new Set(layout.authoredLights.map(l=>l.id));
+for(const light of native.authoredLights||[]){
+ assert(!lightNames.has(light.id),'Duplicate component light: '+light.id);lightNames.add(light.id);
+ for(const key of ['position','direction'])assert(['x','y','z'].every(k=>Number.isFinite(light[key]?.[k])));
+ assert(Math.abs(Math.hypot(...['x','y','z'].map(k=>light.direction[k]))-1)<.0001);
+ assert(['r','g','b'].every(k=>Number.isFinite(light.linearColor?.[k])&&light.linearColor[k]>=0));
+ assert(light.intensity>=0&&Number.isFinite(light.intensity)&&light.range>0&&Number.isFinite(light.range));
+ assert(light.innerSpotAngle>=0&&light.innerSpotAngle<=light.spotAngle&&light.spotAngle<180);
+ layout.authoredLights.push(light);
+}
+station.authoredLights=layout.authoredLights;
 // Exact prefix checks cover all inherited geometry, materials, images and compressed data.
 for(const key of ['accessors','bufferViews','meshes','nodes','materials'])assert.deepEqual(j[key].slice(0,base[key].length),base[key]);
 for(const key of ['images','textures','samplers'])assert.deepEqual((j[key]||[]).slice(0,(base[key]||[]).length),base[key]||[]);
@@ -43,4 +54,4 @@ assert(readGLB(composed).bin.subarray(0,byteOffset).equals(baseBin),'Every inher
 station.layoutSha256=sha(composedLayout);station.authoredMaterials=layout.authoredMaterials;
 await mkdir(out,{recursive:true});await writeFile(out+'/station-layout.json',composedLayout);await writeFile(out+'/atrium.runtime.glb',composed);await writeFile(out+'/station.json',JSON.stringify(station)+'\n');
 const next={...config,layout:out+'/station-layout.json',layoutSha256:sha(composedLayout),geometry:out+'/atrium.runtime.glb',geometrySha256:sha(composed),station:out+'/station.json',sourceComponents:[...(config.sourceComponents||[]),{directory:component,builder:report.builder,builderSha256:report.builderSha256,glbSha256:sha(partBytes),nativeSha256:sha(nativeBytes)}]};
-await writeFile(out+'/assets.json',JSON.stringify(next,null,2)+'\n');await writeFile(out+'/composition.json',JSON.stringify({parent:config,component:report,layoutSha256:sha(composedLayout),geometrySha256:sha(composed),inheritedBinaryBytes:byteOffset,addedGeometryBytes:composed.length-baseBytes.length,addedPanels:native.panels.length,addedDrawBatches:part.meshes.length,originalBuffersExact:true},null,2)+'\n');console.log(JSON.stringify({layout:next.layoutSha256,geometry:next.geometrySha256,addedBytes:composed.length-baseBytes.length,panels:native.panels.length}));
+await writeFile(out+'/assets.json',JSON.stringify(next,null,2)+'\n');await writeFile(out+'/composition.json',JSON.stringify({parent:config,component:report,layoutSha256:sha(composedLayout),geometrySha256:sha(composed),inheritedBinaryBytes:byteOffset,addedGeometryBytes:composed.length-baseBytes.length,addedPanels:native.panels.length,addedLights:(native.authoredLights||[]).length,addedDrawBatches:part.meshes.length,originalBuffersExact:true},null,2)+'\n');console.log(JSON.stringify({layout:next.layoutSha256,geometry:next.geometrySha256,addedBytes:composed.length-baseBytes.length,panels:native.panels.length}));

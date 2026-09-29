@@ -35,7 +35,9 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
-Latest delivery: [Kotetsu shopfront](notes/KOTETSU-FRONTAGE-V2.md) replaces shop 3’s solid placeholder with a photo-guided timber and metal frontage, original tiger screen, ticket terminal and usable doorway. Native doorway/aisle walks, saved-source correspondence and Chrome gameplay pass. Continue with the neighboring shopfront; the deeper dining room remains unfinished.
+Latest delivery: [Daruma glazed shopfront and counter](notes/DARUMA-FRONTAGE-V2.md) replaces shop 4’s placeholder with its photographed glazed side, signs, entrance, ticket terminal and visible counter seating. Native routes, source correspondence, Chrome gameplay and bounded practical lighting pass. Next, refine the conspicuous flat timber, counter and stool finishes in these two modeled shopfronts before expanding to another tenant.
+
+The [Kotetsu shopfront](notes/KOTETSU-FRONTAGE-V2.md) replaces shop 3’s solid placeholder with a photo-guided timber and metal frontage, original tiger screen, ticket terminal and usable doorway. Native doorway/aisle walks, saved-source correspondence and Chrome gameplay pass. Continue with the neighboring shopfront; the deeper dining room remains unfinished.
 
 The [restaurant entrance directories](notes/RESTAURANT-DISPLAYS-V2.md) add two framed displays with all ten current operator-listed shop names. The doorway stays clear and the artwork is integrated into the editable source. Continue with the interior shop frontage and photographed menu/display fittings.
 
