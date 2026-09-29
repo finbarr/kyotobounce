@@ -68,7 +68,9 @@ export function fitStationShadowCamera(sun,station){
 // moves to a different fixture, then fades in; two shadowless shader lights stay
 // allocated throughout. Time rollback cannot leave the selector waiting forever.
 export function createStationLightPool(scene,authoredLights){
-  const fixtures=authoredLights.filter(l=>l.position.y<15);
+  const restaurant=l=>l.id.startsWith('restaurant-practical-');
+  const reach=l=>restaurant(l)?l.range:Math.min(19,l.range+5);
+  const fixtures=authoredLights.filter(l=>l.position.y<15||restaurant(l));
   const slots=Array.from({length:2},()=>{
     const light=new THREE.SpotLight(0xffdab0,0,15,Math.PI/3,.8,2);scene.add(light,light.target);
     return {light,fixture:null,desired:null,level:0};
@@ -81,7 +83,12 @@ export function createStationLightPool(scene,authoredLights){
     const l=slot.light;stats.reassignments++;
     l.position.set(fixture.position.x,fixture.position.y-.08,-fixture.position.z);
     l.target.position.copy(l.position).add(new THREE.Vector3(fixture.direction.x,fixture.direction.y,-fixture.direction.z));
-    l.distance=Math.min(19,fixture.range+5);
+    l.distance=reach(fixture);
+    // Restaurant cones follow the shallow ceiling; preserve the lower hall look.
+    l.angle=restaurant(fixture)?THREE.MathUtils.degToRad(fixture.spotAngle/2):Math.PI/3;
+    l.penumbra=restaurant(fixture)?1-fixture.innerSpotAngle/fixture.spotAngle:.8;
+    if(restaurant(fixture))l.color.setRGB(fixture.linearColor.r,fixture.linearColor.g,fixture.linearColor.b);
+    else l.color.set(0xffdab0);
   }
   function update(position,time){
     const reset=previousTime!==null&&time<previousTime;
@@ -93,7 +100,9 @@ export function createStationLightPool(scene,authoredLights){
       // A fixed squared-distance margin avoids excessive retention under tall
       // ceilings, where multiplying the vertical distance can hide new fixtures.
       const ranked=fixtures.map(f=>({f,d:(f.position.x-position.x)**2+(f.position.y-position.y)**2+(-f.position.z-position.z)**2}))
-        .filter(r=>r.d<Math.min(19,r.f.range+5)**2)
+        // Keep a short viewing margin outside each cone so its lit floor is
+        // already visible while approaching the doorway.
+        .filter(r=>r.d<(reach(r.f)+(restaurant(r.f)?5:0))**2)
         .sort((a,b)=>(a.d-(retained.has(a.f)?4:0))-(b.d-(retained.has(b.f)?4:0)));
       const selected=ranked.slice(0,slots.length).map(r=>r.f);
       // Preserve slot identity when the first and second nearest trade places.

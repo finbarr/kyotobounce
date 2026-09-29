@@ -35,7 +35,9 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
-Latest finish: the [restaurant charcoal tile floor](notes/RESTAURANT-FLOOR-V2.md) adds narrow joints, material variation and a single local reflection capture. The collision geometry is unchanged; native gameplay and Chrome controls pass. Continue with the entrance frontage and the interior practical fixtures visible in the saved photograph.
+Latest delivery: [restaurant practical lighting](notes/RESTAURANT-LIGHTING-V2.md) connects seven existing aisle fixtures to the two-light pool. Warm light reveals the floor and nearby walls while the active light count stays fixed. Source and runtime checks pass. Next, build the entrance menu/display frontage from the saved photograph, with current operator information where text is needed.
+
+The [restaurant charcoal tile floor](notes/RESTAURANT-FLOOR-V2.md) adds narrow joints, material variation and a single local reflection capture. The collision geometry is unchanged; native gameplay and Chrome controls pass. Continue with the entrance frontage and the interior practical fixtures visible in the saved photograph.
 
 The [restaurant entrance lantern frame](notes/RESTAURANT-ENTRY-FRAME-V2.md) adds the photographed cream diffusers, dark crossbars and kickplates. Six native doorway walks and Chrome views pass. Its source is integrated into the same editable station.
 
