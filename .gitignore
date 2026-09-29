@@ -119,6 +119,7 @@ research/kyoto-station/scripts/*
 !research/kyoto-station/notes/
 research/kyoto-station/notes/*
 !research/kyoto-station/notes/*.md
+!research/kyoto-station/notes/subway-control-2026.json
 
 __pycache__/
 *.pyc

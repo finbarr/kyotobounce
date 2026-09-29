@@ -1,0 +1,61 @@
+{
+  "sourceId": "north-plaza-city-study-2026",
+  "sourcePdf": "research/kyoto-station/maps/north-plaza-city-study-2026.pdf",
+  "sourceSha256": "a2032f0643c6651e00ff235a35d6c02fcefcf6c5d0ade103743fa39a2aecb526",
+  "sectionY": 1,
+  "controlPanel": "municipal-building-3891868384",
+  "cornerOrder": ["NW", "NE", "SE", "SW"],
+  "nativeCorners": [[153.31761169433594,83.9150161743164],[184.1395721435547,84.47377014160156],[185.02659606933594,34.978919982910156],[153.89295959472656,34.06781768798828]],
+  "ground": {
+    "pdfPage": 12,
+    "printedPage": 53,
+    "imageNumber": 2,
+    "size": [710,479],
+    "pixelCorners": [[613,341],[670,340],[671,431],[614,432]]
+  },
+  "plaza": {
+    "pdfPage": 9,
+    "printedPage": 50,
+    "imageNumber": 0,
+    "size": [1384,749],
+    "pixelCorners": [[1204,376],[1319,375],[1322,561],[1206,564]]
+  },
+  "underground": {
+    "pdfPage": 12,
+    "printedPage": 53,
+    "imageNumber": 0,
+    "size": [714,484],
+    "southImageNumber": 1,
+    "southImageOffset": [0,484],
+    "matchingMethod": "Manually inspected common cadastral corners; fit a similarity between raster images without shearing. Weak or occluded patches are excluded.",
+    "matches": [
+      {"ground": [670,340], "underground": [674,343]},
+      {"ground": [671,431], "underground": [675,434]},
+      {"ground": [405,305], "underground": [407,308]},
+      {"ground": [420,372], "underground": [422,375]},
+      {"ground": [335,112], "underground": [337,114]}
+    ]
+  },
+  "holdouts": [
+    {"id":"plaza-building-ne", "panel":"municipal-building-4286319776", "native":[50.0772590637207,101.68338012695312], "ground":[420,307], "plaza":[809,314]},
+    {"id":"plaza-building-se", "panel":"municipal-building-4286319776", "native":[50.53417205810547,67.73587799072266], "ground":[420,372], "plaza":[810,435]}
+  ],
+  "features": [
+    {"id":"north-stair-outline", "image":"underground", "kind":"polygon", "pixels":[[476,300],[491,297],[497,327],[482,330]], "interpretation":"Outline interpreted as North platform-stair opening by comparison with the 2012 Kotochika plan; not the paid hall boundary."},
+    {"id":"central-one-stair-outline", "image":"underground", "kind":"polygon", "pixels":[[504,433],[520,432],[522,463],[507,465]], "interpretation":"Outline interpreted as Central 1 platform-stair opening; not the full paid core or a source of underground elevations."},
+    {"id":"exit-three-street-stair", "image":"plaza", "kind":"polygon", "pixels":[[1016,212],[1050,211],[1050,222],[1016,223]], "osmNode":"4334052856", "interpretation":"Street opening near Exit 3, cross-checked with the numbered OSM node and Kotochika entrance order; outline includes the surface opening, not a surveyed bottom landing."},
+    {"id":"exit-four-street-stair", "image":"plaza", "kind":"polygon", "pixels":[[779,227],[813,226],[814,240],[780,241]], "osmNode":"2789395084", "interpretation":"Street opening near Exit 4, cross-checked with the numbered OSM node and Kotochika entrance order."},
+    {"id":"exit-five-street-stair", "image":"plaza", "kind":"polygon", "pixels":[[1069,470],[1112,467],[1113,487],[1070,490]], "interpretation":"Blue underground entrance beside taxi canopy, corroborated by the 2012 plan and Exit 5 photograph. The long axis runs roughly east-west; construction width and landings still need fitting."},
+    {"id":"exit-five-lift-zone", "image":"ground", "kind":"point", "pixels":[[529,395]], "interpretation":"Approximate centre of the ground EV annotation on printed page 53, beside the taxi canopy. Label placement is not a surveyed shaft footprint; fit the kiosk within this zone using photographs."},
+    {"id":"northern-public-passage", "image":"underground", "kind":"polygon", "pixels":[[445,170],[475,170],[475,217],[483,255],[448,255],[447,222]], "interpretation":"Approximate public passage envelope under Karasuma and its bend into the forecourt. Building branches and numbered exits need individual openings."},
+    {"id":"southern-public-passage", "image":"underground", "kind":"polygon", "pixels":[[505,515],[550,515],[550,822],[576,831],[576,835],[548,837],[550,879],[568,879],[568,884],[557,885],[578,909],[614,909],[614,917],[575,917],[555,896],[559,938],[614,943],[614,951],[489,950],[489,937],[501,937],[501,945],[523,943],[527,936],[529,835],[505,835],[505,823],[527,823],[527,543],[505,543]], "interpretation":"Public underpass and Hachijo branches traced across the contiguous northern/southern image pair. The plan does not draw the southern paid halls, so this must not be used as their footprint."}
+  ],
+  "limits": [
+    "Pixel coordinates are manual observations of a city access study, not construction measurements.",
+    "Only the east building supplies the coordinate fit. The other building and numbered OSM entrances are independent checks.",
+    "Small fitting residuals do not establish survey accuracy. Allow at least 5 m of plan-position uncertainty; icon centres are less precise.",
+    "Do not apply a single translation or stretch the existing station to match this plan.",
+    "No elevation, paid-hall width, track spacing or platform length is inferred from these outlines.",
+    "The 2012 plan corroborates northern stair identities and public/paid topology; its tenant names and proportions are not current measurements."
+  ]
+}

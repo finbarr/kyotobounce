@@ -33,6 +33,8 @@ Ten new source receipts in `sources.json` pin the downloaded maps, photographs, 
 
 ## Next construction increment
 
+The [city-plan registration](SUBWAY-CITY-CONTROL-V2.md) now supplies checked northern stair and street anchors, the public passage trace and the affected-component inventory. Use those coordinates and their stated uncertainty for the replacement; the earlier 78 m discrepancy remains a diagnostic only.
+
 1. Register the northern subway's street connections against the retained exterior and the operator's plan. Resolve the taxi-side lift and Exit 5 stair together, then connect them to a correctly oriented Central 1 public approach. Include the northern extent toward Exits 3/4; do not constrain the layout to the current short North-gate footprint.
 2. Replace the affected core/passages as one coherent component. Reuse verified lift and escalator mechanics. Remove obsolete panels, motion instances, route records and shaft openings instead of leaving duplicate entrances or long invented connecting corridors.
 3. Keep the current playable bundle until the replacement has matching source/browser/native geometry and complete public and paid connections. Verify both directions from platform lift through Central 1 to the street lift, the stair alternative, Porta connections and the retained southern passage. Check doors, landings, headroom and empty-shaft protection in native and Chrome runtimes.
