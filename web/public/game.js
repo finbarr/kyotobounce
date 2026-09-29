@@ -112,7 +112,8 @@ const liftControl=document.createElement('button');liftControl.id='lift-control'
 const liftFloors=document.createElement('dialog');liftFloors.id='lift-floors';liftFloors.setAttribute('aria-labelledby','lift-floors-title');document.body.append(liftFloors);
 let liftMenuId=null;
 function closeLiftFloors(){if(liftFloors.open)liftFloors.close();liftMenuId=null;canvas.focus();}
-liftFloors.addEventListener('close',()=>{liftMenuId=null;canvas.focus();});
+// A queued close event may arrive after the picker has already reopened.
+liftFloors.addEventListener('close',()=>{if(!liftFloors.open){liftMenuId=null;canvas.focus();}});
 function useLift(){
   if(!liftAction||liftAction.disabled)return;
   if(!liftAction.stops){send('lift',{lift:liftAction.id});canvas.focus();return;}

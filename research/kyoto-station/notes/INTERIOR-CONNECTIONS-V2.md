@@ -99,7 +99,9 @@ The [South subway platform lift](SUBWAY-SOUTH-LIFT-V2.md) connects the second pl
 
 The [Porta west public lift](PORTA-WEST-LIFT-V2.md) connects the western cross-passage to the station forecourt. The fitted upper threshold follows the original paving slope; both shopping streets and the B2 stair approach remain available.
 
-1. **Underground public connections:** complete the [five-stop central elevator and western B1 approach](CENTRAL-LIFT-RESEARCH.md), remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
+The [central elevator and western receiving halls](CENTRAL-LIFT-V2.md) now connect parking B3, Porta B2, both B1 aisles, the ground concourse and the upper north–south passage. The shaft is protected at every floor; fourteen native route walks and all five Chrome rides/exits pass. Parking ramps and further Isetan/Granvia connections remain unfinished.
+
+1. **Underground public connections:** complete the remaining west Porta aisles and Isetan approach, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

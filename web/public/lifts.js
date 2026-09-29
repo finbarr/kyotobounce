@@ -8,15 +8,20 @@ export function replayLiftPoses(frames=[],time=0){
  let a=frames[0],b=a;for(const frame of frames){b=frame;if(frame.t>=time)break;a=frame;}
  return interpolateLiftPoses(a.poses,b.poses,THREE.MathUtils.clamp((time-a.t)/(b.t-a.t||1),0,1));
 }
+function liftLocalFeet(spec,feet){
+ const a=(spec.yaw||0)*Math.PI/180,c=Math.cos(a),s=Math.sin(a),x=feet.x-spec.origin.x,z=feet.z-spec.origin.z;
+ return{x:c*x-s*z,y:feet.y-spec.origin.y,z:s*x+c*z};
+}
 export function liftPartCenter(spec,part,pose){
  const floor=part.motion==='upper'?(spec.stops?.length??2)-1:part.motion==='landing'?part.floor:0;
  const y=part.motion==='car'?pose.height:spec.stops?.[floor]?.height??(floor===0?0:spec.height);
  const door=part.motion==='car'?pose.carDoor:pose.landingDoors?.[floor]??(floor===0?pose.lowerDoor:pose.upperDoor);
- return{x:spec.origin.x+part.center.x+part.doorSide*spec.doorTravel*door,y:spec.origin.y+part.center.y+y,z:spec.origin.z+part.center.z};
+ const a=(spec.yaw||0)*Math.PI/180,c=Math.cos(a),s=Math.sin(a),x=part.center.x+part.doorSide*spec.doorTravel*door,z=part.center.z;
+ return{x:spec.origin.x+c*x+s*z,y:spec.origin.y+part.center.y+y,z:spec.origin.z-s*x+c*z};
 }
 export function liftButton(spec,pose,feet){
  if(!feet)return null;
- const x=feet.x-spec.origin.x,y=feet.y-spec.origin.y,z=feet.z-spec.origin.z;
+ const {x,y,z}=liftLocalFeet(spec,feet);
  const inside=Math.abs(x)<spec.width/2-.25&&Math.abs(z)<spec.depth/2-.25&&Math.abs(y-pose.height)<.15;
  const floors=spec.stops??[{height:0},{height:spec.height}];
  const floor=floors.findIndex(f=>Math.abs(y-f.height)<.15);
@@ -30,7 +35,8 @@ export function liftRiderFeet(specs=[],release=[],current=[],feet){
  if(!feet)return feet;
  for(const spec of specs){
   const a=release.find(p=>p.id===spec.id),b=current.find(p=>p.id===spec.id);if(!a||!b)continue;
-  if(Math.abs(feet.x-spec.origin.x)<spec.width/2-.25&&Math.abs(feet.z-spec.origin.z)<spec.depth/2-.25&&Math.abs(feet.y-spec.origin.y-a.height)<.15)
+  const p=liftLocalFeet(spec,feet);
+  if(Math.abs(p.x)<spec.width/2-.25&&Math.abs(p.z)<spec.depth/2-.25&&Math.abs(p.y-a.height)<.15)
    return{...feet,y:feet.y+b.height-a.height};
  }
  return feet;
@@ -44,7 +50,7 @@ export function createLifts(scene,specs=[],authoredMaterials=[]){
  }
  for(const spec of specs){
   const root=new THREE.Group();root.name=spec.id;scene.add(root);
-  for(const part of spec.parts){const mesh=new THREE.Mesh(cube,material(part.appearance));mesh.name=part.id;mesh.scale.set(part.size.x,part.size.y,part.size.z);root.add(mesh);parts.push({spec,part,mesh});}
+  for(const part of spec.parts){const mesh=new THREE.Mesh(cube,material(part.appearance));mesh.name=part.id;mesh.rotation.y=-(spec.yaw||0)*Math.PI/180;mesh.scale.set(part.size.x,part.size.y,part.size.z);root.add(mesh);parts.push({spec,part,mesh});}
  }
  const initial=specs.map(s=>({id:s.id,height:0,carDoor:1,lowerDoor:1,upperDoor:0,moving:false,blocked:false,busy:false,...(s.stops?{landingDoors:s.stops.map((_,i)=>i===0?1:0)}:{})}));
  function update(before=initial,after=before,alpha=1){

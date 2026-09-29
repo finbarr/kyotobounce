@@ -9,7 +9,9 @@ const [manifest,prepared,candidate,component,out]=process.argv.slice(2),read=asy
 const parent=await read(manifest),old=await read(parent.layout),a=await read(prepared),b=await read(candidate),base=await read(a.layout),next=await read(b.layout),report=await read(component+'/report.json');
 const retiredIds=report.geometry.retiredIds;
 const modifiedPaving=report.geometry.modifiedPaving;assert(!modifiedPaving||modifiedPaving==='municipal-plaza-642152272');
-const expectedPanels=old.panels.filter(p=>!retiredIds.includes(p.id)).map(p=>p.id===modifiedPaving?base.panels.find(q=>q.id===p.id):p);assert(eq(base.panels,expectedPanels));assert(eq(base.authoredLights,old.authoredLights.filter(r=>!report.geometry.retiredLights.includes(r.id))));assert(eq({...base,panels:old.panels,authoredLights:old.authoredLights},old));
+const modifiedIds=report.geometry.modifiedPanelIds||[];assert(!modifiedIds.length||report.componentPrefix==='central-lift-'&&eq(modifiedIds,['concourse']));
+const expectedPanels=old.panels.filter(p=>!retiredIds.includes(p.id)).map(p=>p.id===modifiedPaving||modifiedIds.includes(p.id)?base.panels.find(q=>q.id===p.id):p);
+if(modifiedIds.length){const cut=await read(prepared.replace('assets.json','floor-cut.json'));assert(cut.pass&&cut.retainedEncodedBytesExact&&Math.abs(cut.nativeRemovedArea-cut.browserRemovedArea)<1e-5);assert.equal(sha(JSON.stringify(old.panels.find(p=>p.id==='concourse'))),cut.originalPanelSha256);assert.equal(sha(JSON.stringify(base.panels.find(p=>p.id==='concourse'))),cut.modifiedPanelSha256);}assert(eq(base.panels,expectedPanels));assert(eq(base.authoredLights,old.authoredLights.filter(r=>!report.geometry.retiredLights.includes(r.id))));assert(eq({...base,panels:old.panels,authoredLights:old.authoredLights},old));
 const added=next.panels.slice(base.panels.length);assert.equal(added.length,report.geometry.panels);
 for(const p of added)assert.equal(typeof p.collision,'boolean',p.id+' must declare collision');
 const native=await read(component+'/native-panels.json');assert(eq(next.authoredLights.slice(0,base.authoredLights.length),base.authoredLights));assert(eq(next.authoredLights.slice(base.authoredLights.length),native.authoredLights));
@@ -20,7 +22,7 @@ if(report.componentPrefix==='hachijo-crossing-'){
  for(const lift of lifts)for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;
  assert(eq(next.lifts,[...base.lifts.filter(l=>!report.geometry.retiredLiftIds.includes(l.id)),...lifts]));assert(eq((await read(b.station)).lifts,next.lifts));retainedNext.lifts=base.lifts;
 }
-if(['subway-lift-','exit-five-','hachijo-lift-','subway-south-lift-','porta-west-lift-'].includes(report.componentPrefix)){
+if(['subway-lift-','exit-five-','hachijo-lift-','subway-south-lift-','porta-west-lift-','central-lift-'].includes(report.componentPrefix)){
  const lift=await read(component+'/lift-spec.json');
  for(const p of lift.parts)p.appearance=next.authoredMaterials.find(a=>a.label===p.appearance).id;
  assert(eq(next.lifts,[...(base.lifts||[]),lift]));assert(eq((await read(b.station)).lifts,next.lifts));

@@ -12312,5 +12312,21 @@
     "rights": "Reference only.",
     "format": "html",
     "status": "read online"
+  },
+  {
+    "id": "station-east-parking-central-lift-access",
+    "title": "East B3 parking access and central elevator",
+    "publisher": "Kyoto Station Building",
+    "category": "circulation",
+    "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/parking/img/parking_04.jpg",
+    "source_date": null,
+    "note": "Operator schematic on https://www.kyoto-station-building.co.jp/parking/ . Visually inspected. Shows central elevator in the parking rows, pedestrian crossings, Isetan and Granvia connections, service entrance and vehicle approach. Inset photograph identifies the recessed blue ground-floor entrance. No dimensions or surveyed floor heights.",
+    "rights": "Reference copy only; not a game texture.",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "maps/east-parking-access-2026.jpg",
+    "bytes": 114918,
+    "sha256": "9537f5623d4f512a4ec7774ad8de2407e3736d3ba31ee63a5e24377eef681edd",
+    "retrieved_at": "2026-09-29T17:22:20.109426+00:00"
   }
 ]

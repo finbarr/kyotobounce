@@ -44,7 +44,7 @@ namespace Kyoto
         }
         public static MovingLift Create(Transform parent,StationLayout.Lift spec,PhysicsMaterial material,bool collision,bool walking)
         {
-            if(spec.height<=0||spec.doorSeconds<=0||spec.waitSeconds<0)
+            if(spec.height<=0||spec.doorSeconds<=0||spec.waitSeconds<0||float.IsNaN(spec.yaw)||float.IsInfinity(spec.yaw))
                 throw new ArgumentException("Invalid lift path: "+spec.id);
             int floors=spec.stops==null?2:spec.stops.Length;var paths=new Vector2[floors,floors][];
             if(spec.stops==null){ValidatePath(spec.travel,spec.height,spec.id);paths[0,1]=spec.travel;}
@@ -63,7 +63,7 @@ namespace Kyoto
                 }
                 for(int a=0;a<floors;a++)for(int b=a+1;b<floors;b++)if(paths[a,b]==null)throw new ArgumentException("Missing lift floor pair: "+spec.id);
             }
-            var root=new GameObject(spec.id);SceneManager.MoveGameObjectToScene(root,parent.gameObject.scene);root.transform.SetParent(parent,false);root.transform.localPosition=spec.origin;
+            var root=new GameObject(spec.id);SceneManager.MoveGameObjectToScene(root,parent.gameObject.scene);root.transform.SetParent(parent,false);root.transform.localPosition=spec.origin;root.transform.localRotation=Quaternion.Euler(0,spec.yaw,0);
             var lift=root.AddComponent<MovingLift>();lift.spec=spec;lift.paths=paths;lift.collision=collision;lift.state=new LiftState{id=spec.id};
             int count=spec.parts.Length;lift.solids=new Transform[count];lift.walkingSolids=new Transform[count];lift.colliders=new BoxCollider[count];lift.surfaces=new Surface[count];
             for(int i=0;i<count;i++)

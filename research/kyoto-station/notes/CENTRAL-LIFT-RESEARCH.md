@@ -37,3 +37,7 @@ The five-floor scene passes 32 Chrome checks with no page or service errors. The
 The existing Porta west lift also passes all seven Chrome ride checks in the complete station, including doorway sensing, protected empty-shaft access and throw/recall during descent. The ride harness now waits for the rendered control to become available before requesting a return trip; a native arrival snapshot can precede the rendered door animation. The normal Chrome entry, movement, full throw, recall, menu and home check passes after the final preview restart.
 
 The fixture has sixty static triangles and twenty-four moving lift parts. It replaces no station geometry and requires no full-station export. After verification, its local server was stopped and 638,666 bytes of generated fixture files were removed; small test reports and screenshots remain. The rebuilt worker and browser controls support the next station increment. The actual central elevator route remains to be constructed.
+
+## Station construction
+
+The [central elevator construction note](CENTRAL-LIFT-V2.md) records the delivered shaft, all five receiving routes, operator parking reference and verification. It supersedes the mechanics-only scope above. Parking ramps, service rooms, further building connections and detailed retail interiors remain unfinished.

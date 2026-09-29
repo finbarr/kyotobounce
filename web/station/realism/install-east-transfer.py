@@ -11,14 +11,15 @@ base=json.loads(base_path.read_text());candidate=json.loads(candidate_path.read_
 old_raw=Path(base['layout']).read_bytes();new_raw=Path(candidate['layout']).read_bytes();old=json.loads(old_raw);new=json.loads(new_raw)
 assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha256']
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
-replaced=[p for p in new['panels']if p['id']==modified_paving]
-retained=[replaced[0]if p['id']==modified_paving else p for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
+modified_ids=report['geometry'].get('modifiedPanelIds',[]);assert not modified_ids or report.get('componentPrefix')=='central-lift-' and modified_ids==['concourse']
+replaced=[p for p in new['panels']if p['id']==modified_paving or p['id']in modified_ids];replaced_by_id={p['id']:p for p in replaced}
+retained=[replaced_by_id.get(p['id'],p) for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
 for key in ('boxes','beams','flights','escalators'):assert old[key]==new[key]
 retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
 assert not retired_lift_ids or report.get('componentPrefix')=='hachijo-crossing-' and retired_lift_ids==['subway-hachijo-east-lift']
 old_lifts=[l for l in old.get('lifts',[])if l['id']not in retired_lift_ids];lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
 added_lifts=lifts[len(old_lifts):]
-assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-','porta-west-lift-')
+assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-','porta-west-lift-','central-lift-')
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')
@@ -39,6 +40,8 @@ assert set(retired_lift_parts)=={p['id']for l in old.get('lifts',[])if l['id']in
 materials={m['id']:m for m in new['authoredMaterials']};created={}
 def material(key):
  if key in created:return created[key]
+ if key not in materials:
+  existing=bpy.data.materials.get(key);assert existing,key;created[key]=existing;return existing
  r=materials[key]
  existing=bpy.data.materials.get(r['label'])
  if existing:created[key]=existing;return existing
@@ -72,9 +75,11 @@ for p in replaced+added:
 lift_objects=[]
 for lift in added_lifts:
  for part in lift['parts']:
-  center=part['center'];origin=lift['origin'];size=part['size'];upper=part['motion']=='upper'
-  position=(origin['x']+center['x']+part['doorSide']*lift['doorTravel']*(0 if upper else 1),origin['z']+center['z'],origin['y']+center['y']+(lift['height'] if upper else 0))
-  bpy.ops.mesh.primitive_cube_add(size=1,location=position);o=bpy.context.object;o.name=part['id'];o.dimensions=(size['x'],size['z'],size['y'])
+  center=part['center'];origin=lift['origin'];size=part['size'];stops=lift.get('stops');floor=(len(stops)-1 if stops else 1)if part['motion']=='upper'else part.get('floor',0)if part['motion']=='landing'else 0
+  height=(stops[floor]['height']if stops else floor*lift['height'])if part['motion']!='car'else 0
+  a=math.radians(lift.get('yaw',0));x=center['x']+part['doorSide']*lift['doorTravel']*(1 if floor==0 else 0);z=center['z']
+  position=(origin['x']+math.cos(a)*x+math.sin(a)*z,origin['z']-math.sin(a)*x+math.cos(a)*z,origin['y']+center['y']+height)
+  bpy.ops.mesh.primitive_cube_add(size=1,location=position);o=bpy.context.object;o.name=part['id'];o.dimensions=(size['x'],size['z'],size['y']);o.rotation_euler.z=-a
   bpy.context.view_layer.update()
   for c in list(o.users_collection):c.objects.unlink(o)
   collection.objects.link(o);o.data.materials.append(material(part['appearance']));o['kyoto_dynamic']=True;o['kyoto_lift']=lift['id'];o['kyoto_lift_part']=part['id'];o['kyoto_physical']=part['material'];o['kyoto_geometry_signature']=signature(o)
@@ -96,7 +101,7 @@ for o in bpy.data.objects:
  if key.startswith('boxes/'):
   assert new['boxes'][int(key.split('/')[1])]['id']==o.get('kyoto_surface',o.name)
 for p in replaced+added:
- o=objects[p['id']];mesh=o.data;assert o['kyoto_seed']=='panels/'+str(by_id[p['id']]);assert signature(o)==o['kyoto_geometry_signature'];assert mesh.materials[0].name==materials[p['appearance']]['label'];assert [i for f in mesh.polygons for i in reversed(f.vertices)]==p['triangles'];assert max((v.co-Vector((q['x'],q['z'],q['y']))).length for v,q in zip(mesh.vertices,p['vertices']))<2e-5
+ o=objects[p['id']];mesh=o.data;assert o['kyoto_seed']=='panels/'+str(by_id[p['id']]);assert signature(o)==o['kyoto_geometry_signature'];assert mesh.materials[0].name==materials.get(p['appearance'],{'label':p['appearance']})['label'];assert [i for f in mesh.polygons for i in reversed(f.vertices)]==p['triangles'];assert max((v.co-Vector((q['x'],q['z'],q['y']))).length for v,q in zip(mesh.vertices,p['vertices']))<2e-5
  for l in mesh.loops:
   if p.get('uv'):assert max(abs(mesh.uv_layers.active.data[l.index].uv[i]-p['uv'][l.vertex_index][k])for i,k in enumerate(('x','y')))<1e-5
   if p.get('normals'):assert max(abs(mesh.corner_normals[l.index].vector[i]-p['normals'][l.vertex_index][k])for i,k in enumerate(('x','z','y')))<.001
@@ -107,5 +112,5 @@ for part,position,size in lift_objects:
 for r in lights:
  o=bpy.data.objects[r['id']];assert abs(o.data.energy-r['intensity'])<1e-6;assert o['kyoto_range_m']==r['range']
 proof={'pass':True,'parentSourceSha256':sha(Path(base['sourceScene']).read_bytes()),'sourceSha256':sha((out/'KyotoAtrium.blend').read_bytes()),'layoutSha256':sha(new_raw),'addedPanels':len(added),'retiredObjects':removed,'savedGeometryUVsNormalsMatch':True,'retainedBindingsMatch':True}
-proof['modifiedPaving']=modified_paving;proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects);proof['retiredLiftParts']=retired_lift_parts
+proof['modifiedPanels']=modified_ids;proof['modifiedPaving']=modified_paving;proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects);proof['retiredLiftParts']=retired_lift_parts
 (out/'installation.json').write_text(json.dumps(proof,indent=2)+'\n');print('EAST_TRANSFER_SOURCE_READY',json.dumps(proof),flush=True)

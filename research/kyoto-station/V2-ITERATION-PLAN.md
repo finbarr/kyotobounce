@@ -18,9 +18,11 @@ The [South subway platform lift](notes/SUBWAY-SOUTH-LIFT-V2.md) adds the second 
 
 The [Porta west public lift](notes/PORTA-WEST-LIFT-V2.md) connects the western cross-passage to the forecourt, with a fitted opening through the retained paving and protected landing doors. Both shopping streets and the B2 stair approach remain clear.
 
+The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) connect all five stops: parking B3, Porta B2, the western B1 hall, the recessed ground entrance and the upper north–south passage. Fourteen native route walks and 34 Chrome lift checks pass. The parking receiving area is established; ramps and further building connections remain unfinished.
+
 Next priorities:
 
-1. Complete the [central elevator](notes/CENTRAL-LIFT-RESEARCH.md), including its Porta B2 stop, other receiving floors and western B1 approach. Then continue the remaining west Porta area, street exits and Kotochika surroundings.
+1. Complete the remaining west Porta aisles and Isetan approach, street exits and Kotochika surroundings. The central elevator's five stops and receiving routes are delivered; keep the distinct floor levels explicit.
 2. Complete the southern shopping streets, building frontage, terrace and forecourt.
 3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 

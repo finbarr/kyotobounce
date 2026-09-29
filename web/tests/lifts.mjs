@@ -49,6 +49,20 @@ const seek=replayLiftPoses([{t:0,poses:[middle]},{t:1,poses:[topFloor]}],.5)[0];
 assert.deepEqual(seek.landingDoors,[0,0,.5,0,.5]);
 for(const {part,mesh}of multiRuntime.parts){const p=liftPartCenter(multi,part,middle);assert(mesh.position.distanceTo(new Vector3(p.x,p.y,-p.z))<1e-9);if(part.motion==='landing'){assert.equal(p.y,multi.origin.y+part.center.y+multi.stops[part.floor].height);assert.equal(p.x,part.center.x+(part.floor===2?part.doorSide*multi.doorTravel:0));}}
 
+// Rotated calls and mesh/camera collision must use the same local frame as
+// native support and CCD. A rectangular car catches width/depth swaps.
+for(const yaw of [-90,45,180]){
+ const oriented={...multi,yaw,width:2.4,depth:3.2},angle=yaw*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle);
+ const world=(x,y,z)=>({x:oriented.origin.x+c*x+s*z,y:oriented.origin.y+y,z:oriented.origin.z-s*x+c*z});
+ assert.equal(liftButton(oriented,middle,world(0,middle.height,-2)).text,'E · Call lift');
+ assert.equal(liftButton(oriented,middle,world(0,middle.height,1.2)).text,'E · Choose floor');
+ const feet=world(0,middle.height,1.2);assert(Math.abs(liftRiderFeet([oriented],[middle],[topFloor],feet).y-(oriented.origin.y+topFloor.height))<1e-8);
+ const runtime=createLifts(new Group(),[oriented]);runtime.update([middle]);
+ for(const {part,mesh}of runtime.parts){const expected=world(part.center.x+part.doorSide*oriented.doorTravel*(part.motion==='car'||part.floor===2?1:0),part.center.y+(part.motion==='car'?middle.height:oriented.stops[part.floor].height),part.center.z);assert(mesh.position.distanceTo(new Vector3(expected.x,expected.y,-expected.z))<1e-8);assert(Math.abs(mesh.rotation.y+angle)<1e-8);}
+ const obstacles=new CameraObstacles(new Group());obstacles.addDynamicMeshes(runtime.parts.map(p=>p.mesh));
+ const a=world(0,middle.height+1.4,0),b=world(0,middle.height+1.4,4);assert(obstacles.clearance(new Vector3(a.x,a.y,-a.z),new Vector3(b.x,b.y,-b.z))<1.1,'Rotated car back stops the camera');
+}
+
 const store=new Store(':memory:');
 try{
  const requests=[],worker={ready:false,capabilities:['lifts-v1'],request:async m=>{requests.push(m);return{message:'Lift called.'};}};

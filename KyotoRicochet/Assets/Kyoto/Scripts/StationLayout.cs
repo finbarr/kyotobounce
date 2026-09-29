@@ -79,7 +79,7 @@ namespace Kyoto
         {
             public string id;
             public Vector3 origin;
-            public float height,width,depth,doorWidth,doorZ,doorTravel,doorSeconds,waitSeconds;
+            public float height,width,depth,doorWidth,doorZ,doorTravel,doorSeconds,waitSeconds,yaw;
             // Seconds and height above the lower floor. Linear spans permit exact CCD.
             public Vector2[] travel;
             public LiftStop[] stops;

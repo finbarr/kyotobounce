@@ -13,15 +13,16 @@ export function liftTravel(height,speed=.8,acceleration=.8){
  });
 }
 
-export function multiStopLift({id,origin,stops}){
+export function multiStopLift({id,origin,stops,yaw=0}){
  assert(stops.length>=2&&stops.length<=16&&stops[0].height===0);
  assert.equal(new Set(stops.map(s=>s.id)).size,stops.length);
  for(const [i,s]of stops.entries())assert(typeof s.id==='string'&&s.id.length&&s.id.length<=64&&typeof s.label==='string'&&s.label.length&&Number.isFinite(s.height)&&(!i||s.height>stops[i-1].height));
+ assert(Number.isFinite(yaw));
  const spec=subwayLift({id,origin,height:stops.at(-1).height});
  const door=spec.parts.filter(p=>p.motion==='lower');
  spec.parts=spec.parts.filter(p=>p.motion==='car');
  for(const [floor,s]of stops.entries())for(const p of door)spec.parts.push({...p,id:id+'-landing-'+s.id+'-door-'+p.doorSide,motion:'landing',floor});
- delete spec.travel;spec.stops=stops;spec.trips=[];
+ spec.yaw=yaw;delete spec.travel;spec.stops=stops;spec.trips=[];
  for(let from=0;from<stops.length;from++)for(let to=from+1;to<stops.length;to++)spec.trips.push({from,to,travel:liftTravel(stops[to].height-stops[from].height)});
  return spec;
 }
