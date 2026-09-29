@@ -12051,5 +12051,34 @@
     "format": "pdf",
     "status": "consulted online",
     "retrieved_at": "2026-09-29T07:30:09.975590+00:00"
+  },
+  {
+    "id": "kintetsu-terminal-four-tracks-2012",
+    "title": "Kyoto terminal four-track completion: platform plan, photographs and section",
+    "publisher": "Kintetsu",
+    "category": "railway architecture",
+    "url": "https://www.kintetsu.jp/news/files/kyouto4senka.pdf",
+    "source_date": "2012-03-08",
+    "format": "pdf",
+    "status": "downloaded",
+    "local_file": "plans/kintetsu-terminal-four-tracks-2012.pdf",
+    "bytes": 844316,
+    "sha256": "f90e66f25b786073ae753359dde6c9529564f6ce02ecaa1679ff6a94ed9fc95f",
+    "retrieved_at": "2026-09-29T07:36:30.203735+00:00",
+    "note": "Pages 1, 2, 3 and 5 rendered and inspected. Four-track comb layout, boarding/alighting separation, north shared 3/4 platform, hotel lift shafts through that platform and the Shinkansen/terminal/ground-floor section. Historical photographs; current topology checked against the 14 March 2026 operator map. Dimensions are not a survey.",
+    "rights": "Reference only; no imagery is shipped in the game."
+  },
+  {
+    "id": "kintetsu-kyoto-line-gauge",
+    "title": "Kyoto Line history and specifications",
+    "publisher": "Kintetsu",
+    "category": "railway technical reference",
+    "url": "https://www.kintetsu.jp/kouhou/Rireki/A40003.html",
+    "source_date": null,
+    "format": "html",
+    "status": "consulted online",
+    "retrieved_at": "2026-09-29T07:47:31.250414+00:00",
+    "note": "Kyoto to Yamato-Saidaiji is listed as standard gauge. Used for the nominal 1.435 m Kintetsu track gauge.",
+    "rights": "Reference only."
   }
 ]

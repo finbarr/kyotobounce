@@ -31,6 +31,8 @@ Browser and native exports contain the same 990 new panels and 103,004 triangles
 
 The first complete walk suite covers approximately 958 m at normal speed and takes about twelve minutes. For later localized repairs, test between nearby landings and reuse verified unchanged routes; repeating long platform walks would add time without checking new geometry. The component workflow avoids a full station export, and temporary full-station files are removed at promotion.
 
+The [Kintetsu terminal delivery](KINTETSU-TERMINAL-V2.md) subsequently shortens the excessive western extension of platform/track 10 and removes its conflicting western canopy, while retaining its access stair and eastern platform.
+
 ## Remaining work
 
 Platform 0 and the north rear-floor boundary are now connected and repaired in the [subsequent platform 0 delivery](PLATFORM-ZERO-V2.md).

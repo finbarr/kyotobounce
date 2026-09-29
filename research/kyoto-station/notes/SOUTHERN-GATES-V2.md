@@ -2,7 +2,7 @@
 
 29 September 2026. Replace the lower passage’s blank side walls with the opposing Kintetsu and Shinkansen ticket fronts.
 
-The subsequent [Shinkansen connection](SHINKANSEN-V2.md) opens one Shinkansen lane and replaces its receiving-room end with the paid concourse and elevated platforms. The Kintetsu bank still awaits its terminal. The verification below describes this original gate-front delivery.
+The subsequent [Shinkansen connection](SHINKANSEN-V2.md) opens one Shinkansen lane and replaces its receiving-room end with the paid concourse and elevated platforms. The subsequent [Kintetsu terminal](KINTETSU-TERMINAL-V2.md) opens its bank and replaces the remaining room end. The verification below describes this original gate-front delivery.
 
 ## Change and limits
 

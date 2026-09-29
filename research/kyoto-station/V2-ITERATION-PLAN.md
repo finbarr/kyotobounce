@@ -12,11 +12,11 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: [the Shinkansen connection](notes/SHINKANSEN-V2.md) opens a central gate lane into the paid concourse, with two working stair routes to islands 11–12 and 13–14, four tracks and the elevated deck and canopies. [The southern operator entrances](notes/SOUTHERN-GATES-V2.md), [platform 0](notes/PLATFORM-ZERO-V2.md), [the other conventional platforms](notes/CONVENTIONAL-RAILWAY-V2.md), [the public passage](notes/PUBLIC-PASSAGE-SOUTH-V2.md), both Central Gate bridge connections and the east 4F–7F repair are integrated.
+Latest structural delivery: [the Kintetsu terminal](notes/KINTETSU-TERMINAL-V2.md) opens its gate into a level concourse and four platform strips, with four terminating tracks and clear routes around the hotel shafts. The conflicting western JR10 extension is corrected. [The Shinkansen connection](notes/SHINKANSEN-V2.md) links its paid concourse to islands 11–12 and 13–14, four tracks and the elevated deck and canopies. [The southern operator entrances](notes/SOUTHERN-GATES-V2.md), [platform 0](notes/PLATFORM-ZERO-V2.md), [the other conventional platforms](notes/CONVENTIONAL-RAILWAY-V2.md), [the public passage](notes/PUBLIC-PASSAGE-SOUTH-V2.md), both Central Gate bridge connections and the east 4F–7F repair are integrated.
 
 Next priorities:
 
-1. Build Kintetsu's terminal behind its gate, replacing the remaining provisional receiving-room end; continue the Hachijo building, terrace and forecourt, and missing Shinkansen transfer/entrance routes.
+1. Connect the JR and Shinkansen paid concourses through the missing central transfer route. Then continue the Hachijo building, ground shopping/public routes, terrace and forecourt.
 2. Complete the western 30–34 platforms and eastern transfer connection.
 3. Repair other interior obstructions, then refine railway alignment, enclosures and finishes.
 
