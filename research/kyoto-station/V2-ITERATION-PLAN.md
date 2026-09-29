@@ -35,7 +35,9 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
-Latest delivery: [restaurant entrance directories](notes/RESTAURANT-DISPLAYS-V2.md) adds two framed displays with all ten current operator-listed shop names. The doorway stays clear and the artwork is integrated into the editable source. Continue with the interior shop frontage and photographed menu/display fittings.
+Latest delivery: [Kotetsu shopfront](notes/KOTETSU-FRONTAGE-V2.md) replaces shop 3’s solid placeholder with a photo-guided timber and metal frontage, original tiger screen, ticket terminal and usable doorway. Native doorway/aisle walks, saved-source correspondence and Chrome gameplay pass. Continue with the neighboring shopfront; the deeper dining room remains unfinished.
+
+The [restaurant entrance directories](notes/RESTAURANT-DISPLAYS-V2.md) add two framed displays with all ten current operator-listed shop names. The doorway stays clear and the artwork is integrated into the editable source. Continue with the interior shop frontage and photographed menu/display fittings.
 
 The [restaurant practical lighting](notes/RESTAURANT-LIGHTING-V2.md) connects seven existing aisle fixtures to the two-light pool. Warm light reveals the floor and nearby walls while the active light count stays fixed. Source and runtime checks pass. Next, build the entrance menu/display frontage from the saved photograph, with current operator information where text is needed.
 

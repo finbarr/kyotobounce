@@ -1,8 +1,8 @@
 {
   "layout": ".local/v2/current/station/station-layout.json",
-  "layoutSha256": "2b1c076820cb949542903fcb32eb246259e536dbb6934a2c954ee2eb22200830",
+  "layoutSha256": "b8dd5185a94b66e01dfb94bd17991065b7a2b5670d6e9e051ba0c7ae9e6b5d3d",
   "geometry": ".local/v2/current/station/atrium.runtime.glb",
-  "geometrySha256": "789ea71dbed15f8cf4808c8239227a6bd29f7230dd453ebcf11bbb6b87ef01b6",
+  "geometrySha256": "632992aea625aa449b111d5072996816790162bf475236efbde4f5060ff59260",
   "station": ".local/v2/current/station/station.json",
   "detail": ".local/v2/current/motion/atrium-detail.json",
   "motionLayout": ".local/v2/current/source/station-layout.json",
