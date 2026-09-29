@@ -23,3 +23,10 @@
 #toggle-fly{justify-self:center;min-width:210px}.is-flying footer span:not(:last-child){display:none}.is-flying footer:before{content:'WASD · FLY   SHIFT · BOOST   ALT · PRECISE   E / Q · UP / DOWN   ESC · MENUS'}
 #lift-control{position:fixed;bottom:164px;left:50%;transform:translateX(-50%);z-index:25;padding:12px 18px;background:#143d43;color:#fff7de;border:1px solid #7ba5a3;border-radius:4px;font:600 14px system-ui;cursor:pointer}
 #lift-control[hidden]{display:none}
+#lift-control:disabled{opacity:.7;cursor:default}
+#lift-floors{width:min(340px,calc(100vw - 48px));padding:24px;background:#143d43;color:#fff7de;border:1px solid #7ba5a3;border-radius:6px;font:600 16px system-ui}
+#lift-floors::backdrop{background:#07171bb3}
+#lift-floors h2{margin:0 0 18px;font-size:21px}
+#lift-floors button{display:block;width:100%;min-height:48px;margin-top:8px;padding:10px 14px;text-align:left;background:#244d53;color:inherit;border:1px solid #7ba5a3;border-radius:4px;font:inherit;cursor:pointer}
+#lift-floors button:disabled{opacity:.55;cursor:default}
+#lift-floors button:focus-visible{outline:3px solid #fbd779;outline-offset:2px}

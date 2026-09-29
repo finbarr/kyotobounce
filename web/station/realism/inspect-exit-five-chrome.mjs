@@ -16,6 +16,7 @@ window.__liftInspection={aim(y){yaw=y;pitch=0;centerOnAim();},read(){return{lift
  // Connect the second session after first-use textures load, within the hello timeout.
  other=new Client(origin.replace(/^http/,'ws'));await other.join();await delay(200);assert.equal(other.state.lifts.find(p=>p.id===spec.id).height,0);
  const read=()=>page.evaluate(()=>__liftInspection.read());
+ async function useLift(){await page.waitForFunction(()=>{const b=document.getElementById('lift-control');return b&&!b.hidden&&!b.disabled;},null,{timeout:5000});await page.keyboard.press('e');}
  async function walk(z,yaw){await page.evaluate(y=>__liftInspection.aim(y),yaw);await page.keyboard.down('w');try{await page.waitForFunction(([z,yaw])=>yaw===0?kyotoState.feet.z>=z:kyotoState.feet.z<=z,[z,yaw],{timeout:15000});}finally{await page.keyboard.up('w');}await page.waitForTimeout(180);}
  await page.evaluate(()=>__liftInspection.aim(0));await page.screenshot({path:out+'/passage.png'});
  await walk(Z-.2,0);let s=await read();assert(Math.abs(s.feet.y-L)<.06&&s.grounded,'Walk into the lower car');report.checks.push('Walk from public passage into the car');
@@ -25,20 +26,20 @@ window.__liftInspection={aim(y){yaw=y;pitch=0;centerOnAim();},read(){return{lift
  await walk(Z-.2,0);
  await page.waitForFunction(()=>__liftInspection.read().lifts[0].moving,null,{timeout:12000});
  s=await read();assert(Math.abs(s.feet.y-(L+s.lifts[0].height))<.08&&s.grounded);assert.equal(other.state.lifts.find(p=>p.id===spec.id).height,0,'The other private session remains at floor 0');report.checks.push('Native lift carries the player; private sessions stay independent');
- await page.waitForFunction(()=>{const s=__liftInspection.read();return s.lifts[0].upperDoor>.99;},null,{timeout:20000});
+ await page.waitForFunction(()=>{const s=__liftInspection.read();return s.lifts[0].upperDoor>.99&&!s.lifts[0].busy;},null,{timeout:20000});
  s=await read();assert(s.grounded);report.upper=s;await page.screenshot({path:out+'/upper-car.png'});
  await walk(Z-2.95,180);s=await read();assert(Math.abs(s.feet.y-H)<.06&&s.grounded);report.checks.push('Walk out onto the upper public landing');await page.screenshot({path:out+'/upper-landing.png'});
  // Return to the public passage while the car stays upstairs, and test the landing.
  await page.keyboard.press('Escape');await page.getByRole('button',{name:'↶ Start',exact:true}).click();await page.getByRole('button',{name:'Close levels'}).click();await page.waitForTimeout(300);
  await page.evaluate(()=>__liftInspection.aim(0));await page.keyboard.down('w');await page.waitForTimeout(3000);await page.keyboard.up('w');s=await read();assert(s.feet.z<Z-1.5&&s.grounded&&Math.abs(s.feet.y-L)<.06,'Closed door blocks entry to the empty shaft');report.checks.push('Empty lower shaft remains inaccessible');
- await page.keyboard.press('e');await page.waitForFunction(()=>__liftInspection.read().lifts[0].lowerDoor>.99,null,{timeout:20000});await walk(Z-.2,0);await page.keyboard.press('e');await page.waitForFunction(()=>__liftInspection.read().lifts[0].upperDoor>.99,null,{timeout:20000});
- await page.keyboard.press('e');
+ await useLift();await page.waitForFunction(()=>{const p=__liftInspection.read().lifts[0];return p.lowerDoor>.99&&!p.busy;},null,{timeout:20000});await walk(Z-.2,0);await useLift();await page.waitForFunction(()=>{const p=__liftInspection.read().lifts[0];return p.upperDoor>.99&&!p.busy;},null,{timeout:20000});
+ await useLift();
  await page.waitForFunction(()=>__liftInspection.read().lifts[0].moving,null,{timeout:12000});
  // A moving lift must survive the game's ahead simulation and recall rewind.
  await page.keyboard.down('Space');await page.waitForTimeout(150);await page.keyboard.up('Space');
  await page.waitForFunction(()=>kyotoState.phase==='Flight',null,{timeout:15000});await page.waitForTimeout(400);await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim',null,{timeout:10000});
  s=await read();assert(Math.abs(s.feet.y-(L+s.lifts[0].height))<.09,'Recall restores the rider at the car presentation time');report.checks.push('Throw and recall while descending preserve car and rider alignment');
- await page.waitForFunction(()=>__liftInspection.read().lifts[0].lowerDoor>.99,null,{timeout:20000});await walk(Z-2.95,180);
+ await page.waitForFunction(()=>{const p=__liftInspection.read().lifts[0];return p.lowerDoor>.99&&!p.busy;},null,{timeout:20000});await walk(Z-2.95,180);
  s=await read();assert(s.grounded&&Math.abs(s.feet.y-L)<.06);report.lower=s;report.checks.push('Return trip and exit to public passage');
  assert.deepEqual(report.errors,[]);report.pass=true;console.log('PASS',report.checks);
 }catch(error){report.error=String(error);throw error;}finally{await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');other?.close();await browser.close();}

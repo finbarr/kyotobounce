@@ -82,13 +82,17 @@ namespace Kyoto
             public float height,width,depth,doorWidth,doorZ,doorTravel,doorSeconds,waitSeconds;
             // Seconds and height above the lower floor. Linear spans permit exact CCD.
             public Vector2[] travel;
+            public LiftStop[] stops;
+            public LiftTrip[] trips;
             public LiftPart[] parts;
         }
+        [Serializable] public sealed class LiftStop {public string id,label;public float height;}
+        [Serializable] public sealed class LiftTrip {public int from,to;public Vector2[] travel;}
         [Serializable] public sealed class LiftPart
         {
             public string id,material,motion;
             public Vector3 center,size;
-            public int doorSide;
+            public int doorSide,floor;
         }
         [Serializable] public sealed class Panel
         {

@@ -99,7 +99,7 @@ The [South subway platform lift](SUBWAY-SOUTH-LIFT-V2.md) connects the second pl
 
 The [Porta west public lift](PORTA-WEST-LIFT-V2.md) connects the western cross-passage to the station forecourt. The fitted upper threshold follows the original paving slope; both shopping streets and the B2 stair approach remain available.
 
-1. **Underground public connections:** complete the Porta B2 lift, remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
+1. **Underground public connections:** complete the [five-stop central elevator and western B1 approach](CENTRAL-LIFT-RESEARCH.md), remaining west Porta aisles, street exits and Kotochika surroundings. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

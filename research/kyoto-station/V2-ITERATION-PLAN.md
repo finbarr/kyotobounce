@@ -20,7 +20,7 @@ The [Porta west public lift](notes/PORTA-WEST-LIFT-V2.md) connects the western c
 
 Next priorities:
 
-1. Complete the Porta B2 lift and remaining west Porta area, street exits and Kotochika surroundings.
+1. Complete the [central elevator](notes/CENTRAL-LIFT-RESEARCH.md), including its Porta B2 stop, other receiving floors and western B1 approach. Then continue the remaining west Porta area, street exits and Kotochika surroundings.
 2. Complete the southern shopping streets, building frontage, terrace and forecourt.
 3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 

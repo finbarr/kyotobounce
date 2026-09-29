@@ -11,7 +11,7 @@ namespace Kyoto
     {
         [Serializable] public class Command
         {
-            public string type,id,request,powerRange,scoring,lift;
+            public string type,id,request,powerRange,scoring,lift,liftStop;
             public float x,z,yaw,pitch,top,kick,power,rate;
             public bool fast;
             public Vector3 origin,direction;public float radius;public string slot;

@@ -124,10 +124,11 @@ export class Competition {
   if(m.type==='course-progress')return this.progress(member);
   if(member.restoring)throw new Error('Your attempt is being restored. Try again in a moment.');
   if(m.type==='lift'){
-   if(Object.keys(m).some(k=>!['type','lift'].includes(k))||typeof m.lift!=='string'||m.lift.length>100)throw new Error('Choose a lift button');
+   if(Object.keys(m).some(k=>!['type','lift','stop'].includes(k))||typeof m.lift!=='string'||m.lift.length>100||('stop'in m&&(typeof m.stop!=='string'||!m.stop.length||m.stop.length>64)))throw new Error('Choose a lift button');
    if(member.attempt)throw new Error('Finish or recall your throw before using the lift');
    if(!this.worker.capabilities.includes('lifts-v1'))throw new Error('Rebuild and restart the physics worker for lifts');
-   const reply=await this.worker.request({type:'lift',id,lift:m.lift});return{type:'notice',message:reply.message};
+   if('stop'in m&&!this.worker.capabilities.includes('lift-stops-v1'))throw new Error('Rebuild and restart the physics worker for lift floors');
+   const reply=await this.worker.request({type:'lift',id,lift:m.lift,...('stop'in m?{liftStop:m.stop}:{})});return{type:'notice',message:reply.message};
   }
   if(m.type==='playback-rate'){
    if(Object.keys(m).some(key=>!['type','attempt','rate'].includes(key))||![1,2].includes(m.rate)||typeof m.attempt!=='string')throw new Error('Choose normal or 2x shot playback');

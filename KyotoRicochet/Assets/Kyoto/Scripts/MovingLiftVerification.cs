@@ -15,11 +15,90 @@ namespace Kyoto
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Native()
         {
-            string specPath=null,output=null;bool requested=false;
-            foreach(var a in Environment.GetCommandLineArgs()){if(a=="--kyoto-lifts")requested=true;if(a.StartsWith("--kyoto-lift-spec="))specPath=a.Substring(18);if(a.StartsWith("--kyoto-evidence="))output=a.Substring(17);}
+            string specPath=null,output=null;bool requested=false,multi=false;
+            foreach(var a in Environment.GetCommandLineArgs()){if(a=="--kyoto-lifts")requested=true;if(a=="--kyoto-lift-stops")requested=multi=true;if(a.StartsWith("--kyoto-lift-spec="))specPath=a.Substring(18);if(a.StartsWith("--kyoto-evidence="))output=a.Substring(17);}
             if(!requested)return;
             foreach(var worker in UnityEngine.Object.FindObjectsByType<BrowserPhysicsWorker>(FindObjectsSortMode.None))worker.enabled=false;
-            try{Run(specPath,output);Application.Quit(0);}catch(Exception e){Debug.LogException(e);Application.Quit(1);}
+            try{if(multi)RunStops(specPath,output);else Run(specPath,output);Application.Quit(0);}catch(Exception e){Debug.LogException(e);Application.Quit(1);}
+        }
+        public static void RunStops(string specPath,string output)
+        {
+            var spec=JsonUtility.FromJson<StationLayout.Lift>(File.ReadAllText(specPath));spec.origin=Vector3.zero;checks.Clear();Directory.CreateDirectory(output);
+            var samples=new List<Sample>();
+            using(var sim=new ShotSimulation(false))
+            {
+                var lift=MovingLift.Create(sim.Root,spec,Surface.Material("Lift stops test",.64f,.2f),true,false);
+                Check(lift.FloorCount==5,"Five authored floors loaded");
+                for(int from=0;from<5;from++)for(int to=0;to<5;to++)if(from!=to)
+                {
+                    lift.state=new LiftState{id=spec.id,from=from,to=to,startTime=0};
+                    float prior=lift.FloorHeight(from);double duration=lift.TotalSeconds+1;
+                    for(int i=0;i<=240;i++)
+                    {
+                        double time=i/240.0*duration;var pose=lift.Pose(time,out _);samples.Add(new Sample{time=time,pose=pose});
+                        if(pose.moving&&(pose.carDoor>1e-6f||Array.Exists(pose.landingDoors,d=>d>1e-6f)))throw new Exception("Open door between floors");
+                        for(int floor=0;floor<5;floor++)if(pose.landingDoors[floor]>1e-6f&&Mathf.Abs(pose.height-lift.FloorHeight(floor))>1e-5f)throw new Exception("Door opened at an empty floor");
+                        if(i>0&&Mathf.Abs(pose.height-prior)/(duration/240)>.801f)throw new Exception("Lift exceeded authored speed");prior=pose.height;
+                    }
+                    var final=lift.Pose(duration,out _);Check(Mathf.Abs(final.height-lift.FloorHeight(to))<1e-5f&&final.landingDoors[to]==1&&!final.busy,"Direct trip "+from+" to "+to+" reaches its own landing");
+                }
+                lift.state=new LiftState{id=spec.id,from=2,to=4,startTime=0};
+                Check(lift.Sweep(new Vector3(0,lift.FloorHeight(1)+1,spec.doorZ-1),new Vector3(0,0,2),.023f,0,.02f,out var hit)&&hit.surface.surfaceId.Contains("landing-"+spec.stops[1].id),"Unoccupied intermediate landing stops a fast ball");
+                double ballStart=spec.waitSeconds+spec.doorSeconds+2;
+                StationMotion.SetTime(sim.Scene,ballStart);float floorHeight=lift.Pose(ballStart,out _).height;
+                sim.Ball.Launch(new Vector3(0,floorHeight+.2f,0),Vector3.down,Vector3.right*20);int moving=0;bool settled=false;
+                for(int i=0;i<8000;i++)
+                {
+                    sim.Ball.BeforeStep(BallBody.Step);var pose=lift.Pose(StationMotion.Time(sim.Scene),out _);
+                    if(sim.Ball.Body.position.y-sim.Ball.Profile.radius_m<pose.height-.006f)throw new Exception("Ball crossed multi-stop car floor");
+                    if(pose.moving){moving++;if(sim.Ball.Sleeping)throw new Exception("Ball finished on moving multi-stop lift");}
+                    else if(sim.Ball.Sleeping){settled=true;break;}
+                }
+                Check(moving>300&&settled,"Spinning ball reaches full rest after a non-terminal departure");
+            }
+            var root=new GameObject("Five-floor walker fixture");var lane=MovingLift.Create(root.transform,spec,Surface.Material("Lift walk test",.64f,.2f),true,true);
+            for(int floor=0;floor<5;floor++)StationGeometry.Box(root.transform,"landing "+floor,new Vector3(0,lane.FloorHeight(floor)-.1f,-2.3f),new Vector3(5,.2f,2.2f),Surface.Material("Landing",.7f,.4f),"landing "+floor,"LANDING");
+            var walker=new GameObject("Five-floor walker").AddComponent<FirstPersonWalker>();walker.FallLimitY=-10;walker.Place(new Vector3(0,.03f,-2.4f));
+            var scene=root.scene;StationMotion.SetAnalyticOnly(scene,true);StationMotion.SetTime(scene,0);Physics.SyncTransforms();
+            void Step(float forward=0,float yaw=0){StationMotion.Advance(scene,BallBody.Step);walker.Move(new Vector2(0,forward),yaw,false,BallBody.Step);}
+            void Enter(){for(int i=0;i<500&&walker.transform.position.z<-.1f;i++)Step(1);Check(walker.Grounded&&walker.transform.position.z>-.15f,"Walk into occupied car");}
+            Enter();
+            Check(!lane.Request(walker.transform.position,StationMotion.Time(scene),out _),"Five-floor car requires an explicit destination");
+            Check(!lane.Request(walker.transform.position,StationMotion.Time(scene),"invalid",out _),"Native authority rejects an unknown floor");
+            foreach(int target in new[]{2,1,4,3,0})
+            {
+                double start=StationMotion.Time(scene);Check(lane.Request(walker.transform.position,start,spec.stops[target].id,out _),"Select floor "+target);
+                Check(!lane.Request(walker.transform.position,start,spec.stops[(target+1)%5].id,out _),"Reject destination changes during a trip");
+                for(int i=0;i<8000;i++)
+                {
+                    Step();double now=StationMotion.Time(scene);var pose=lane.Pose(now,out _);
+                    if(!walker.Grounded||Mathf.Abs(walker.transform.position.y-pose.height)>.06f)throw new Exception("Rider lost multi-stop car support at "+now);
+                    if(!lane.Busy(now))break;
+                }
+                Check(Mathf.Abs(walker.transform.position.y-lane.FloorHeight(target))<.06f,"Grounded rider arrives at floor "+target);
+                for(int i=0;i<500&&walker.transform.position.z> -2.3f;i++)Step(1,180);
+                Check(walker.Grounded&&Mathf.Abs(walker.transform.position.y-lane.FloorHeight(target))<.06f&&walker.transform.position.z< -2.2f,"Exit onto floor "+target);
+                Check(!lane.Request(walker.transform.position,StationMotion.Time(scene),spec.stops[(target+1)%5].id,out _),"Landing button cannot send a remote destination");
+                Enter();
+            }
+            lane.state=new LiftState{id=spec.id,from=4,to=4};walker.Place(new Vector3(0,lane.FloorHeight(1)+.03f,-2.4f));Step();
+            Check(lane.Request(walker.transform.position,StationMotion.Time(scene),out _)&&lane.state.to==1,"Intermediate landing calls the car to its own floor");
+            int callSteps=Mathf.CeilToInt(lane.TotalSeconds/BallBody.Step)+400;
+            for(int i=0;i<callSteps;i++)
+            {
+                Step(walker.transform.position.z<-.1f?1:0);var pose=lane.Pose(StationMotion.Time(scene),out _);
+                if(Mathf.Abs(pose.height-lane.FloorHeight(1))>.05f&&walker.transform.position.z>spec.doorZ-.20f)throw new Exception("Entered empty intermediate shaft");
+                if(walker.transform.position.y<lane.FloorHeight(1)-.01f)throw new Exception("Fell through intermediate threshold");
+            }
+            Check(walker.Grounded&&walker.transform.position.z>-.2f,"Intermediate door guards the empty shaft until the called car arrives");
+            lane.state=new LiftState{id=spec.id,from=2,to=4,startTime=StationMotion.Time(scene)-spec.waitSeconds-.3};
+            float held=lane.Pose(StationMotion.Time(scene),out _).carDoor;
+            Check(lane.InDoorway(new Vector3(0,lane.FloorHeight(2),spec.doorZ),.24f,1.8f,StationMotion.Time(scene)),"Middle-floor doorway detects a person");
+            Check(!lane.InDoorway(new Vector3(0,0,spec.doorZ),.24f,1.8f,StationMotion.Time(scene)),"A person on another floor does not obstruct departure");
+            for(int i=0;i<180;i++){lane.HoldDoor(StationMotion.Time(scene),BallBody.Step,true);Step();}
+            Check(lane.state.blocked&&Mathf.Abs(lane.Pose(StationMotion.Time(scene),out _).carDoor-held)<.0001f,"Middle-floor doorway holds car and landing doors");
+            UnityEngine.Object.DestroyImmediate(walker.gameObject);UnityEngine.Object.DestroyImmediate(root);
+            File.WriteAllText(Path.Combine(output,"native-lift-stops.json"),JsonUtility.ToJson(new Evidence{pass=true,checks=checks.ToArray(),samples=samples.ToArray()},true));
         }
         public static void Run(string specPath,string output)
         {

@@ -22,7 +22,7 @@ namespace Kyoto
             if(state.phase=="Aim")
             {
                 var lift=StationMotion.FindLift(gameObject.scene,c.lift);
-                if(lift)ok=lift.Request(player.walker.transform.position,stationTime,out message);
+                if(lift)ok=lift.Request(player.walker.transform.position,stationTime,c.liftStop,out message);
                 else message="Lift unavailable.";
             }
             Send(new RpcReply{request=c.request,ok=ok,message=message});

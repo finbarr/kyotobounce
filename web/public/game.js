@@ -109,7 +109,22 @@ function setFly(active,capture=false){
 }
 $('toggle-fly').onclick=()=>setFly(!fly.active,true);
 const liftControl=document.createElement('button');liftControl.id='lift-control';liftControl.hidden=true;document.body.append(liftControl);
-function useLift(){if(liftAction){send('lift',{lift:liftAction.id});canvas.focus();}}
+const liftFloors=document.createElement('dialog');liftFloors.id='lift-floors';liftFloors.setAttribute('aria-labelledby','lift-floors-title');document.body.append(liftFloors);
+let liftMenuId=null;
+function closeLiftFloors(){if(liftFloors.open)liftFloors.close();liftMenuId=null;canvas.focus();}
+liftFloors.addEventListener('close',()=>{liftMenuId=null;canvas.focus();});
+function useLift(){
+  if(!liftAction||liftAction.disabled)return;
+  if(!liftAction.stops){send('lift',{lift:liftAction.id});canvas.focus();return;}
+  cancel();send('input',{x:0,z:0,yaw,pitch,top,kick,fast:false});
+  const id=liftAction.id;liftMenuId=id;liftFloors.replaceChildren();
+  const title=document.createElement('h2');title.id='lift-floors-title';title.textContent='Choose a floor';liftFloors.append(title);
+  for(const stop of liftAction.stops.toReversed()){
+    const button=document.createElement('button');button.type='button';button.textContent=stop.label+(stop.current?' · You are here':'');button.disabled=stop.current;button.dataset.stop=stop.id;
+    button.onclick=()=>{if(liftAction?.id===id&&!liftAction.disabled&&liftAction.stops?.some(s=>s.id===stop.id&&!s.current))send('lift',{lift:id,stop:stop.id});closeLiftFloors();};liftFloors.append(button);
+  }
+  const close=document.createElement('button');close.type='button';close.textContent='Cancel';close.onclick=closeLiftFloors;liftFloors.append(close);liftFloors.showModal();
+}
 liftControl.onclick=useLift;
 function designerView(mode){if(mode!=='play')briefing?.dismiss();setFly(mode==='editor');if(mode==='play'){aimOrbit=null;ballCameraActive=false;robotResultCamera=false;flightManual=false;centerOnAim();}if(mode==='replay'){returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;manualCamera=false;aimOrbit=null;}if(mode==='design'){liveThrow.reset();discardThrowMotion();returnRequested=true;flightPending=false;lastThrowAim=null;centerOnAim();}}
 function focusDesignTarget(target){setFly(true);fly.focus(target);canvas.focus();}
@@ -231,7 +246,7 @@ function restoreThrowAim(){
   centerOnAim();
 }
 function startCharge(){
-  if(fly.active||ui?.completed)return;
+  if(fly.active||ui?.completed||liftFloors.open)return;
   if(recallPending){recallChargeQueued=true;return;}
   if(names?.active||mobile?.menu||briefing?.blocked||!loaded||!workerReady||!snapshot||chargeMeter.charging||!['play','design'].includes(ui.state.mode))return;
   if(flightPending||(chargeMeter.released&&snapshot.phase!=='Result')||ui.state.session?.busy||ui.state.session?.restoring||['Release','Flight'].includes(snapshot.phase))return;
@@ -341,6 +356,7 @@ document.addEventListener('focusin',e=>{if(e.target!==canvas&&!speedIndicator.co
 window.addEventListener('blur',cancel);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancel();});
 window.addEventListener('keydown',e=>{
   if(e.defaultPrevented||names?.active||startup?.active||e.isComposing)return;
+  if(liftFloors.open){if(e.code==='Escape'){e.preventDefault();closeLiftFloors();}return;}
   const editing=e.target.closest('input,textarea,select,[contenteditable="true"]'),modified=e.metaKey||e.ctrlKey||e.altKey;
   if(!editing&&!modified&&e.code==='KeyL'&&ui.state.mode==='play'){e.preventDefault();if(!e.repeat){if(levelMenuOpen())closeLevelMenu();else openLevelMenu();}return;}
   if(briefing?.active){if(e.code==='Enter'&&e.target.closest('button')&&e.target.id!=='briefing-play')return;if(['Space','Enter'].includes(e.code)&&!modified){e.preventDefault();if(!e.repeat)briefing.start();}if(e.code==='Escape'){e.preventDefault();briefing.start(false);}return;}
@@ -370,9 +386,9 @@ window.addEventListener('keydown',e=>{
     const control=$(['KeyQ','KeyE'].includes(e.code)?'top':'kick');control.value=THREE.MathUtils.clamp(Number(control.value)+(['KeyQ','KeyZ'].includes(e.code)?-25:25),-200,200);syncSpin();
   }
 });
-window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='Space'&&(fastForwardHeld||ui.state.mode==='replay')){e.preventDefault();setFastForward(false);return;}if(fly.active){if(e.code==='Space')e.preventDefault();return;}if(e.code==='Space'&&!(e.target instanceof HTMLInputElement)){e.preventDefault();release();}});
+window.addEventListener('keyup',e=>{keys.delete(e.code);if(liftFloors.open)return;if(e.code==='Space'&&(fastForwardHeld||ui.state.mode==='replay')){e.preventDefault();setFastForward(false);return;}if(fly.active){if(e.code==='Space')e.preventDefault();return;}if(e.code==='Space'&&!(e.target instanceof HTMLInputElement)){e.preventDefault();release();}});
 function self(){return snapshot?.players.find(p=>p.id===guestId);}
-function sendInput(){if(names?.active||briefing?.blocked||!workerReady||!loaded||ui.state.mode==='replay'||shotPlayback.active)return;send('input',{x:fly.active||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyD'))-Number(keys.has('KeyA'))+(mobile?.movement.x||0),-1,1),z:fly.active||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyW'))-Number(keys.has('KeyS'))+(mobile?.movement.z||0),-1,1),fast:keys.has('ShiftLeft')||keys.has('ShiftRight')||!!mobile?.movement.fast,yaw,pitch,top,kick});}
+function sendInput(){if(names?.active||briefing?.blocked||!workerReady||!loaded||ui.state.mode==='replay'||shotPlayback.active)return;send('input',{x:fly.active||liftFloors.open||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyD'))-Number(keys.has('KeyA'))+(mobile?.movement.x||0),-1,1),z:fly.active||liftFloors.open||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyW'))-Number(keys.has('KeyS'))+(mobile?.movement.z||0),-1,1),fast:keys.has('ShiftLeft')||keys.has('ShiftRight')||!!mobile?.movement.fast,yaw,pitch,top,kick});}
 setInterval(sendInput,1000/30);
 
 function createAvatar(id){
@@ -520,9 +536,10 @@ function animate(now){
   if(snapshot){
     const poses=lifts.update(previous?.lifts,snapshot.lifts,alpha);
     liftAction=!fly.active&&!replaying&&phase==='Aim'&&!levelMenuOpen()&&!names.active&&!briefing.blocked?lifts.button(poses,p?.feet):null;
-    setHidden(liftControl,!liftAction);if(liftAction)setText(liftControl,liftAction.text);
+    if(liftFloors.open&&(!liftAction?.stops||liftAction.id!==liftMenuId||liftAction.disabled))closeLiftFloors();
+    setHidden(liftControl,!liftAction);if(liftAction){setText(liftControl,liftAction.text);liftControl.disabled=liftAction.disabled;}
   }
-  mobile.update({mode:ui.state.mode,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked,charging:chargeMeter.charging,fastForward:fastForwardHeld,resultVisible:!$('result-card').hidden});
+  mobile.update({mode:ui.state.mode,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked||liftFloors.open,charging:chargeMeter.charging,fastForward:fastForwardHeld,resultVisible:!$('result-card').hidden});
   setHidden(speedIndicator,(!replaying&&phase!=='Flight')||briefing.blocked);speedIndicator.disabled=replaying&&!ui.state.replayPlaying;
   setData(speedIndicator,'rate',String(presentationRate));setData(speedIndicator,'audioRate',String(sound.state.playbackRate));setData(speedIndicator,'musicBpm',String(sound.state.bpm));
   if(speedIndicator.dataset.active!==String(presentationRate===2)||speedIndicator.dataset.touch!==String(mobile.active)){setData(speedIndicator,'active',String(presentationRate===2));setData(speedIndicator,'touch',String(mobile.active));setText($('shot-speed-label'),presentationRate===2?'⏩ 2× FAST FORWARD':mobile.active?'TAP · 2× SPEED':'HOLD SPACE · 2×');setText($('shot-speed-help'),presentationRate===2?'RELEASE SPACE / CLICK FOR NORMAL':'OR CLICK TO FAST FORWARD');speedIndicator.setAttribute('aria-pressed',String(presentationRate===2));}
