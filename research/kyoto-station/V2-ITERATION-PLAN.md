@@ -12,11 +12,11 @@ This supersedes the previous iteration pilot and the old plan's course-preservat
 
 The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
 
-Latest structural delivery: [Central 2 subway gate](notes/SUBWAY-CENTRAL-TWO-V2.md) connects the public underground passage to the island platform through an enclosed hall and stairs, with aligned floor openings and clear side aisles. The [eastern railway underpass](notes/EAST-TRANSFER-V2.md) connects six conventional-platform areas to the eastern Shinkansen transfer stair and Underground East gate. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
+Latest structural delivery: [the North subway gate](notes/SUBWAY-NORTH-V2.md) adds the fourth gate connection, its paid hall and stairs, and the extended platform end. The [Central 2 gate](notes/SUBWAY-CENTRAL-TWO-V2.md) and [eastern railway underpass](notes/EAST-TRANSFER-V2.md) are already connected. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
 
 Next priorities:
 
-1. Complete the North subway gate hall and the onward route to plaza Porta B1. Add missing accessible vertical connections.
+1. Connect the subway public hall to plaza Porta B1 and its Kotochika surroundings. Add missing accessible vertical connections and platform escalators.
 2. Complete the southern shopping streets, building frontage, terrace and forecourt.
 3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
 

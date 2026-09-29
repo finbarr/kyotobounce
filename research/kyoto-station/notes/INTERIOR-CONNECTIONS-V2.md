@@ -81,7 +81,9 @@ The [eastern railway underpass](EAST-TRANSFER-V2.md) connects all six convention
 
 The [Central 2 subway gate](SUBWAY-CENTRAL-TWO-V2.md) now connects the public passage to the shared island platform, with a complete stair well and clear platform aisles.
 
-1. **Underground public connections:** complete the North subway gate hall and the onward plaza Porta B1 connection; add missing accessible vertical routes. Keep the separate floor levels explicit.
+The [North subway gate](SUBWAY-NORTH-V2.md) adds the fourth entrance, its paid hall and stairs, and the northern platform extension. The public street-exit route remains alongside it.
+
+1. **Underground public connections:** connect the subway public hall to plaza Porta B1 and its Kotochika surroundings; add missing accessible vertical routes and platform escalators. Keep the separate floor levels explicit.
 2. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt.
 3. **Other connections and enclosures:** western platforms 30–34, remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 

@@ -1,4 +1,4 @@
-// Walk the eastern underpass, platform stairs, transfer and relocated Porta junction.
+// Walk a component's routes and check any closed platform boundaries it defines.
 import assert from 'node:assert/strict';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
@@ -8,11 +8,11 @@ import {PhysicsWorker} from '../../worker.ts';
 const [layoutPath,component,out]=process.argv.slice(2);assert(out?.startsWith('.local/'));await mkdir(out,{recursive:true});
 const bytes=await readFile(layoutPath),layout=JSON.parse(bytes);
 process.env.KYOTO_LAYOUT=resolve(layoutPath);process.env.KYOTO_WORKER_LOG=resolve(out+'/worker.log');
-const worker=new PhysicsWorker(),id='east-transfer',report={layoutSha256:createHash('sha256').update(bytes).digest('hex'),mode:process.env.KYOTO_PREFLIGHT?'entry-placements':'walks',entries:[],walks:[],pass:false};let state;
+const worker=new PhysicsWorker(),id='east-transfer',report={layoutSha256:createHash('sha256').update(bytes).digest('hex'),mode:process.env.KYOTO_PREFLIGHT?'entry-placements':'walks',entries:[],walks:[],boundaries:[],pass:false};let state;
 worker.on('message',m=>{if(m.type==='state'&&m.id===id)state=m;});
 async function until(fn){const end=performance.now()+90000;while(!fn()){assert(performance.now()<end,'Native state timeout');await delay(30);}}
 const feet=()=>state.players.find(p=>p.id===id).feet;
-async function start(p){const placed=await worker.request({type:'place',id,slot:'start',radius:.3,origin:{...p,y:p.y+.5},direction:{x:0,y:-1,z:0}});assert(placed.ok,'Unsupported route entry '+JSON.stringify(placed));await worker.request({type:'design-start',id,start:placed.disk});await delay(200);}
+async function start(p){const placed=await worker.request({type:'place',id,slot:'start',radius:.3,origin:{...p,y:p.y+.5},direction:{x:0,y:-1,z:0}});assert(placed.ok,'Unsupported route entry '+JSON.stringify(placed));await worker.request({type:'design-start',id,start:placed.disk});await delay(200);assert(state.players.find(p=>p.id===id).grounded,'Route entry must remain grounded');assert(Math.abs(feet().y-p.y)<.06,'Route entry floor height');}
 async function walk(points,label){const row={label,points,samples:[],pass:false};report.walks.push(row);
  for(let i=1;i<points.length;i++){
   const a=points[i-1],b=points[i],deadline=performance.now()+35000,dx=b.x-a.x,dz=b.z-a.z,length2=dx*dx+dz*dz;
@@ -30,6 +30,11 @@ try{
   const passed=previous?.walks.find(w=>w.label===row.label&&w.pass);if(passed){assert.deepEqual(passed.points,row.points);continue;}
   try{await start(row.points[0]);}catch(e){throw Error(row.label+' entry: '+e.message);}
   if(process.env.KYOTO_PREFLIGHT){report.entries.push({label:row.label,point:row.points[0],pass:true});console.log('ENTRY',row.label);continue;}await walk(row.points,row.label);
+ }
+ if(!process.env.KYOTO_PREFLIGHT)for(const row of (construction.geometry.blocked||[]).filter(r=>!process.env.KYOTO_ROUTE_FILTER||r.label.includes(process.env.KYOTO_ROUTE_FILTER))){
+  await start(row.start);const samples=[];
+  for(let i=0;i<60;i++){worker.send({type:'input',id,x:0,z:1,yaw:row.yaw,pitch:0,fast:false});await delay(60);const p=feet();samples.push({...p});assert((p[row.axis]-row.limit)*row.sign>=0,row.label+' crossed');assert(Math.abs(p.y-row.start.y)<.06,row.label+' lost floor');}
+  worker.send({type:'input',id,x:0,z:0,fast:false});assert(state.players.find(p=>p.id===id).grounded,row.label+' must remain grounded');assert(Math.abs(feet()[row.axis]-row.start[row.axis])>.2,row.label+' never approached barrier');report.boundaries.push({...row,samples,pass:true});await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log('PASS',row.label);
  }
  report.pass=true;
 }catch(error){report.error=String(error);throw error;}finally{worker.stop();await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');}
