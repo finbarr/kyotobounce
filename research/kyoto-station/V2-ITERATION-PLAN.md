@@ -35,7 +35,9 @@ The first task is integrated in the local v2 build. `npm run dev:v2` uses the la
 
 ## Subsequent priorities
 
-Latest delivery: [Restaurant timber, counters and stools](notes/RESTAURANT-MATERIALS-V2.md) replaces flat shop finishes with aligned grain and upholstery, smooths the existing stool cylinders, and corrects Daruma’s washed-out local illumination. Geometry remains unchanged. Next, develop the empty serving opening and photographed counter/wall fittings.
+Latest delivery: [Daruma Kyoto kitchen and counter](notes/DARUMA-KITCHEN-V2.md) uses a newly located firsthand Kyoto interior photograph to correct the counter finish and add pitchers, condiment pots, notices and serving-hatch equipment. Next, correct the missing central communal table and circulation from the same photograph.
+
+The [Restaurant timber, counters and stools](notes/RESTAURANT-MATERIALS-V2.md) replaces flat shop finishes with aligned grain and upholstery, smooths the existing stool cylinders, and corrects Daruma’s washed-out local illumination. Geometry remains unchanged. The subsequent Kyoto-specific kitchen pass develops the serving opening and counter fittings; wall photographs remain unfinished.
 
 The [Daruma glazed shopfront and counter](notes/DARUMA-FRONTAGE-V2.md) replaces shop 4’s placeholder with its photographed glazed side, signs, entrance, ticket terminal and visible counter seating. Native routes, source correspondence, Chrome gameplay and bounded practical lighting pass. Its timber, counter and stool finishes are now integrated in the subsequent material pass.
 

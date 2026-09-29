@@ -1,5 +1,7 @@
 # Restaurant timber, counters and stool finishes
 
+The subsequent [Kyoto kitchen pass](DARUMA-KITCHEN-V2.md) replaces the provisional maple counter finish with cream using a firsthand photograph of the built shop. The timber grain remains on Kotetsu and Daruma’s dark bases.
+
 ## Evidence and interpretation
 
 The saved [Kotetsu visitor photograph](https://mckee-blog.net/menyakotetsu_misoramen_kyotoramenkoji/) shows warm timber uprights and rails around the tiger screen. The article is dated July 2024 and has later updates; the photograph's capture date is uncertain. The [Daruma opening release](https://prtimes.jp/main/html/rd/p/000000008.000131832.html) includes pale counters, dark bases, red padded seats and chrome supports. Its interior collage may include other premises, so it supports the finish vocabulary rather than an exact Kyoto floor plan. The [June 2026 visitor account](https://osumituki.com/kyoto-ramen/225895.html) supports the Kyoto shop's dark frontage and glazed side.
