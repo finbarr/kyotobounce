@@ -45,10 +45,12 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is in the eastern JR underground passage. Six conventional
-platform stairs, the eastern Shinkansen transfer gate and the public Underground
-East gate are connected. The neighboring Porta stairs and ramp remain public;
-see the [eastern connection notes](../research/kyoto-station/notes/EAST-TRANSFER-V2.md).
+The current spawn is beside the Central 2 subway gate in the public underground
+passage. Its hall and stairs connect to the island platform; see the
+[Central 2 notes](../research/kyoto-station/notes/SUBWAY-CENTRAL-TWO-V2.md).
+Six conventional-platform stairs, the eastern Shinkansen transfer gate and the
+public Underground East gate remain connected. The neighboring Porta stairs and
+ramp remain public; see the [eastern connection notes](../research/kyoto-station/notes/EAST-TRANSFER-V2.md).
 The western approach, Grand Stairway, restaurant and central Skyway remain
 connected, as recorded in the [western route notes](../research/kyoto-station/notes/WESTERN-UPPER-CONNECTION-V2.md).
 

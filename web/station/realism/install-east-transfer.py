@@ -14,10 +14,11 @@ retained=[p for p in old['panels'] if p['id'] not in report['geometry']['retired
 for key in ('boxes','beams','flights','escalators'):assert old[key]==new[key]
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
-added=new['panels'][len(retained):];assert len(added)==report['geometry']['panels'] and all(p['id'].startswith('east-transfer-')for p in added)
+prefix=report.get('componentPrefix','east-transfer-')
+added=new['panels'][len(retained):];assert len(added)==report['geometry']['panels'] and all(p['id'].startswith(prefix)for p in added)
 bpy.ops.wm.open_mainfile(filepath=str(Path(base['sourceScene']).resolve()));assert bpy.data.texts['Kyoto runtime seed.json'].as_string()==old_raw.decode()
 by_id={p['id']:i for i,p in enumerate(new['panels'])}
-assert not (set(by_id) & {r['id'] for r in new['authoredLights'] if r['id'].startswith('east-transfer-')})
+assert not (set(by_id) & {r['id'] for r in new['authoredLights'] if r['id'].startswith(prefix)})
 removed=[]
 for o in list(bpy.data.objects):
  if o.name in report['geometry']['retiredLights']:bpy.data.objects.remove(o,do_unlink=True);continue
@@ -39,7 +40,7 @@ def material(key):
  if r.get('albedo'):
   image=bpy.data.images.load(str((component/report['texture']['file']).resolve()),check_existing=True);image.pack();tex=m.node_tree.nodes.new('ShaderNodeTexImage');tex.image=image;tex.extension='EXTEND';m.node_tree.links.new(tex.outputs['Color'],bs.inputs['Base Color'])
  created[key]=m;return m
-collection=bpy.data.collections.new('East underground railway passage and transfer');bpy.context.scene.collection.children.link(collection)
+collection=bpy.data.collections.new(report.get('sourceCollection','East underground railway passage and transfer'));bpy.context.scene.collection.children.link(collection)
 def signature(o):
  vertices=np.empty(len(o.data.vertices)*3,dtype=np.float32);o.data.vertices.foreach_get('co',vertices);loops=np.empty(len(o.data.loops),dtype=np.int32);o.data.loops.foreach_get('vertex_index',loops)
  return sha(vertices.tobytes()+loops.tobytes()+np.array(o.matrix_world,dtype=np.float32).tobytes())

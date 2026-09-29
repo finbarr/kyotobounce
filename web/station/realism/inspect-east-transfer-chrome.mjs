@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {chromium} from 'playwright';
-const [origin,out]=process.argv.slice(2);assert(['localhost','127.0.0.1'].includes(new URL(origin).hostname));assert(out.startsWith('.local/'));await mkdir(out,{recursive:true});
+const [origin,out,viewFile]=process.argv.slice(2);assert(['localhost','127.0.0.1'].includes(new URL(origin).hostname));assert(out.startsWith('.local/'));await mkdir(out,{recursive:true});
 // Native coordinates, converted at the camera boundary.
-const views=[
+const views=viewFile?JSON.parse(await readFile(viewFile)):[
  ['platform-0-descent',[125,1.7,-35.2],[136,-3,-35.0]],
  ['platform-2-3-descent',[125,1.7,-49.95],[138,-4,-49.7]],
  ['platform-4-5-arrival',[143,-4.5,-75.68],[132,-2,-75.82]],
