@@ -12,7 +12,7 @@ old_raw=Path(base['layout']).read_bytes();new_raw=Path(candidate['layout']).read
 assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha256']
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
 modified_ids=report['geometry'].get('modifiedPanelIds',[])
-allowed_modified={'garden-promenade-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203'],'garden-access-':['west-south-floor-10','west-south-slab-edge-10-5-0'],'central-lift-':['concourse'],'granvia-entrance-':['concourse','east-passage-north-wall','east-passage-south-wall'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
+allowed_modified={'garden-store-entry-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203'],'garden-promenade-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203'],'garden-access-':['west-south-floor-10','west-south-slab-edge-10-5-0'],'central-lift-':['concourse'],'granvia-entrance-':['concourse','east-passage-north-wall','east-passage-south-wall'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
 if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','isetan-stair-','isetan-lift-'):
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
  assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix'] in ('isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-stair-','isetan-lift-') and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' or report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-') and id.startswith('north-side-') and next(p for p in old['panels']if p['id']==id)['role']=='parapet' for id in modified_ids)
@@ -185,6 +185,16 @@ for p in replaced+added:
      }[p['id']]
      assert (b-a).cross(c-a).length/2<area_limit and angle<angle_limit,('Saved preview normal differs',p['id'],l.index,angle)
      if p['id']=='west-south-slab-edge-5-5-0':assert max(p['vertices'][i]['y']for i in polygon.vertices)<spec['floor']
+   elif report['componentPrefix']=='garden-store-entry-' and angle>=.1:
+    # Preserve the already checked municipal corners through this new cut.
+    # Match positions and export normals, rather than reusing face indices.
+    assert p['id']=='municipal-station-wing-west-Untitled.203'
+    polygon=next(f for f in mesh.polygons if l.index in f.loop_indices)
+    original=next(q for q in old['panels']if q['id']==p['id'])
+    def face_key(q,ids):
+     return sorted(tuple(round(q[field][i][k],6)for field in ('vertices','normals')for k in ('x','y','z'))for i in ids)
+    assert face_key(p,polygon.vertices)in [face_key(original,original['triangles'][i:i+3])for i in range(0,len(original['triangles']),3)],('New cut preview normal differs',p['id'],l.index,angle)
+    assert angle<.6,('Inherited preview normal differs',p['id'],l.index,angle)
    elif report['componentPrefix']=='garden-promenade-' and angle>=.1:
     # Blender packs custom viewport normals relative to the cut face. These
     # three municipal corners quantize more strongly; exact export vectors
@@ -193,7 +203,7 @@ for p in replaced+added:
     polygon=next(f for f in mesh.polygons if l.index in f.loop_indices)
     area_limit,angle_limit={1275:(1.473,.58),1477:(24.273,.36),2268:(2.645,.42)}[polygon.index]
     assert polygon.area<area_limit and angle<angle_limit,('Saved preview normal differs',p['id'],l.index,angle)
-   elif report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-eighth-north-','garden-access-','garden-promenade-'):assert angle<.1,('Saved preview normal differs',p['id'],l.index,angle)
+   elif report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-eighth-north-','garden-access-','garden-promenade-','garden-store-entry-'):assert angle<.1,('Saved preview normal differs',p['id'],l.index,angle)
    else:assert max(abs(a-b)for a,b in zip(preview,expected))<.001,('Saved corner normal differs',p['id'],l.index)
 for p in retained:
  o=objects.get(p['id']);assert o and o['kyoto_seed']=='panels/'+str(by_id[p['id']])

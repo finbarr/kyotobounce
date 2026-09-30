@@ -25,7 +25,7 @@ assert g.get('stair') or r['componentPrefix']in ('isetan-fourth-','isetan-fifth-
 if g.get('stair'):
  maximum_rise=.20 if r['componentPrefix']=='garden-access-' else .19
  assert .14<g['stair']['rise']<maximum_rise
-if r['componentPrefix']=='garden-access-':
+if r['componentPrefix']in ('garden-access-','garden-store-entry-'):
  assert len(g['stair']['stepIds'])==28
  for id in g['stair']['stepIds']:
   p=panels[id];top=max(v['y']for v in p['vertices']);a=min(v['x']for v in p['vertices']);b=max(v['x']for v in p['vertices']);z=spec['centerZ']

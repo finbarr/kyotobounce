@@ -49,7 +49,9 @@ The current spawn is at the upper Grand Stairway landing, beside the repaired
 [rooftop garden connection](../research/kyoto-station/notes/ATRIUM-GARDEN-ROUTE-V2.md).
 Follow the short flight west into the [garden court and promenade](../research/kyoto-station/notes/GARDEN-PROMENADE-V2.md).
 The court now connects to its northern viewing window and western rooftop path.
-The western Isetan entrance remains unfinished. Descend the Grand Stairway
+The [western Isetan entrance](../research/kyoto-station/notes/GARDEN-STORE-ENTRY-V2.md)
+now leads down an indoor stair and along the 11F public hall back to the upper
+atrium landing. Restaurant interiors remain unfinished. Descend the Grand Stairway
 to return towards Muromachi Square and the atrium.
 The central pairs connect 3F through 8F. The eighth-floor south entrance,
 store aisles and café now connect to the public stair landing; see the

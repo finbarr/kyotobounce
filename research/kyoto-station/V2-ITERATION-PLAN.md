@@ -50,7 +50,7 @@ The user now wants most effort on the atrium and everything reachable from it, e
 
 Next priorities:
 
-1. Refine the garden’s enclosing roof rooms, northern viewing screen and western entrance using the operator photographs. The [garden court and promenade](notes/GARDEN-PROMENADE-V2.md) now join the stair arrival, northern viewing bay and western path on one floor; the western Isetan doorway still needs a usable destination.
+1. Refine the garden’s enclosing roof rooms and northern viewing screen using the operator photographs. The [garden court and promenade](notes/GARDEN-PROMENADE-V2.md) connect to the [western Isetan entrance and 11F hall](notes/GARDEN-STORE-ENTRY-V2.md), forming a return route to the upper atrium. Improve the roof enclosure and public finishes next; the restaurant interiors and 11F central escalators remain unfinished.
 2. Improve the garden’s paving, planting, seating and signs from operator photographs, and clarify connections to the Skyway and restaurant terrace.
 3. Continue the atrium’s immediately reachable public spaces and entrances. Resume deeper store interiors or distant southern frontage after these routes are coherent.
 
