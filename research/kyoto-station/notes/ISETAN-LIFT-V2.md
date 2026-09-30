@@ -1,5 +1,9 @@
 # Isetan north lift and B3 lobby
 
+The provisional five-stop core described below has been replaced by the
+[corrected north core](ISETAN-NORTH-CORE-V2.md), clear of the Grand Stairway
+and serving B3 through 5F. Its old floor openings are closed.
+
 ## Evidence and scope
 
 The [station operator's parking diagram](https://www.kyoto-station-building.co.jp/parking/)

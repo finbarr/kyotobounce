@@ -21,10 +21,10 @@ try{
  async function walk(z,yaw){await page.evaluate(y=>__liftStopsTest.aim(y),yaw+(spec.yaw||0));await page.keyboard.down('w');try{await page.waitForFunction(({z,yaw,spec})=>{const a=(spec.yaw||0)*Math.PI/180,p=kyotoState.feet,localZ=Math.sin(a)*(p.x-spec.origin.x)+Math.cos(a)*(p.z-spec.origin.z);return yaw===0?localZ>=z:localZ<=z;},{z,yaw,spec},{timeout:12000});}finally{await page.keyboard.up('w');}await page.waitForTimeout(200);}
  const startFloor=spec.stops.findIndex(s=>Math.abs(identity.spawn.y-spec.origin.y-s.height)<.06);assert(startFloor>=0);
  async function useLift(){await page.waitForFunction(()=>{const b=document.getElementById('lift-control');return b&&!b.hidden&&!b.disabled;},null,{timeout:5000});await page.keyboard.press('e');}
- if(startFloor!==0){await useLift();await page.waitForFunction(i=>{const l=__liftStopsTest.read().lift;return !l.busy&&l.landingDoors[i]>.99;},startFloor,{timeout:45000});check(true,'Call central car to the starting landing');}
- await walk(-.2,0);check((await read()).grounded,'Walk from lower landing into the five-floor car');
+ if(startFloor!==0){await useLift();await page.waitForFunction(i=>{const l=__liftStopsTest.read().lift;return !l.busy&&l.landingDoors[i]>.99;},startFloor,{timeout:Math.ceil(spec.height/.8*1000)+15000});check(true,'Call central car to the starting landing');}
+ await walk(-.2,0);check((await read()).grounded,'Walk from landing into the multi-floor car');
  await useLift();await page.locator('#lift-floors').waitFor({state:'visible'});
- check(await page.locator('#lift-floors button[data-stop]').count()===5,'Floor picker offers all five named destinations');
+ check(await page.locator('#lift-floors button[data-stop]').count()===spec.stops.length,'Floor picker offers all '+spec.stops.length+' named destinations');
  check(await page.locator('#lift-floors [data-stop="'+spec.stops[startFloor].id+'"]').isDisabled(),'Current floor is identified and disabled');
  await page.screenshot({path:out+'/floor-picker.png'});
  const feet=(await read()).feet;await page.keyboard.down('w');await page.waitForTimeout(450);await page.keyboard.up('w');
@@ -44,7 +44,8 @@ try{
  });
  check((await read()).menu,'Rapid floor picker close and reopen keeps the new dialog open');
  await page.keyboard.press('Escape');
- for(const target of [2,1,4,3,0]){
+ const targets=[2,1,...Array.from({length:spec.stops.length-3},(_,i)=>spec.stops.length-1-i),0];
+ for(const target of targets){
   await useLift();await page.locator('#lift-floors [data-stop="'+spec.stops[target].id+'"]').click();
   await page.waitForFunction(()=>__liftStopsTest.read().lift.moving,null,{timeout:10000});
   s=await read();check(s.lift.landingDoors.every(v=>v===0)&&s.lift.carDoor===0,'All landing doors stay closed during the trip to '+spec.stops[target].id);
@@ -54,7 +55,7 @@ try{
    await page.keyboard.down('Space');await page.waitForTimeout(150);await page.keyboard.up('Space');await page.waitForFunction(()=>kyotoState.phase==='Flight',null,{timeout:15000});await page.waitForTimeout(350);await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim',null,{timeout:10000});
    s=await read();check(Math.abs(s.feet.y-spec.origin.y-s.lift.height)<.09,'Throw and recall preserve the rider on a descending intermediate-floor trip');
   }
-  await page.waitForFunction(i=>{const s=__liftStopsTest.read();return !s.lift.busy&&s.lift.landingDoors[i]>.99;},target,{timeout:45000});
+  await page.waitForFunction(i=>{const s=__liftStopsTest.read();return !s.lift.busy&&s.lift.landingDoors[i]>.99;},target,{timeout:Math.ceil(spec.height/.8*1000)+15000});
   // Presentation intentionally trails the newest native snapshot. Wait for the
   // rendered doors too before comparing exact resting transforms.
   const pose={height:spec.stops[target].height,carDoor:1,lowerDoor:target===0?1:0,upperDoor:target===spec.stops.length-1?1:0,landingDoors:spec.stops.map((_,i)=>i===target?1:0)};
