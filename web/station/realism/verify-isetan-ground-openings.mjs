@@ -20,12 +20,13 @@ function insidePolygon(triangle,bounds){
 }
 function reader({json:j,bin}){const cache=new Map();return ai=>{if(cache.has(ai))return cache.get(ai);const a=j.accessors[ai],v=j.bufferViews[a.bufferView],e=v.extensions?.EXT_meshopt_compression,w={SCALAR:1,VEC2:2,VEC3:3}[a.type],bytes={5123:2,5125:4,5126:4}[a.componentType];assert(w&&bytes&&!a.sparse);let b=bin.subarray(v.byteOffset||0,(v.byteOffset||0)+v.byteLength);if(e){b=Buffer.alloc(e.count*e.byteStride);MeshoptDecoder.decodeGltfBuffer(b,e.count,e.byteStride,bin.subarray(e.byteOffset,e.byteOffset+e.byteLength),e.mode,e.filter);}const result=Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>b[a.componentType===5126?'readFloatLE':bytes===2?'readUInt16LE':'readUInt32LE']((a.byteOffset||0)+i*(v.byteStride||w*bytes)+k*bytes)));cache.set(ai,result);return result;};}
 export async function verifyIsetanOpenings(parent,candidate,old,next,report,spec){
- await MeshoptDecoder.ready;assert(['isetan-ground-','isetan-second-','isetan-third-','isetan-stair-','granvia-entrance-','isetan-lift-','granvia-parking-'].includes(report.componentPrefix));
- const cuts=report.componentPrefix==='granvia-entrance-'?{concourse:report.geometry.pits.map(p=>[[p.minX,p.maxX],[-.7,.1],[p.minZ,p.maxZ]]),...Object.fromEntries(Object.entries(spec.wallCuts).map(([id,bounds])=>[id,[bounds]]))}:Object.fromEntries(Object.entries(spec.cuts).map(([id,bounds])=>[id,[bounds]]));
+ await MeshoptDecoder.ready;assert(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-stair-','granvia-entrance-','isetan-lift-','granvia-parking-'].includes(report.componentPrefix));
+ const cuts=report.componentPrefix==='granvia-entrance-'?{concourse:report.geometry.pits.map(p=>[[p.minX,p.maxX],[-.7,.1],[p.minZ,p.maxZ]]),...Object.fromEntries(Object.entries(spec.wallCuts).map(([id,bounds])=>[id,[bounds]]))}:report.componentPrefix==='isetan-fourth-'?spec.cuts:Object.fromEntries(Object.entries(spec.cuts).map(([id,bounds])=>[id,[bounds]]));
  assert.deepEqual(report.geometry.modifiedPanelIds,Object.keys(cuts));
+ for(const volumes of Object.values(cuts))for(let i=0;i<volumes.length;i++)for(const b of volumes.slice(i+1))assert(volumes[i].some(([lo,hi],k)=>hi<=b[k][0]||b[k][1]<=lo),'Cut volumes must have disjoint interiors');
  const expected=new Map(),areaChecks=[];let nativeTriangles=0,wholeFaces=0;
  for(const id of report.geometry.modifiedPanelIds){
-  const a=old.panels.find(p=>p.id===id),b=next.panels.find(p=>p.id===id),bounds=cuts[id][0],label=old.authoredMaterials.find(m=>m.id===a.appearance)?.label||a.appearance;assert(a&&b);
+  const a=old.panels.find(p=>p.id===id),b=next.panels.find(p=>p.id===id),volumes=cuts[id],bounds=volumes[0],label=old.authoredMaterials.find(m=>m.id===a.appearance)?.label||a.appearance;assert(a&&b);
   if(id==='concourse'){
    const total=p=>Array.from({length:p.triangles.length/3},(_,i)=>area(p.triangles.slice(i*3,i*3+3).map(i=>p.vertices[i]).map(v=>[v.x,v.y,v.z]))).reduce((a,b)=>a+b,0);
    const removed=cuts[id].reduce((sum,b)=>sum+2*(b[0][1]-b[0][0])*(b[2][1]-b[2][0]),0),rim=cuts[id].reduce((sum,b)=>sum+2*((b[0][1]-b[0][0])+(b[2][1]-b[2][0]))*.6000000238418579,0);
@@ -36,14 +37,14 @@ export async function verifyIsetanOpenings(parent,candidate,old,next,report,spec
   assert(b.normals);
   assert.deepEqual({...b,vertices:a.vertices,triangles:a.triangles,normals:a.normals,uv:a.uv},{...a,normals:a.normals,uv:a.uv});
   const original=[];let oldArea=0,cutArea=0,newArea=0;
-  for(let i=0;i<a.triangles.length;i+=3){const triangle=a.triangles.slice(i,i+3).map(i=>a.vertices[i]),vs=triangle.map(v=>[v.x,v.y,v.z]),poly=insidePolygon(vs,bounds);oldArea+=area(vs);for(let n=1;n+1<poly.length;n++)cutArea+=area([poly[0],poly[n],poly[n+1]]);original.push(vs);}
+  for(let i=0;i<a.triangles.length;i+=3){const triangle=a.triangles.slice(i,i+3).map(i=>a.vertices[i]),vs=triangle.map(v=>[v.x,v.y,v.z]);oldArea+=area(vs);for(const bounds of volumes){const poly=insidePolygon(vs,bounds);for(let n=1;n+1<poly.length;n++)cutArea+=area([poly[0],poly[n],poly[n+1]]);}original.push(vs);}
   const retainedKeys=new Set();
   for(let i=0;i<b.triangles.length;i+=3){const ix=b.triangles.slice(i,i+3),vs=ix.map(i=>b.vertices[i]).map(v=>[v.x,v.y,v.z]);newArea+=area(vs);
-   assert(bounds.some(([lo,hi],k)=>vs.every(v=>v[k]<=lo+2e-5)||vs.every(v=>v[k]>=hi-2e-5)),id+' still crosses the intended void');
+   assert(volumes.every(bounds=>bounds.some(([lo,hi],k)=>vs.every(v=>v[k]<=lo+2e-5)||vs.every(v=>v[k]>=hi-2e-5))),id+' still crosses the intended void');
    assert(original.some(tri=>{const t=new T.Triangle(...tri.map(v=>new T.Vector3(...v)));return vs.every(v=>t.closestPointToPoint(new T.Vector3(...v),new T.Vector3()).distanceTo(new T.Vector3(...v))<5e-5);}),id+' moved outside the original surface');
    const vertices=ix.toReversed().map(i=>({POSITION:pos(b.vertices[i]),NORMAL:pos(b.normals[i]),...(b.uv?{TEXCOORD_0:[b.uv[i].x,1-b.uv[i].y]}:{})})),k=label+'|'+key(vertices.map(v=>v.POSITION));assert(!expected.has(k));expected.set(k,vertices);retainedKeys.add(key(vs));nativeTriangles++;
   }
-  for(const tri of original)if(bounds.some(([lo,hi],k)=>tri.every(v=>v[k]<=lo)||tri.every(v=>v[k]>=hi))){assert(retainedKeys.has(key(tri)),id+' lost a whole face outside the opening');wholeFaces++;}
+  for(const tri of original)if(volumes.every(bounds=>bounds.some(([lo,hi],k)=>tri.every(v=>v[k]<=lo)||tri.every(v=>v[k]>=hi)))){assert(retainedKeys.has(key(tri)),id+' lost a whole face outside the opening');wholeFaces++;}
   const error=Math.abs(oldArea-cutArea-newArea);assert(error<Math.max(.004,oldArea*2e-6),id+' surface area mismatch '+error);areaChecks.push({id,oldArea,cutArea,newArea,error});
  }
  const after=reader(candidate),before=reader(parent),seen=new Set(),oldBufferSize=parent.bin.length;

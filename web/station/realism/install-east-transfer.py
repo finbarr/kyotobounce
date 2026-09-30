@@ -13,9 +13,9 @@ assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
 modified_ids=report['geometry'].get('modifiedPanelIds',[])
 allowed_modified={'central-lift-':['concourse'],'granvia-entrance-':['concourse','east-passage-north-wall','east-passage-south-wall'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
-if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-stair-','isetan-lift-'):
+if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-stair-','isetan-lift-'):
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
- assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix'] in ('isetan-second-','isetan-third-','isetan-stair-','isetan-lift-') and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' for id in modified_ids)
+ assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix'] in ('isetan-second-','isetan-third-','isetan-fourth-','isetan-stair-','isetan-lift-') and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' or report['componentPrefix']=='isetan-fourth-' and id.startswith('north-side-') and next(p for p in old['panels']if p['id']==id)['role']=='parapet' for id in modified_ids)
 elif report.get('componentPrefix')=='granvia-parking-':
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
  assert modified_ids[0]=='concourse' and all(id.startswith('east-frontage-') for id in modified_ids[1:])
@@ -25,7 +25,7 @@ retained=[replaced_by_id.get(p['id'],p) for p in old['panels'] if p['id'] not in
 retired_boxes=report['geometry'].get('retiredBoxIds',[]);assert not retired_boxes or report.get('componentPrefix')in ('porta-west-','isetan-ground-','isetan-second-','granvia-entrance-')
 assert new['boxes']==[p for p in old['boxes']if p['id']not in retired_boxes]
 modified_flights=report['geometry'].get('modifiedFlightIds',[])
-assert not modified_flights or report.get('componentPrefix')=='isetan-ground-'
+assert not modified_flights or report.get('componentPrefix')in ('isetan-ground-','isetan-fourth-')
 assert new['flights']==[dict(f,foundationDepth=0)if f['id']in modified_flights else f for f in old['flights']]
 assert old['beams']==new['beams']
 lanes=json.loads((component/'motion.json').read_text())['escalators'] if report.get('componentPrefix')=='granvia-entrance-' else []
@@ -78,6 +78,7 @@ def signature(o):
  return sha(vertices.tobytes()+loops.tobytes()+np.array(o.matrix_world,dtype=np.float32).tobytes())
 for p in replaced:
  o=next(o for o in bpy.data.objects if o.get('kyoto_surface',o.name)==p['id']);bpy.data.objects.remove(o,do_unlink=True)
+max_preview_normal_angle=0
 for p in replaced+added:
  index=by_id[p['id']]
  mesh=bpy.data.meshes.new(p['id']);mesh.from_pydata([(v['x'],v['z'],v['y'])for v in p['vertices']],[],[p['triangles'][i:i+3][::-1]for i in range(0,len(p['triangles']),3)]);mesh.update();o=bpy.data.objects.new(p['id'],mesh);collection.objects.link(o);mesh.materials.append(material(p['appearance']))
@@ -140,7 +141,17 @@ for p in replaced+added:
  o=objects[p['id']];mesh=o.data;assert o['kyoto_seed']=='panels/'+str(by_id[p['id']]);assert signature(o)==o['kyoto_geometry_signature'];assert mesh.materials[0].name==materials.get(p['appearance'],{'label':p['appearance']})['label'];assert [i for f in mesh.polygons for i in reversed(f.vertices)]==p['triangles'];assert max((v.co-Vector((q['x'],q['z'],q['y']))).length for v,q in zip(mesh.vertices,p['vertices']))<2e-5
  for l in mesh.loops:
   if p.get('uv'):assert max(abs(mesh.uv_layers.active.data[l.index].uv[i]-p['uv'][l.vertex_index][k])for i,k in enumerate(('x','y')))<1e-5
-  if p.get('normals'):assert max(abs(mesh.corner_normals[l.index].vector[i]-p['normals'][l.vertex_index][k])for i,k in enumerate(('x','z','y')))<.001,('Saved corner normal differs',p['id'],l.index)
+  if p.get('normals'):
+   expected=Vector(tuple(p['normals'][l.vertex_index][k]for k in ('x','z','y')))
+   # The exporter restores these full-precision vectors. Blender's encoded
+   # viewport normals can quantize a thin cut face by a small angle.
+   exact=mesh.attributes['kyoto_authored_normal'].data[l.index].vector
+   assert max(abs(a-b)for a,b in zip(exact,expected))<1e-6,('Saved export normal differs',p['id'],l.index)
+   preview=mesh.corner_normals[l.index].vector
+   angle=math.degrees(math.atan2(preview.cross(expected).length,preview.dot(expected)))
+   max_preview_normal_angle=max(max_preview_normal_angle,angle)
+   if report['componentPrefix']=='isetan-fourth-':assert angle<.1,('Saved preview normal differs',p['id'],l.index,angle)
+   else:assert max(abs(a-b)for a,b in zip(preview,expected))<.001,('Saved corner normal differs',p['id'],l.index)
 for p in retained:
  o=objects.get(p['id']);assert o and o['kyoto_seed']=='panels/'+str(by_id[p['id']])
 for part,position,size in lift_objects:
@@ -157,4 +168,5 @@ for lane in lanes:
 proof={'pass':True,'parentSourceSha256':sha(Path(base['sourceScene']).read_bytes()),'sourceSha256':sha((out/'KyotoAtrium.blend').read_bytes()),'layoutSha256':sha(new_raw),'addedPanels':len(added),'retiredObjects':removed,'savedGeometryUVsNormalsMatch':True,'retainedBindingsMatch':True}
 proof['addedEscalators']=len(lanes);proof['animation']=motion_manifest
 proof['modifiedPanels']=modified_ids;proof['modifiedPaving']=modified_paving;proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects);proof['retiredLiftParts']=retired_lift_parts
+proof['savedExportNormalsExact']=True;proof['maximumPreviewNormalAngleDegrees']=max_preview_normal_angle
 (out/'installation.json').write_text(json.dumps(proof,indent=2)+'\n');print('EAST_TRANSFER_SOURCE_READY',json.dumps(proof),flush=True)

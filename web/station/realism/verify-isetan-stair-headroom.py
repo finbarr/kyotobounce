@@ -21,7 +21,8 @@ for prefix,steps in g.get('headroomStairs',[('isetan-stair-',21),('isetan-ground
    assert abs(b-a-.3)<1e-5
    volumes.append((p['id'],[(a+.035,b-.035),(top+.35,top+2.1),(z-.3,z+.3)]));count+=1
  p=panels[prefix+'stair-landing'];top=max(v['y']for v in p['vertices']);a=min(v['x']for v in p['vertices']);b=max(v['x']for v in p['vertices']);volumes.append((p['id'],[(a+.2,b-.2),(top+.35,top+2.1),(8.6,13.8)]))
-assert .14<g['stair']['rise']<.19
+assert g.get('stair') or r['componentPrefix']=='isetan-fourth-'
+if g.get('stair'):assert .14<g['stair']['rise']<.19
 # Check flat approaches and the north bypass with the player capsule width.
 for route in g['routes']:
  if g.get('headroomRoutes') and route['label']not in g['headroomRoutes']:continue
@@ -71,18 +72,34 @@ for name,bounds in volumes:
   for tri in ids:assert clipped_area([vs[k]for k in tri],bounds)<1e-8,(name,id)
 # Older generated flights and beams are outside these volumes. Conservative
 # bounds include their foundations and profiles; an overlap requires inspection.
-other=[];flight_plans={};plan_checks=0
+other=[];flight_plans={};plan_checks=0;beam_checks=0
 for f in layout['flights']:
+ # StationWorld does not instantiate legacy escalator flight meshes; the
+ # operating escalators use separate records and are exercised by route walks.
  if f.get('role')=='escalator' and not f.get('foundationDepth'):continue
  ps=[p for row in f['contours']for p in row['points']]
  if not f.get('foundationDepth'):flight_plans[f['id']]=f['contours']
- other.append((f['id'],[(min(p['x']for p in ps),max(p['x']for p in ps)),(f['baseElevation']-.31-max(0,f.get('foundationDepth',0)),f['baseElevation']+f['rise']*(len(f['contours'])-1)),(min(p['y']for p in ps),max(p['y']for p in ps))]))
+ other.append((f['id'],[(min(p['x']for p in ps),max(p['x']for p in ps)),(f['baseElevation']-.31-max(0,f.get('foundationDepth',0)),f['baseElevation']+f['rise']*(len(f['contours'])-1)),(min(p['y']for p in ps),max(p['y']for p in ps))],None))
 for b in layout['beams']:
  if not b.get('collision',False):continue
- other.append((b['id'],[(min(b['a'][k],b['b'][k])-b['radius'],max(b['a'][k],b['b'][k])+b['radius'])for k in ('x','y','z')]))
+ radius=b['radius']*(math.sqrt(2)if b.get('profile')=='square'else 1)
+ other.append((b['id'],[(min(b['a'][k],b['b'][k])-radius,max(b['a'][k],b['b'][k])+radius)for k in ('x','y','z')],b))
 for name,bounds in volumes:
- for id,b in other:
+ for id,b,beam in other:
   if any(b[a][1]<=bounds[a][0]or b[a][0]>=bounds[a][1]for a in range(3)):continue
+  if beam:
+   # The long sloping escalator rails have huge empty AABB corners. Enclose
+   # the actual square prism/capsule by expanding the box around its segment.
+   # A disjoint segment proves clearance; an intersection still fails closed.
+   radius=beam['radius']*(math.sqrt(2)if beam.get('profile')=='square'else 1);lo=0;hi=1
+   for axis,k in enumerate(('x','y','z')):
+    a=beam['a'][k];delta=beam['b'][k]-a;low,high=bounds[axis];low-=radius;high+=radius
+    if abs(delta)<1e-12:
+     if not low<=a<=high:lo=2;break
+    else:
+     enter,leave=sorted(((low-a)/delta,(high-a)/delta));lo=max(lo,enter);hi=min(hi,leave)
+   assert lo>hi,('Inspect generated beam collider',name,id)
+   beam_checks+=1;continue
   assert id in flight_plans,('Inspect generated collider',name,id)
   # An oblique flight's axis-aligned bounds include empty space beside its
   # foot. Its contour cells give a conservative plan footprint for every tread
@@ -95,4 +112,4 @@ for name,bounds in volumes:
     vs=[dict(x=p['x'],y=y,z=p['y'])for p in q]
     for ix in [(0,1,2),(0,2,3)]:assert clipped_area([vs[k]for k in ix],bounds)<1e-8,('Inspect generated collider',name,id)
   plan_checks+=1
-proof=dict(pass_=True,layoutSha256=m['layoutSha256'],geometrySha256=m['geometrySha256'],treads=count,stepRiseM=g['stair']['rise'],stairHeadroomM=2.1,headroomVolumes=len(volumes),retainedStairSurfaces=len(retained_stair),flightPlanChecks=plan_checks);proof['pass']=proof.pop('pass_');out.write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))
+proof=dict(pass_=True,layoutSha256=m['layoutSha256'],geometrySha256=m['geometrySha256'],treads=count,stepRiseM=g.get('stair',{}).get('rise'),stairHeadroomM=2.1,headroomVolumes=len(volumes),retainedStairSurfaces=len(retained_stair),flightPlanChecks=plan_checks,beamSegmentChecks=beam_checks);proof['pass']=proof.pop('pass_');out.write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))
