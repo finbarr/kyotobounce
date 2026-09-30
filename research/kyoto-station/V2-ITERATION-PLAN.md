@@ -20,7 +20,7 @@ The [Porta west public lift](notes/PORTA-WEST-LIFT-V2.md) connects the western c
 
 The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) connect all five stops: parking B3, Porta B2, the western B1 hall, the recessed ground entrance and the upper north–south passage. Fourteen native route walks and 34 Chrome lift checks pass. The parking receiving area is established; ramps and further building connections remain unfinished.
 
-The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both B2 food-hall entrances, connect aisle loops and add a guarded internal stair. The central lift remains reachable from both levels. Detailed shop fitouts and further store-floor connections remain unfinished.
+The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both B2 food-hall entrances, connect aisle loops and add a guarded internal stair. The [ground entrance and stair](notes/ISETAN-GROUND-V2.md) extend that connection into an open ground-floor receiving hall. The central lift remains reachable from both basements. Upper store floors and further vertical circulation remain unfinished.
 
 The [retained Porta pavilion stair](notes/PORTA-PAVILION-V2.md) restores the forecourt entrance and opens both stair lanes onto North Street. Adjacent shop bays, the west cross-passage and lift approach remain usable. Its exact exit number remains unconfirmed.
 
@@ -28,11 +28,11 @@ The [western platforms 30–34](notes/WESTERN-PLATFORMS-V2.md) connect to platfo
 
 Next priorities:
 
-1. Complete the remaining southern building frontage, terrace, forecourt and Miyako Michi connections.
-2. Complete missing public-room openings around the subway receiving halls before adding tenant detail.
+1. Repair remaining Isetan and Granvia interior connections and parking access before tenant decoration.
+2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 
-The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. Tenant interiors and working ASTY escalators remain unfinished.
+The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. The [station-side escalators](notes/STATION-ESCALATORS-V2.md) complete the shared stair halls. Tenant interiors remain unfinished.
 
 Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).
 

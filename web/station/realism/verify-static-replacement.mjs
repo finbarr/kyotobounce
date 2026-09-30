@@ -4,13 +4,17 @@ import {readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import * as T from 'three';
 import {verifyWesternShell} from './verify-western-platform-shell.mjs';
+import {verifyIsetanOpenings} from './verify-isetan-ground-openings.mjs';
 import {readGLB} from '../../../tools/optimize-browser-assets.mjs';
 const [basePath,candidatePath,component,out]=process.argv.slice(2);assert(out?.startsWith('.local/'));
 const read=async p=>JSON.parse(await readFile(p)),sha=b=>createHash('sha256').update(b).digest('hex');
 const base=await read(basePath),m=await read(candidatePath),oldRaw=await readFile(base.layout),raw=await readFile(m.layout),old=JSON.parse(oldRaw),next=JSON.parse(raw),r=await read(component+'/report.json'),native=await read(component+'/native-panels.json');
 assert.equal(sha(oldRaw),base.layoutSha256);assert.equal(sha(raw),m.layoutSha256);assert.equal(r.sourceLayoutSha256,base.layoutSha256);
 const removed=new Set(r.geometry.retiredIds),retained=old.panels.filter(p=>!removed.has(p.id));
-assert.equal(old.panels.length-retained.length,removed.size);const modified=r.geometry.modifiedPanelIds||[];
+const retiredBoxes=r.geometry.retiredBoxIds||[];
+assert(!retiredBoxes.length||r.componentPrefix==='isetan-ground-');
+assert.deepEqual(next.boxes,old.boxes.filter(p=>!retiredBoxes.includes(p.id)));
+assert.equal(old.panels.length-retained.length+retiredBoxes.length+(r.geometry.retiredSourceOnlyIds||[]).length,removed.size);const modified=r.geometry.modifiedPanelIds||[];
 assert.deepEqual(next.panels.slice(0,retained.length).map(p=>modified.includes(p.id)?old.panels.find(q=>q.id===p.id):p),retained);
 const added=next.panels.slice(retained.length);assert.equal(added.length,native.panels.length);
 assert.deepEqual(next.authoredMaterials.slice(0,old.authoredMaterials.length),old.authoredMaterials);
@@ -27,7 +31,8 @@ if(['hachijo-escalators-','station-escalators-'].includes(r.componentPrefix)){
  const motion=await read(component+'/motion.json');assert.equal(motion.escalators.length,r.componentPrefix==='station-escalators-'?2:4);
  assert.deepEqual(next.escalators,[...old.escalators,...motion.escalators]);addedEscalators=motion.escalators.length;
 }else assert.deepEqual(next.escalators,old.escalators);
-assert.deepEqual({...next,escalators:old.escalators,lifts:old.lifts,panels:old.panels,authoredMaterials:old.authoredMaterials,authoredLights:old.authoredLights,architecture:old.architecture},old);
+const modifiedFlights=r.geometry.modifiedFlightIds||[];assert(!modifiedFlights.length||r.componentPrefix==='isetan-ground-');assert.deepEqual(next.flights,old.flights.map(f=>modifiedFlights.includes(f.id)?{...f,foundationDepth:0}:f));
+assert.deepEqual({...next,flights:old.flights,boxes:old.boxes,escalators:old.escalators,lifts:old.lifts,panels:old.panels,authoredMaterials:old.authoredMaterials,authoredLights:old.authoredLights,architecture:old.architecture},old);
 const removal=await read(candidatePath.replace('assets.json','removal.json')),composition=await read(candidatePath.replace('assets.json','composition.json'));
 assert.deepEqual(removal.removedIds,r.geometry.retiredIds);assert(removal.retainedBufferBytesExact&&composition.originalBuffersExact);
 assert.equal(removal.parent.geometrySha256,base.geometrySha256);assert.equal(composition.geometrySha256,m.geometrySha256);
@@ -37,7 +42,7 @@ const {json:j,bin}=readGLB(glb),part=readGLB(await readFile(component+'/'+r.outp
 const parentGLB=readGLB(await readFile(base.geometry));
 assert(bin.subarray(0,parentGLB.bin.length).equals(parentGLB.bin));
 assert.deepEqual(j.materials.slice(0,parentGLB.json.materials.length),parentGLB.json.materials);
-const shell=modified.length?await verifyWesternShell(parentGLB,{json:j,bin},old,next,r):{};
+const shell=modified.length?(r.componentPrefix==='isetan-ground-'?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
 const values=ai=>{const a=j.accessors[ai],v=j.bufferViews[a.bufferView],w={SCALAR:1,VEC2:2,VEC3:3}[a.type];assert(!v.extensions&&!v.byteStride&&!a.sparse);return Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>bin[a.componentType===5126?'readFloatLE':'readUInt32LE']((v.byteOffset||0)+(a.byteOffset||0)+(i*w+k)*4)));};
 let vertices=0,triangles=0;
 for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const p of mesh.primitives){
@@ -57,5 +62,5 @@ for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const
  assert.equal(offset,ps.length);assert.deepEqual(expected,ix);vertices+=offset;
 }
 assert.equal(triangles,r.geometry.triangles);
-await writeFile(out,JSON.stringify({pass:true,layoutSha256:m.layoutSha256,geometrySha256:m.geometrySha256,...shell,removedPanels:removed.size,removedTriangles:removal.removedTriangles,addedPanels:added.length,vertices,triangles,retainedNativeRecordsExact:true,retainedBrowserBufferBytesExact:true,retainedMovingHardwareUnchanged:true,addedLifts,addedEscalators},null,2)+'\n');
+await writeFile(out,JSON.stringify({pass:true,layoutSha256:m.layoutSha256,geometrySha256:m.geometrySha256,...shell,removedPanels:old.panels.length-retained.length,removedBoxes:retiredBoxes.length,retiredSourceOnlyObjects:(r.geometry.retiredSourceOnlyIds||[]).length,modifiedFlights,removedTriangles:removal.removedTriangles,addedPanels:added.length,vertices,triangles,retainedNativeRecordsExact:true,retainedBrowserBufferBytesExact:true,retainedMovingHardwareUnchanged:true,addedLifts,addedEscalators},null,2)+'\n');
 console.log('PASS static replacement',added.length,'panels',vertices,'vertices',triangles,'triangles');

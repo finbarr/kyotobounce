@@ -13,12 +13,18 @@ assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
 modified_ids=report['geometry'].get('modifiedPanelIds',[])
 allowed_modified={'central-lift-':['concourse'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
-assert not modified_ids or modified_ids==allowed_modified.get(report.get('componentPrefix'))
+if report.get('componentPrefix')=='isetan-ground-':
+ spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
+ assert all(id=='concourse' or id.startswith(('west-north-','west-south-'))for id in modified_ids)
+else:assert not modified_ids or modified_ids==allowed_modified.get(report.get('componentPrefix'))
 replaced=[p for p in new['panels']if p['id']==modified_paving or p['id']in modified_ids];replaced_by_id={p['id']:p for p in replaced}
 retained=[replaced_by_id.get(p['id'],p) for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
-retired_boxes=report['geometry'].get('retiredBoxIds',[]);assert not retired_boxes or report.get('componentPrefix')=='porta-west-'
+retired_boxes=report['geometry'].get('retiredBoxIds',[]);assert not retired_boxes or report.get('componentPrefix')in ('porta-west-','isetan-ground-')
 assert new['boxes']==[p for p in old['boxes']if p['id']not in retired_boxes]
-for key in ('beams','flights','escalators'):assert old[key]==new[key]
+modified_flights=report['geometry'].get('modifiedFlightIds',[])
+assert not modified_flights or report.get('componentPrefix')=='isetan-ground-'
+assert new['flights']==[dict(f,foundationDepth=0)if f['id']in modified_flights else f for f in old['flights']]
+for key in ('beams','escalators'):assert old[key]==new[key]
 retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
 assert not retired_lift_ids or report.get('componentPrefix')=='hachijo-crossing-' and retired_lift_ids==['subway-hachijo-east-lift']
 old_lifts=[l for l in old.get('lifts',[])if l['id']not in retired_lift_ids];lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts

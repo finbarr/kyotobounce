@@ -13081,5 +13081,22 @@
     "bytes": 4047445,
     "sha256": "d28564c97636bb09211a95d68115b822f3f9374b3584d26040809d68249f26eb",
     "retrieved_at": "2026-09-30T04:16:15.044Z"
+  },
+  {
+    "id": "isetan-1f-floor-plan-20260701",
+    "title": "JR Kyoto Isetan ground-floor plan",
+    "publisher": "JR Kyoto Isetan",
+    "category": "circulation",
+    "url": "https://www.mistore.jp/content/dam/isetan_mitsukoshi/site/wjri/shops/floormap/japan/floor_01f.png",
+    "final_url": "https://www.isetan.mistore.jp/content/dam/isetan_mitsukoshi/site/wjri/shops/floormap/japan/floor_01f.png",
+    "source_date": "2026-07-01",
+    "note": "Official floor-guide image, date from 1F_260701 alt text. Visually inspected; east station entrance, central and cross aisles, north and west entrances, boutiques and internal vertical circulation. Orientation checked with station operator 1F diagram. No surveyed dimensions.",
+    "rights": "Reference copy only; not a game texture.",
+    "format": "png",
+    "status": "downloaded",
+    "local_file": "maps/isetan-1f-2026.png",
+    "bytes": 241406,
+    "sha256": "5c36f987ac1f3793d3f626003db0f3b6647ec9d43dc11726a2431d9ce479e441",
+    "retrieved_at": "2026-09-30T05:38:32.730Z"
   }
 ]
