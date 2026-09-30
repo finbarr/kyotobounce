@@ -95,9 +95,15 @@ The [connected subway reconstruction](SUBWAY-REBUILD-V2.md) replaces the misplac
 
 The [Hachijo ASTY street](HACHIJO-ASTY-V2.md) opens the missing covered connection between the main and eastern entrance halls, with its eastern bend, thirteen room shells and three forecourt exits. Both rail entrances remain accessible. Tenant interiors remain unfinished.
 
-1. **Southern halls and Hachijo side:** complete the remaining western shopping street, building frontage, terrace and forecourt, prioritizing missing public routes.
-2. **Other connections and enclosures:** western platforms 30–34 and remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
+The [western ASTY street and public stair](ASTY-WEST-V2.md) open the main foyer's western end into a covered street, fifteen room shells and forecourt exits. The interior stair joins the upper public passage beside Kintetsu, with both external terrace stairs retained.
+
+1. **Western railway:** add platforms 30–34 and their missing passenger connections. Resolve stairs and floor openings before refining track alignment and enclosures.
+2. **Southern halls and Hachijo side:** complete the remaining building frontage, terrace, forecourt and Miyako Michi connections, prioritizing missing public routes.
 3. **Subway receiving halls:** add the missing public-room openings and verify interior boundaries against the operator diagrams before adding fixtures and tenant detail.
+
+Later rendering finding: pale ASTY fascias show banded shading. Investigate the cause after the missing structural routes; geometry correspondence alone does not explain it.
+
+Later performance finding: Chrome's empty-page cadence was 30 Hz during the western ASTY delivery, and the current frame-interval rule still reduced resolution. Distinguish browser scheduling limits from scene cost in a focused performance pass.
 
 Finish one connection, verify it in the complete station, integrate the editable source and playable bundle, then commit and merge before starting another. Small decorative work remains deferred.
 

@@ -26,9 +26,11 @@ The [retained Porta pavilion stair](notes/PORTA-PAVILION-V2.md) restores the for
 
 Next priorities:
 
-1. Complete the remaining street exits and Kotochika surroundings. The [western Porta loop and forecourt stair](notes/PORTA-WEST-V2.md) replace the isolated receiving room and connect both shopping streets. Keep the distinct floor levels explicit.
-2. Complete the southern shopping streets, building frontage, terrace and forecourt.
-3. Complete western platforms 30–34 and other missing stairs; then refine railway alignment, enclosures and finishes.
+1. Complete western platforms 30–34 and their passenger connections; then refine railway alignment and enclosures.
+2. Complete the remaining southern building frontage, terrace, forecourt and Miyako Michi connections.
+3. Complete missing public-room openings around the subway receiving halls before adding tenant detail.
+
+The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. Tenant interiors and working ASTY escalators remain unfinished.
 
 Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).
 
