@@ -1,4 +1,4 @@
-// Walk all three store stairs and their connected aisles in Chrome.
+// Walk declared stair and aisle routes with Chrome keyboard controls.
 import assert from 'node:assert/strict';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {chromium} from 'playwright';
@@ -8,6 +8,43 @@ const m=await read(manifest),build=await read(component+'/report.json'),layout=a
 const previous=process.env.KYOTO_SKIP_REPORT?await read(process.env.KYOTO_SKIP_REPORT):null;
 if(previous){assert.equal(previous.layoutSha256,m.layoutSha256);assert.equal(previous.geometrySha256,m.geometrySha256);assert.deepEqual(previous.errors,[]);report.reusedFrom=process.env.KYOTO_SKIP_REPORT;}
 const treads=layout.panels.filter(p=>p.id.startsWith('isetan-')&&['stair-tread','stair-landing'].includes(p.role)).map(p=>({id:p.id,x0:Math.min(...p.vertices.map(v=>v.x)),x1:Math.max(...p.vertices.map(v=>v.x)),z0:Math.min(...p.vertices.map(v=>v.z)),z1:Math.max(...p.vertices.map(v=>v.z)),top:Math.max(...p.vertices.map(v=>v.y))}));
+// Generated stairs use the contour-cell interpolation from StairGeometry.Create
+// for players. Check the height at the actual foot position on that ramp,
+// rather than treating the nearest riser waypoint as a flat floor.
+const ramps=[];
+for(const id of build.geometry.generatedStairs||[]){
+ const f=layout.flights.find(f=>f.id===id);assert(f&&f.role!=='escalator',id);
+ for(let row=0;row<f.contours.length-1;row++)for(let col=0;col<f.contours[row].points.length-1;col++){
+  const vertices=[[row,col],[row,col+1],[row+1,col+1],[row+1,col]].map(([r,c])=>{const p=f.contours[r].points[c];return{x:p.x,y:f.baseElevation+r*f.rise,z:p.y};});
+  for(const ids of[[0,1,2],[0,2,3]]){
+   const points=ids.map(i=>vertices[i]),[a,b,c]=points,u=[b.x-a.x,b.y-a.y,b.z-a.z],v=[c.x-a.x,c.y-a.y,c.z-a.z],n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],normalY=Math.abs(n[1])/Math.hypot(...n);
+   const length=Math.hypot(...n),sign=Math.sign(n[1]);ramps.push({id,points,normalY,normal:n.map(v=>v/length*sign),x0:Math.min(...points.map(p=>p.x)),x1:Math.max(...points.map(p=>p.x)),z0:Math.min(...points.map(p=>p.z)),z1:Math.max(...points.map(p=>p.z))});
+  }
+ }
+}
+function rampSupport(feet){
+ const hits=[],radius=.24;
+ for(const r of ramps){
+  if(feet.x<r.x0-radius||feet.x>r.x1+radius||feet.z<r.z0-radius||feet.z>r.z1+radius)continue;
+  const[a,b,c]=r.points,det=(b.z-c.z)*(a.x-c.x)+(c.x-b.x)*(a.z-c.z);if(Math.abs(det)<1e-12)continue;
+  // Test the spherical foot's contact point, which lies uphill of its centre.
+  // Include triangle edges so flat-to-slope joins also use finite geometry.
+  const x=feet.x-radius*r.normal[0],z=feet.z-radius*r.normal[2];
+  const u=((b.z-c.z)*(x-c.x)+(c.x-b.x)*(z-c.z))/det,v=((c.z-a.z)*(x-c.x)+(a.x-c.x)*(z-c.z))/det,w=1-u-v,contacts=[];
+  if(Math.min(u,v,w)>=-1e-6)contacts.push(u*a.y+v*b.y+w*c.y+radius*r.normalY-radius);
+  for(const[p,q]of[[a,b],[b,c],[c,a]]){
+   const dx=q.x-p.x,dz=q.z-p.z,length=Math.hypot(dx,dz);if(length<1e-9)continue;
+   const along=((feet.x-p.x)*dx+(feet.z-p.z)*dz)/length,across=((feet.x-p.x)*dz-(feet.z-p.z)*dx)/length;
+   if(Math.abs(across)>radius)continue;
+   const reach=Math.sqrt(radius*radius-across*across),slope=(q.y-p.y)/length,t=Math.max(0,Math.min(length,along+reach*slope/Math.sqrt(1+slope*slope)));
+   if(Math.abs(t-along)<=reach)contacts.push(p.y+slope*t+Math.sqrt(Math.max(0,reach*reach-(t-along)**2))-radius);
+  }
+  if(!contacts.length)continue;
+  const expectedFeet=Math.max(...contacts);if(Math.abs(expectedFeet-feet.y)>.35)continue;
+  hits.push({id:r.id,expectedFeet,walkable:r.normalY>=Math.cos(48*Math.PI/180)});
+ }
+ return hits.sort((a,b)=>b.expectedFeet-a.expectedFeet)[0];
+}
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']});
 try{
  const page=await browser.newPage({viewport:{width:1280,height:800}}),waiters=[];page.on('pageerror',e=>report.errors.push(e.message));
@@ -22,7 +59,7 @@ try{
    await page.keyboard.down('w');try{await page.waitForFunction(p=>Math.hypot(kyotoState.feet.x-p.x,kyotoState.feet.z-p.z)<.16,p,{timeout:35000});}catch(e){row.failure={point:p,from:feet,state:await page.evaluate(()=>({feet:kyotoState.feet,yaw:kyotoState.yaw,mode:kyotoState.mode,phase:kyotoState.phase,activeElement:document.activeElement?.outerHTML}))};await page.screenshot({path:out+'/failure.png'});throw Error(label+' '+JSON.stringify(row.failure),{cause:e});}finally{await page.keyboard.up('w');}
    // The capsule can contact the next tread before its center crosses the riser.
    // Require a nearby tread at the actual foot height as well as the route height.
-   await page.waitForTimeout(180);const at=await page.evaluate(()=>__isetanGround.read()),tread=treads.filter(t=>Math.hypot(Math.max(t.x0-at.feet.x,0,at.feet.x-t.x1),Math.max(t.z0-at.feet.z,0,at.feet.z-t.z1))<=.265&&Math.abs(t.top-p.y)<.25&&Math.abs(at.feet.y-t.top)<.07).sort((a,b)=>Math.abs(a.top-at.feet.y)-Math.abs(b.top-at.feet.y))[0],floor=tread?.top??p.y;row.checks.push({point:p,...at,support:tread?.id,expectedFloor:floor});assert(at.grounded&&Math.abs(at.feet.y-floor)<.07&&Math.abs(at.feet.y-p.y)<.25,label+' landing '+JSON.stringify(at));
+   await page.waitForTimeout(180);const at=await page.evaluate(()=>__isetanGround.read()),tread=rampSupport(at.feet)||treads.filter(t=>Math.hypot(Math.max(t.x0-at.feet.x,0,at.feet.x-t.x1),Math.max(t.z0-at.feet.z,0,at.feet.z-t.z1))<=.265&&Math.abs(t.top-p.y)<.25&&Math.abs(at.feet.y-t.top)<.07).sort((a,b)=>Math.abs(a.top-at.feet.y)-Math.abs(b.top-at.feet.y))[0],floor=tread?.top??p.y,expectedFeet=tread?.expectedFeet??floor;row.checks.push({point:p,...at,support:tread?.id,expectedFloor:floor,expectedFeet});assert(at.grounded&&tread?.walkable!==false&&Math.abs(at.feet.y-expectedFeet)<.07&&Math.abs(at.feet.y-p.y)<.25,label+' landing '+JSON.stringify(at));
   }
   row.pass=true;await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log('PASS Chrome',label,row.checks.length,'waypoints');
  }

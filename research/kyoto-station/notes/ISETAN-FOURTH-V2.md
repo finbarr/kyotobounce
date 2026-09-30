@@ -93,12 +93,10 @@ Delivery receipts are retained under `.local/v2/current/components/isetan-fourth
 The single candidate is promoted into the existing local main bundle, then its
 duplicate full exports and isolated server overlay are removed.
 
-## Next defect to investigate
+## Resolved follow-up: Grand Stairway test route
 
-A broader retained Grand Stairway route stalls at approximately
-X−80.837, Y18.306, Z5.708 near flight 02, on both the parent and candidate
-layouts. Normal-speed and alternative waypoint checks also fail. This does not
-block access to the new halls from Muromachi Square, but the upper public route
-is not claimed as verified. Investigate the collider and walking-assist geometry
-there before extending the store upward. The failed diagnostic receipts are
-retained beside this increment's passing scoped route reports.
+The initial broader Grand Stairway test stalled near flight 02 on both the
+parent and candidate layouts. The [passenger-lane audit](GRAND-STAIR-CIRCULATION-V2.md)
+identifies the cause: its centreline route crossed a retained handrail. Actual
+passenger lanes pass all fourteen flights in both directions in native physics.
+The failed diagnostic receipts remain available beside the scoped 4F checks.

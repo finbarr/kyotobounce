@@ -24,7 +24,7 @@ The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both 
 
 The [Granvia ground entrance](notes/GRANVIA-ENTRANCE-V2.md) connects the forecourt to the hotel lobby by stair, paired escalators and lift, retaining the M3F and theatre approaches. The [Granvia parking connection](notes/GRANVIA-PARKING-V2.md) adds the separate pair of north-bank lifts between B3 and the 2F lobby, with protected shafts and usable approaches. Higher hotel stops remain unfinished.
 
-The [Isetan fourth-floor halls](notes/ISETAN-FOURTH-V2.md) open both Muromachi Square entrances and connect the north, south and western aisles. Bounded cuts remove the overextended parapets and foundations protruding through the store, preserving the public stairs above. Both entrances, the aisle loops and the affected northern stairs pass native checks; five Chrome routes and gameplay also pass. A separate retained Grand Stairway obstruction near flight 02 is recorded for the next repair.
+The [Isetan fourth-floor halls](notes/ISETAN-FOURTH-V2.md) open both Muromachi Square entrances and connect the north, south and western aisles. Bounded cuts remove the overextended parapets and foundations protruding through the store, preserving the public stairs above. Both entrances, the aisle loops and the affected northern stairs pass native checks; five Chrome routes and gameplay also pass. The [Grand Stairway audit](notes/GRAND-STAIR-CIRCULATION-V2.md) resolves the suspected flight 02 obstruction as a test route crossing the central handrail: both actual passenger lanes pass all 14 flights in both native directions, plus a complete Chrome ascent and descent.
 
 The [retained Porta pavilion stair](notes/PORTA-PAVILION-V2.md) restores the forecourt entrance and opens both stair lanes onto North Street. Adjacent shop bays, the west cross-passage and lift approach remain usable. Its exact exit number remains unconfirmed.
 
@@ -32,7 +32,7 @@ The [western platforms 30–34](notes/WESTERN-PLATFORMS-V2.md) connect to platfo
 
 Next priorities:
 
-1. Diagnose the retained Grand Stairway obstruction near flight 02 recorded in the [4F notes](notes/ISETAN-FOURTH-V2.md), then address remaining upper-floor links and the rest of the Isetan lift bank before tenant decoration.
+1. Connect the remaining upper Isetan floors, starting with internal access from 3F to the constructed 4F halls, and complete the rest of the lift bank before tenant decoration.
 2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 
