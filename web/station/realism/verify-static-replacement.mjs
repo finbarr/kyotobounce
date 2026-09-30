@@ -49,11 +49,11 @@ const {json:j,bin}=readGLB(glb),part=readGLB(await readFile(component+'/'+r.outp
 const parentGLB=readGLB(await readFile(base.geometry));
 assert(bin.subarray(0,parentGLB.bin.length).equals(parentGLB.bin));
 assert.deepEqual(j.materials.slice(0,parentGLB.json.materials.length),parentGLB.json.materials);
-const shell=modified.length?(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-stair-','granvia-entrance-','isetan-lift-','isetan-north-core-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','garden-access-','garden-promenade-','garden-store-entry-','garden-roof-enclosure-','granvia-parking-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
+const shell=modified.length?(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-stair-','granvia-entrance-','isetan-lift-','isetan-north-core-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','garden-access-','garden-promenade-','garden-store-entry-','garden-roof-enclosure-','east-skyway-mouth-','granvia-parking-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
 const values=ai=>{const a=j.accessors[ai],v=j.bufferViews[a.bufferView],w={SCALAR:1,VEC2:2,VEC3:3}[a.type];assert(!v.extensions&&!v.byteStride&&!a.sparse);return Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>bin[a.componentType===5126?'readFloatLE':'readUInt32LE']((v.byteOffset||0)+(a.byteOffset||0)+(i*w+k)*4)));};
 let vertices=0,triangles=0;
 const movedPanels=new Set(r.geometry.movedIds||[]),originalPanels=new Map(old.panels.map(p=>[r.componentPrefix+p.id,p]));
-for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const p of mesh.primitives){
+for(const [batch,mesh]of j.meshes.slice(j.meshes.length-part.meshes.length).entries())for(const p of mesh.primitives){
  const ps=values(p.attributes.POSITION),ns=values(p.attributes.NORMAL),ix=values(p.indices).flat(),uv=p.attributes.TEXCOORD_0===undefined?null:values(p.attributes.TEXCOORD_0),expected=[];let offset=0;
  for(const source of native.panels.filter(p=>p.browserMaterial===batch)){
   const panel=added.find(p=>p.id===source.id);assert(panel);

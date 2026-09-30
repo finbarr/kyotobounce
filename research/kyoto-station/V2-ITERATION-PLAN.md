@@ -50,9 +50,11 @@ The user now wants most effort on the atrium and everything reachable from it, e
 
 The [northern garden enclosure](notes/GARDEN-ROOF-ENCLOSURE-V2.md) replaces the coarse garden-facing wall treatment and redundant railings with concrete panels, pale ribbed metal and a supported viewing screen. The [western Isetan entrance and 11F hall](notes/GARDEN-STORE-ENTRY-V2.md) provide the return route to the upper atrium.
 
+The [eastern Skyway mouth](notes/EAST-SKYWAY-MOUTH-V2.md) removes an old shell face that appeared to wall off the escalator landing. The 10F restaurant route and central Skyway remain connected. The surrounding canopy still has coarse overlaps and exposed members visible from the descent.
+
 Next priorities:
 
-1. Inspect the upper atrium's connection to the 10F Skyway and restaurant terrace. Repair missing landings, floor joins or entrances before further decoration.
+1. Repair the coarse roof and wall overlaps around the eastern Skyway descent, then inspect the onward East Square and restaurant-terrace routes. Prioritize broken geometry and missing connections.
 2. Refine the garden's western roof rooms, paving, planting, seating and signs from operator photographs.
 3. Continue the atrium's immediately reachable public spaces and entrances. Deeper store interiors and distant southern frontage follow once these routes are coherent.
 

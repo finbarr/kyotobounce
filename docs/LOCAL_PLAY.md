@@ -106,6 +106,8 @@ public Underground East gate remain connected. The neighboring Porta stairs and
 ramp remain public; see the [eastern connection notes](../research/kyoto-station/notes/EAST-TRANSFER-V2.md).
 The western approach, Grand Stairway, restaurant and central Skyway remain
 connected, as recorded in the [western route notes](../research/kyoto-station/notes/WESTERN-UPPER-CONNECTION-V2.md).
+The [eastern Skyway mouth](../research/kyoto-station/notes/EAST-SKYWAY-MOUTH-V2.md)
+now opens visibly onto the paired escalators descending to East Square.
 
 `web/v2/assets.json` identifies the current private reconstruction under `.local/v2/current/`. Its layout and GLB hashes are checked before launch, along with escalator and comb-support correspondence. An optional hardware GLB is also hash-checked. Only the spawn metadata changes; large geometry stays symlinked. The launch command creates a public asset overlay, matching browser manifest, native layout and asset receipt under `.local/v2/PORT/`. It also keeps the database and worker log there, separate from published saves.
 

@@ -21,7 +21,7 @@ for prefix,steps in g.get('headroomStairs',[('isetan-stair-',21),('isetan-ground
    assert abs(b-a-.3)<1e-5
    volumes.append((p['id'],[(a+.035,b-.035),(top+.35,top+2.1),(z-.3,z+.3)]));count+=1
  p=panels[prefix+'stair-landing'];top=max(v['y']for v in p['vertices']);a=min(v['x']for v in p['vertices']);b=max(v['x']for v in p['vertices']);volumes.append((p['id'],[(a+.2,b-.2),(top+.35,top+2.1),(8.6,13.8)]))
-assert g.get('stair') or r['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','isetan-north-core-','garden-promenade-','garden-roof-enclosure-')
+assert g.get('stair') or r['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','isetan-north-core-','garden-promenade-','garden-roof-enclosure-','east-skyway-mouth-')
 if g.get('stair'):
  maximum_rise=.20 if r['componentPrefix']=='garden-access-' else .19
  assert .14<g['stair']['rise']<maximum_rise
