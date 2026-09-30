@@ -47,7 +47,7 @@ assert(areaCoverage.every(r=>Math.abs(r.verticalError)<Math.max(spec.componentPr
 const groups=new Map();
 for(const p of panels){
  const label=layout.authoredMaterials.find(m=>m.id===p.appearance).label;assert(!p.uv||spec.componentPrefix==='granvia-parking-','Only the declared hotel cuts edit textured surfaces');
- assert(p.normals||spec.componentPrefix==='isetan-second-'&&p.id.startsWith('isetan-ground-')&&p.role==='foundation','Preserve authored facade normals: '+p.id);
+ assert(p.normals||['isetan-second-','isetan-third-'].includes(spec.componentPrefix)&&p.id.startsWith('isetan-ground-')&&p.role==='foundation','Preserve authored facade normals: '+p.id);
  const fragments=[];
  for(let i=0;i<p.triangles.length;i+=3){const ids=p.triangles.slice(i,i+3).toReversed(),positions=ids.map(i=>[p.vertices[i].x,p.vertices[i].y,-p.vertices[i].z]),normal=new T.Triangle(...positions.map(v=>new T.Vector3(...v))).getNormal(new T.Vector3()).toArray(),tri=ids.map((i,k)=>({POSITION:positions[k],NORMAL:p.normals?[p.normals[i].x,p.normals[i].y,-p.normals[i].z]:normal,...(p.uv?{TEXCOORD_0:[p.uv[i].x,1-p.uv[i].y]}:{})})),kept=retain(tri,spec.cuts[p.id]);if(kept.length===1&&kept[0]===tri)unchanged++;
   // Discard slivers that collapse when positions are encoded as float32.

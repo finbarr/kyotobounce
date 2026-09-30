@@ -13208,5 +13208,41 @@
     "bytes": 38821,
     "sha256": "46aec24ad158b21478d89cb1deb9c276281c1df39660f92b8a2c1deccb4bbac7",
     "retrieved_at": "2026-09-30T09:26:46.647030+00:00"
+  },
+  {
+    "id": "official-3f-map",
+    "title": "Station operator third-floor plan",
+    "publisher": "Kyoto Station Building",
+    "category": "floor-plan",
+    "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_3f.svg",
+    "source_date": null,
+    "note": "Eastern store entrance, northern stair core and connected aisle layout. Retrieved from the official floor-guide loader; dimensions remain fitted approximations.",
+    "rights": "Reference copy only; no permission to ship imagery or reproduce protected artwork is implied.",
+    "format": "svg",
+    "status": "downloaded",
+    "local_file": "maps/floor-3f.svg",
+    "bytes": 145214,
+    "sha256": "fa1be5f66f04fc406389e68477ab69b5e18e5cc53cf40f158fada1afa3369d43",
+    "content_type": "image/svg+xml",
+    "final_url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_3f.svg",
+    "retrieved_at": "2026-09-30T10:08:09.036614+00:00"
+  },
+  {
+    "id": "official-3f-isetan-map",
+    "title": "Station operator Isetan third-floor plan",
+    "publisher": "Kyoto Station Building",
+    "category": "floor-plan",
+    "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_3f_isetan.svg",
+    "source_date": null,
+    "note": "Eastern store entrance, northern stair core and connected aisle layout. Retrieved from the official floor-guide loader; dimensions remain fitted approximations.",
+    "rights": "Reference copy only; no permission to ship imagery or reproduce protected artwork is implied.",
+    "format": "svg",
+    "status": "downloaded",
+    "local_file": "maps/floor-3f-isetan.svg",
+    "bytes": 60046,
+    "sha256": "0459dbb2d42875065044ceec51e9349c51de37170159916c0cc07bca8d8b6055",
+    "content_type": "image/svg+xml",
+    "final_url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/floorguide/img/map/img_map_3f_isetan.svg",
+    "retrieved_at": "2026-09-30T10:08:09.036972+00:00"
   }
 ]

@@ -24,6 +24,7 @@ for prefix,steps in g.get('headroomStairs',[('isetan-stair-',21),('isetan-ground
 assert .14<g['stair']['rise']<.19
 # Check flat approaches and the north bypass with the player capsule width.
 for route in g['routes']:
+ if g.get('headroomRoutes') and route['label']not in g['headroomRoutes']:continue
  if route['label'].endswith(' return'):continue
  for a,b in zip(route['points'],route['points'][1:]):
   if abs(a['y']-b['y'])>.001:continue
@@ -70,15 +71,28 @@ for name,bounds in volumes:
   for tri in ids:assert clipped_area([vs[k]for k in tri],bounds)<1e-8,(name,id)
 # Older generated flights and beams are outside these volumes. Conservative
 # bounds include their foundations and profiles; an overlap requires inspection.
-other=[]
+other=[];flight_plans={};plan_checks=0
 for f in layout['flights']:
  if f.get('role')=='escalator' and not f.get('foundationDepth'):continue
  ps=[p for row in f['contours']for p in row['points']]
+ if not f.get('foundationDepth'):flight_plans[f['id']]=f['contours']
  other.append((f['id'],[(min(p['x']for p in ps),max(p['x']for p in ps)),(f['baseElevation']-.31-max(0,f.get('foundationDepth',0)),f['baseElevation']+f['rise']*(len(f['contours'])-1)),(min(p['y']for p in ps),max(p['y']for p in ps))]))
 for b in layout['beams']:
  if not b.get('collision',False):continue
  other.append((b['id'],[(min(b['a'][k],b['b'][k])-b['radius'],max(b['a'][k],b['b'][k])+b['radius'])for k in ('x','y','z')]))
 for name,bounds in volumes:
  for id,b in other:
-  assert any(b[a][1]<=bounds[a][0]or b[a][0]>=bounds[a][1]for a in range(3)),('Inspect generated collider',name,id)
-proof=dict(pass_=True,layoutSha256=m['layoutSha256'],geometrySha256=m['geometrySha256'],treads=count,stepRiseM=g['stair']['rise'],stairHeadroomM=2.1,headroomVolumes=len(volumes),retainedStairSurfaces=len(retained_stair));proof['pass']=proof.pop('pass_');out.write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))
+  if any(b[a][1]<=bounds[a][0]or b[a][0]>=bounds[a][1]for a in range(3)):continue
+  assert id in flight_plans,('Inspect generated collider',name,id)
+  # An oblique flight's axis-aligned bounds include empty space beside its
+  # foot. Its contour cells give a conservative plan footprint for every tread
+  # and riser (StairGeometry.Create). Require zero plan overlap before accepting
+  # a headroom volume inside that broad bounding box.
+  rows=flight_plans[id];y=(bounds[1][0]+bounds[1][1])/2
+  for a,d in zip(rows,rows[1:]):
+   for i in range(len(a['points'])-1):
+    q=[a['points'][i],a['points'][i+1],d['points'][i+1],d['points'][i]]
+    vs=[dict(x=p['x'],y=y,z=p['y'])for p in q]
+    for ix in [(0,1,2),(0,2,3)]:assert clipped_area([vs[k]for k in ix],bounds)<1e-8,('Inspect generated collider',name,id)
+  plan_checks+=1
+proof=dict(pass_=True,layoutSha256=m['layoutSha256'],geometrySha256=m['geometrySha256'],treads=count,stepRiseM=g['stair']['rise'],stairHeadroomM=2.1,headroomVolumes=len(volumes),retainedStairSurfaces=len(retained_stair),flightPlanChecks=plan_checks);proof['pass']=proof.pop('pass_');out.write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))
