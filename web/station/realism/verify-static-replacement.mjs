@@ -1,0 +1,46 @@
+// Validate one static replacement after composition in the same staging folder.
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import * as T from 'three';
+import {readGLB} from '../../../tools/optimize-browser-assets.mjs';
+const [basePath,candidatePath,component,out]=process.argv.slice(2);assert(out?.startsWith('.local/'));
+const read=async p=>JSON.parse(await readFile(p)),sha=b=>createHash('sha256').update(b).digest('hex');
+const base=await read(basePath),m=await read(candidatePath),oldRaw=await readFile(base.layout),raw=await readFile(m.layout),old=JSON.parse(oldRaw),next=JSON.parse(raw),r=await read(component+'/report.json'),native=await read(component+'/native-panels.json');
+assert.equal(sha(oldRaw),base.layoutSha256);assert.equal(sha(raw),m.layoutSha256);assert.equal(r.sourceLayoutSha256,base.layoutSha256);
+const removed=new Set(r.geometry.retiredIds),retained=old.panels.filter(p=>!removed.has(p.id));
+assert.equal(old.panels.length-retained.length,removed.size);assert.deepEqual(next.panels.slice(0,retained.length),retained);
+const added=next.panels.slice(retained.length);assert.equal(added.length,native.panels.length);
+assert.deepEqual(next.authoredMaterials.slice(0,old.authoredMaterials.length),old.authoredMaterials);
+assert.deepEqual(next.authoredLights,[...old.authoredLights.filter(l=>!r.geometry.retiredLights.includes(l.id)),...(native.authoredLights||[])]);
+assert.deepEqual({...next,panels:old.panels,authoredMaterials:old.authoredMaterials,authoredLights:old.authoredLights,architecture:old.architecture},old);
+const removal=await read(candidatePath.replace('assets.json','removal.json')),composition=await read(candidatePath.replace('assets.json','composition.json'));
+assert.deepEqual(removal.removedIds,r.geometry.retiredIds);assert(removal.retainedBufferBytesExact&&composition.originalBuffersExact);
+assert.equal(removal.parent.geometrySha256,base.geometrySha256);assert.equal(composition.geometrySha256,m.geometrySha256);
+assert.equal(await readFile(component+'/native-panels.json').then(sha),r.outputs.nativePanelsSha256);
+const glb=await readFile(m.geometry);assert.equal(sha(glb),m.geometrySha256);
+const {json:j,bin}=readGLB(glb),part=readGLB(await readFile(component+'/'+r.outputs.glbFile)).json;
+const parentGLB=readGLB(await readFile(base.geometry));
+assert(bin.subarray(0,parentGLB.bin.length).equals(parentGLB.bin));
+assert.deepEqual(j.materials.slice(0,parentGLB.json.materials.length),parentGLB.json.materials);
+const values=ai=>{const a=j.accessors[ai],v=j.bufferViews[a.bufferView],w={SCALAR:1,VEC2:2,VEC3:3}[a.type];assert(!v.extensions&&!v.byteStride&&!a.sparse);return Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>bin[a.componentType===5126?'readFloatLE':'readUInt32LE']((v.byteOffset||0)+(a.byteOffset||0)+(i*w+k)*4)));};
+let vertices=0,triangles=0;
+for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const p of mesh.primitives){
+ const ps=values(p.attributes.POSITION),ns=values(p.attributes.NORMAL),ix=values(p.indices).flat(),uv=p.attributes.TEXCOORD_0===undefined?null:values(p.attributes.TEXCOORD_0),expected=[];let offset=0;
+ for(const source of native.panels.filter(p=>p.browserMaterial===batch)){
+  const panel=added.find(p=>p.id===source.id);assert(panel);
+  assert.equal(panel.material,source.material);assert.equal(panel.collision,source.collision);
+  const material=next.authoredMaterials.find(a=>a.id===panel.appearance);assert.equal(material.label,j.materials[p.material].name.replace(/ \| Browser$/,''));
+  for(const [i,v]of panel.vertices.entries()){
+   assert.deepEqual(ps[offset+i],[v.x,v.y,-v.z]);assert.deepEqual(v,Object.fromEntries(Object.entries(source.vertices[i]).map(([k,n])=>[k,Math.fround(n)])));
+   if(panel.uv){assert(uv);assert(Math.abs(uv[offset+i][0]-panel.uv[i].x)<1e-6&&Math.abs(uv[offset+i][1]-(1-panel.uv[i].y))<1e-6);}
+  }
+  assert.deepEqual(panel.triangles,source.triangles);
+  for(let i=0;i<panel.triangles.length;i+=3){const ids=panel.triangles.slice(i,i+3).reverse().map(v=>v+offset);expected.push(...ids);const n=new T.Triangle(...ids.map(i=>new T.Vector3(...ps[i]))).getNormal(new T.Vector3());for(const k of ids)assert(n.distanceTo(new T.Vector3(...ns[k]))<1e-5,panel.id+' normal');triangles++;}
+  offset+=panel.vertices.length;
+ }
+ assert.equal(offset,ps.length);assert.deepEqual(expected,ix);vertices+=offset;
+}
+assert.equal(triangles,r.geometry.triangles);
+await writeFile(out,JSON.stringify({pass:true,layoutSha256:m.layoutSha256,geometrySha256:m.geometrySha256,removedPanels:removed.size,removedTriangles:removal.removedTriangles,addedPanels:added.length,vertices,triangles,retainedNativeRecordsExact:true,retainedBrowserBufferBytesExact:true,movingHardwareUnchanged:true},null,2)+'\n');
+console.log('PASS static replacement',added.length,'panels',vertices,'vertices',triangles,'triangles');

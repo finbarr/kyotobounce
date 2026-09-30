@@ -26,7 +26,13 @@ try{
  await page.waitForFunction(()=>kyotoState.phase==='Flight');await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim');
  assert.equal(await page.evaluate(()=>kyotoState.result),null);
  await page.keyboard.press('Escape');
- await page.getByRole('button',{name:'↶ Start',exact:true}).click();await page.waitForTimeout(300);
+ await page.getByRole('button',{name:'↶ Start',exact:true}).click();
+ // Home replaces the player snapshot asynchronously. Wait for the returned
+ // position, rather than reading during the brief gap between snapshots.
+ await page.waitForFunction(start=>{
+  const state=window.kyotoState,feet=state?.feet;
+  return state?.ready&&state.phase==='Aim'&&feet&&Math.hypot(feet.x-start.x,feet.z-start.z)<.1;
+ },initial,{timeout:10000});
  const home=await page.evaluate(()=>kyotoState.feet);assert(Math.hypot(home.x-initial.x,home.z-initial.z)<.1);
  await page.getByRole('button',{name:'Close levels'}).click();
  await mkdir('.local/v2/browser',{recursive:true});await page.screenshot({path:'.local/v2/browser/current.png'});

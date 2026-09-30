@@ -93,7 +93,9 @@ The [retained Porta pavilion stair](PORTA-PAVILION-V2.md) connects the forecourt
 
 The [connected subway reconstruction](SUBWAY-REBUILD-V2.md) replaces the misplaced gate halls with four connected stair cores, one shared island, three street stairs, two platform lifts and the Exit 5 street lift. Its public routes join the retained Porta floors, JR gate and Hachijo lobby. Northern placement follows the registered city plan; southern dimensions remain fitted and documented. The complete station, editable source, 46 route walks and moving hardware checks are integrated into the local playable build.
 
-1. **Southern halls and Hachijo side:** complete the southern shopping streets, building frontage, terrace and forecourt, prioritizing missing public routes.
+The [Hachijo ASTY street](HACHIJO-ASTY-V2.md) opens the missing covered connection between the main and eastern entrance halls, with its eastern bend, thirteen room shells and three forecourt exits. Both rail entrances remain accessible. Tenant interiors remain unfinished.
+
+1. **Southern halls and Hachijo side:** complete the remaining western shopping street, building frontage, terrace and forecourt, prioritizing missing public routes.
 2. **Other connections and enclosures:** western platforms 30–34 and remaining stairs and floor openings. Refine rail alignment and visible enclosures after their routes are usable.
 3. **Subway receiving halls:** add the missing public-room openings and verify interior boundaries against the operator diagrams before adding fixtures and tenant detail.
 
