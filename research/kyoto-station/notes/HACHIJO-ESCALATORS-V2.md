@@ -15,7 +15,7 @@ The banks connect the existing reserved deck edges at X−85.5 and X−40.5 to t
 - Pavement openings beneath the returning steps, preserving the irregular Miyako Michi ground outline and the adjacent southern lift opening.
 - Guarded upper receiving aprons and warning paving at both ends of each lane.
 
-The two original station-side escalators north of the terrace are still missing. Their receiving arrangement needs to be reconciled with the current ASTY frontage before construction. Street and bus/pickup canopies remain separate work.
+The [two original station-side escalators](STATION-ESCALATORS-V2.md) north of the terrace now connect through shared stair halls, with clear receiving routes around the ASTY frontage. Street and bus/pickup canopies remain separate work.
 
 ## Verification
 

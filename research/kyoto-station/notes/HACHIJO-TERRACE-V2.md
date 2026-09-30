@@ -39,6 +39,6 @@ Private receipts live in `.local/v2/current/components/hachijo-terrace/` after l
 
 ## Remaining work
 
-The [four terrace escalators](HACHIJO-ESCALATORS-V2.md) now connect both deck ends to the ground with paired up/down lanes. The original station-side escalators remain missing, followed by the bus/pickup canopies and street arrangement. Seating, information displays and photographic materials remain later work.
+The [four terrace escalators](HACHIJO-ESCALATORS-V2.md) connect both deck ends to the ground with paired up/down lanes. The [two original station-side escalators](STATION-ESCALATORS-V2.md) now complete the shared stair halls. Bus/pickup canopies and the street arrangement remain unfinished. Seating, information displays and photographic materials remain later work.
 
 Rebuild with `build-hachijo-terrace.mjs`, `prepare-east-transfer-base.mjs`, `web/v2/compose-component.mjs`, `integrate-hachijo-terrace.mjs` and `install-east-transfer.py`. `verify-hachijo-terrace.mjs` checks complete-layout clearances and floors; the shared native route/lift tools and `inspect-component-lifts-chrome.mjs` check movement.

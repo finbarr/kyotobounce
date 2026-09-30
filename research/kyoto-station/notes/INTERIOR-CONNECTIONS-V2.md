@@ -107,8 +107,10 @@ The [southern subway rooms](SUBWAY-SOUTH-ROOMS-V2.md) add shops 10–14, the sta
 
 The [Miyako Yume Terrace reconstruction](HACHIJO-TERRACE-V2.md) replaces the provisional southern deck with the city-plan terrace, four stairs, three working lifts and an eastern walkway. Its [four terrace escalators](HACHIJO-ESCALATORS-V2.md) now provide paired up/down connections at both ends, with ground circulation beneath the deck retained.
 
-1. **Southern building and public spaces:** reconcile the two original station-side escalators with the ASTY frontage and complete their receiving connections, then the bus/pickup canopies, street edges and remaining upper frontage. Resolve the small Miyako Michi southeast stair's destination before constructing it.
-2. **Remaining interior connections:** inspect the unfinished Isetan and Granvia upper-floor links and parking access recorded in the basement and central-lift notes; repair concrete missing connections before room decoration.
+The [two original station-side escalators](STATION-ESCALATORS-V2.md) complete the shared stair halls, with their solid dividing walls removed and the adjacent ASTY shop rooms and street exits retained.
+
+1. **Remaining interior connections:** inspect the unfinished Isetan and Granvia upper-floor links and parking access recorded in the basement and central-lift notes; repair concrete missing connections before room decoration.
+2. **Southern building and public spaces:** add the bus/pickup canopies, street edges and remaining upper frontage. Resolve the small Miyako Michi southeast stair's destination before constructing it.
 3. **Railway refinement:** improve fitted track alignment, platform enclosures and further building connections after the missing public routes.
 
 Later rendering finding: pale ASTY fascias show banded shading. Investigate the cause after the missing structural routes; geometry correspondence alone does not explain it.

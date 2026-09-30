@@ -23,8 +23,8 @@ if(r.componentPrefix==='hachijo-terrace-'){
  assert.deepEqual(next.lifts,[...old.lifts,...expected]);addedLifts=expected.length;
 }else assert.deepEqual(next.lifts,old.lifts);
 let addedEscalators=0;
-if(r.componentPrefix==='hachijo-escalators-'){
- const motion=await read(component+'/motion.json');assert.equal(motion.escalators.length,4);
+if(['hachijo-escalators-','station-escalators-'].includes(r.componentPrefix)){
+ const motion=await read(component+'/motion.json');assert.equal(motion.escalators.length,r.componentPrefix==='station-escalators-'?2:4);
  assert.deepEqual(next.escalators,[...old.escalators,...motion.escalators]);addedEscalators=motion.escalators.length;
 }else assert.deepEqual(next.escalators,old.escalators);
 assert.deepEqual({...next,escalators:old.escalators,lifts:old.lifts,panels:old.panels,authoredMaterials:old.authoredMaterials,authoredLights:old.authoredLights,architecture:old.architecture},old);

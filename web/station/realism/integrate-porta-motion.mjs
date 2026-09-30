@@ -5,7 +5,8 @@ import {createHash} from 'node:crypto';
 const [manifest,component]=process.argv.slice(2),read=async p=>JSON.parse(await readFile(p)),sha=b=>createHash('sha256').update(b).digest('hex');
 assert(manifest.startsWith('.local/'));
 const m=await read(manifest),layout=await read(m.layout),station=await read(m.station),detail=await read(m.detail),motion=await read(component+'/motion.json'),report=await read(component+'/report.json');
-assert.equal(motion.escalators.length,4);assert.equal(motion.combSupports.length,8);
+const expected=report.componentPrefix==='station-escalators-'?2:4;
+assert.equal(motion.escalators.length,expected);assert.equal(motion.combSupports.length,2*expected);
 assert.deepEqual(layout.escalators,station.escalators);
 for(const lane of motion.escalators){
  assert(!layout.escalators.some(e=>e.id===lane.id));
@@ -27,4 +28,4 @@ detail.candidateMotionIntegration={...detail.candidateMotionIntegration,layoutSh
 // sourceLayoutSha256 remains the provenance of the unchanged hardware GLB.
 const directory=manifest.slice(0,manifest.lastIndexOf('/'));m.layoutSha256=sha(bytes);m.motionLayout=m.layout;m.detail=directory+'/atrium-detail.json';m.spawn=report.geometry.spawn||{x:1.2,y:report.geometry.B2,z:3};
 await writeFile(m.layout,bytes);await writeFile(m.station,JSON.stringify(station)+'\n');await writeFile(m.detail,JSON.stringify(detail)+'\n');await writeFile(manifest,JSON.stringify(m,null,2)+'\n');
-console.log({layoutSha256:m.layoutSha256,lanes:layout.escalators.length,added:4});
+console.log({layoutSha256:m.layoutSha256,lanes:layout.escalators.length,added:expected});
