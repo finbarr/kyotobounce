@@ -113,7 +113,9 @@ The [Isetan ground entrance and stair](ISETAN-GROUND-V2.md) open the sealed vest
 
 The [Granvia ground entrance](GRANVIA-ENTRANCE-V2.md) now connects the forecourt to the existing 2F lobby through a broad stair, paired operating escalators and a two-stop lift. Two former passage walls have usable openings, with the east–west ground route, M3F stair and theatre approach retained. Hotel room fitouts and further upper floors remain unfinished.
 
-1. **Remaining interior connections:** inspect the unfinished Isetan and Granvia upper-floor links and parking access recorded in the basement and central-lift notes; repair concrete missing connections before room decoration.
+The [Isetan second-floor entrance](ISETAN-SECOND-V2.md) opens the north–south passage into a receiving hall, counter aisles and information desk. Its entrance and the central public lift share a continuous route. Internal store circulation between 1F and 2F remains unfinished.
+
+1. **Remaining interior connections:** connect Isetan's internal 1F–2F circulation and inspect parking access, then address the remaining upper-floor links; repair concrete missing connections before room decoration.
 2. **Southern building and public spaces:** add the bus/pickup canopies, street edges and remaining upper frontage. Resolve the small Miyako Michi southeast stair's destination before constructing it.
 3. **Railway refinement:** improve fitted track alignment, platform enclosures and further building connections after the missing public routes.
 

@@ -20,7 +20,9 @@ The [Porta west public lift](notes/PORTA-WEST-LIFT-V2.md) connects the western c
 
 The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) connect all five stops: parking B3, Porta B2, the western B1 hall, the recessed ground entrance and the upper north–south passage. Fourteen native route walks and 34 Chrome lift checks pass. The parking receiving area is established; ramps and further building connections remain unfinished.
 
-The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both B2 food-hall entrances, connect aisle loops and add a guarded internal stair. The [ground entrance and stair](notes/ISETAN-GROUND-V2.md) extend that connection into an open ground-floor receiving hall. The central lift remains reachable from both basements. Upper store floors and further vertical circulation remain unfinished.
+The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both B2 food-hall entrances, connect aisle loops and add a guarded internal stair. The [ground entrance and stair](notes/ISETAN-GROUND-V2.md) extend that connection into an open ground-floor receiving hall. The [second-floor entrance](notes/ISETAN-SECOND-V2.md) opens the north–south passage into a receiving hall and aisle loop, reachable from the central public lift. Internal store circulation between 1F and 2F, higher store floors and further western rooms remain unfinished.
+
+The [Granvia ground entrance](notes/GRANVIA-ENTRANCE-V2.md) connects the forecourt to the hotel lobby by stair, paired escalators and lift, retaining the M3F and theatre approaches.
 
 The [retained Porta pavilion stair](notes/PORTA-PAVILION-V2.md) restores the forecourt entrance and opens both stair lanes onto North Street. Adjacent shop bays, the west cross-passage and lift approach remain usable. Its exact exit number remains unconfirmed.
 
@@ -28,7 +30,7 @@ The [western platforms 30–34](notes/WESTERN-PLATFORMS-V2.md) connect to platfo
 
 Next priorities:
 
-1. Repair remaining Isetan and Granvia interior connections and parking access before tenant decoration.
+1. Connect Isetan's internal 1F–2F circulation and inspect parking access, then address remaining upper-floor links before tenant decoration.
 2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 

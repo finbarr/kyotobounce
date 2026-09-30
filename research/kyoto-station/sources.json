@@ -13128,5 +13128,37 @@
     "retrieved_at": "2026-09-30T06:25:22.752935+00:00",
     "rights": "Reference copy only; not a game texture.",
     "note": "Official floor-guide image. Visually inspected for ground drop-off, stair/escalators, lift, 2F main entrance and M3F connection. North points down; dimensions are not surveyed."
+  },
+  {
+    "id": "isetan-2f-floor-plan-20260930",
+    "title": "JR Kyoto Isetan second-floor plan",
+    "publisher": "JR Kyoto Isetan",
+    "category": "circulation",
+    "url": "https://www.isetan.mistore.jp/content/dam/isetan_mitsukoshi/site/wjri/shops/floormap/japan/floor_02f.png",
+    "source_date": null,
+    "note": "Visually inspected: east entrance off north-south passage, receiving aisle, information desk, cosmetics islands, fragrances, boutiques and internal circulation. North points right, checked against the station operator diagram. Dimensions are not surveyed.",
+    "rights": "Reference copy only; not a game texture.",
+    "format": "png",
+    "status": "downloaded",
+    "local_file": "maps/isetan-2f-2026.png",
+    "bytes": 480193,
+    "sha256": "0cc800e91e788b409773e5e3f71ba9b076cebc4a963750212f7ab7c3e1b1fbe3",
+    "retrieved_at": "2026-09-30T07:21:04.812389+00:00"
+  },
+  {
+    "id": "isetan-2f-public-entrance-photo",
+    "title": "Isetan 2F entrance from the north-south public passage",
+    "publisher": "Kyoto Station Building",
+    "category": "circulation",
+    "url": "https://www.kyoto-station-building.co.jp/app/themes/kyoto-station-building/directions/img/img_route_navi2_bc_02.jpg",
+    "source_date": null,
+    "note": "Official directions photograph, visually inspected: glazed frontage and doors, dark surrounds, transom and continuous public corridor. Publication date is not supplied.",
+    "rights": "Reference copy only; not a game texture.",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "photos/isetan-2f-passage-entrance.jpg",
+    "bytes": 299976,
+    "sha256": "d38bd8569d70cfadc4effc1067a2159ea5362330bd318dc1f8d0ad6cfece7fb3",
+    "retrieved_at": "2026-09-30T07:21:04.812994+00:00"
   }
 ]
