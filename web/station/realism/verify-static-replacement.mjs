@@ -12,7 +12,7 @@ const base=await read(basePath),m=await read(candidatePath),oldRaw=await readFil
 assert.equal(sha(oldRaw),base.layoutSha256);assert.equal(sha(raw),m.layoutSha256);assert.equal(r.sourceLayoutSha256,base.layoutSha256);
 const removed=new Set(r.geometry.retiredIds),retained=old.panels.filter(p=>!removed.has(p.id));
 const retiredBoxes=r.geometry.retiredBoxIds||[];
-assert(!retiredBoxes.length||r.componentPrefix==='isetan-ground-');
+assert(!retiredBoxes.length||['isetan-ground-','granvia-entrance-'].includes(r.componentPrefix));
 assert.deepEqual(next.boxes,old.boxes.filter(p=>!retiredBoxes.includes(p.id)));
 assert.equal(old.panels.length-retained.length+retiredBoxes.length+(r.geometry.retiredSourceOnlyIds||[]).length,removed.size);const modified=r.geometry.modifiedPanelIds||[];
 assert.deepEqual(next.panels.slice(0,retained.length).map(p=>modified.includes(p.id)?old.panels.find(q=>q.id===p.id):p),retained);
@@ -21,14 +21,14 @@ assert.deepEqual(next.authoredMaterials.slice(0,old.authoredMaterials.length),ol
 assert.deepEqual(next.authoredLights,[...old.authoredLights.filter(l=>!r.geometry.retiredLights.includes(l.id)),...(native.authoredLights||[])]);
 // The terrace appends three explicitly declared lifts; all prior motion stays exact.
 let addedLifts=0;
-if(r.componentPrefix==='hachijo-terrace-'){
- const motion=await read(component+'/motion.json');assert.equal(motion.lifts.length,3);
+if(['hachijo-terrace-','granvia-entrance-'].includes(r.componentPrefix)){
+ const motion=await read(component+'/motion.json');assert.equal(motion.lifts.length,r.componentPrefix==='granvia-entrance-'?1:3);
  const expected=structuredClone(motion.lifts);for(const l of expected)for(const p of l.parts){const a=next.authoredMaterials.find(a=>a.label===p.appearance);assert(a);p.appearance=a.id;}
  assert.deepEqual(next.lifts,[...old.lifts,...expected]);addedLifts=expected.length;
 }else assert.deepEqual(next.lifts,old.lifts);
 let addedEscalators=0;
-if(['hachijo-escalators-','station-escalators-'].includes(r.componentPrefix)){
- const motion=await read(component+'/motion.json');assert.equal(motion.escalators.length,r.componentPrefix==='station-escalators-'?2:4);
+if(['hachijo-escalators-','station-escalators-','granvia-entrance-'].includes(r.componentPrefix)){
+ const motion=await read(component+'/motion.json');assert.equal(motion.escalators.length,r.componentPrefix==='hachijo-escalators-'?4:2);
  assert.deepEqual(next.escalators,[...old.escalators,...motion.escalators]);addedEscalators=motion.escalators.length;
 }else assert.deepEqual(next.escalators,old.escalators);
 const modifiedFlights=r.geometry.modifiedFlightIds||[];assert(!modifiedFlights.length||r.componentPrefix==='isetan-ground-');assert.deepEqual(next.flights,old.flights.map(f=>modifiedFlights.includes(f.id)?{...f,foundationDepth:0}:f));
@@ -42,7 +42,7 @@ const {json:j,bin}=readGLB(glb),part=readGLB(await readFile(component+'/'+r.outp
 const parentGLB=readGLB(await readFile(base.geometry));
 assert(bin.subarray(0,parentGLB.bin.length).equals(parentGLB.bin));
 assert.deepEqual(j.materials.slice(0,parentGLB.json.materials.length),parentGLB.json.materials);
-const shell=modified.length?(r.componentPrefix==='isetan-ground-'?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
+const shell=modified.length?(['isetan-ground-','granvia-entrance-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
 const values=ai=>{const a=j.accessors[ai],v=j.bufferViews[a.bufferView],w={SCALAR:1,VEC2:2,VEC3:3}[a.type];assert(!v.extensions&&!v.byteStride&&!a.sparse);return Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>bin[a.componentType===5126?'readFloatLE':'readUInt32LE']((v.byteOffset||0)+(a.byteOffset||0)+(i*w+k)*4)));};
 let vertices=0,triangles=0;
 for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const p of mesh.primitives){

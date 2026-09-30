@@ -13098,5 +13098,35 @@
     "bytes": 241406,
     "sha256": "5c36f987ac1f3793d3f626003db0f3b6647ec9d43dc11726a2431d9ce479e441",
     "retrieved_at": "2026-09-30T05:38:32.730Z"
+  },
+  {
+    "id": "granvia-1f-map",
+    "title": "Hotel Granvia Kyoto 1F entrance and circulation plan",
+    "publisher": "JR West Hotels / Hotel Granvia Kyoto",
+    "category": "circulation",
+    "url": "https://jrwest-hotels.jp/granvia-kyoto/floor/images/img_floor_1.jpg",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "maps/granvia-1f-map.jpg",
+    "bytes": 308173,
+    "sha256": "0df1b17b69dcd8d0079df2853fda772a0a635734e01adff6f74efa89a4b97785",
+    "retrieved_at": "2026-09-30T06:25:22.752271+00:00",
+    "rights": "Reference copy only; not a game texture.",
+    "note": "Official floor-guide image. Visually inspected for ground drop-off, stair/escalators, lift, 2F main entrance and M3F connection. North points down; dimensions are not surveyed."
+  },
+  {
+    "id": "granvia-2f-map",
+    "title": "Hotel Granvia Kyoto 2F entrance and circulation plan",
+    "publisher": "JR West Hotels / Hotel Granvia Kyoto",
+    "category": "circulation",
+    "url": "https://jrwest-hotels.jp/granvia-kyoto/floor/images/img_floor_2.jpg",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "maps/granvia-2f-map.jpg",
+    "bytes": 329286,
+    "sha256": "0e4518daed1f296f7bc3e33df961e511de87e78d0feb37a8ce2f7b5d82b39c33",
+    "retrieved_at": "2026-09-30T06:25:22.752935+00:00",
+    "rights": "Reference copy only; not a game texture.",
+    "note": "Official floor-guide image. Visually inspected for ground drop-off, stair/escalators, lift, 2F main entrance and M3F connection. North points down; dimensions are not surveyed."
   }
 ]

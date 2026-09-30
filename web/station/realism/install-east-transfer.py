@@ -12,24 +12,28 @@ old_raw=Path(base['layout']).read_bytes();new_raw=Path(candidate['layout']).read
 assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha256']
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
 modified_ids=report['geometry'].get('modifiedPanelIds',[])
-allowed_modified={'central-lift-':['concourse'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
+allowed_modified={'central-lift-':['concourse'],'granvia-entrance-':['concourse','east-passage-north-wall','east-passage-south-wall'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
 if report.get('componentPrefix')=='isetan-ground-':
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
  assert all(id=='concourse' or id.startswith(('west-north-','west-south-'))for id in modified_ids)
 else:assert not modified_ids or modified_ids==allowed_modified.get(report.get('componentPrefix'))
 replaced=[p for p in new['panels']if p['id']==modified_paving or p['id']in modified_ids];replaced_by_id={p['id']:p for p in replaced}
 retained=[replaced_by_id.get(p['id'],p) for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
-retired_boxes=report['geometry'].get('retiredBoxIds',[]);assert not retired_boxes or report.get('componentPrefix')in ('porta-west-','isetan-ground-')
+retired_boxes=report['geometry'].get('retiredBoxIds',[]);assert not retired_boxes or report.get('componentPrefix')in ('porta-west-','isetan-ground-','granvia-entrance-')
 assert new['boxes']==[p for p in old['boxes']if p['id']not in retired_boxes]
 modified_flights=report['geometry'].get('modifiedFlightIds',[])
 assert not modified_flights or report.get('componentPrefix')=='isetan-ground-'
 assert new['flights']==[dict(f,foundationDepth=0)if f['id']in modified_flights else f for f in old['flights']]
-for key in ('beams','escalators'):assert old[key]==new[key]
+assert old['beams']==new['beams']
+lanes=json.loads((component/'motion.json').read_text())['escalators'] if report.get('componentPrefix')=='granvia-entrance-' else []
+assert new['escalators']==old['escalators']+lanes
+assert not lanes or len(lanes)==2
 retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
 assert not retired_lift_ids or report.get('componentPrefix')=='hachijo-crossing-' and retired_lift_ids==['subway-hachijo-east-lift']
 old_lifts=[l for l in old.get('lifts',[])if l['id']not in retired_lift_ids];lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
 added_lifts=lifts[len(old_lifts):]
-assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-','porta-west-lift-','central-lift-','hachijo-terrace-')
+assert not {p['id']for l in added_lifts for p in l['parts']} & {p['id']for p in new['panels']},'Static and moving source object names must be distinct'
+assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-','porta-west-lift-','central-lift-','hachijo-terrace-','granvia-entrance-')
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')
@@ -101,6 +105,22 @@ lights=new['authoredLights'][len(retained_lights):]
 assert len(lights)==len(json.loads((component/'native-panels.json').read_text())['authoredLights'])
 for r in lights:
  lamp=bpy.data.lights.new(r['id'],'SPOT');lamp.color=tuple(r['linearColor'][k]for k in 'rgb');lamp.energy=r['intensity'];lamp.spot_size=math.radians(r['spotAngle']);lamp.spot_blend=1-r['innerSpotAngle']/r['spotAngle'];o=bpy.data.objects.new(r['id'],lamp);collection.objects.link(o);p=r['position'];o.location=(p['x'],p['z'],p['y']);o['kyoto_fixture']=True;o['kyoto_unity_intensity']=r['intensity'];o['kyoto_range_m']=r['range']
+motion_manifest=[]
+if lanes:
+ sys.path.insert(0,str(Path.cwd()/'tools'));from blender_escalators import build as build_escalators
+ cube=[(x,y,z)for z in (-.5,.5)for y in (-.5,.5)for x in (-.5,.5)]
+ cube_faces=[(0,2,3,1),(4,5,7,6),(0,1,5,4),(2,6,7,3),(0,4,6,2),(1,3,7,5)]
+ physical={}
+ for key,name in [('escalator','north-escalator-lower-1 step 0'),('steel','north-escalator-lower-1 nosing 0'),('escalator-casing','north-escalator-lower-1 casing 0')]:
+  physical[key]=bpy.data.objects[name].data.materials[0]
+ physical['escalator-edge']=physical['steel']
+ prior=set(bpy.data.objects);motion_manifest=build_escalators(lanes,{'Player-only walking surfaces':collection},physical,cube,cube_faces)
+ for o in set(bpy.data.objects)-prior:
+  o['kyoto_dynamic']=True
+  if o.get('step_count'):o['kyoto_lane']=o.get('surface_id')
+  if o.get('role')in ('walking-proxy','escalator-casing'):
+   o.hide_render=True;o['kyoto_motion_aux']=o.get('surface_id')
+ # Public casings are already included in the matching static component.
 out.mkdir(parents=True,exist_ok=True);(out/'station-layout.json').write_bytes(new_raw)
 bpy.data.texts.remove(bpy.data.texts['Kyoto runtime seed.json']);seed=bpy.data.texts.load(str((out/'station-layout.json').resolve()),internal=True);seed.name='Kyoto runtime seed.json'
 textures=(out/'textures');texture_source=(Path(base['sourceScene']).parent/'textures').resolve()
@@ -124,6 +144,14 @@ for part,position,size in lift_objects:
  o=bpy.data.objects[part['id']];assert o['kyoto_dynamic'] and o['kyoto_lift_part']==part['id'];assert (o.location-Vector(position)).length<2e-5;assert (o.dimensions-Vector(size)).length<2e-5;assert o.data.materials[0].name==materials[part['appearance']]['label'];assert signature(o)==o['kyoto_geometry_signature']
 for r in lights:
  o=bpy.data.objects[r['id']];assert abs(o.data.energy-r['intensity'])<1e-6;assert o['kyoto_range_m']==r['range']
+for lane in lanes:
+ root=bpy.data.objects[lane['id']+' operating chain'];assert root['step_count']==lane['stepCount'] and root['kyoto_lane']==lane['id']
+ for i in range(lane['stepCount']):
+  step=bpy.data.objects[lane['id']+' step '+str(i)];strip=step.animation_data.nla_tracks[0].strips[0]
+  assert strip.use_reverse==(lane['speed']<0) and abs(strip.scale-bpy.context.scene.render.fps/abs(lane['speed']))<.001
+  action=strip.action;bag=action.layers[0].strips[0].channelbag(strip.action_slot)
+  assert len(bag.fcurves)==3 and all(len(c.keyframe_points)==len(lane['path'])for c in bag.fcurves)
 proof={'pass':True,'parentSourceSha256':sha(Path(base['sourceScene']).read_bytes()),'sourceSha256':sha((out/'KyotoAtrium.blend').read_bytes()),'layoutSha256':sha(new_raw),'addedPanels':len(added),'retiredObjects':removed,'savedGeometryUVsNormalsMatch':True,'retainedBindingsMatch':True}
+proof['addedEscalators']=len(lanes);proof['animation']=motion_manifest
 proof['modifiedPanels']=modified_ids;proof['modifiedPaving']=modified_paving;proof['addedLifts']=len(added_lifts);proof['liftParts']=len(lift_objects);proof['retiredLiftParts']=retired_lift_parts
 (out/'installation.json').write_text(json.dumps(proof,indent=2)+'\n');print('EAST_TRANSFER_SOURCE_READY',json.dumps(proof),flush=True)

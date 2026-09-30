@@ -25,7 +25,9 @@ try{
  await page.keyboard.down('Space');await page.waitForTimeout(500);await page.keyboard.up('Space');
  await page.waitForFunction(()=>kyotoState.phase==='Flight');await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim');
  assert.equal(await page.evaluate(()=>kyotoState.result),null);
- await page.keyboard.press('Escape');
+ // Chrome can consume Escape to release pointer lock. Use the game's explicit
+ // Levels shortcut so the home check waits on the intended menu interaction.
+ await page.keyboard.press('l');
  await page.getByRole('button',{name:'↶ Start',exact:true}).click();
  // Home replaces the player snapshot asynchronously. Wait for the returned
  // position, rather than reading during the brief gap between snapshots.
