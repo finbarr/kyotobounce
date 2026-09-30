@@ -99,8 +99,10 @@ The [western ASTY street and public stair](ASTY-WEST-V2.md) open the main foyer'
 
 The [western platforms 30–34](WESTERN-PLATFORMS-V2.md) now connect to platform 0 through a ground concourse. The blocked western wall and coarse lower building shell are opened beneath the retained upper façade. Three platform strips and four terminating tracks follow the operator plan.
 
-1. **Southern halls and Hachijo side:** complete the remaining building frontage, terrace, forecourt and Miyako Michi connections, prioritizing missing public routes.
-2. **Subway receiving halls:** add the missing public-room openings and verify interior boundaries against the operator diagrams before adding fixtures and tenant detail.
+The [Miyako Michi street and western forecourt](MIYAKOMICHI-V2.md) now connect the ASTY western portal to the fountain plaza, 31 room shells, both washroom lobbies and three public Hachijo exits. The forecourt reaches the retained terrace stair, and the railway hall above remains accessible.
+
+1. **Subway receiving halls:** add the missing public-room openings and verify interior boundaries against the operator diagrams before adding fixtures and tenant detail.
+2. **Southern building and public spaces:** complete the remaining upper frontage, terrace, street edges and larger receiving rooms. Resolve the small Miyako Michi southeast stair's destination before constructing it.
 3. **Railway refinement:** improve fitted track alignment, platform enclosures and further building connections after the missing public routes.
 
 Later rendering finding: pale ASTY fascias show banded shading. Investigate the cause after the missing structural routes; geometry correspondence alone does not explain it.
