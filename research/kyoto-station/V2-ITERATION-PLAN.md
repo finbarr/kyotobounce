@@ -46,12 +46,12 @@ The [eighth-floor connection](notes/ISETAN-EIGHTH-V2.md) opens the southern stai
 
 ## Current focus — 30 September 2026
 
-The user now wants most effort on the atrium and everything reachable from it, especially the walk up to the gardens at the top. The [eighth-floor northern entrance and lift](notes/ISETAN-EIGHTH-NORTH-V2.md) complete the current store connection. Prioritize the continuous public route next. Further store floors and lift banks can wait unless they directly repair an atrium connection.
+The user now wants most effort on the atrium and everything reachable from it, especially the walk up to the gardens at the top. The [eighth-floor northern entrance and lift](notes/ISETAN-EIGHTH-NORTH-V2.md) complete the current store connection. The [upper landing and rooftop garden connection](notes/ATRIUM-GARDEN-ROUTE-V2.md) now passes the full Muromachi Square ascent and descent in native play and Chrome. Continue with the garden and adjacent public routes. Further store floors and lift banks can wait unless they directly repair an atrium connection.
 
 Next priorities:
 
-1. Repair the [confirmed upper landing and garden-stair defects](notes/ATRIUM-GARDEN-ROUTE-V2.md): the direct approach drops off its floor, the apron is 0.392 m above the corrected landing, and the stair intersects the façade. Complete the atrium → Grand Stairway → rooftop garden journey and verify it in both directions.
-2. Complete the gardens and their adjacent public paths using official plans and photographs; clarify exits, railings, seating and connections to the Skyway and restaurant terrace.
+1. Inspect and complete the rooftop garden path and northern viewing promenade using the official roof plan; verify a clear walk from the new stair arrival.
+2. Refine the garden’s paving, planting, seating and signs from operator photographs, and clarify connections to the Skyway and restaurant terrace.
 3. Continue the atrium’s immediately reachable public spaces and entrances. Resume deeper store interiors or distant southern frontage after these routes are coherent.
 
 The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. The [station-side escalators](notes/STATION-ESCALATORS-V2.md) complete the shared stair halls. Tenant interiors remain unfinished.

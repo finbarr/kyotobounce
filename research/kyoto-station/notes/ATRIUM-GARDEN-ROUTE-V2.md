@@ -1,8 +1,26 @@
-# Atrium to rooftop garden: current route defects
+# Atrium to rooftop garden connection
 
-30 September 2026. The user’s main priority is the atrium and its reachable public spaces, especially walking up to the gardens. The next construction task is the connection from the top of the Grand Stairway into the rooftop garden.
+30 September 2026. The user’s main priority is the atrium and its reachable public spaces, especially walking up to the gardens. This increment repairs the connection from the top of the Grand Stairway into the rooftop garden.
 
-## Confirmed in the current build
+## Delivered connection
+
+The corrected upper landing now joins a westward flight into the rooftop garden. The 28 steps have a 0.310 m tread and approximately 0.189 m rise. A fitted 2.75 m² floor infill closes the missing approach at the corrected landing height. The old stair and its opening are replaced; the new well has guards on its three exposed sides and opens into the garden at the west end.
+
+The route follows the operator's RF schematic. Its dimensions fit the retained model and are not surveyed measurements. The façade remains intact; two bounded slab cuts clear the new opening. Existing garden furniture and planting are retained for the next refinement.
+
+### Verification
+
+- Four native walks pass: the short connection and the complete Muromachi Square–garden route, each in both directions (1,867 movement samples).
+- The same four routes pass with Chrome keyboard controls (500 checked waypoints). All three approaches to the stair well are blocked by the guards.
+- Independent geometry checks confirm the floor infill, all 28 risers, 2.1 m headroom along the tested route, and matching browser/collision geometry. The 42 retired objects are absent from the editable source. A separate browser check rejects remnants of their guards.
+- Four final Chrome views were inspected: the lower approach, garden arrival, court and filled former stair opening. The views have stable texture and reflection-capture counts and no page errors.
+- Native gameplay, Chrome walking/throws/recall/home and `npm run build:web` pass. Free throws finish only after translation and spin stop. Existing escalators and lifts retain their exact geometry and definitions.
+
+The editable Blender scene and matching playable assets are integrated in `.local/v2/current/`. The build starts beside the garden stairs at http://127.0.0.1:4425. Receipts and small component files are in `.local/v2/current/components/garden-access/`; the temporary full source, station export and preview overlay are removed after promotion.
+
+Next, inspect and complete the garden's public path, northern viewing promenade and onward connections. Refine paving, planting, seating and signs from the existing operator photographs. The neighboring shell and garden finishes remain provisional.
+
+## Defects confirmed before the repair
 
 Inspected six real Chrome views of the atrium approach, upper landing, garden stair, garden court and western roof. Two independent native walks reproduce defects on layout `ce61c4797cc57c882aa9b62aba12f821c2c2081a73d4ff798da072ad64e46c50`:
 
@@ -22,7 +40,7 @@ The rooftop court already contains paving, planting, seating and lights. Its arc
 
 Private plan, photograph, screenshots and failed native receipts are under `.local/v2/current/components/atrium-garden-audit/`. No full station copy was created for this audit.
 
-## Next increment and acceptance
+## Connection acceptance
 
 Refit the upper landing, final garden stair and garden entrance as one continuous public connection. Check the flight’s alignment against the RF plan and retained floor boundaries before choosing façade openings. Preserve the established garden level and useful existing furnishings where they fit.
 
@@ -49,4 +67,4 @@ KYOTO_FAST=1 KYOTO_ROUTE_FILTER='Existing garden' \
   .local/v2/candidate/atrium-garden-route/stair-baseline
 ```
 
-Both native commands currently fail on the recorded geometry. These are diagnostic probes, not acceptance tests for the repaired route.
+Both probes failed on the recorded parent geometry. They document the original defects; the new builder declares the repaired route checks.

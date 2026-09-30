@@ -45,7 +45,10 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is in the Isetan 8F northern lift hall.
+The current spawn is at the upper Grand Stairway landing, beside the repaired
+[rooftop garden connection](../research/kyoto-station/notes/ATRIUM-GARDEN-ROUTE-V2.md).
+Follow the short flight west into the garden, or descend the Grand Stairway
+towards Muromachi Square and the atrium.
 The central pairs connect 3F through 8F. The eighth-floor south entrance,
 store aisles and café now connect to the public stair landing; see the
 [eighth-floor notes](../research/kyoto-station/notes/ISETAN-EIGHTH-V2.md).

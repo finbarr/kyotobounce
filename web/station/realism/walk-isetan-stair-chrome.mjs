@@ -7,7 +7,18 @@ assert(['localhost','127.0.0.1'].includes(new URL(origin).hostname));assert(out.
 const m=await read(manifest),build=await read(component+'/report.json'),layout=await read(m.layout),report={pass:false,layoutSha256:m.layoutSha256,geometrySha256:m.geometrySha256,routes:[],errors:[]};
 const previous=process.env.KYOTO_SKIP_REPORT?await read(process.env.KYOTO_SKIP_REPORT):null;
 if(previous){assert.equal(previous.layoutSha256,m.layoutSha256);assert.equal(previous.geometrySha256,m.geometrySha256);assert.deepEqual(previous.errors,[]);report.reusedFrom=process.env.KYOTO_SKIP_REPORT;}
-const treads=layout.panels.filter(p=>p.id.startsWith('isetan-')&&['stair-tread','stair-landing'].includes(p.role)).map(p=>({id:p.id,x0:Math.min(...p.vertices.map(v=>v.x)),x1:Math.max(...p.vertices.map(v=>v.x)),z0:Math.min(...p.vertices.map(v=>v.z)),z1:Math.max(...p.vertices.map(v=>v.z)),top:Math.max(...p.vertices.map(v=>v.y))}));
+const declaredTreads=new Set(build.geometry.stair?.stepIds||[]);
+const treads=layout.panels.filter(p=>declaredTreads.has(p.id)||p.id.startsWith('isetan-')&&['stair-tread','stair-landing'].includes(p.role)).map(p=>({id:p.id,x0:Math.min(...p.vertices.map(v=>v.x)),x1:Math.max(...p.vertices.map(v=>v.x)),z0:Math.min(...p.vertices.map(v=>v.z)),z1:Math.max(...p.vertices.map(v=>v.z)),top:Math.max(...p.vertices.map(v=>v.y))}));
+function treadSupport(feet,waypoint){
+ const radius=.24;
+ return treads.map(t=>{
+  const distance=Math.hypot(Math.max(t.x0-feet.x,0,feet.x-t.x1),Math.max(t.z0-feet.z,0,feet.z-t.z1));
+  // The spherical foot can touch a higher tread edge before its centre reaches
+  // that tread. Compare against that contact height, as for generated ramps.
+  const expectedFeet=t.top-radius+Math.sqrt(Math.max(0,radius*radius-distance*distance));
+  return {...t,distance,expectedFeet};
+ }).filter(t=>t.distance<=radius&&Math.abs(t.top-waypoint.y)<.25&&Math.abs(feet.y-t.expectedFeet)<.07).sort((a,b)=>b.expectedFeet-a.expectedFeet)[0];
+}
 // Generated stairs use the contour-cell interpolation from StairGeometry.Create
 // for players. Check the height at the actual foot position on that ramp,
 // rather than treating the nearest riser waypoint as a flat floor.
@@ -59,7 +70,7 @@ try{
    await page.keyboard.down('w');try{await page.waitForFunction(p=>Math.hypot(kyotoState.feet.x-p.x,kyotoState.feet.z-p.z)<.16,p,{timeout:35000});}catch(e){row.failure={point:p,from:feet,state:await page.evaluate(()=>({feet:kyotoState.feet,yaw:kyotoState.yaw,mode:kyotoState.mode,phase:kyotoState.phase,activeElement:document.activeElement?.outerHTML}))};await page.screenshot({path:out+'/failure.png'});throw Error(label+' '+JSON.stringify(row.failure),{cause:e});}finally{await page.keyboard.up('w');}
    // The capsule can contact the next tread before its center crosses the riser.
    // Require a nearby tread at the actual foot height as well as the route height.
-   await page.waitForTimeout(180);const at=await page.evaluate(()=>__isetanGround.read()),tread=rampSupport(at.feet)||treads.filter(t=>Math.hypot(Math.max(t.x0-at.feet.x,0,at.feet.x-t.x1),Math.max(t.z0-at.feet.z,0,at.feet.z-t.z1))<=.265&&Math.abs(t.top-p.y)<.25&&Math.abs(at.feet.y-t.top)<.07).sort((a,b)=>Math.abs(a.top-at.feet.y)-Math.abs(b.top-at.feet.y))[0],floor=tread?.top??p.y,expectedFeet=tread?.expectedFeet??floor;row.checks.push({point:p,...at,support:tread?.id,expectedFloor:floor,expectedFeet});assert(at.grounded&&tread?.walkable!==false&&Math.abs(at.feet.y-expectedFeet)<.07&&Math.abs(at.feet.y-p.y)<.25,label+' landing '+JSON.stringify(at));
+   await page.waitForTimeout(180);const at=await page.evaluate(()=>__isetanGround.read()),tread=rampSupport(at.feet)||treadSupport(at.feet,p),floor=tread?.top??p.y,expectedFeet=tread?.expectedFeet??floor;row.checks.push({point:p,...at,support:tread?.id,expectedFloor:floor,expectedFeet});assert(at.grounded&&tread?.walkable!==false&&Math.abs(at.feet.y-expectedFeet)<.07&&Math.abs(at.feet.y-p.y)<.25,label+' landing '+JSON.stringify(at));
   }
   row.pass=true;await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log('PASS Chrome',label,row.checks.length,'waypoints');
  }
