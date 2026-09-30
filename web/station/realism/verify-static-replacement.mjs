@@ -3,13 +3,15 @@ import assert from 'node:assert/strict';
 import {readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import * as T from 'three';
+import {verifyWesternShell} from './verify-western-platform-shell.mjs';
 import {readGLB} from '../../../tools/optimize-browser-assets.mjs';
 const [basePath,candidatePath,component,out]=process.argv.slice(2);assert(out?.startsWith('.local/'));
 const read=async p=>JSON.parse(await readFile(p)),sha=b=>createHash('sha256').update(b).digest('hex');
 const base=await read(basePath),m=await read(candidatePath),oldRaw=await readFile(base.layout),raw=await readFile(m.layout),old=JSON.parse(oldRaw),next=JSON.parse(raw),r=await read(component+'/report.json'),native=await read(component+'/native-panels.json');
 assert.equal(sha(oldRaw),base.layoutSha256);assert.equal(sha(raw),m.layoutSha256);assert.equal(r.sourceLayoutSha256,base.layoutSha256);
 const removed=new Set(r.geometry.retiredIds),retained=old.panels.filter(p=>!removed.has(p.id));
-assert.equal(old.panels.length-retained.length,removed.size);assert.deepEqual(next.panels.slice(0,retained.length),retained);
+assert.equal(old.panels.length-retained.length,removed.size);const modified=r.geometry.modifiedPanelIds||[];
+assert.deepEqual(next.panels.slice(0,retained.length).map(p=>modified.includes(p.id)?old.panels.find(q=>q.id===p.id):p),retained);
 const added=next.panels.slice(retained.length);assert.equal(added.length,native.panels.length);
 assert.deepEqual(next.authoredMaterials.slice(0,old.authoredMaterials.length),old.authoredMaterials);
 assert.deepEqual(next.authoredLights,[...old.authoredLights.filter(l=>!r.geometry.retiredLights.includes(l.id)),...(native.authoredLights||[])]);
@@ -23,6 +25,7 @@ const {json:j,bin}=readGLB(glb),part=readGLB(await readFile(component+'/'+r.outp
 const parentGLB=readGLB(await readFile(base.geometry));
 assert(bin.subarray(0,parentGLB.bin.length).equals(parentGLB.bin));
 assert.deepEqual(j.materials.slice(0,parentGLB.json.materials.length),parentGLB.json.materials);
+const shell=modified.length?await verifyWesternShell(parentGLB,{json:j,bin},old,next,r):{};
 const values=ai=>{const a=j.accessors[ai],v=j.bufferViews[a.bufferView],w={SCALAR:1,VEC2:2,VEC3:3}[a.type];assert(!v.extensions&&!v.byteStride&&!a.sparse);return Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>bin[a.componentType===5126?'readFloatLE':'readUInt32LE']((v.byteOffset||0)+(a.byteOffset||0)+(i*w+k)*4)));};
 let vertices=0,triangles=0;
 for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const p of mesh.primitives){
@@ -42,5 +45,5 @@ for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const
  assert.equal(offset,ps.length);assert.deepEqual(expected,ix);vertices+=offset;
 }
 assert.equal(triangles,r.geometry.triangles);
-await writeFile(out,JSON.stringify({pass:true,layoutSha256:m.layoutSha256,geometrySha256:m.geometrySha256,removedPanels:removed.size,removedTriangles:removal.removedTriangles,addedPanels:added.length,vertices,triangles,retainedNativeRecordsExact:true,retainedBrowserBufferBytesExact:true,movingHardwareUnchanged:true},null,2)+'\n');
+await writeFile(out,JSON.stringify({pass:true,layoutSha256:m.layoutSha256,geometrySha256:m.geometrySha256,...shell,removedPanels:removed.size,removedTriangles:removal.removedTriangles,addedPanels:added.length,vertices,triangles,retainedNativeRecordsExact:true,retainedBrowserBufferBytesExact:true,movingHardwareUnchanged:true},null,2)+'\n');
 console.log('PASS static replacement',added.length,'panels',vertices,'vertices',triangles,'triangles');

@@ -24,11 +24,13 @@ The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both 
 
 The [retained Porta pavilion stair](notes/PORTA-PAVILION-V2.md) restores the forecourt entrance and opens both stair lanes onto North Street. Adjacent shop bays, the west cross-passage and lift approach remain usable. Its exact exit number remains unconfirmed.
 
+The [western platforms 30–34](notes/WESTERN-PLATFORMS-V2.md) connect to platform 0 through an opened ground approach and head concourse. Three platform strips, four terminating tracks, buffers and canopies occupy the former solid building shell. The upper façade is retained. Precise track alignment, final signs and detailed finishes remain unfinished.
+
 Next priorities:
 
-1. Complete western platforms 30–34 and their passenger connections; then refine railway alignment and enclosures.
-2. Complete the remaining southern building frontage, terrace, forecourt and Miyako Michi connections.
-3. Complete missing public-room openings around the subway receiving halls before adding tenant detail.
+1. Complete the remaining southern building frontage, terrace, forecourt and Miyako Michi connections.
+2. Complete missing public-room openings around the subway receiving halls before adding tenant detail.
+3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 
 The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. Tenant interiors and working ASTY escalators remain unfinished.
 

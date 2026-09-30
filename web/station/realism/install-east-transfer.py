@@ -11,7 +11,9 @@ base=json.loads(base_path.read_text());candidate=json.loads(candidate_path.read_
 old_raw=Path(base['layout']).read_bytes();new_raw=Path(candidate['layout']).read_bytes();old=json.loads(old_raw);new=json.loads(new_raw)
 assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha256']
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
-modified_ids=report['geometry'].get('modifiedPanelIds',[]);assert not modified_ids or report.get('componentPrefix')=='central-lift-' and modified_ids==['concourse']
+modified_ids=report['geometry'].get('modifiedPanelIds',[])
+allowed_modified={'central-lift-':['concourse'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
+assert not modified_ids or modified_ids==allowed_modified.get(report.get('componentPrefix'))
 replaced=[p for p in new['panels']if p['id']==modified_paving or p['id']in modified_ids];replaced_by_id={p['id']:p for p in replaced}
 retained=[replaced_by_id.get(p['id'],p) for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
 retired_boxes=report['geometry'].get('retiredBoxIds',[]);assert not retired_boxes or report.get('componentPrefix')=='porta-west-'
