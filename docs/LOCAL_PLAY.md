@@ -45,21 +45,21 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is in the Isetan 7F southern hall beside the escalators to 8F.
+The current spawn is in the Isetan 8F northern lift hall.
 The central pairs connect 3F through 8F. The eighth-floor south entrance,
 store aisles and café now connect to the public stair landing; see the
 [eighth-floor notes](../research/kyoto-station/notes/ISETAN-EIGHTH-V2.md).
 The seventh-floor south entrance
 opens from the Grand Stairway into connected store aisles; see the
 [seventh-floor notes](../research/kyoto-station/notes/ISETAN-SEVENTH-V2.md).
-The [northern entrance and lift](../research/kyoto-station/notes/ISETAN-SEVENTH-NORTH-V2.md)
-connect the public stair landing to the seventh-floor hall network.
+The [eighth-floor northern entrance and lift](../research/kyoto-station/notes/ISETAN-EIGHTH-NORTH-V2.md)
+connect the public stair landing to the eighth-floor hall network.
 On 6F, the south, west and north store aisles connect to both public stair
 entrances; see the
 [sixth-floor notes](../research/kyoto-station/notes/ISETAN-SIXTH-V2.md).
 The [northern passage](../research/kyoto-station/notes/ISETAN-SIXTH-NORTH-V2.md)
 opens onto the retained landing and northern stairs.
-The corrected north lift serves B3 through 7F: walk inside and press **E**
+The corrected north lift serves B3 through 8F: walk inside and press **E**
 to choose a stop. Each landing connects to its constructed hall; see the
 [north core notes](../research/kyoto-station/notes/ISETAN-NORTH-CORE-V2.md).
 The fifth-floor hall also opens onto the Grand Stairway; see the

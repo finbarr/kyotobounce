@@ -13,7 +13,7 @@ assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
 modified_ids=report['geometry'].get('modifiedPanelIds',[])
 allowed_modified={'central-lift-':['concourse'],'granvia-entrance-':['concourse','east-passage-north-wall','east-passage-south-wall'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
-if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-sixth-north-','isetan-seventh-north-','isetan-stair-','isetan-lift-'):
+if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','isetan-stair-','isetan-lift-'):
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
  assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix'] in ('isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-stair-','isetan-lift-') and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' or report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-') and id.startswith('north-side-') and next(p for p in old['panels']if p['id']==id)['role']=='parapet' for id in modified_ids)
 elif report.get('componentPrefix')=='isetan-north-core-':
@@ -35,11 +35,11 @@ lanes=json.loads((component/'motion.json').read_text())['escalators'] if report.
 assert new['escalators']==old['escalators']+lanes
 assert not lanes or len(lanes)==2
 retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
-assert not retired_lift_ids or retired_lift_ids=={'hachijo-crossing-':['subway-hachijo-east-lift'],'isetan-north-core-':['isetan-north-lift'],'isetan-sixth-north-':['isetan-north-lift'],'isetan-seventh-north-':['isetan-north-lift']}.get(report.get('componentPrefix'))
+assert not retired_lift_ids or retired_lift_ids=={'hachijo-crossing-':['subway-hachijo-east-lift'],'isetan-north-core-':['isetan-north-lift'],'isetan-sixth-north-':['isetan-north-lift'],'isetan-seventh-north-':['isetan-north-lift'],'isetan-eighth-north-':['isetan-north-lift']}.get(report.get('componentPrefix'))
 old_lifts=[l for l in old.get('lifts',[])if l['id']not in retired_lift_ids];lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
 added_lifts=lifts[len(old_lifts):]
 assert not {p['id']for l in added_lifts for p in l['parts']} & {p['id']for p in new['panels']},'Static and moving source object names must be distinct'
-assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-','porta-west-lift-','central-lift-','hachijo-terrace-','granvia-entrance-','isetan-lift-','isetan-north-core-','isetan-sixth-north-','isetan-seventh-north-','granvia-parking-')
+assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-','porta-west-lift-','central-lift-','hachijo-terrace-','granvia-entrance-','isetan-lift-','isetan-north-core-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','granvia-parking-')
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')
@@ -185,7 +185,7 @@ for p in replaced+added:
      }[p['id']]
      assert (b-a).cross(c-a).length/2<area_limit and angle<angle_limit,('Saved preview normal differs',p['id'],l.index,angle)
      if p['id']=='west-south-slab-edge-5-5-0':assert max(p['vertices'][i]['y']for i in polygon.vertices)<spec['floor']
-   elif report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-'):assert angle<.1,('Saved preview normal differs',p['id'],l.index,angle)
+   elif report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-eighth-north-'):assert angle<.1,('Saved preview normal differs',p['id'],l.index,angle)
    else:assert max(abs(a-b)for a,b in zip(preview,expected))<.001,('Saved corner normal differs',p['id'],l.index)
 for p in retained:
  o=objects.get(p['id']);assert o and o['kyoto_seed']=='panels/'+str(by_id[p['id']])

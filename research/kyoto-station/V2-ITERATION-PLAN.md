@@ -44,11 +44,15 @@ The [seventh-floor northern entrance and lift](notes/ISETAN-SEVENTH-NORTH-V2.md)
 
 The [eighth-floor connection](notes/ISETAN-EIGHTH-V2.md) opens the southern stair entrance into connected store halls and adds the operating 7F–8F escalator pair. Four overextended foundations are fitted around the halls, and the floating FUKUNAGA901 café is aligned with the floor and given a clear entrance.
 
+## Current focus — 30 September 2026
+
+The user now wants most effort on the atrium and everything reachable from it, especially the walk up to the gardens at the top. The [eighth-floor northern entrance and lift](notes/ISETAN-EIGHTH-NORTH-V2.md) complete the current store connection. Prioritize the continuous public route next. Further store floors and lift banks can wait unless they directly repair an atrium connection.
+
 Next priorities:
 
-1. Connect the eighth-floor northern entrance and extend the north lift before continuing the remaining upper floors and lift banks; check retained floor texture coordinates and slab overlap as those rooms are opened. Update the older lift landing signs whose printed service ranges end below the new top stop.
-2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
-3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
+1. Walk and inspect the full atrium → Grand Stairway → upper terrace → rooftop garden route. Repair blocked approaches, missing landings, abrupt walls, gaps and incomplete garden access as one coherent journey.
+2. Complete the gardens and their adjacent public paths using official plans and photographs; clarify exits, railings, seating and connections to the Skyway and restaurant terrace.
+3. Continue the atrium’s immediately reachable public spaces and entrances. Resume deeper store interiors or distant southern frontage after these routes are coherent.
 
 The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. The [station-side escalators](notes/STATION-ESCALATORS-V2.md) complete the shared stair halls. Tenant interiors remain unfinished.
 
@@ -56,7 +60,7 @@ Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIO
 
 ## Replacement goal
 
-Continuously repair and complete Kyoto Bounce v2’s station interior, railway and Hachijo side using research, prioritizing broken stairs, blocked hallways and missing connections; finish, test, commit and merge each improvement into the playable local main build before starting the next, while preserving smooth gameplay, reliable physics and a single reusable checkout.
+Continuously improve Kyoto Bounce v2’s atrium and the public spaces reachable from it, prioritizing a coherent walk up the Grand Stairway to the rooftop gardens and repairing broken stairs, blocked passages and missing connections using research; finish, test, commit and merge each improvement into the playable local main build before starting the next, while preserving smooth gameplay, reliable physics and a single reusable checkout.
 
 ## Working loop
 
