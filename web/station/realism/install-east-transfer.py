@@ -2,7 +2,7 @@
 import bpy,json,sys,hashlib,math
 from pathlib import Path
 import numpy as np
-from mathutils import Vector
+from mathutils import Matrix,Vector
 base_path,candidate_path,component,out=map(Path,sys.argv[sys.argv.index('--')+1:])
 assert Path('.local').resolve() in out.resolve().parents
 assert not (out/'KyotoAtrium.blend').exists()
@@ -13,7 +13,7 @@ assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
 modified_ids=report['geometry'].get('modifiedPanelIds',[])
 allowed_modified={'central-lift-':['concourse'],'granvia-entrance-':['concourse','east-passage-north-wall','east-passage-south-wall'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
-if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-sixth-north-','isetan-stair-','isetan-lift-'):
+if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-sixth-north-','isetan-seventh-north-','isetan-stair-','isetan-lift-'):
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
  assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix'] in ('isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-stair-','isetan-lift-') and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' or report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-') and id.startswith('north-side-') and next(p for p in old['panels']if p['id']==id)['role']=='parapet' for id in modified_ids)
 elif report.get('componentPrefix')=='isetan-north-core-':
@@ -35,11 +35,11 @@ lanes=json.loads((component/'motion.json').read_text())['escalators'] if report.
 assert new['escalators']==old['escalators']+lanes
 assert not lanes or len(lanes)==2
 retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
-assert not retired_lift_ids or retired_lift_ids=={'hachijo-crossing-':['subway-hachijo-east-lift'],'isetan-north-core-':['isetan-north-lift'],'isetan-sixth-north-':['isetan-north-lift']}.get(report.get('componentPrefix'))
+assert not retired_lift_ids or retired_lift_ids=={'hachijo-crossing-':['subway-hachijo-east-lift'],'isetan-north-core-':['isetan-north-lift'],'isetan-sixth-north-':['isetan-north-lift'],'isetan-seventh-north-':['isetan-north-lift']}.get(report.get('componentPrefix'))
 old_lifts=[l for l in old.get('lifts',[])if l['id']not in retired_lift_ids];lifts=new.get('lifts',[]);assert lifts[:len(old_lifts)]==old_lifts
 added_lifts=lifts[len(old_lifts):]
 assert not {p['id']for l in added_lifts for p in l['parts']} & {p['id']for p in new['panels']},'Static and moving source object names must be distinct'
-assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-','porta-west-lift-','central-lift-','hachijo-terrace-','granvia-entrance-','isetan-lift-','isetan-north-core-','isetan-sixth-north-','granvia-parking-')
+assert not added_lifts or report.get('componentPrefix')in ('subway-lift-','exit-five-','hachijo-lift-','hachijo-crossing-','subway-south-lift-','porta-west-lift-','central-lift-','hachijo-terrace-','granvia-entrance-','isetan-lift-','isetan-north-core-','isetan-sixth-north-','isetan-seventh-north-','granvia-parking-')
 retained_lights=[r for r in old['authoredLights']if r['id'] not in report['geometry']['retiredLights']]
 assert new['authoredLights'][:len(retained_lights)]==retained_lights
 prefix=report.get('componentPrefix','east-transfer-')
@@ -97,17 +97,19 @@ for p in replaced+added:
 # Lift cars are editable boxes, excluded from static exports. The embedded
 # native seed holds their movement definition; source geometry shows floor 0.
 lift_objects=[]
+cube_vertices=[(x,y,z)for z in (-.5,.5)for y in (-.5,.5)for x in (-.5,.5)]
+cube_faces=[(0,2,3,1),(4,5,7,6),(0,1,5,4),(2,6,7,3),(0,4,6,2),(1,3,7,5)]
 for lift in added_lifts:
  for part in lift['parts']:
   center=part['center'];origin=lift['origin'];size=part['size'];stops=lift.get('stops');floor=(len(stops)-1 if stops else 1)if part['motion']=='upper'else part.get('floor',0)if part['motion']=='landing'else 0
   height=(stops[floor]['height']if stops else floor*lift['height'])if part['motion']!='car'else 0
   a=math.radians(lift.get('yaw',0));x=center['x']+part['doorSide']*lift['doorTravel']*(1 if floor==0 else 0);z=center['z']
   position=(origin['x']+math.cos(a)*x+math.sin(a)*z,origin['z']-math.sin(a)*x+math.cos(a)*z,origin['y']+center['y']+height)
-  bpy.ops.mesh.primitive_cube_add(size=1,location=position);o=bpy.context.object;o.name=part['id'];o.dimensions=(size['x'],size['z'],size['y']);o.rotation_euler.z=-a
-  bpy.context.view_layer.update()
-  for c in list(o.users_collection):c.objects.unlink(o)
-  collection.objects.link(o);o.data.materials.append(material(part['appearance']));o['kyoto_dynamic']=True;o['kyoto_lift']=lift['id'];o['kyoto_lift_part']=part['id'];o['kyoto_physical']=part['material'];o['kyoto_geometry_signature']=signature(o)
-  lift_objects.append((part,position,tuple(o.dimensions)))
+  # Direct mesh creation avoids updating the whole station once per lift part.
+  dimensions=(size['x'],size['z'],size['y']);mesh=bpy.data.meshes.new(part['id']);mesh.from_pydata([tuple(v[i]*dimensions[i]for i in range(3))for v in cube_vertices],[],cube_faces);mesh.update()
+  o=bpy.data.objects.new(part['id'],mesh);collection.objects.link(o);o.matrix_world=Matrix.Translation(position)@Matrix.Rotation(-a,4,'Z')
+  o.data.materials.append(material(part['appearance']));o['kyoto_dynamic']=True;o['kyoto_lift']=lift['id'];o['kyoto_lift_part']=part['id'];o['kyoto_physical']=part['material'];o['kyoto_geometry_signature']=signature(o)
+  lift_objects.append((part,position,dimensions))
 lights=new['authoredLights'][len(retained_lights):]
 assert len(lights)==len(json.loads((component/'native-panels.json').read_text())['authoredLights'])
 for r in lights:
