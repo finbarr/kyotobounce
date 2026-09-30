@@ -21,8 +21,8 @@ assert.deepEqual(next.authoredMaterials.slice(0,old.authoredMaterials.length),ol
 assert.deepEqual(next.authoredLights,[...old.authoredLights.filter(l=>!r.geometry.retiredLights.includes(l.id)),...(native.authoredLights||[])]);
 // The terrace appends three explicitly declared lifts; all prior motion stays exact.
 let addedLifts=0;
-if(['hachijo-terrace-','granvia-entrance-'].includes(r.componentPrefix)){
- const motion=await read(component+'/motion.json');assert.equal(motion.lifts.length,r.componentPrefix==='granvia-entrance-'?1:3);
+if(['hachijo-terrace-','granvia-entrance-','isetan-lift-'].includes(r.componentPrefix)){
+ const motion=r.componentPrefix==='isetan-lift-'?{lifts:[await read(component+'/lift-spec.json')]}:await read(component+'/motion.json');assert.equal(motion.lifts.length,r.componentPrefix==='hachijo-terrace-'?3:1);
  const expected=structuredClone(motion.lifts);for(const l of expected)for(const p of l.parts){const a=next.authoredMaterials.find(a=>a.label===p.appearance);assert(a);p.appearance=a.id;}
  assert.deepEqual(next.lifts,[...old.lifts,...expected]);addedLifts=expected.length;
 }else assert.deepEqual(next.lifts,old.lifts);
@@ -42,7 +42,7 @@ const {json:j,bin}=readGLB(glb),part=readGLB(await readFile(component+'/'+r.outp
 const parentGLB=readGLB(await readFile(base.geometry));
 assert(bin.subarray(0,parentGLB.bin.length).equals(parentGLB.bin));
 assert.deepEqual(j.materials.slice(0,parentGLB.json.materials.length),parentGLB.json.materials);
-const shell=modified.length?(['isetan-ground-','isetan-second-','isetan-stair-','granvia-entrance-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
+const shell=modified.length?(['isetan-ground-','isetan-second-','isetan-stair-','granvia-entrance-','isetan-lift-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
 const values=ai=>{const a=j.accessors[ai],v=j.bufferViews[a.bufferView],w={SCALAR:1,VEC2:2,VEC3:3}[a.type];assert(!v.extensions&&!v.byteStride&&!a.sparse);return Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>bin[a.componentType===5126?'readFloatLE':'readUInt32LE']((v.byteOffset||0)+(a.byteOffset||0)+(i*w+k)*4)));};
 let vertices=0,triangles=0;
 for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const p of mesh.primitives){

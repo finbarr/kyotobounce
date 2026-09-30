@@ -13160,5 +13160,21 @@
     "bytes": 299976,
     "sha256": "d38bd8569d70cfadc4effc1067a2159ea5362330bd318dc1f8d0ad6cfece7fb3",
     "retrieved_at": "2026-09-30T07:21:04.812994+00:00"
+  },
+  {
+    "id": "isetan-north-lift-rys-photo",
+    "title": "Isetan entrance and north elevator location",
+    "publisher": "Kyoto Station Channel",
+    "category": "circulation",
+    "url": "https://kyoto-rys.com/facility/elevator/2.jpg",
+    "source_date": null,
+    "note": "Visually inspected entrance photograph. Annotation locates the northern bank inside the Isetan ground entrance. The accompanying guide lists B3 parking through 11F; floor plans establish the bank beside the northern stair. No surveyed dimensions.",
+    "rights": "Research reference only; not a game texture.",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "photos/isetan-north-lift-guide.jpg",
+    "bytes": 55629,
+    "sha256": "b72be2055689883f615eedb2447cc561a05b72a0ce01c68ea7954f0dd7e8ba34",
+    "retrieved_at": "2026-09-30T08:59:15.504433+00:00"
   }
 ]
