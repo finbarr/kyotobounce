@@ -103,8 +103,10 @@ The [Miyako Michi street and western forecourt](MIYAKOMICHI-V2.md) now connect t
 
 The [subway public rooms](SUBWAY-PUBLIC-ROOMS-V2.md) correct the North shopping island, move the Central 1 café to its mapped head position, separate the grocery and bakery, and add the missing washroom approach. All thirteen room envelopes have usable entrances and sampled floor coverage. Tenant fitouts and sanitary fixtures remain unfinished.
 
-1. **Southern subway public rooms:** add the remaining Central 2 and South shop envelopes and openings from the operator diagram, preserving the gate, platform-lift and southern passage routes. Resolve the small kiosk positions before adding them.
-2. **Southern building and public spaces:** complete the remaining upper frontage, terrace, street edges and larger receiving rooms. Resolve the small Miyako Michi southeast stair's destination before constructing it.
+The [southern subway rooms](SUBWAY-SOUTH-ROOMS-V2.md) add shops 10–14, the station office and Central 1's two serving kiosks. New floor and ceiling strips complete the room footprints. Public entrances, counter bays and the continuous aisle remain separate from the gate and lift approaches.
+
+1. **Southern building and public spaces:** complete the remaining upper frontage, terrace, street edges and larger receiving rooms. Resolve the small Miyako Michi southeast stair's destination before constructing it.
+2. **Remaining interior connections:** inspect the unfinished Isetan and Granvia upper-floor links and parking access recorded in the basement and central-lift notes; repair concrete missing connections before room decoration.
 3. **Railway refinement:** improve fitted track alignment, platform enclosures and further building connections after the missing public routes.
 
 Later rendering finding: pale ASTY fascias show banded shading. Investigate the cause after the missing structural routes; geometry correspondence alone does not explain it.
