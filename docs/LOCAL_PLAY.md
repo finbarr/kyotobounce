@@ -48,7 +48,8 @@ Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omi
 The current spawn is at the upper Grand Stairway landing, beside the repaired
 [rooftop garden connection](../research/kyoto-station/notes/ATRIUM-GARDEN-ROUTE-V2.md).
 Follow the short flight west into the [garden court and promenade](../research/kyoto-station/notes/GARDEN-PROMENADE-V2.md).
-The court now connects to its northern viewing window and western rooftop path.
+The court connects to its [northern viewing window and rebuilt enclosure](../research/kyoto-station/notes/GARDEN-ROOF-ENCLOSURE-V2.md)
+and the western rooftop path.
 The [western Isetan entrance](../research/kyoto-station/notes/GARDEN-STORE-ENTRY-V2.md)
 now leads down an indoor stair and along the 11F public hall back to the upper
 atrium landing. Restaurant interiors remain unfinished. Descend the Grand Stairway
