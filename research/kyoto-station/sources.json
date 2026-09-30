@@ -13049,5 +13049,37 @@
     "bytes": 73880,
     "sha256": "edd9a816a5eb855c394017b2305556570361f4381ca26d99d5760b35a1bf25dc",
     "retrieved_at": "2026-09-30T03:41:48.681Z"
+  },
+  {
+    "id": "hachijo-terrace-advertising-plan-2026",
+    "title": "Miyako Yume Terrace dimensioned deck and stair photographs",
+    "publisher": "City of Kyoto",
+    "category": "Hachijo public circulation",
+    "url": "https://www.city.kyoto.lg.jp/gyozai/cmsfiles/contents/0000294/294495/zumen.pdf",
+    "source_date": "2026-08-12",
+    "note": "Four-page city attachment; page 1 supplies the 39 m column grid, 45 m outer width, three lifts and access layout. Pages 3–4 show the existing station stairs and open terrace. Inspected visually. Linked city page updated 12 August 2026; PDF metadata dated 3 July 2026.",
+    "rights": "Reference copy only; no permission to ship the document or photographs is implied.",
+    "format": "pdf",
+    "status": "downloaded",
+    "local_file": "plans/hachijo-terrace-advertising-plan-2026.pdf",
+    "bytes": 1016239,
+    "sha256": "6b4bd2f8bd9cfb37b60d1018bbc17ee4bfc83cf039e38e499b280c4c9a60de2e",
+    "retrieved_at": "2026-09-30T04:16:15.039Z"
+  },
+  {
+    "id": "hachijo-terrace-advertising-guidelines-2026",
+    "title": "Miyako Yume Terrace advertising guidelines",
+    "publisher": "City of Kyoto",
+    "category": "Hachijo public circulation",
+    "url": "https://www.city.kyoto.lg.jp/gyozai/cmsfiles/contents/0000294/294495/yoryo_yumeterrace.pdf",
+    "source_date": "2026-08-12",
+    "note": "Companion city application document retained with its separate dimensioned drawing. Geometry is based on the inspected drawing attachment, not this administrative document.",
+    "rights": "Reference copy only; no permission to ship the document or photographs is implied.",
+    "format": "pdf",
+    "status": "downloaded",
+    "local_file": "plans/hachijo-terrace-advertising-guidelines-2026.pdf",
+    "bytes": 4047445,
+    "sha256": "d28564c97636bb09211a95d68115b822f3f9374b3584d26040809d68249f26eb",
+    "retrieved_at": "2026-09-30T04:16:15.044Z"
   }
 ]
