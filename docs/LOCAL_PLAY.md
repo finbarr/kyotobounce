@@ -45,11 +45,14 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is in the B3 lobby beside the Isetan north lift. Walk into
-its car and press E to choose B2, B1, ground or 2F. Each stop opens onto a usable
-store route; see the [north lift notes](../research/kyoto-station/notes/ISETAN-LIFT-V2.md).
-The garage portal also leads to the adjacent B3–2F stair and the central public
-lift. Both parking aisles remain connected.
+The current spawn is inside Isetan 4F, south of the central aisle. Walk west
+toward the guarded escalator pair to descend to 3F and return on the upward
+lane; see the [store escalator notes](../research/kyoto-station/notes/ISETAN-ESCALATORS-V2.md).
+Both fourth-floor entrances lead to Muromachi Square. The internal northern
+stair connects 3F to the lower store floors. The Isetan north lift continues to
+serve B3, B2, B1, ground and 2F; see the
+[north lift notes](../research/kyoto-station/notes/ISETAN-LIFT-V2.md).
+Both B3 parking aisles and the central public lift remain connected.
 The western railway head concourse and platforms 30–34 remain connected at
 ground level around the buffered track ends; see the
 [western platform notes](../research/kyoto-station/notes/WESTERN-PLATFORMS-V2.md).

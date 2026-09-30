@@ -30,9 +30,11 @@ The [retained Porta pavilion stair](notes/PORTA-PAVILION-V2.md) restores the for
 
 The [western platforms 30–34](notes/WESTERN-PLATFORMS-V2.md) connect to platform 0 through an opened ground approach and head concourse. Three platform strips, four terminating tracks, buffers and canopies occupy the former solid building shell. The upper façade is retained. Precise track alignment, final signs and detailed finishes remain unfinished.
 
+The [Isetan 3F–4F escalators](notes/ISETAN-ESCALATORS-V2.md) now provide an operating internal up/down connection, with fitted floor and ceiling openings, guarded upper wells and clear approaches. Both native and Chrome rides pass, together with the surrounding aisle walks.
+
 Next priorities:
 
-1. Connect the remaining upper Isetan floors, starting with internal access from 3F to the constructed 4F halls, and complete the rest of the lift bank before tenant decoration.
+1. Connect the remaining upper Isetan floors beyond 4F and complete the rest of the lift bank before tenant decoration.
 2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 
