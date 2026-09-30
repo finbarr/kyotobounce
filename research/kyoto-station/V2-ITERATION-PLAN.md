@@ -50,7 +50,7 @@ The user now wants most effort on the atrium and everything reachable from it, e
 
 Next priorities:
 
-1. Walk and inspect the full atrium → Grand Stairway → upper terrace → rooftop garden route. Repair blocked approaches, missing landings, abrupt walls, gaps and incomplete garden access as one coherent journey.
+1. Repair the [confirmed upper landing and garden-stair defects](notes/ATRIUM-GARDEN-ROUTE-V2.md): the direct approach drops off its floor, the apron is 0.392 m above the corrected landing, and the stair intersects the façade. Complete the atrium → Grand Stairway → rooftop garden journey and verify it in both directions.
 2. Complete the gardens and their adjacent public paths using official plans and photographs; clarify exits, railings, seating and connections to the Skyway and restaurant terrace.
 3. Continue the atrium’s immediately reachable public spaces and entrances. Resume deeper store interiors or distant southern frontage after these routes are coherent.
 
