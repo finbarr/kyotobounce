@@ -27,7 +27,7 @@ if(['hachijo-terrace-','granvia-entrance-','isetan-lift-','isetan-north-core-','
  const retired=r.geometry.retiredLiftIds||[];assert(!retired.length||r.componentPrefix==='isetan-north-core-'&&retired.length===1&&retired[0]==='isetan-north-lift');assert.deepEqual(next.lifts,[...old.lifts.filter(l=>!retired.includes(l.id)),...expected]);addedLifts=expected.length;
 }else assert.deepEqual(next.lifts,old.lifts);
 let addedEscalators=0;
-if(['hachijo-escalators-','station-escalators-','granvia-entrance-','isetan-fifth-'].includes(r.componentPrefix)){
+if(['hachijo-escalators-','station-escalators-','granvia-entrance-','isetan-fifth-','isetan-sixth-'].includes(r.componentPrefix)){
  const motion=await read(component+'/motion.json');assert.equal(motion.escalators.length,r.componentPrefix==='hachijo-escalators-'?4:2);
  assert.deepEqual(next.escalators,[...old.escalators,...motion.escalators]);addedEscalators=motion.escalators.length;
 }else assert.deepEqual(next.escalators,old.escalators);
@@ -42,7 +42,7 @@ const {json:j,bin}=readGLB(glb),part=readGLB(await readFile(component+'/'+r.outp
 const parentGLB=readGLB(await readFile(base.geometry));
 assert(bin.subarray(0,parentGLB.bin.length).equals(parentGLB.bin));
 assert.deepEqual(j.materials.slice(0,parentGLB.json.materials.length),parentGLB.json.materials);
-const shell=modified.length?(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-stair-','granvia-entrance-','isetan-lift-','isetan-north-core-','granvia-parking-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
+const shell=modified.length?(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-stair-','granvia-entrance-','isetan-lift-','isetan-north-core-','granvia-parking-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
 const values=ai=>{const a=j.accessors[ai],v=j.bufferViews[a.bufferView],w={SCALAR:1,VEC2:2,VEC3:3}[a.type];assert(!v.extensions&&!v.byteStride&&!a.sparse);return Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>bin[a.componentType===5126?'readFloatLE':'readUInt32LE']((v.byteOffset||0)+(a.byteOffset||0)+(i*w+k)*4)));};
 let vertices=0,triangles=0;
 for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const p of mesh.primitives){

@@ -45,14 +45,16 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is beside the corrected Isetan north lift in B3 parking.
-Walk into the car and press **E** to choose any of its eight stops, B3 through
-5F. Each landing connects to the corresponding constructed hall; see the
+The current spawn is on Isetan 5F beside the new escalators to 6F.
+The central pairs connect 3F through 6F. Upstairs, the south, west and north
+store aisles connect to the southern Grand Stairway entrance; see the
+[sixth-floor notes](../research/kyoto-station/notes/ISETAN-SIXTH-V2.md).
+The sixth-floor northern entrance and lift extension remain unfinished.
+The corrected north lift serves B3 through 5F: walk inside and press **E**
+to choose a stop. Each landing connects to its constructed hall; see the
 [north core notes](../research/kyoto-station/notes/ISETAN-NORTH-CORE-V2.md).
-The central escalators also connect 3F, 4F and 5F. The fifth-floor
-hall also opens onto the Grand Stairway through its retained doorway; see the
-[fifth-floor notes](../research/kyoto-station/notes/ISETAN-FIFTH-V2.md) and
-[3F–4F escalator notes](../research/kyoto-station/notes/ISETAN-ESCALATORS-V2.md).
+The fifth-floor hall also opens onto the Grand Stairway; see the
+[fifth-floor notes](../research/kyoto-station/notes/ISETAN-FIFTH-V2.md).
 Both fourth-floor entrances lead to Muromachi Square. The internal northern
 stair connects 3F to the lower store floors.
 Both B3 parking aisles and the central public lift remain connected.

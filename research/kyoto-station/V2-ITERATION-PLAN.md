@@ -34,9 +34,11 @@ The [Isetan 3F–4F escalators](notes/ISETAN-ESCALATORS-V2.md) now provide an op
 
 The [Isetan fifth-floor connection](notes/ISETAN-FIFTH-V2.md) opens the retained Grand Stairway doorway into connected store aisles, fills the missing floor and landing threshold, and adds the next operating escalator pair between 4F and 5F. Fitted cuts clear the hall while preserving the public stairs above. The previous 3F–4F pair remains usable.
 
+The [Isetan sixth-floor connection](notes/ISETAN-SIXTH-V2.md) refits the southern Grand Stairway entrance clear of its public flight, fills the missing store floor and joins the south, west and north aisles. The new 5F–6F escalator pair continues the central stack, with the existing 4F–5F transfer retained.
+
 Next priorities:
 
-1. Connect the remaining upper Isetan floors beyond 5F and complete the rest of the lift bank before tenant decoration.
+1. Complete the sixth-floor northern entrance and extend the corrected north lift to its hall. Then connect 7F and higher floors and complete the remaining lift bank before tenant decoration.
 2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 

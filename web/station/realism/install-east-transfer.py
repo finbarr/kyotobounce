@@ -13,9 +13,9 @@ assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
 modified_ids=report['geometry'].get('modifiedPanelIds',[])
 allowed_modified={'central-lift-':['concourse'],'granvia-entrance-':['concourse','east-passage-north-wall','east-passage-south-wall'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
-if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-stair-','isetan-lift-'):
+if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-stair-','isetan-lift-'):
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
- assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix'] in ('isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-stair-','isetan-lift-') and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' or report['componentPrefix']in ('isetan-fourth-','isetan-fifth-') and id.startswith('north-side-') and next(p for p in old['panels']if p['id']==id)['role']=='parapet' for id in modified_ids)
+ assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix'] in ('isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-stair-','isetan-lift-') and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' or report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-') and id.startswith('north-side-') and next(p for p in old['panels']if p['id']==id)['role']=='parapet' for id in modified_ids)
 elif report.get('componentPrefix')=='isetan-north-core-':
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
  assert all(id.startswith(('west-north-','isetan-'))for id in modified_ids)
@@ -31,7 +31,7 @@ modified_flights=report['geometry'].get('modifiedFlightIds',[])
 assert not modified_flights or report.get('componentPrefix')in ('isetan-ground-','isetan-fourth-')
 assert new['flights']==[dict(f,foundationDepth=0)if f['id']in modified_flights else f for f in old['flights']]
 assert old['beams']==new['beams']
-lanes=json.loads((component/'motion.json').read_text())['escalators'] if report.get('componentPrefix')in ('granvia-entrance-','isetan-fifth-') else []
+lanes=json.loads((component/'motion.json').read_text())['escalators'] if report.get('componentPrefix')in ('granvia-entrance-','isetan-fifth-','isetan-sixth-') else []
 assert new['escalators']==old['escalators']+lanes
 assert not lanes or len(lanes)==2
 retired_lift_ids=report['geometry'].get('retiredLiftIds',[])
@@ -156,7 +156,15 @@ for p in replaced+added:
    # One thin north-core foundation corner quantizes by 0.122 degrees in
    # Blender. Its full-precision export attribute is checked above.
    if report['componentPrefix']=='isetan-north-core-':assert angle<.15,('Saved preview normal differs',p['id'],l.index,angle)
-   elif report['componentPrefix']in ('isetan-fourth-','isetan-fifth-'):assert angle<.1,('Saved preview normal differs',p['id'],l.index,angle)
+   elif report['componentPrefix']=='isetan-sixth-' and angle>=.1:
+    # Two tiny foundation cut faces quantize in Blender's viewport normals.
+    # Bound this exception to their measured area and angle; the authored
+    # export normals above still require full float precision.
+    assert p['id']in ('isetan-ground-daikaidan-flight-09-foundation','isetan-ground-daikaidan-flight-10-foundation')
+    polygon=next(f for f in mesh.polygons if l.index in f.loop_indices)
+    a,b,c=[mesh.vertices[i].co for i in polygon.vertices]
+    assert (b-a).cross(c-a).length/2<.000002 and angle<.6,('Saved preview normal differs',p['id'],l.index,angle)
+   elif report['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-'):assert angle<.1,('Saved preview normal differs',p['id'],l.index,angle)
    else:assert max(abs(a-b)for a,b in zip(preview,expected))<.001,('Saved corner normal differs',p['id'],l.index)
 for p in retained:
  o=objects.get(p['id']);assert o and o['kyoto_seed']=='panels/'+str(by_id[p['id']])
