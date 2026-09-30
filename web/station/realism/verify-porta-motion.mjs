@@ -4,7 +4,7 @@ import * as T from 'three';
 import {createEscalators} from '../../public/escalators.js';
 import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
-const [directory,out]=process.argv.slice(2);assert(directory&&out&&resolve(out).startsWith(resolve('.local')+'/'));const bytes=await readFile(directory+'/native-panels.json'),{escalators,combSupports}=JSON.parse(await readFile(directory+'/motion.json')),build=JSON.parse(await readFile(directory+'/report.json')),nativeSha256=createHash('sha256').update(bytes).digest('hex');assert.equal(nativeSha256,build.outputs.nativePanelsSha256);assert.equal(escalators.length,['station-escalators-','isetan-escalators-','isetan-fifth-','isetan-sixth-','isetan-seventh-'].includes(build.componentPrefix)?2:4);
+const [directory,out]=process.argv.slice(2);assert(directory&&out&&resolve(out).startsWith(resolve('.local')+'/'));const bytes=await readFile(directory+'/native-panels.json'),{escalators,combSupports}=JSON.parse(await readFile(directory+'/motion.json')),build=JSON.parse(await readFile(directory+'/report.json')),nativeSha256=createHash('sha256').update(bytes).digest('hex');assert.equal(nativeSha256,build.outputs.nativePanelsSha256);assert.equal(escalators.length,['station-escalators-','isetan-escalators-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-'].includes(build.componentPrefix)?2:4);
 const tracks=escalators.map(s=>{
  const distance=[0];for(let i=1;i<s.path.length;i++){const a=s.path[i-1],b=s.path[i];distance.push(distance.at(-1)+Math.fround(Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z)));}
  const length=distance.at(-1),pitch=length/s.stepCount;

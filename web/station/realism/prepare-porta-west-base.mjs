@@ -11,7 +11,7 @@ const unrendered=spec.retiredUnrenderedIds||[];assert(!unrendered.length||spec.c
 function surface(id,label,points){let normal=cross(sub(points[1],points[0]),sub(points[2],points[0])),length=Math.hypot(...normal);assert(length>1e-9);normal=normal.map(v=>v/length);const center=points[0].map((_,a)=>points.reduce((n,v)=>n+v[a],0)/points.length);const edges=points.map((v,i)=>{const n=cross(sub(points[(i+1)%points.length],v),normal),sign=Math.sign(dot(sub(center,v),n));return{v,n,sign};});assert(edges.every(e=>e.sign));return{id,label,points,normal,edges,count:0,area:points.slice(2).reduce((sum,v,i)=>sum+Math.hypot(...cross(sub(points[i+1],points[0]),sub(v,points[0])))/2,0),matchedArea:0};}
 for(const o of source)for(const f of o.faces)surfaces.push(surface(o.name,o.materials[f.material].replace(/ \| Browser$/,''),f.vertices.map(i=>o.vertices[i])));
 const protectedSurfaces=(spec.preservedBrowserTriangles||[]).map(s=>surface(s.id,s.label,s.points));
-assert(!protectedSurfaces.length||spec.componentPrefix==='isetan-seventh-');
+assert(!protectedSurfaces.length||['isetan-seventh-','isetan-eighth-'].includes(spec.componentPrefix));
 
 function faceOf(s,vs){const n=cross(sub(vs[1],vs[0]),sub(vs[2],vs[0]));return dot(n,s.normal)>.999*Math.hypot(...n)&&vs.every(v=>Math.abs(dot(sub(v,s.points[0]),s.normal))<.00015&&s.edges.every(e=>e.sign*dot(sub(v,e.v),e.n)>-.00015));}
 const triangleArea=vs=>Math.hypot(...cross(sub(vs[1],vs[0]),sub(vs[2],vs[0])))/2;

@@ -1,8 +1,8 @@
 {
   "layout": ".local/v2/current/station/station-layout.json",
-  "layoutSha256": "5ac4097a14f1e525d3a8fec4854915c384c27fcba2009e9124369f8a1c3e506c",
+  "layoutSha256": "96bd705525973a609433ace80130d9e6271f645ae41ad141bd4f063ec0960ee6",
   "geometry": ".local/v2/current/station/atrium.runtime.glb",
-  "geometrySha256": "b917d7fe7bbd80b5ac76bcf37bd9bca737a77293da58aa704d194029b3a5eeec",
+  "geometrySha256": "afbce291382e5920b7ac7eb2a5e0681b40fdf5ff347c3e4d26aa8ed50f3405b8",
   "station": ".local/v2/current/station/station.json",
   "detail": ".local/v2/current/motion/atrium-detail.json",
   "motionLayout": ".local/v2/current/source/station-layout.json",
@@ -11,8 +11,8 @@
   "sourceScene": ".local/v2/current/source/KyotoAtrium.blend",
   "sourceComponents": [],
   "spawn": {
-    "x": -96,
+    "x": -110,
     "y": 30.349000930786133,
-    "z": 26.5
+    "z": -23
   }
 }

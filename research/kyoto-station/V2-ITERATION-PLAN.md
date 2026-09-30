@@ -42,9 +42,11 @@ The [seventh-floor connection](notes/ISETAN-SEVENTH-V2.md) opens the southern Gr
 
 The [seventh-floor northern entrance and lift](notes/ISETAN-SEVENTH-NORTH-V2.md) join the public stair landing to the north hall and extend the existing car through 7F. Both seventh-floor public entrances and the central escalators now connect to that hall network.
 
+The [eighth-floor connection](notes/ISETAN-EIGHTH-V2.md) opens the southern stair entrance into connected store halls and adds the operating 7F–8F escalator pair. Four overextended foundations are fitted around the halls, and the floating FUKUNAGA901 café is aligned with the floor and given a clear entrance.
+
 Next priorities:
 
-1. Continue the remaining Isetan upper floors and lift banks before tenant decoration; check retained floor texture coordinates and slab overlap as those rooms are opened. Update the older lift landing signs whose printed service ranges end below the new top stop.
+1. Connect the eighth-floor northern entrance and extend the north lift before continuing the remaining upper floors and lift banks; check retained floor texture coordinates and slab overlap as those rooms are opened. Update the older lift landing signs whose printed service ranges end below the new top stop.
 2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 
