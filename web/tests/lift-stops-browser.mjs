@@ -21,7 +21,9 @@ try{
  async function walk(z,yaw){await page.evaluate(y=>__liftStopsTest.aim(y),yaw+(spec.yaw||0));await page.keyboard.down('w');try{await page.waitForFunction(({z,yaw,spec})=>{const a=(spec.yaw||0)*Math.PI/180,p=kyotoState.feet,localZ=Math.sin(a)*(p.x-spec.origin.x)+Math.cos(a)*(p.z-spec.origin.z);return yaw===0?localZ>=z:localZ<=z;},{z,yaw,spec},{timeout:12000});}finally{await page.keyboard.up('w');}await page.waitForTimeout(200);}
  const startFloor=spec.stops.findIndex(s=>Math.abs(identity.spawn.y-spec.origin.y-s.height)<.06);assert(startFloor>=0);
  async function useLift(){await page.waitForFunction(()=>{const b=document.getElementById('lift-control');return b&&!b.hidden&&!b.disabled;},null,{timeout:5000});await page.keyboard.press('e');}
- if(startFloor!==0){await useLift();await page.waitForFunction(i=>{const l=__liftStopsTest.read().lift;return !l.busy&&l.landingDoors[i]>.99;},startFloor,{timeout:Math.ceil(spec.height/.8*1000)+15000});check(true,'Call central car to the starting landing');}
+ // A hall spawn can be outside the call button's reach. Approach the closed
+ // landing with ordinary walking before calling the car from another floor.
+ if(startFloor!==0){await walk(-1.95,0);check((await read()).grounded,'Walk to the starting landing call control');await useLift();await page.waitForFunction(i=>{const l=__liftStopsTest.read().lift;return !l.busy&&l.landingDoors[i]>.99;},startFloor,{timeout:Math.ceil(spec.height/.8*1000)+15000});check(true,'Call central car to the starting landing');}
  await walk(-.2,0);check((await read()).grounded,'Walk from landing into the multi-floor car');
  await useLift();await page.locator('#lift-floors').waitFor({state:'visible'});
  check(await page.locator('#lift-floors button[data-stop]').count()===spec.stops.length,'Floor picker offers all '+spec.stops.length+' named destinations');
