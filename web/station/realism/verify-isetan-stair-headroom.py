@@ -21,7 +21,7 @@ for prefix,steps in g.get('headroomStairs',[('isetan-stair-',21),('isetan-ground
    assert abs(b-a-.3)<1e-5
    volumes.append((p['id'],[(a+.035,b-.035),(top+.35,top+2.1),(z-.3,z+.3)]));count+=1
  p=panels[prefix+'stair-landing'];top=max(v['y']for v in p['vertices']);a=min(v['x']for v in p['vertices']);b=max(v['x']for v in p['vertices']);volumes.append((p['id'],[(a+.2,b-.2),(top+.35,top+2.1),(8.6,13.8)]))
-assert g.get('stair') or r['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-sixth-north-','isetan-north-core-')
+assert g.get('stair') or r['componentPrefix']in ('isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-sixth-north-','isetan-north-core-')
 if g.get('stair'):assert .14<g['stair']['rise']<.19
 # Check flat approaches and the north bypass with the player capsule width.
 for route in g['routes']:

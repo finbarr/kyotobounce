@@ -45,9 +45,13 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is on Isetan 6F beside the north lift.
-The central pairs connect 3F through 6F. Upstairs, the south, west and north
-store aisles connect to both public stair entrances; see the
+The current spawn is on Isetan 6F beside the central escalator bank.
+The central pairs connect 3F through 7F. The seventh-floor south entrance
+opens from the Grand Stairway into connected store aisles; see the
+[seventh-floor notes](../research/kyoto-station/notes/ISETAN-SEVENTH-V2.md).
+Its northern public entrance and lift stop remain unfinished.
+On 6F, the south, west and north store aisles connect to both public stair
+entrances; see the
 [sixth-floor notes](../research/kyoto-station/notes/ISETAN-SIXTH-V2.md).
 The [northern passage](../research/kyoto-station/notes/ISETAN-SIXTH-NORTH-V2.md)
 opens onto the retained landing and northern stairs.

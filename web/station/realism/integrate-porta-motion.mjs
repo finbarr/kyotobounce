@@ -5,7 +5,7 @@ import {createHash} from 'node:crypto';
 const [manifest,component]=process.argv.slice(2),read=async p=>JSON.parse(await readFile(p)),sha=b=>createHash('sha256').update(b).digest('hex');
 assert(manifest.startsWith('.local/'));
 const m=await read(manifest),layout=await read(m.layout),station=await read(m.station),detail=await read(m.detail),motion=await read(component+'/motion.json'),report=await read(component+'/report.json');
-const expected=['station-escalators-','isetan-escalators-','isetan-fifth-','isetan-sixth-'].includes(report.componentPrefix)?2:4;
+const expected=['station-escalators-','isetan-escalators-','isetan-fifth-','isetan-sixth-','isetan-seventh-'].includes(report.componentPrefix)?2:4;
 assert.equal(motion.escalators.length,expected);assert.equal(motion.combSupports.length,2*expected);
 assert.deepEqual(layout.escalators,station.escalators);
 for(const lane of motion.escalators){

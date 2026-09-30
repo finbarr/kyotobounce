@@ -38,9 +38,11 @@ The [Isetan sixth-floor connection](notes/ISETAN-SIXTH-V2.md) refits the souther
 
 The [sixth-floor northern entrance and lift](notes/ISETAN-SIXTH-NORTH-V2.md) join the public stair landing to the northern store hall and extend the existing north car through 6F. Both sixth-floor public entrances, the central escalators and the north lift now connect to the hall network.
 
+The [seventh-floor connection](notes/ISETAN-SEVENTH-V2.md) opens the southern Grand Stairway entrance into connected store aisles and adds the operating 6F–7F escalator pair. The western aisle turns around the upper public stair structure. Floor retirement and texture-coordinate fixes remove the overlap and dark patches found during inspection.
+
 Next priorities:
 
-1. Connect Isetan 7F to the public stairs, store escalators and north lift. Continue the remaining upper floors and lift banks before tenant decoration.
+1. Connect the northern Isetan 7F public entrance and extend the north lift to its hall. Continue the remaining upper floors and lift banks before tenant decoration; check retained floor texture coordinates and slab overlap as those rooms are opened.
 2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 
