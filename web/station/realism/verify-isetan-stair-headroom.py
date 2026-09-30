@@ -1,10 +1,20 @@
-"""Verify all three stacked stairs have 2.1 m clear headroom in the complete station."""
+"""Verify the declared store stairs and routes have 2.1 m clear headroom."""
 import hashlib,json,sys,math
 from pathlib import Path
 manifest,component,out=map(Path,sys.argv[1:]);m=json.loads(manifest.read_text());raw=Path(m['layout']).read_bytes();assert hashlib.sha256(raw).hexdigest()==m['layoutSha256'];layout=json.loads(raw);r=json.loads((component/'report.json').read_text());g=r['geometry'];panels={p['id']:p for p in layout['panels']}
 assert not set(g['retiredIds'])&({p['id']for p in layout['panels']}|{p['id']for p in layout['boxes']})
+spec=json.loads((component/'spec.json').read_text());retained_stair=spec.get('retainedStair',[])
+for old in retained_stair:
+ p=panels[r['componentPrefix']+'retained-'+old['id'].removeprefix('isetan-basement-')]
+ b=[(min(v[k]for v in p['vertices']),max(v[k]for v in p['vertices']))for k in ('x','y','z')]
+ assert all(abs(b[a][i]-old['bounds'][a][i])<1e-6 for a in (0,2)for i in (0,1)),old['id']
+ assert abs(b[1][1]-old['bounds'][1][1])<1e-6 and b[1][0]>old['bounds'][1][0],old['id']
+if r['componentPrefix']=='isetan-parking-':
+ floor_bottom=min(v['y']for v in panels['isetan-parking-b2-floor']['vertices'])
+ for id in ('outer-west','outer-south','outer-north','extension-east-return'):
+  assert max(v['y']for v in panels['isetan-parking-'+id]['vertices'])<=floor_bottom+1e-6,('Wall overlaps floor finish',id)
 volumes=[];count=0
-for prefix,steps in [('isetan-stair-',21),('isetan-ground-',14),('isetan-basement-',11)]:
+for prefix,steps in g.get('headroomStairs',[('isetan-stair-',21),('isetan-ground-',14),('isetan-basement-',11)]):
  for flight in ('lower','upper'):
   for i in range(steps):
    p=panels[prefix+flight+'-step-'+str(i)];top=max(v['y']for v in p['vertices']);a=min(v['x']for v in p['vertices']);b=max(v['x']for v in p['vertices']);z=9.7 if flight=='lower'else 12.7
@@ -49,9 +59,10 @@ for p in layout['boxes']:
  for q in [(0,1,2,3),(4,5,6,7),(0,1,5,4),(2,3,7,6),(0,3,7,4),(1,2,6,5)]:ids.extend([q[:3],(q[0],q[2],q[3])])
  solids.append((p['id'],vs,ids))
 near=[]
+region=[(min(b[a][0]for _,b in volumes),max(b[a][1]for _,b in volumes))for a in range(3)]
 for id,vs,ids in solids:
  bounds=[(min(v[k]for v in vs),max(v[k]for v in vs))for k in ('x','y','z')]
- if bounds[0][0]>-63 or bounds[0][1]<-124 or bounds[2][0]>16 or bounds[2][1]<-21:continue
+ if any(bounds[a][1]<region[a][0] or bounds[a][0]>region[a][1] for a in range(3)):continue
  near.append((id,vs,ids,bounds))
 for name,bounds in volumes:
  for id,vs,ids,b in near:
@@ -70,4 +81,4 @@ for b in layout['beams']:
 for name,bounds in volumes:
  for id,b in other:
   assert any(b[a][1]<=bounds[a][0]or b[a][0]>=bounds[a][1]for a in range(3)),('Inspect generated collider',name,id)
-proof=dict(pass_=True,layoutSha256=m['layoutSha256'],geometrySha256=m['geometrySha256'],treads=count,stepRiseM=g['stair']['rise'],stairHeadroomM=2.1,headroomVolumes=len(volumes));proof['pass']=proof.pop('pass_');out.write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))
+proof=dict(pass_=True,layoutSha256=m['layoutSha256'],geometrySha256=m['geometrySha256'],treads=count,stepRiseM=g['stair']['rise'],stairHeadroomM=2.1,headroomVolumes=len(volumes),retainedStairSurfaces=len(retained_stair));proof['pass']=proof.pop('pass_');out.write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))

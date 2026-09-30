@@ -18,7 +18,7 @@ The [South subway platform lift](notes/SUBWAY-SOUTH-LIFT-V2.md) adds the second 
 
 The [Porta west public lift](notes/PORTA-WEST-LIFT-V2.md) connects the western cross-passage to the forecourt, with a fitted opening through the retained paving and protected landing doors. Both shopping streets and the B2 stair approach remain clear.
 
-The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) connect all five stops: parking B3, Porta B2, the western B1 hall, the recessed ground entrance and the upper north–south passage. Fourteen native route walks and 34 Chrome lift checks pass. The parking receiving area is established; ramps and further building connections remain unfinished.
+The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) connect all five stops: parking B3, Porta B2, the western B1 hall, the recessed ground entrance and the upper north–south passage. Fourteen native route walks and 34 Chrome lift checks pass. The [Isetan parking stair](notes/ISETAN-PARKING-V2.md) now joins both B3 parking aisles to the store’s B2–2F core. Vehicle ramps, the dedicated Isetan parking lift and the hotel connection remain unfinished.
 
 The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both B2 food-hall entrances, connect aisle loops and add a guarded internal stair. The [ground entrance and stair](notes/ISETAN-GROUND-V2.md) extend that connection into an open ground-floor receiving hall. The [second-floor entrance](notes/ISETAN-SECOND-V2.md) opens the north–south passage into a receiving hall and aisle loop, reachable from the central public lift. The [internal stair](notes/ISETAN-STAIR-V2.md) now extends the northern core through B2, B1, ground and 2F, with a protected upper opening and northern bypass. Store escalators, store lifts, higher floors and further western rooms remain unfinished.
 
@@ -30,7 +30,7 @@ The [western platforms 30–34](notes/WESTERN-PLATFORMS-V2.md) connect to platfo
 
 Next priorities:
 
-1. Inspect parking access and address the remaining upper-floor links and store lifts before tenant decoration.
+1. Add the missing Isetan parking/store lift and Granvia parking connection, then address remaining upper-floor links before tenant decoration.
 2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 
