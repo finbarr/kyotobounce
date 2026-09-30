@@ -32,9 +32,11 @@ The [western platforms 30–34](notes/WESTERN-PLATFORMS-V2.md) connect to platfo
 
 The [Isetan 3F–4F escalators](notes/ISETAN-ESCALATORS-V2.md) now provide an operating internal up/down connection, with fitted floor and ceiling openings, guarded upper wells and clear approaches. Both native and Chrome rides pass, together with the surrounding aisle walks.
 
+The [Isetan fifth-floor connection](notes/ISETAN-FIFTH-V2.md) opens the retained Grand Stairway doorway into connected store aisles, fills the missing floor and landing threshold, and adds the next operating escalator pair between 4F and 5F. Fitted cuts clear the hall while preserving the public stairs above. The previous 3F–4F pair remains usable.
+
 Next priorities:
 
-1. Connect the remaining upper Isetan floors beyond 4F and complete the rest of the lift bank before tenant decoration.
+1. Connect the remaining upper Isetan floors beyond 5F and complete the rest of the lift bank before tenant decoration.
 2. Complete the remaining southern frontage, bus/pickup canopies and street edges; resolve the small Miyako Michi southeast stair's destination.
 3. Refine railway alignment, platform enclosures and further building connections after the major missing public routes.
 

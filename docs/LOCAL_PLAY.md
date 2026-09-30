@@ -46,8 +46,10 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
 The current spawn is inside Isetan 4F, south of the central aisle. Walk west
-toward the guarded escalator pair to descend to 3F and return on the upward
-lane; see the [store escalator notes](../research/kyoto-station/notes/ISETAN-ESCALATORS-V2.md).
+toward the central escalators to travel between 3F, 4F and 5F. The fifth-floor
+hall also opens onto the Grand Stairway through its retained doorway; see the
+[fifth-floor notes](../research/kyoto-station/notes/ISETAN-FIFTH-V2.md) and
+[3F–4F escalator notes](../research/kyoto-station/notes/ISETAN-ESCALATORS-V2.md).
 Both fourth-floor entrances lead to Muromachi Square. The internal northern
 stair connects 3F to the lower store floors. The Isetan north lift continues to
 serve B3, B2, B1, ground and 2F; see the

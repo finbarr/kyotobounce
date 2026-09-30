@@ -5,7 +5,7 @@ from shapely.geometry import Polygon,shape
 from shapely.ops import unary_union
 manifest,component,output=map(Path,sys.argv[1:]);m=json.loads(manifest.read_text());raw=Path(m['layout']).read_bytes()
 assert hashlib.sha256(raw).hexdigest()==m['layoutSha256']
-layout=json.loads(raw);spec=json.loads((component/'spec.json').read_text());panels={p['id']:p for p in layout['panels']};prefix='isetan-escalators-'
+layout=json.loads(raw);spec=json.loads((component/'spec.json').read_text());panels={p['id']:p for p in layout['panels']};prefix=spec.get('componentPrefix','isetan-escalators-')
 def top(p):
     y=max(v['y']for v in p['vertices']);ts=[]
     for i in range(0,len(p['triangles']),3):
@@ -40,14 +40,18 @@ def clipped_area(vs,bounds):
         a=[poly[i][k]-poly[0][k]for k in range(3)];b=[poly[i+1][k]-poly[0][k]for k in range(3)]
         cross=[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];area+=sum(v*v for v in cross)**.5/2
     return area
+lanes=[e for e in layout['escalators']if e['id'].startswith(prefix)];assert len(lanes)==2
+retained=[e for e in layout['escalators']if e['id']in spec.get('retainedEscalatorIds',[])];assert len(retained)==len(spec.get('retainedEscalatorIds',[]))
+all_lanes=lanes+retained
+region=[(min(e['lowerCenter']['x']-e['flatLength']-.3 for e in all_lanes),max(e['lowerCenter']['x']+e['run']+e['flatLength']+.3 for e in all_lanes)),(min(e['lowerCenter']['y']+.3 for e in all_lanes),max(e['lowerCenter']['y']+e['height']+2.1 for e in all_lanes)),(min(e['lowerCenter']['z']-.3 for e in all_lanes),max(e['lowerCenter']['z']+.3 for e in all_lanes))]
 near=[]
 for p in layout['panels']:
     b=[(min(v[k]for v in p['vertices']),max(v[k]for v in p['vertices']))for k in ('x','y','z')]
-    if all(a<hi and z>lo for (a,z),(lo,hi)in zip(b,[[-107,-94],[11.8,17.8],[-20.3,-16.7]])):near.append((p,b))
+    if all(a<hi and z>lo for (a,z),(lo,hi)in zip(b,region)):near.append((p,b))
 checks=0
-lanes=[e for e in layout['escalators']if e['id'].startswith(prefix)];assert len(lanes)==2
-for e in lanes:
-    assert abs(e['lowerCenter']['y']-spec['floor3'])<1e-6 and abs(e['lowerCenter']['y']+e['height']-spec['floor4'])<1e-6
+for e,bank in zip(lanes,spec['banks']):
+    assert e['lowerCenter']==bank['lowerCenter'] and abs(e['height']-bank['height'])<1e-6
+for e in all_lanes:
     for q in e['path'][:e['publicPointCount']][::3]:
         x=e['lowerCenter']['x']+q['z'];z=e['lowerCenter']['z'];y=e['lowerCenter']['y']+q['y']
         bounds=[(x-.24,x+.24),(y+.3,y+2.1),(z-.24,z+.24)]
@@ -58,5 +62,5 @@ for e in lanes:
                 assert clipped_area(vs,bounds)<1e-8,(e['id'],q,p['id'])
         checks+=1
 assert sorted(e['speed']for e in lanes)==[-.5,.5]
-report=dict(layoutSha256=m['layoutSha256'],slabs=slabs,lanes=len(lanes),headroomM=2.1,headroomVolumes=checks);report['pass']=True
+report=dict(layoutSha256=m['layoutSha256'],slabs=slabs,lanes=len(lanes),retainedLanes=len(retained),headroomM=2.1,headroomVolumes=checks);report['pass']=True
 output.write_text(json.dumps(report,indent=2)+'\n');print(report)

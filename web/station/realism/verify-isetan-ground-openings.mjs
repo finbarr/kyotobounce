@@ -2,7 +2,9 @@
 import assert from 'node:assert/strict';
 import {MeshoptDecoder} from 'meshoptimizer';
 import * as T from 'three';
-const key=vs=>vs.map(v=>v.map(n=>String(Math.fround(n)||0)).join(',')).sort().join('|');
+// Adjacent closed slab segments share opposite-facing closure triangles.
+// Preserve winding so both faces are checked without conflating their normals.
+const key=vs=>{const rows=vs.map(v=>v.map(n=>String(Math.fround(n)||0)).join(','));return rows.map((_,i)=>rows.slice(i).concat(rows.slice(0,i)).join('|')).sort()[0];};
 const pos=v=>[v.x,v.y,-v.z];
 const area=vs=>new T.Triangle(...vs.map(v=>new T.Vector3(...v))).getArea();
 function insidePolygon(triangle,bounds){
@@ -20,8 +22,8 @@ function insidePolygon(triangle,bounds){
 }
 function reader({json:j,bin}){const cache=new Map();return ai=>{if(cache.has(ai))return cache.get(ai);const a=j.accessors[ai],v=j.bufferViews[a.bufferView],e=v.extensions?.EXT_meshopt_compression,w={SCALAR:1,VEC2:2,VEC3:3}[a.type],bytes={5123:2,5125:4,5126:4}[a.componentType];assert(w&&bytes&&!a.sparse);let b=bin.subarray(v.byteOffset||0,(v.byteOffset||0)+v.byteLength);if(e){b=Buffer.alloc(e.count*e.byteStride);MeshoptDecoder.decodeGltfBuffer(b,e.count,e.byteStride,bin.subarray(e.byteOffset,e.byteOffset+e.byteLength),e.mode,e.filter);}const result=Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>b[a.componentType===5126?'readFloatLE':bytes===2?'readUInt16LE':'readUInt32LE']((a.byteOffset||0)+i*(v.byteStride||w*bytes)+k*bytes)));cache.set(ai,result);return result;};}
 export async function verifyIsetanOpenings(parent,candidate,old,next,report,spec){
- await MeshoptDecoder.ready;assert(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-stair-','granvia-entrance-','isetan-lift-','granvia-parking-'].includes(report.componentPrefix));
- const cuts=report.componentPrefix==='granvia-entrance-'?{concourse:report.geometry.pits.map(p=>[[p.minX,p.maxX],[-.7,.1],[p.minZ,p.maxZ]]),...Object.fromEntries(Object.entries(spec.wallCuts).map(([id,bounds])=>[id,[bounds]]))}:report.componentPrefix==='isetan-fourth-'?spec.cuts:Object.fromEntries(Object.entries(spec.cuts).map(([id,bounds])=>[id,[bounds]]));
+ await MeshoptDecoder.ready;assert(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-stair-','granvia-entrance-','isetan-lift-','granvia-parking-'].includes(report.componentPrefix));
+ const cuts=report.componentPrefix==='granvia-entrance-'?{concourse:report.geometry.pits.map(p=>[[p.minX,p.maxX],[-.7,.1],[p.minZ,p.maxZ]]),...Object.fromEntries(Object.entries(spec.wallCuts).map(([id,bounds])=>[id,[bounds]]))}:['isetan-fourth-','isetan-fifth-'].includes(report.componentPrefix)?spec.cuts:Object.fromEntries(Object.entries(spec.cuts).map(([id,bounds])=>[id,[bounds]]));
  assert.deepEqual(report.geometry.modifiedPanelIds,Object.keys(cuts));
  for(const volumes of Object.values(cuts))for(let i=0;i<volumes.length;i++)for(const b of volumes.slice(i+1))assert(volumes[i].some(([lo,hi],k)=>hi<=b[k][0]||b[k][1]<=lo),'Cut volumes must have disjoint interiors');
  const expected=new Map(),areaChecks=[];let nativeTriangles=0,wholeFaces=0;
