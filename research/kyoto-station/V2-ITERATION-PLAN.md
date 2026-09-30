@@ -50,8 +50,8 @@ The user now wants most effort on the atrium and everything reachable from it, e
 
 Next priorities:
 
-1. Inspect and complete the rooftop garden path and northern viewing promenade using the official roof plan; verify a clear walk from the new stair arrival.
-2. Refine the garden’s paving, planting, seating and signs from operator photographs, and clarify connections to the Skyway and restaurant terrace.
+1. Refine the garden’s enclosing roof rooms, northern viewing screen and western entrance using the operator photographs. The [garden court and promenade](notes/GARDEN-PROMENADE-V2.md) now join the stair arrival, northern viewing bay and western path on one floor; the western Isetan doorway still needs a usable destination.
+2. Improve the garden’s paving, planting, seating and signs from operator photographs, and clarify connections to the Skyway and restaurant terrace.
 3. Continue the atrium’s immediately reachable public spaces and entrances. Resume deeper store interiors or distant southern frontage after these routes are coherent.
 
 The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. The [station-side escalators](notes/STATION-ESCALATORS-V2.md) complete the shared stair halls. Tenant interiors remain unfinished.

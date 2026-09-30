@@ -12,7 +12,7 @@ const base=await read(basePath),m=await read(candidatePath),oldRaw=await readFil
 assert.equal(sha(oldRaw),base.layoutSha256);assert.equal(sha(raw),m.layoutSha256);assert.equal(r.sourceLayoutSha256,base.layoutSha256);
 const removed=new Set(r.geometry.retiredIds),retained=old.panels.filter(p=>!removed.has(p.id));
 const retiredBoxes=r.geometry.retiredBoxIds||[];
-assert(!retiredBoxes.length||['isetan-ground-','isetan-second-','granvia-entrance-','isetan-eighth-'].includes(r.componentPrefix));
+assert(!retiredBoxes.length||['isetan-ground-','isetan-second-','granvia-entrance-','isetan-eighth-','garden-promenade-'].includes(r.componentPrefix));
 assert.deepEqual(next.boxes,old.boxes.filter(p=>!retiredBoxes.includes(p.id)));
 assert.equal(old.panels.length-retained.length+retiredBoxes.length+(r.geometry.retiredSourceOnlyIds||[]).length,removed.size);const modified=r.geometry.modifiedPanelIds||[];
 assert.deepEqual(next.panels.slice(0,retained.length).map(p=>modified.includes(p.id)?old.panels.find(q=>q.id===p.id):p),retained);
@@ -34,7 +34,8 @@ if(['hachijo-escalators-','station-escalators-','granvia-entrance-','isetan-fift
 const modifiedFlights=r.geometry.modifiedFlightIds||[];assert(!modifiedFlights.length||['isetan-ground-','isetan-fourth-','isetan-eighth-'].includes(r.componentPrefix));assert.deepEqual(next.flights,old.flights.map(f=>modifiedFlights.includes(f.id)?{...f,foundationDepth:0}:f));
 const retiredRoutes=r.geometry.retiredRouteIds||[],retiredLabels=r.geometry.retiredLabelIds||[];
 if(retiredRoutes.length||retiredLabels.length){
- assert.equal(r.componentPrefix,'isetan-eighth-');assert.deepEqual(retiredRoutes,['add-fukunaga-entry']);assert.deepEqual(retiredLabels,['add-fukunaga-portal-identity']);
+ if(r.componentPrefix==='garden-promenade-'){assert.deepEqual(retiredRoutes,['add-garden-edge-walk']);assert.deepEqual(retiredLabels,['add-garden-arrival']);}
+ else {assert.equal(r.componentPrefix,'isetan-eighth-');assert.deepEqual(retiredRoutes,['add-fukunaga-entry']);assert.deepEqual(retiredLabels,['add-fukunaga-portal-identity']);}
 }
 assert.deepEqual(next.routes,old.routes.filter(p=>!retiredRoutes.includes(p.id)));
 assert.deepEqual(next.concourseDetails,{...old.concourseDetails,labels:old.concourseDetails.labels.filter(p=>!retiredLabels.includes(p.id))});
@@ -48,9 +49,10 @@ const {json:j,bin}=readGLB(glb),part=readGLB(await readFile(component+'/'+r.outp
 const parentGLB=readGLB(await readFile(base.geometry));
 assert(bin.subarray(0,parentGLB.bin.length).equals(parentGLB.bin));
 assert.deepEqual(j.materials.slice(0,parentGLB.json.materials.length),parentGLB.json.materials);
-const shell=modified.length?(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-stair-','granvia-entrance-','isetan-lift-','isetan-north-core-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','garden-access-','granvia-parking-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
+const shell=modified.length?(['isetan-ground-','isetan-second-','isetan-third-','isetan-fourth-','isetan-fifth-','isetan-sixth-','isetan-seventh-','isetan-eighth-','isetan-stair-','granvia-entrance-','isetan-lift-','isetan-north-core-','isetan-sixth-north-','isetan-seventh-north-','isetan-eighth-north-','garden-access-','garden-promenade-','granvia-parking-'].includes(r.componentPrefix)?await verifyIsetanOpenings(parentGLB,{json:j,bin},old,next,r,await read(component+'/spec.json')):await verifyWesternShell(parentGLB,{json:j,bin},old,next,r)):{};
 const values=ai=>{const a=j.accessors[ai],v=j.bufferViews[a.bufferView],w={SCALAR:1,VEC2:2,VEC3:3}[a.type];assert(!v.extensions&&!v.byteStride&&!a.sparse);return Array.from({length:a.count},(_,i)=>Array.from({length:w},(_,k)=>bin[a.componentType===5126?'readFloatLE':'readUInt32LE']((v.byteOffset||0)+(a.byteOffset||0)+(i*w+k)*4)));};
 let vertices=0,triangles=0;
+const movedPanels=new Set(r.geometry.movedIds||[]),originalPanels=new Map(old.panels.map(p=>[r.componentPrefix+p.id,p]));
 for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const p of mesh.primitives){
  const ps=values(p.attributes.POSITION),ns=values(p.attributes.NORMAL),ix=values(p.indices).flat(),uv=p.attributes.TEXCOORD_0===undefined?null:values(p.attributes.TEXCOORD_0),expected=[];let offset=0;
  for(const source of native.panels.filter(p=>p.browserMaterial===batch)){
@@ -62,7 +64,12 @@ for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const
    if(panel.uv){assert(uv);assert(Math.abs(uv[offset+i][0]-panel.uv[i].x)<1e-6&&Math.abs(uv[offset+i][1]-(1-panel.uv[i].y))<1e-6);}
   }
   assert.deepEqual(panel.triangles,source.triangles);
-  for(let i=0;i<panel.triangles.length;i+=3){const ids=panel.triangles.slice(i,i+3).reverse().map(v=>v+offset);expected.push(...ids);const n=new T.Triangle(...ids.map(i=>new T.Vector3(...ps[i]))).getNormal(new T.Vector3());for(const k of ids)assert(n.distanceTo(new T.Vector3(...ns[k]))<1e-5,panel.id+' normal');triangles++;}
+  for(let i=0;i<panel.triangles.length;i+=3){const ids=panel.triangles.slice(i,i+3).reverse().map(v=>v+offset);expected.push(...ids);const n=new T.Triangle(...ids.map(i=>new T.Vector3(...ps[i]))).getNormal(new T.Vector3());for(const k of ids){
+   if(r.componentPrefix==='garden-promenade-'&&movedPanels.has(panel.id)){
+    const oldPanel=originalPanels.get(panel.id)||source;assert(oldPanel);
+    const normal=oldPanel.normals[k-offset];assert(normal);assert(new T.Vector3(normal.x,normal.y,-normal.z).distanceTo(new T.Vector3(...ns[k]))<1e-6,panel.id+' retained authored normal');
+   }else assert(n.distanceTo(new T.Vector3(...ns[k]))<1e-5,panel.id+' normal');
+  }triangles++;}
   offset+=panel.vertices.length;
  }
  assert.equal(offset,ps.length);assert.deepEqual(expected,ix);vertices+=offset;
