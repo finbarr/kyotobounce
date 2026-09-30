@@ -45,9 +45,11 @@ KYOTO_WORKER_EXECUTABLE='/path/to/compatible/worker' npm run dev:v2
 
 Open http://127.0.0.1:4425. Pass another port with `npm run dev:v2 -- 4426`. Omit the worker variable if this checkout has its own worker in the default build path.
 
-The current spawn is the western railway head concourse. Walk west onto
-platforms 30–34, or east along platform 0 into the main station. The platforms
-connect at ground level around the buffered track ends; see the
+The current spawn is beside Isetan’s ground-floor stair. Climb to the second-floor
+receiving hall and public passage, or use the adjoining stair to reach B1 and B2;
+see the [Isetan stair notes](../research/kyoto-station/notes/ISETAN-STAIR-V2.md).
+The western railway head concourse and platforms 30–34 remain connected at
+ground level around the buffered track ends; see the
 [western platform notes](../research/kyoto-station/notes/WESTERN-PLATFORMS-V2.md).
 The Porta west lift remains beside its cross-passage, with both shopping
 streets and the B2 stair accessible; see the

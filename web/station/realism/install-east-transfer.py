@@ -13,9 +13,9 @@ assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha
 modified_paving=report['geometry'].get('modifiedPaving');assert not modified_paving or modified_paving=='municipal-plaza-642152272'
 modified_ids=report['geometry'].get('modifiedPanelIds',[])
 allowed_modified={'central-lift-':['concourse'],'granvia-entrance-':['concourse','east-passage-north-wall','east-passage-south-wall'],'western-platforms-':['municipal-station-wing-west-Untitled.199','municipal-station-wing-west-Untitled.201','municipal-station-wing-west-Untitled.203','west-south-west-return-0']}
-if report.get('componentPrefix')in ('isetan-ground-','isetan-second-'):
+if report.get('componentPrefix')in ('isetan-ground-','isetan-second-','isetan-stair-'):
  spec=json.loads((component/'spec.json').read_text());assert modified_ids==list(spec['cuts'])
- assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix']=='isetan-second-' and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' for id in modified_ids)
+ assert all(id=='concourse' or id.startswith(('west-north-','west-south-')) or report['componentPrefix'] in ('isetan-second-','isetan-stair-') and id.startswith('isetan-ground-') and next(p for p in old['panels']if p['id']==id)['role']=='foundation' for id in modified_ids)
 else:assert not modified_ids or modified_ids==allowed_modified.get(report.get('componentPrefix'))
 replaced=[p for p in new['panels']if p['id']==modified_paving or p['id']in modified_ids];replaced_by_id={p['id']:p for p in replaced}
 retained=[replaced_by_id.get(p['id'],p) for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
