@@ -117,7 +117,9 @@ The [Granvia ground entrance](GRANVIA-ENTRANCE-V2.md) now connects the forecourt
 
 The [Isetan second-floor entrance](ISETAN-SECOND-V2.md) opens the north–south passage into a receiving hall, counter aisles and information desk. Its entrance and the central public lift share a continuous route. The [internal stair](ISETAN-STAIR-V2.md) connects ground and 2F. The [B3 parking extension](ISETAN-PARKING-V2.md) completes the lower flight into the car park, preserving the connected core through B2, B1 and ground.
 
-1. **Remaining interior connections:** add the missing Isetan parking/store lift and Granvia parking connection, then address remaining upper-floor links; repair concrete missing connections before room decoration.
+The [Isetan north lift](ISETAN-LIFT-V2.md) connects B3, B2, B1, ground and 2F. The [Granvia north lift bank](GRANVIA-PARKING-V2.md) connects B3 parking to the hotel lobby through two opposing cars, with the garage, lobby and Porta approaches retained. Further cars and upper-floor stops remain unfinished.
+
+1. **Remaining interior connections:** address remaining upper-floor links and the rest of the Isetan lift bank; repair concrete missing connections before room decoration.
 2. **Southern building and public spaces:** add the bus/pickup canopies, street edges and remaining upper frontage. Resolve the small Miyako Michi southeast stair's destination before constructing it.
 3. **Railway refinement:** improve fitted track alignment, platform enclosures and further building connections after the missing public routes.
 

@@ -13176,5 +13176,37 @@
     "bytes": 55629,
     "sha256": "b72be2055689883f615eedb2447cc561a05b72a0ce01c68ea7954f0dd7e8ba34",
     "retrieved_at": "2026-09-30T08:59:15.504433+00:00"
+  },
+  {
+    "id": "granvia-mlit-accessibility-case",
+    "title": "Hotel Granvia Kyoto accessibility case study",
+    "publisher": "MLIT",
+    "category": "architecture",
+    "url": "https://www.mlit.go.jp/common/001264618.pdf",
+    "source_date": null,
+    "note": "Page 8: hotel-supplied 2F/M3F plan identifies the north lift bank serving underground parking, reception and guest floors; distinct from the 1F drop-off lift.",
+    "rights": "Reference only; no permission to ship imagery or reproduce protected artwork is implied.",
+    "format": "pdf",
+    "status": "downloaded",
+    "local_file": "maps/granvia-mlit-accessibility-case.pdf",
+    "bytes": 7219234,
+    "sha256": "d53671e26ec773621e419ae8a5c1342f81fbc7545e5b5a4eed575790d3fa2c27",
+    "retrieved_at": "2026-09-30T09:26:46.646858+00:00"
+  },
+  {
+    "id": "granvia-parking-entrance-guide",
+    "title": "Granvia entrance from East Parking B3",
+    "publisher": "Kyoto-rys firsthand guide",
+    "category": "architecture",
+    "url": "https://kyoto-rys.com/hotel/granvia/parking/200.jpg",
+    "source_date": null,
+    "note": "Warm stone lift vestibule, bronze doors and green/burgundy hotel entrance fascia. Guide: https://kyoto-rys.com/hotel/granvia/parking/ . Dimensions cannot be measured from this photograph.",
+    "rights": "Reference only; no permission to ship imagery or reproduce protected artwork is implied.",
+    "format": "jpg",
+    "status": "downloaded",
+    "local_file": "photos/granvia-parking-entrance-guide.jpg",
+    "bytes": 38821,
+    "sha256": "46aec24ad158b21478d89cb1deb9c276281c1df39660f92b8a2c1deccb4bbac7",
+    "retrieved_at": "2026-09-30T09:26:46.647030+00:00"
   }
 ]

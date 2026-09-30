@@ -22,14 +22,14 @@ try{
   await request('design-start',{start:placed.disk},'design-ready');await page.waitForFunction(p=>Math.hypot(kyotoState.feet.x-p.x,kyotoState.feet.z-p.z)<.1,threshold);await page.waitForTimeout(200);
   const read=()=>page.evaluate(id=>__componentLift.read(id),l.id);
   async function walk(z,inward){await page.evaluate(y=>__componentLift.aim(y),(l.yaw||0)+(inward?0:180));await page.keyboard.down('w');try{await page.waitForFunction(({l,z,inward})=>{const p=kyotoState.feet,a=(l.yaw||0)*Math.PI/180,v=Math.sin(a)*(p.x-l.origin.x)+Math.cos(a)*(p.z-l.origin.z);return inward?v>=z:v<=z;},{l,z,inward},{timeout:10000});}finally{await page.keyboard.up('w');}await page.waitForTimeout(220);}
-  await walk(-.2,true);let s=await read();assert(s.grounded&&Math.abs(s.feet.y-l.origin.y)<.06);row.checks.push('Walk from street into car');
+  await walk(-.2,true);let s=await read();assert(s.grounded&&Math.abs(s.feet.y-l.origin.y)<.06);row.checks.push('Walk from lower landing into car');
   await page.keyboard.press('e');await page.waitForFunction(id=>__componentLift.read(id).pose.moving,l.id,{timeout:12000});
   s=await read();assert(s.grounded&&Math.abs(s.feet.y-l.origin.y-s.pose.height)<.09);assert(s.pose.carDoor===0&&s.pose.lowerDoor===0&&s.pose.upperDoor===0);row.checks.push('Grounded ascent with all doors closed');
-  await page.waitForFunction(id=>{const p=__componentLift.read(id).pose;return p.upperDoor>.99&&!p.busy;},l.id,{timeout:20000});
+  await page.waitForFunction(id=>{const p=__componentLift.read(id).pose;return p.upperDoor>.99&&!p.busy;},l.id,{timeout:Math.ceil(l.travel.at(-1).x*1000)+12000});
   const pose={height:l.height,carDoor:1,lowerDoor:0,upperDoor:1},expected=l.parts.map(p=>{const q=liftPartCenter(l,p,pose);return{id:p.id,position:[q.x,q.y,-q.z]};});
   await page.waitForFunction(({id,expected})=>{const parts=__componentLift.read(id).parts;return expected.every(e=>e.position.every((v,i)=>Math.abs(v-parts.find(p=>p.id===e.id).position[i])<.002));},{id:l.id,expected},{timeout:3000});row.checks.push('Rendered parts match native rotated arrival');
-  await walk(-1.95,false);s=await read();assert(s.grounded&&Math.abs(s.feet.y-l.origin.y-l.height)<.06);row.checks.push('Exit onto terrace landing');await page.screenshot({path:out+'/'+l.id+'-upper.png'});
-  await walk(-.2,true);await page.keyboard.press('e');await page.waitForFunction(id=>{const p=__componentLift.read(id).pose;return p.lowerDoor>.99&&!p.busy;},l.id,{timeout:20000});await walk(-1.95,false);s=await read();assert(s.grounded&&Math.abs(s.feet.y-l.origin.y)<.06);row.checks.push('Return and exit onto street');row.pass=true;console.log('PASS Chrome',row.id,row.checks.length);await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');
+  await walk(-1.95,false);s=await read();assert(s.grounded&&Math.abs(s.feet.y-l.origin.y-l.height)<.06);row.checks.push('Exit onto upper landing');await page.screenshot({path:out+'/'+l.id+'-upper.png'});
+  await walk(-.2,true);await page.keyboard.press('e');await page.waitForFunction(id=>{const p=__componentLift.read(id).pose;return p.lowerDoor>.99&&!p.busy;},l.id,{timeout:Math.ceil(l.travel.at(-1).x*1000)+12000});await walk(-1.95,false);s=await read();assert(s.grounded&&Math.abs(s.feet.y-l.origin.y)<.06);row.checks.push('Return and exit onto lower landing');row.pass=true;console.log('PASS Chrome',row.id,row.checks.length);await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');
  }
  assert.deepEqual(report.errors,[]);report.pass=true;
 }catch(e){report.error=String(e);throw e;}finally{await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');await browser.close();}
