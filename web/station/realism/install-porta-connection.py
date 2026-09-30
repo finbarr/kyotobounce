@@ -12,7 +12,7 @@ prefix=report.get('componentPrefix','porta-connection-')
 old_raw=Path(base['layout']).read_bytes();new_raw=Path(candidate['layout']).read_bytes();old=json.loads(old_raw);new=json.loads(new_raw)
 assert sha(old_raw)==base['layoutSha256'] and sha(new_raw)==candidate['layoutSha256']
 retained=[p for p in old['panels'] if p['id'] not in report['geometry']['retiredIds']];assert new['panels'][:len(retained)]==retained
-for key in ('boxes','beams','flights'):assert old[key]==new[key]
+for key in ('boxes','beams','flights','lifts'):assert old[key]==new[key]
 assert new['authoredLights'][:len(old['authoredLights'])]==old['authoredLights']
 lanes=json.loads((component/'motion.json').read_text())['escalators']
 assert new['escalators']==old['escalators']+lanes

@@ -22,7 +22,12 @@ if(r.componentPrefix==='hachijo-terrace-'){
  const expected=structuredClone(motion.lifts);for(const l of expected)for(const p of l.parts){const a=next.authoredMaterials.find(a=>a.label===p.appearance);assert(a);p.appearance=a.id;}
  assert.deepEqual(next.lifts,[...old.lifts,...expected]);addedLifts=expected.length;
 }else assert.deepEqual(next.lifts,old.lifts);
-assert.deepEqual({...next,lifts:old.lifts,panels:old.panels,authoredMaterials:old.authoredMaterials,authoredLights:old.authoredLights,architecture:old.architecture},old);
+let addedEscalators=0;
+if(r.componentPrefix==='hachijo-escalators-'){
+ const motion=await read(component+'/motion.json');assert.equal(motion.escalators.length,4);
+ assert.deepEqual(next.escalators,[...old.escalators,...motion.escalators]);addedEscalators=motion.escalators.length;
+}else assert.deepEqual(next.escalators,old.escalators);
+assert.deepEqual({...next,escalators:old.escalators,lifts:old.lifts,panels:old.panels,authoredMaterials:old.authoredMaterials,authoredLights:old.authoredLights,architecture:old.architecture},old);
 const removal=await read(candidatePath.replace('assets.json','removal.json')),composition=await read(candidatePath.replace('assets.json','composition.json'));
 assert.deepEqual(removal.removedIds,r.geometry.retiredIds);assert(removal.retainedBufferBytesExact&&composition.originalBuffersExact);
 assert.equal(removal.parent.geometrySha256,base.geometrySha256);assert.equal(composition.geometrySha256,m.geometrySha256);
@@ -52,5 +57,5 @@ for(const [batch,mesh]of j.meshes.slice(-part.meshes.length).entries())for(const
  assert.equal(offset,ps.length);assert.deepEqual(expected,ix);vertices+=offset;
 }
 assert.equal(triangles,r.geometry.triangles);
-await writeFile(out,JSON.stringify({pass:true,layoutSha256:m.layoutSha256,geometrySha256:m.geometrySha256,...shell,removedPanels:removed.size,removedTriangles:removal.removedTriangles,addedPanels:added.length,vertices,triangles,retainedNativeRecordsExact:true,retainedBrowserBufferBytesExact:true,retainedMovingHardwareUnchanged:true,addedLifts},null,2)+'\n');
+await writeFile(out,JSON.stringify({pass:true,layoutSha256:m.layoutSha256,geometrySha256:m.geometrySha256,...shell,removedPanels:removed.size,removedTriangles:removal.removedTriangles,addedPanels:added.length,vertices,triangles,retainedNativeRecordsExact:true,retainedBrowserBufferBytesExact:true,retainedMovingHardwareUnchanged:true,addedLifts,addedEscalators},null,2)+'\n');
 console.log('PASS static replacement',added.length,'panels',vertices,'vertices',triangles,'triangles');

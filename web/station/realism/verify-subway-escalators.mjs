@@ -1,4 +1,4 @@
-// Walk onto every lane, ride to its upper landing without input, and walk off.
+// Walk onto each lane, ride in its declared direction without input, and exit.
 import assert from 'node:assert/strict';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
@@ -19,13 +19,14 @@ async function walk(e,target,row){const deadline=performance.now()+35000;while(t
 try{
  await worker.start();await until(()=>worker.ready);worker.send({type:'join',id});await until(()=>state?.players?.length);
  for(const e of lanes){
-  const bottom=at(e,-e.flatLength-1.15),top=at(e,e.run+e.flatLength+1.15),row={lane:e.id,approach:[],samples:[],pass:false};report.rides.push(row);
-  const placed=await worker.request({type:'place',id,slot:'start',radius:.3,origin:{...bottom,y:bottom.y+.5},direction:{x:0,y:-1,z:0}});assert(placed.ok,e.id+' lower approach placement');await worker.request({type:'design-start',id,start:placed.disk});await delay(200);assert(player().grounded);
-  await walk(e,at(e,0),row);await walk(e,at(e,1),row);await delay(150);
+  const direction=Math.sign(e.speed);assert(direction);
+  const bottom=at(e,-e.flatLength-1.15),top=at(e,e.run+e.flatLength+1.15),start=direction>0?bottom:top,end=direction>0?top:bottom,row={lane:e.id,direction,approach:[],samples:[],pass:false};report.rides.push(row);
+  const placed=await worker.request({type:'place',id,slot:'start',radius:.3,origin:{...start,y:start.y+.5},direction:{x:0,y:-1,z:0}});assert(placed.ok,e.id+' approach placement');await worker.request({type:'design-start',id,start:placed.disk});await delay(200);assert(player().grounded);
+  await walk(e,at(e,direction>0?0:e.run),row);await walk(e,at(e,direction>0?1:e.run-1),row);await delay(150);
   const from={...feet()},deadline=performance.now()+30000;let last=along(e,from);
-  while(along(e,feet())<e.run+.4){await delay(80);const p={...feet()},a=along(e,p),expected=at(e,a).y;row.samples.push({...p,expected,grounded:player().grounded});assert(Math.abs(p.y-expected)<.16,e.id+' idle ride floor mismatch');assert(player().grounded,e.id+' idle rider lost ground');assert(a>=last-.01,e.id+' rider moved downhill');assert(performance.now()<deadline,e.id+' idle ride stalled at '+JSON.stringify(p));last=a;}
-  row.travel=along(e,feet())-along(e,from);assert(row.travel>e.run-1.7,e.id+' idle ride did not cover the slope');
-  await walk(e,at(e,e.run+e.flatLength),row);await walk(e,top,row);await delay(200);assert(player().grounded);assert(Math.abs(feet().y-top.y)<.06);row.endpoint={...feet()};row.pass=true;await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log('PASS',e.id,'idle ride',row.travel.toFixed(3),'m');
+  while(direction>0?along(e,feet())<e.run+.4:along(e,feet())>-.4){await delay(80);const p={...feet()},a=along(e,p),expected=at(e,a).y;row.samples.push({...p,expected,grounded:player().grounded});assert(Math.abs(p.y-expected)<.16,e.id+' idle ride floor mismatch');assert(player().grounded,e.id+' idle rider lost ground');assert(direction*(a-last)>=-.01,e.id+' rider moved against the lane');assert(performance.now()<deadline,e.id+' idle ride stalled at '+JSON.stringify(p));last=a;}
+  row.travel=direction*(along(e,feet())-along(e,from));assert(row.travel>e.run-1.7,e.id+' idle ride did not cover the slope');
+  await walk(e,at(e,direction>0?e.run+e.flatLength:-e.flatLength),row);await walk(e,end,row);await delay(200);assert(player().grounded);assert(Math.abs(feet().y-end.y)<.06);row.endpoint={...feet()};row.pass=true;await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log('PASS',e.id,'idle ride',row.travel.toFixed(3),'m');
  }
  report.pass=true;
 }catch(e){report.error=String(e);throw e;}finally{worker.stop();await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');}
