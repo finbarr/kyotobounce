@@ -60,6 +60,8 @@ The [southern rooftop outlooks](notes/GARDEN-SOUTH-ENCLOSURE-V2.md) restore the 
 
 The [western passage wall junction](notes/GARDEN-WEST-JUNCTION-V2.md) now has a finished rear, garden-facing end and fitted coping. The existing public wall treatment continues around its exposed volume; the garden's western outlook and low glass guard remain open.
 
+The [western garden planting](notes/GARDEN-WEST-PLANTING-V2.md) replaces the dark triangular row with low leafy shrubs, recessed soil, fitted rims and ribbed yellow planters. The western path and its end turns remain clear.
+
 The [eastern Skyway mouth](notes/EAST-SKYWAY-MOUTH-V2.md) removes an old shell face that appeared to wall off the escalator landing. The 10F restaurant route and central Skyway remain connected. The [eastern canopy repair](notes/EAST-CANOPY-INTERFACE-V2.md) removes the duplicate opaque shell beneath its glazing and nine detached tie assemblies. The [canopy junction](notes/EAST-CANOPY-JUNCTION-V2.md) now connects both retained roof edges with fitted glazing and framing, replacing the hanging opaque facing around the landing.
 
 The [East Square ramp landing](notes/EAST-SQUARE-LANDING-V2.md) now has a complete guard return. Native and Chrome walks pass along the ramp and through its open turn onto the square in both directions.
@@ -70,7 +72,7 @@ The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) rem
 
 Next priorities:
 
-1. Refine the garden's planting and seating from operator photographs, starting with the western row of coarse triangular planting. The arrival, southern outlooks, passage walls and public paving are now fitted.
+1. Refine the garden's remaining bamboo, central low planting beds and seating from operator photographs. The western planting row now has rounded leafy shrubs and detailed planters; the arrival, southern outlooks, passage walls and public paving are fitted.
 2. Inspect the remaining roof-room ends and coarse equipment visible beyond the garden's western guard. Establish their forms from reference photographs while preserving the open outlook. The western passage wall's exposed back and end are now finished.
 3. Complete the southern hotel lobby's public vertical connections once its 6F receiving floor and lift alignment are established from the operator plans. Continue the atrium's immediately reachable public spaces; deeper store interiors and distant southern frontage follow once these routes are coherent.
 
