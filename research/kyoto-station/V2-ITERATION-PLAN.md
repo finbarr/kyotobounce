@@ -58,6 +58,8 @@ The [garden arrival](notes/GARDEN-ARRIVAL-V2.md) now has open paved approaches i
 
 The [southern rooftop outlooks](notes/GARDEN-SOUTH-ENCLOSURE-V2.md) restore the public areas on both sides of the central roof room shown on the operator map. Connected paving, framed viewing screens and a finished enclosure replace the railing and broken municipal shell that blocked this part of the roof.
 
+The [western passage wall junction](notes/GARDEN-WEST-JUNCTION-V2.md) now has a finished rear, garden-facing end and fitted coping. The existing public wall treatment continues around its exposed volume; the garden's western outlook and low glass guard remain open.
+
 The [eastern Skyway mouth](notes/EAST-SKYWAY-MOUTH-V2.md) removes an old shell face that appeared to wall off the escalator landing. The 10F restaurant route and central Skyway remain connected. The [eastern canopy repair](notes/EAST-CANOPY-INTERFACE-V2.md) removes the duplicate opaque shell beneath its glazing and nine detached tie assemblies. The [canopy junction](notes/EAST-CANOPY-JUNCTION-V2.md) now connects both retained roof edges with fitted glazing and framing, replacing the hanging opaque facing around the landing.
 
 The [East Square ramp landing](notes/EAST-SQUARE-LANDING-V2.md) now has a complete guard return. Native and Chrome walks pass along the ramp and through its open turn onto the square in both directions.
@@ -68,8 +70,8 @@ The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) rem
 
 Next priorities:
 
-1. Inspect remaining unfinished roof junctions visible from the garden, especially the western passage mouth. The southern outlooks and central enclosure are now connected and fitted.
-2. Refine the garden's planting and seating from operator photographs, starting with the western row of coarse triangular planting. The arrival is now open, and the passage walls and public paving are fitted.
+1. Refine the garden's planting and seating from operator photographs, starting with the western row of coarse triangular planting. The arrival, southern outlooks, passage walls and public paving are now fitted.
+2. Inspect the remaining roof-room ends and coarse equipment visible beyond the garden's western guard. Establish their forms from reference photographs while preserving the open outlook. The western passage wall's exposed back and end are now finished.
 3. Complete the southern hotel lobby's public vertical connections once its 6F receiving floor and lift alignment are established from the operator plans. Continue the atrium's immediately reachable public spaces; deeper store interiors and distant southern frontage follow once these routes are coherent.
 
 The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. The [station-side escalators](notes/STATION-ESCALATORS-V2.md) complete the shared stair halls. Tenant interiors remain unfinished.

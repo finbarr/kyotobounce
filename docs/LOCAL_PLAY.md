@@ -115,6 +115,9 @@ now has fitted glazing and framing around the open escalator landing.
 The [western rooftop passage](../research/kyoto-station/notes/GARDEN-WEST-PASSAGE-V2.md)
 leads from the garden to Isetan between fitted concrete and metal walls, with
 closed service doors and cabinets beside the clear public path.
+Its [garden-facing wall junction](../research/kyoto-station/notes/GARDEN-WEST-JUNCTION-V2.md)
+now has a finished back and end beneath the roof cap, preserving the open
+western outlook and low garden guard.
 The [garden paving](../research/kyoto-station/notes/GARDEN-PAVING-V2.md) now has
 pale stone slabs and narrow joints throughout the rooftop walk.
 The [garden arrival](../research/kyoto-station/notes/GARDEN-ARRIVAL-V2.md) is open
