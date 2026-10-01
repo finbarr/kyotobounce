@@ -27,7 +27,6 @@ namespace Kyoto
             public PlayerState thrower;
             public Vector3 launchPosition,velocity,spin;
             public ReplayPose[] poses;
-            public ReplayLiftFrame[] liftFrames;
             public ImpactEvent[] contacts;
             public DesignCapture design;
         }
@@ -200,7 +199,6 @@ namespace Kyoto
             thrower=JsonUtility.FromJson<PlayerState>(JsonUtility.ToJson(owner.state));thrower.feet=owner.walker.transform.position;
             launchVelocity=ball.Velocity;launchSpin=ball.AngularVelocity;
             replayPoses.Add(new ReplayPose{t=0,p=ball.Body.position,q=ball.Body.rotation});
-            BeginLiftRecording();
         }
         bool GoalStep()
         {
@@ -223,7 +221,7 @@ namespace Kyoto
             pendingResult=new ThrowResult{attempt=attempt,id=owner.state.id,reason=reason,layout=state.layout,profile=state.profile,challenge=activeChallenge,
                 success=success,destinationReached=success,waypointHits=waypointHits.ToArray(),score=success?1000+100*distinct.Count:0,surfaces=distinct.Count,impacts=impactCount,duration=ball.Clock,
                 releaseTime=state.releaseTime,chargeTime=state.chargeTime,thrower=thrower,launchPosition=state.launchPosition,velocity=launchVelocity,spin=launchSpin,
-                poses=replayPoses.ToArray(),liftFrames=replayLiftFrames.ToArray(),contacts=replayContacts.ToArray(),design=designArmed?CaptureDesign():null};
+                poses=replayPoses.ToArray(),contacts=replayContacts.ToArray(),design=designArmed?CaptureDesign():null};
         }
 
     }

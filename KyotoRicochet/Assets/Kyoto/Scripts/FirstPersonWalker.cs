@@ -39,12 +39,6 @@ namespace Kyoto
         public void Move(Vector2 input,float yaw,bool fast,float dt)
         {
             if(!Capsule||!Capsule.enabled||dt<=0)return;
-            // Move a supported rider with the car before resolving their own
-            // input. Car and rider shift together, so a descending floor cannot
-            // leave the capsule airborne and an ascending floor cannot overlap it.
-            var liftCarry=Grounded?StationMotion.LiftCarry(gameObject.scene,transform.position,dt):Vector3.zero;
-            if(liftCarry.sqrMagnitude>0){Capsule.enabled=false;transform.position+=liftCarry;Capsule.enabled=true;}
-            StationMotion.SyncLifts(gameObject.scene);
             input=Vector2.ClampMagnitude(input,1);
             var direction=Quaternion.Euler(0,yaw,0)*new Vector3(input.x,0,input.y);
             float speed=fast?TravelSpeed:WalkSpeed;

@@ -12,8 +12,9 @@ is paused. The unfinished central planting candidate is set aside; it has not
 been merged into the playable build. The simplification is authorized. The first delivery is the forecourt boundary:
 retain the façades and tower, hide the city beyond, constrain the camera, and
 remove distant objects from the source and runtime together. See the
-[delivery record](notes/FORECOURT-BOUNDARY.md). Interior and elevator removal
-remain the next bounded task.
+[delivery record](notes/FORECOURT-BOUNDARY.md). The [elevator removal delivery](notes/ELEVATOR-REMOVAL.md) removes the operating
+machinery and hidden shafts while retaining closed public frontages. Removing
+deep interiors remains the next bounded task.
 
 ## Scope rule
 

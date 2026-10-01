@@ -24,7 +24,6 @@ import { createAvatar as makeAvatar, disposeAvatar, poseAvatar, setAvatarCharact
 import { createCharacterPicker, readCharacterChoice } from './character-picker.js';
 import { computeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
 import { createEscalators } from './escalators.js';
-import { createLifts } from './lifts.js';
 import { competitionUI } from './competition.js';
 import { arcadeAudio } from './arcade-audio.js';
 import { challengeBriefing } from './briefing.js';
@@ -63,7 +62,7 @@ const trailPositions=new Float32Array(180*3),trailGeometry=new THREE.BufferGeome
 const trail=new THREE.Line(trailGeometry,new THREE.LineBasicMaterial({color:0xf49368,transparent:true,opacity:.35,depthWrite:false}));trail.frustumCulled=false;scene.add(trail);let trailCount=0;
 const heat=ballHeat({scene,ball,trail}),blur=speedBlur(renderer);
 let heatPresentationKey='',heatPresentationTime=null;
-let station,robotAsset,motion,lifts,liftAction=null,loaded=false,guestId='',identityId=localStorage.getItem('kyoto-guest-id')||'',snapshot=null,previous=null,received=0,workerReady=false;
+let station,robotAsset,motion,loaded=false,guestId='',identityId=localStorage.getItem('kyoto-guest-id')||'',snapshot=null,previous=null,received=0,workerReady=false;
 const history=[],ballRotations=new BallRotationBuffer();
 const shotPlayback=new ShotPlayback();
 const liveThrow=new LiveThrow();
@@ -111,25 +110,6 @@ function setFly(active,capture=false){
  if(capture)captureMouse();canvas.focus();
 }
 $('toggle-fly').onclick=()=>setFly(!fly.active,true);
-const liftControl=document.createElement('button');liftControl.id='lift-control';liftControl.hidden=true;document.body.append(liftControl);
-const liftFloors=document.createElement('dialog');liftFloors.id='lift-floors';liftFloors.setAttribute('aria-labelledby','lift-floors-title');document.body.append(liftFloors);
-let liftMenuId=null;
-function closeLiftFloors(){if(liftFloors.open)liftFloors.close();liftMenuId=null;canvas.focus();}
-// A queued close event may arrive after the picker has already reopened.
-liftFloors.addEventListener('close',()=>{if(!liftFloors.open){liftMenuId=null;canvas.focus();}});
-function useLift(){
-  if(!liftAction||liftAction.disabled)return;
-  if(!liftAction.stops){send('lift',{lift:liftAction.id});canvas.focus();return;}
-  cancel();send('input',{x:0,z:0,yaw,pitch,top,kick,fast:false});
-  const id=liftAction.id;liftMenuId=id;liftFloors.replaceChildren();
-  const title=document.createElement('h2');title.id='lift-floors-title';title.textContent='Choose a floor';liftFloors.append(title);
-  for(const stop of liftAction.stops.toReversed()){
-    const button=document.createElement('button');button.type='button';button.textContent=stop.label+(stop.current?' · You are here':'');button.disabled=stop.current;button.dataset.stop=stop.id;
-    button.onclick=()=>{if(liftAction?.id===id&&!liftAction.disabled&&liftAction.stops?.some(s=>s.id===stop.id&&!s.current))send('lift',{lift:id,stop:stop.id});closeLiftFloors();};liftFloors.append(button);
-  }
-  const close=document.createElement('button');close.type='button';close.textContent='Cancel';close.onclick=closeLiftFloors;liftFloors.append(close);liftFloors.showModal();
-}
-liftControl.onclick=useLift;
 function designerView(mode){if(mode!=='play')briefing?.dismiss();setFly(mode==='editor');if(mode==='play'){aimOrbit=null;ballCameraActive=false;robotResultCamera=false;flightManual=false;centerOnAim();}if(mode==='replay'){returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;manualCamera=false;aimOrbit=null;}if(mode==='design'){liveThrow.reset();discardThrowMotion();returnRequested=true;flightPending=false;lastThrowAim=null;centerOnAim();}}
 function focusDesignTarget(target){setFly(true);fly.focus(target);canvas.focus();}
 
@@ -250,7 +230,7 @@ function restoreThrowAim(){
   centerOnAim();
 }
 function startCharge(){
-  if(fly.active||ui?.completed||liftFloors.open)return;
+  if(fly.active||ui?.completed)return;
   if(recallPending){recallChargeQueued=true;return;}
   if(names?.active||mobile?.menu||briefing?.blocked||!loaded||!workerReady||!snapshot||chargeMeter.charging||!['play','design'].includes(ui.state.mode))return;
   if(flightPending||(chargeMeter.released&&snapshot.phase!=='Result')||ui.state.session?.busy||ui.state.session?.restoring||['Release','Flight'].includes(snapshot.phase))return;
@@ -360,14 +340,12 @@ document.addEventListener('focusin',e=>{if(e.target!==canvas&&!speedIndicator.co
 window.addEventListener('blur',cancel);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancel();});
 window.addEventListener('keydown',e=>{
   if(e.defaultPrevented||names?.active||startup?.active||e.isComposing)return;
-  if(liftFloors.open){if(e.code==='Escape'){e.preventDefault();closeLiftFloors();}return;}
   const editing=e.target.closest('input,textarea,select,[contenteditable="true"]'),modified=e.metaKey||e.ctrlKey||e.altKey;
   if(!editing&&!modified&&e.code==='KeyL'&&ui.state.mode==='play'){e.preventDefault();if(!e.repeat){if(levelMenuOpen())closeLevelMenu();else openLevelMenu();}return;}
   if(briefing?.active){if(e.code==='Enter'&&e.target.closest('button')&&e.target.id!=='briefing-play')return;if(['Space','Enter'].includes(e.code)&&!modified){e.preventDefault();if(!e.repeat)briefing.start();}if(e.code==='Escape'){e.preventDefault();briefing.start(false);}return;}
   if(briefing?.blocked)return;
   if(levelMenuOpen()){if(e.code==='Escape'){e.preventDefault();closeLevelMenu();}else ui.navigateLevels(e);return;}
   if(editing)return;
-  if(!modified&&!fly.active&&e.code==='KeyE'&&liftAction){e.preventDefault();if(!e.repeat)useLift();return;}
   if(!modified&&['design','editor'].includes(ui.state.mode)&&e.code==='Escape'){e.preventDefault();cancel();ui.exitDesign();return;}
   if(!modified&&ui.state.mode==='editor'&&e.code==='KeyR'){e.preventDefault();if(!e.repeat)ui.retryDesign();return;}
   if(!modified&&e.code==='KeyR'&&['play','design'].includes(ui.state.mode)){e.preventDefault();if(!e.repeat){recall();canvas.focus();}return;}
@@ -390,9 +368,9 @@ window.addEventListener('keydown',e=>{
     const control=$(['KeyQ','KeyE'].includes(e.code)?'top':'kick');control.value=THREE.MathUtils.clamp(Number(control.value)+(['KeyQ','KeyZ'].includes(e.code)?-25:25),-200,200);syncSpin();
   }
 });
-window.addEventListener('keyup',e=>{keys.delete(e.code);if(liftFloors.open)return;if(e.code==='Space'&&(fastForwardHeld||ui.state.mode==='replay')){e.preventDefault();setFastForward(false);return;}if(fly.active){if(e.code==='Space')e.preventDefault();return;}if(e.code==='Space'&&!(e.target instanceof HTMLInputElement)){e.preventDefault();release();}});
+window.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='Space'&&(fastForwardHeld||ui.state.mode==='replay')){e.preventDefault();setFastForward(false);return;}if(fly.active){if(e.code==='Space')e.preventDefault();return;}if(e.code==='Space'&&!(e.target instanceof HTMLInputElement)){e.preventDefault();release();}});
 function self(){return snapshot?.players.find(p=>p.id===guestId);}
-function sendInput(){if(names?.active||briefing?.blocked||!workerReady||!loaded||ui.state.mode==='replay'||shotPlayback.active)return;send('input',{x:fly.active||liftFloors.open||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyD'))-Number(keys.has('KeyA'))+(mobile?.movement.x||0),-1,1),z:fly.active||liftFloors.open||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyW'))-Number(keys.has('KeyS'))+(mobile?.movement.z||0),-1,1),fast:keys.has('ShiftLeft')||keys.has('ShiftRight')||!!mobile?.movement.fast,yaw,pitch,top,kick});}
+function sendInput(){if(names?.active||briefing?.blocked||!workerReady||!loaded||ui.state.mode==='replay'||shotPlayback.active)return;send('input',{x:fly.active||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyD'))-Number(keys.has('KeyA'))+(mobile?.movement.x||0),-1,1),z:fly.active||ui.levelsOpen||mobile?.menu||ui.state.mode==='editor'||flightControls()?0:THREE.MathUtils.clamp(Number(keys.has('KeyW'))-Number(keys.has('KeyS'))+(mobile?.movement.z||0),-1,1),fast:keys.has('ShiftLeft')||keys.has('ShiftRight')||!!mobile?.movement.fast,yaw,pitch,top,kick});}
 setInterval(sendInput,1000/30);
 
 function createAvatar(id){
@@ -426,8 +404,6 @@ async function load(){
     fly.setStationBounds(new THREE.Box3().setFromObject(station));
     cameraObstacles=new CameraObstacles(station);
     motion=createEscalators(scene,data.escalators,detailData.combSupports);motion(0);
-    lifts=createLifts(scene,data.lifts,data.authoredMaterials);
-    cameraObstacles.addDynamicMeshes(lifts.parts.map(p=>p.mesh));
     startup.progress(90,'Lighting the glass, stone and steel…');await yieldLoadingUI();
     stationLook=dressStation(renderer,scene,sun,station,data);
     boundary.applyFog(scene);
@@ -487,7 +463,7 @@ briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state
   applyLevelAim(ui.state.selected);
   if(capture)captureMouse();else{briefing.dismiss();openLevelMenu();}
 }});
-ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,getLifts:()=>lifts?.specs||[],sharedReplay:!!sharedReplayId,overview:(c,{automatic=false}={})=>{if(!startup?.active&&(!automatic||!isTutorial(c)))briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:(c,{automatic=false}={})=>{if(!startup?.active&&(!automatic||!isTutorial(c)))briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 $('replay-free').onclick=()=>setFly(true);
 for(const id of ['replay-play','replay-restart','replay-recenter','replay-free'])$(id).addEventListener('click',()=>canvas.focus());
 names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});
@@ -538,13 +514,7 @@ function animate(now){
   if(heatKey!==heatPresentationKey||(heatPresentationTime!==null&&scorePresentation.time<heatPresentationTime-.0001)){trailCount=0;trailGeometry.setDrawRange(0,0);heatPresentationKey=heatKey;}heatPresentationTime=scorePresentation.time;
   const timeline=ui.timeline()||renderTimeline(now),snapshot=timeline.after,previous=timeline.before;
   const p=replaying?snapshot?.players[0]:snapshot?.players.find(p=>p.id===(snapshot?.owner||guestId)),phase=replaying?timeline.phase:liveThrow.phase(snapshot,timeline.phase),alpha=timeline.alpha;
-  if(snapshot){
-    const poses=lifts.update(previous?.lifts,snapshot.lifts,alpha);
-    liftAction=!fly.active&&!replaying&&phase==='Aim'&&!levelMenuOpen()&&!names.active&&!briefing.blocked?lifts.button(poses,p?.feet):null;
-    if(liftFloors.open&&(!liftAction?.stops||liftAction.id!==liftMenuId||liftAction.disabled))closeLiftFloors();
-    setHidden(liftControl,!liftAction);if(liftAction){setText(liftControl,liftAction.text);liftControl.disabled=liftAction.disabled;}
-  }
-  mobile.update({mode:ui.state.mode,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked||liftFloors.open,charging:chargeMeter.charging,fastForward:fastForwardHeld,resultVisible:!$('result-card').hidden});
+  mobile.update({mode:ui.state.mode,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked,charging:chargeMeter.charging,fastForward:fastForwardHeld,resultVisible:!$('result-card').hidden});
   setHidden(speedIndicator,(!replaying&&phase!=='Flight')||briefing.blocked);speedIndicator.disabled=replaying&&!ui.state.replayPlaying;
   setData(speedIndicator,'rate',String(presentationRate));setData(speedIndicator,'audioRate',String(sound.state.playbackRate));setData(speedIndicator,'musicBpm',String(sound.state.bpm));
   if(speedIndicator.dataset.active!==String(presentationRate===2)||speedIndicator.dataset.touch!==String(mobile.active)){setData(speedIndicator,'active',String(presentationRate===2));setData(speedIndicator,'touch',String(mobile.active));setText($('shot-speed-label'),presentationRate===2?'⏩ 2× FAST FORWARD':mobile.active?'TAP · 2× SPEED':'HOLD SPACE · 2×');setText($('shot-speed-help'),presentationRate===2?'RELEASE SPACE / CLICK FOR NORMAL':'OR CLICK TO FAST FORWARD');speedIndicator.setAttribute('aria-pressed',String(presentationRate===2));}

@@ -112,7 +112,6 @@ namespace Kyoto
             if(layout.escalators!=null)foreach(var e in layout.escalators)
                 MovingEscalator.Create(parent,e,Physical("escalator"),Visual("escalator"),collision,walking,
                     Visual(e.id.StartsWith("east-skyway-escalator")?"escalator-edge":"escalator-silver-edge"),Visual("escalator-casing"));
-            if(layout.lifts!=null)foreach(var lift in layout.lifts)MovingLift.Create(parent,lift,Physical("steel"),collision,walking);
             if(layout.panels!=null)foreach(var p in layout.panels)
             {
                 if(p.playerOnly&&!walking)continue;

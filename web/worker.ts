@@ -84,15 +84,6 @@ export class PhysicsWorker extends EventEmitter {
         }
         if(message.type==='ready'){
           if(this.ready)continue;
-          if(process.env.KYOTO_REQUIRE_LIFTS==='1'&&!message.capabilities?.includes('lifts-v1')){
-            this.fail(run,'This station requires lift support. Rebuild and restart the physics worker.');return;
-          }
-          if(process.env.KYOTO_REQUIRE_LIFT_STOPS==='1'&&!message.capabilities?.includes('lift-stops-v1')){
-            this.fail(run,'This station requires lifts with multiple stops. Rebuild and restart the physics worker.');return;
-          }
-          if(process.env.KYOTO_REQUIRE_LIFT_YAW==='1'&&!message.capabilities?.includes('lift-yaw-v1')){
-            this.fail(run,'This station requires oriented lifts. Rebuild and restart the physics worker.');return;
-          }
           clearTimeout(run.startupTimer);this.ready=true;this.capabilities=Array.isArray(message.capabilities)?message.capabilities:[];
           console.log('Native physics ready',message.profile,String(message.layout).slice(0,12));
           this.setStatus('ready','Physics is ready.');
