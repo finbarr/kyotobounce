@@ -56,9 +56,11 @@ The [East Square ramp landing](notes/EAST-SQUARE-LANDING-V2.md) now has a comple
 
 The [East Square gallery](notes/EAST-GALLERY-V2.md) opens the blocked raised entrance beside NIWA into a continuous corridor, lobby and facilities rooms. Six native and Chrome routes pass. The [eastern public lift](notes/EAST-PUBLIC-LIFT-V2.md) now connects that lobby to the 2F theatre foyer and 1F forecourt, with protected doors and walkable receiving routes at all three stops.
 
+The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) removes the floating earlier NIWA shell, furniture and signs. The registered eastern café remains intact. The hotel’s July 2026 map locates a public clinic hall behind the southern frontage; its entrance and supported floor connection remain unfinished.
+
 Next priorities:
 
-1. Inspect East Square's southern public route for blocked openings, floor gaps and missing guards; repair a confirmed defect before expanding the area.
+1. Locate and open East Square's southern hotel entrance, then provide its supported receiving hall from the July 2026 hotel plan. Preserve the rounded and folded frontage. The older floating café has been removed.
 2. Refine the garden's western roof rooms, paving, planting, seating and signs from operator photographs.
 3. Continue the atrium's immediately reachable public spaces and entrances. Deeper store interiors and distant southern frontage follow once these routes are coherent.
 

@@ -120,6 +120,9 @@ It leads east to a lobby and two facilities rooms. The
 [eastern public lift](../research/kyoto-station/notes/EAST-PUBLIC-LIFT-V2.md)
 connects this lobby to the 2F theatre foyer and the 1F forecourt entrance.
 Approach the car and press E to choose a floor.
+The obsolete floating café above the southern court wall has been removed;
+the registered NIWA café remains on the eastern side. The southern hotel
+hall remains unfinished; see the [cleanup notes](../research/kyoto-station/notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md).
 
 `web/v2/assets.json` identifies the current private reconstruction under `.local/v2/current/`. Its layout and GLB hashes are checked before launch, along with escalator and comb-support correspondence. An optional hardware GLB is also hash-checked. Only the spawn metadata changes; large geometry stays symlinked. The launch command creates a public asset overlay, matching browser manifest, native layout and asset receipt under `.local/v2/PORT/`. It also keeps the database and worker log there, separate from published saves.
 
