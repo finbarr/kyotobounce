@@ -54,11 +54,11 @@ The [eastern Skyway mouth](notes/EAST-SKYWAY-MOUTH-V2.md) removes an old shell f
 
 The [East Square ramp landing](notes/EAST-SQUARE-LANDING-V2.md) now has a complete guard return. Native and Chrome walks pass along the ramp and through its open turn onto the square in both directions.
 
-The [East Square gallery](notes/EAST-GALLERY-V2.md) opens the blocked raised entrance beside NIWA into a continuous corridor, lobby and facilities rooms. Six native and Chrome routes pass. The eastern lift bank remains the missing onward connection.
+The [East Square gallery](notes/EAST-GALLERY-V2.md) opens the blocked raised entrance beside NIWA into a continuous corridor, lobby and facilities rooms. Six native and Chrome routes pass. The [eastern public lift](notes/EAST-PUBLIC-LIFT-V2.md) now connects that lobby to the 2F theatre foyer and 1F forecourt, with protected doors and walkable receiving routes at all three stops.
 
 Next priorities:
 
-1. Establish the eastern public lift's lower connections from official maps and complete its connection to the gallery lobby. Inspect East Square's southern public route for blocked openings, floor gaps and missing guards.
+1. Inspect East Square's southern public route for blocked openings, floor gaps and missing guards; repair a confirmed defect before expanding the area.
 2. Refine the garden's western roof rooms, paving, planting, seating and signs from operator photographs.
 3. Continue the atrium's immediately reachable public spaces and entrances. Deeper store interiors and distant southern frontage follow once these routes are coherent.
 

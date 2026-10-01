@@ -27,6 +27,8 @@ try{
  assert.equal(await page.evaluate(()=>kyotoState.result),null);
  // Chrome can consume Escape to release pointer lock. Use the game's explicit
  // Levels shortcut so the home check waits on the intended menu interaction.
+ // Recall can expose Aim before the presented shot and its controls settle.
+ await page.waitForFunction(()=>!document.getElementById('toggle-levels').disabled);
  await page.keyboard.press('l');
  await page.getByRole('button',{name:'↶ Start',exact:true}).click();
  // Home replaces the player snapshot asynchronously. Wait for the returned

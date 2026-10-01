@@ -116,8 +116,10 @@ The [East Square ramp landing](../research/kyoto-station/notes/EAST-SQUARE-LANDI
 has a guard around its exposed end, with the turn onto the square open.
 From the square, climb the short stair beside NIWA and enter the
 [raised gallery corridor](../research/kyoto-station/notes/EAST-GALLERY-V2.md).
-It leads east to a lobby and two facilities rooms. The eastern lift bank
-has not yet been built.
+It leads east to a lobby and two facilities rooms. The
+[eastern public lift](../research/kyoto-station/notes/EAST-PUBLIC-LIFT-V2.md)
+connects this lobby to the 2F theatre foyer and the 1F forecourt entrance.
+Approach the car and press E to choose a floor.
 
 `web/v2/assets.json` identifies the current private reconstruction under `.local/v2/current/`. Its layout and GLB hashes are checked before launch, along with escalator and comb-support correspondence. An optional hardware GLB is also hash-checked. Only the spawn metadata changes; large geometry stays symlinked. The launch command creates a public asset overlay, matching browser manifest, native layout and asset receipt under `.local/v2/PORT/`. It also keeps the database and worker log there, separate from published saves.
 
@@ -139,6 +141,7 @@ The private asset files must already be present at the manifest paths; this cand
 | `KYOTO_ASSET_CACHE` | Download cache; default `~/.cache/kyotobounce` |
 | `KYOTO_TEST_ORIGIN` | Server tested by the runtime test |
 | `KYOTO_TEST_SHOT_START` | Optional JSON `{ "x": 0, "y": 0, "z": 0 }` position for testing a throw on a component's supported floor; spawn, movement and home still use the normal spawn |
+| `KYOTO_TEST_LIFT_START` | Optional JSON landing position for the Chrome lift-stop check; keeps the normal game spawn |
 | `KYOTO_TEST_OUTPUT` | Separate runtime-test receipt path |
 
 UI-only sessions can point `KYOTO_WORKER_EXECUTABLE` at a known compatible prebuilt worker, provided nobody rebuilds that binary while it is in use. Copy it into the worktree for stronger isolation. This shortcut is inappropriate for C# or physics/protocol changes, which require a fresh worker build.

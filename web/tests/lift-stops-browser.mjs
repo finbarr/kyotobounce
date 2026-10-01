@@ -6,20 +6,31 @@ import {liftPartCenter} from '../public/lifts.js';
 const [origin,fixture,out,manifest]=process.argv.slice(2);
 assert(['localhost','127.0.0.1'].includes(new URL(origin).hostname));assert(out.startsWith('.local/'));await mkdir(out,{recursive:true});
 const spec=JSON.parse(await readFile(fixture+'/lift-spec.json')),identity=JSON.parse(await readFile(manifest||fixture+'/assets.json'));
-const report={pass:false,...identity,checks:[],errors:[]};
+const start=process.env.KYOTO_TEST_LIFT_START?JSON.parse(process.env.KYOTO_TEST_LIFT_START):identity.spawn;
+assert(['x','y','z'].every(k=>Number.isFinite(start[k])),'Finite lift test start');
+const report={pass:false,...identity,testStart:start,checks:[],errors:[]};
 const check=(pass,message)=>{assert(pass,message);report.checks.push(message);console.log('PASS',message);};
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=metal']});let other;
 try{
- const page=await browser.newPage({viewport:{width:1280,height:800}});page.on('pageerror',e=>report.errors.push(e.message));
- page.on('websocket',socket=>socket.on('framereceived',({payload})=>{const m=JSON.parse(String(payload));if(m.type==='error')report.errors.push('Service: '+m.message);}));
+ const page=await browser.newPage({viewport:{width:1280,height:800}}),waiters=[];page.on('pageerror',e=>report.errors.push(e.message));
+ page.on('websocket',socket=>socket.on('framereceived',({payload})=>{const m=JSON.parse(String(payload));if(m.type==='error')report.errors.push('Service: '+m.message);for(const w of [...waiters])if(m.type===w.type||m.type==='error'){waiters.splice(waiters.indexOf(w),1);clearTimeout(w.timer);w.resolve(m);}}));
  await page.route('**/game.js',async route=>route.fulfill({contentType:'text/javascript',body:await readFile('web/public/game.js','utf8')+`
- window.__liftStopsTest={aim(y){yaw=y;pitch=0;centerOnAim();},read(){return{lift:snapshot?.lifts.find(p=>p.id==='${spec.id}'),feet:self()?.feet,grounded:self()?.grounded,phase:snapshot?.phase,menu:liftFloors.open,parts:lifts.parts.map(p=>({id:p.part.id,position:p.mesh.position.toArray()}))};}};`}));
+ window.__liftStopsTest={send,aim(y){yaw=y;pitch=0;centerOnAim();},read(){return{lift:snapshot?.lifts.find(p=>p.id==='${spec.id}'),feet:self()?.feet,grounded:self()?.grounded,phase:snapshot?.phase,menu:liftFloors.open,parts:lifts.parts.map(p=>({id:p.part.id,position:p.mesh.position.toArray()}))};}};`}));
  const deadline=Date.now()+60000;while(!(await fetch(origin+'/api/health').then(r=>r.json()).catch(()=>null))?.worker){assert(Date.now()<deadline,'Fixture worker ready');await delay(250);}
  await page.goto(origin);await page.locator('#loading-name input[name="player"]').fill('Lift floors verification',{timeout:120000});await page.getByRole('button',{name:'LET’S PLAY →'}).click();await page.waitForFunction(()=>window.kyotoState?.ready&&!document.body.classList.contains('is-loading'),null,{timeout:120000});
  other=new Client(origin.replace(/^http/,'ws'));await other.join();
+ if(process.env.KYOTO_TEST_LIFT_START){
+  async function request(type,data,expected){
+   const pending=new Promise((resolve,reject)=>{const w={type:expected,resolve,timer:setTimeout(()=>reject(Error('No '+expected)),15000)};waiters.push(w);});
+   await page.evaluate(({type,data})=>__liftStopsTest.send(type,data),{type,data});const msg=await pending;assert.notEqual(msg.type,'error',msg.message);return msg;
+  }
+  const placed=await request('place',{slot:'start',radius:.3,origin:{...start,y:start.y+.5},direction:{x:0,y:-1,z:0}},'placement');assert(placed.disk);
+  await request('design-start',{start:placed.disk},'design-ready');
+  await page.waitForFunction(p=>{const f=kyotoState.feet;return f&&Math.hypot(f.x-p.x,f.z-p.z)<.1&&Math.abs(f.y-p.y)<.06;},start);
+ }
  const read=()=>page.evaluate(()=>__liftStopsTest.read());
  async function walk(z,yaw){await page.evaluate(y=>__liftStopsTest.aim(y),yaw+(spec.yaw||0));await page.keyboard.down('w');try{await page.waitForFunction(({z,yaw,spec})=>{const a=(spec.yaw||0)*Math.PI/180,p=kyotoState.feet,localZ=Math.sin(a)*(p.x-spec.origin.x)+Math.cos(a)*(p.z-spec.origin.z);return yaw===0?localZ>=z:localZ<=z;},{z,yaw,spec},{timeout:12000});}finally{await page.keyboard.up('w');}await page.waitForTimeout(200);}
- const startFloor=spec.stops.findIndex(s=>Math.abs(identity.spawn.y-spec.origin.y-s.height)<.06);assert(startFloor>=0);
+ const startFloor=spec.stops.findIndex(s=>Math.abs(start.y-spec.origin.y-s.height)<.06);assert(startFloor>=0);
  async function useLift(){await page.waitForFunction(()=>{const b=document.getElementById('lift-control');return b&&!b.hidden&&!b.disabled;},null,{timeout:5000});await page.keyboard.press('e');}
  // A hall spawn can be outside the call button's reach. Approach the closed
  // landing with ordinary walking before calling the car from another floor.
