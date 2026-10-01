@@ -112,6 +112,9 @@ The [canopy above the descent](../research/kyoto-station/notes/EAST-CANOPY-INTER
 has its obsolete opaque shell and detached ties removed.
 Its [junction with the atrium roof](../research/kyoto-station/notes/EAST-CANOPY-JUNCTION-V2.md)
 now has fitted glazing and framing around the open escalator landing.
+The [western rooftop passage](../research/kyoto-station/notes/GARDEN-WEST-PASSAGE-V2.md)
+leads from the garden to Isetan between fitted concrete and metal walls, with
+closed service doors and cabinets beside the clear public path.
 The [East Square ramp landing](../research/kyoto-station/notes/EAST-SQUARE-LANDING-V2.md)
 has a guard around its exposed end, with the turn onto the square open.
 From the square, climb the short stair beside NIWA and enter the
