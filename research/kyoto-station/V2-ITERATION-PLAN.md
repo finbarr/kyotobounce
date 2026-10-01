@@ -56,12 +56,12 @@ The [East Square ramp landing](notes/EAST-SQUARE-LANDING-V2.md) now has a comple
 
 The [East Square gallery](notes/EAST-GALLERY-V2.md) opens the blocked raised entrance beside NIWA into a continuous corridor, lobby and facilities rooms. Six native and Chrome routes pass. The [eastern public lift](notes/EAST-PUBLIC-LIFT-V2.md) now connects that lobby to the 2F theatre foyer and 1F forecourt, with protected doors and walkable receiving routes at all three stops.
 
-The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) removes the floating earlier NIWA shell, furniture and signs. The registered eastern café remains intact. The hotel’s July 2026 map locates a public clinic hall behind the southern frontage; its entrance and supported floor connection remain unfinished.
+The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) removes the floating earlier NIWA shell, furniture and signs. The registered eastern café remains intact. The [southern hotel hall](notes/EAST-SQUARE-SOUTH-HALL-V2.md) now opens the straight return beside the rounded frontage into a supported lobby, sloped public corridor and eastern terrace. The terrace has guards along its exposed edges. Hotel lifts, the 6F escalators and clinic interiors remain unfinished.
 
 Next priorities:
 
-1. Locate and open East Square's southern hotel entrance, then provide its supported receiving hall from the July 2026 hotel plan. Preserve the rounded and folded frontage. The older floating café has been removed.
-2. Refine the garden's western roof rooms, paving, planting, seating and signs from operator photographs.
+1. Refine the garden's western roof rooms, paving, planting, seating and signs from operator photographs. Choose one visible area per increment.
+2. Complete the southern hotel lobby's public vertical connections once its 6F receiving floor and lift alignment are established from the operator plans.
 3. Continue the atrium's immediately reachable public spaces and entrances. Deeper store interiors and distant southern frontage follow once these routes are coherent.
 
 The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. The [station-side escalators](notes/STATION-ESCALATORS-V2.md) complete the shared stair halls. Tenant interiors remain unfinished.
