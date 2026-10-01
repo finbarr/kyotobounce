@@ -72,7 +72,7 @@ The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) rem
 
 Next priorities:
 
-1. Refine the garden's remaining bamboo, central low planting beds and seating from operator photographs. The western planting row now has rounded leafy shrubs and detailed planters; the arrival, southern outlooks, passage walls and public paving are fitted.
+1. Refine the garden's central low planting beds, seating and lawn from operator photographs. The [four bamboo beds](notes/GARDEN-BAMBOO-V2.md) now have jointed canes, branching foliage, pale support frames and ribbed planters. The western planting row, arrival, southern outlooks, passage walls and public paving are fitted.
 2. Inspect the remaining roof-room ends and coarse equipment visible beyond the garden's western guard. Establish their forms from reference photographs while preserving the open outlook. The western passage wall's exposed back and end are now finished.
 3. Complete the southern hotel lobby's public vertical connections once its 6F receiving floor and lift alignment are established from the operator plans. Continue the atrium's immediately reachable public spaces; deeper store interiors and distant southern frontage follow once these routes are coherent.
 

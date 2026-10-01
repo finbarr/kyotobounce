@@ -120,6 +120,9 @@ now has a finished back and end beneath the roof cap, preserving the open
 western outlook and low garden guard.
 The [western garden planting](../research/kyoto-station/notes/GARDEN-WEST-PLANTING-V2.md)
 has low leafy shrubs, recessed soil and ribbed planters beside the clear path.
+The four [bamboo beds](../research/kyoto-station/notes/GARDEN-BAMBOO-V2.md)
+have slender jointed canes, branching foliage and pale support frames inside
+ribbed planters, with both garden aisles clear.
 The [garden paving](../research/kyoto-station/notes/GARDEN-PAVING-V2.md) now has
 pale stone slabs and narrow joints throughout the rooftop walk.
 The [garden arrival](../research/kyoto-station/notes/GARDEN-ARRIVAL-V2.md) is open
