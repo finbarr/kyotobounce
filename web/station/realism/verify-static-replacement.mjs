@@ -40,7 +40,15 @@ if(retiredRoutes.length||retiredLabels.length){
 assert.deepEqual(next.routes,old.routes.filter(p=>!retiredRoutes.includes(p.id)));
 assert.deepEqual(next.concourseDetails,{...old.concourseDetails,labels:old.concourseDetails.labels.filter(p=>!retiredLabels.includes(p.id))});
 assert.deepEqual({...next,routes:old.routes,concourseDetails:old.concourseDetails,flights:old.flights,boxes:old.boxes,escalators:old.escalators,lifts:old.lifts,panels:old.panels,authoredMaterials:old.authoredMaterials,authoredLights:old.authoredLights,architecture:old.architecture},old);
-const removal=await read(candidatePath.replace('assets.json','removal.json')),composition=await read(candidatePath.replace('assets.json','composition.json'));
+const composition=await read(candidatePath.replace('assets.json','composition.json'));
+let removal;
+if(removed.size||retiredBoxes.length||modified.length){
+ removal=await read(candidatePath.replace('assets.json','removal.json'));
+}else{
+ // An additive component composes directly against the exact parent manifest.
+ assert.deepEqual(composition.parent,base);
+ removal={removedIds:[],removedTriangles:0,parent:base,retainedBufferBytesExact:composition.originalBuffersExact};
+}
 assert.deepEqual(removal.removedIds,r.geometry.retiredIds);assert(removal.retainedBufferBytesExact&&composition.originalBuffersExact);
 assert.equal(removal.parent.geometrySha256,base.geometrySha256);assert.equal(composition.geometrySha256,m.geometrySha256);
 assert.equal(await readFile(component+'/native-panels.json').then(sha),r.outputs.nativePanelsSha256);

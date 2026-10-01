@@ -74,5 +74,27 @@ try{
   }
   row.pass=true;await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');console.log('PASS Chrome',label,row.checks.length,'waypoints');
  }
+ report.boundaries=[];
+ for(const boundary of build.geometry.blocked||[]){
+  const start=boundary.start,placed=await request('place',{slot:'start',radius:.3,origin:{...start,y:start.y+.5},direction:{x:0,y:-1,z:0}},'placement');assert(placed.disk);
+  await request('design-start',{start:placed.disk},'design-ready');
+  await page.waitForFunction(p=>Math.hypot(kyotoState.feet.x-p.x,kyotoState.feet.z-p.z)<.1,start);
+  await page.evaluate(y=>__isetanGround.aim(y),boundary.yaw);
+  const ledge=boundary.contactLedge?layout.panels.find(p=>p.id===boundary.contactLedge):null;
+  if(boundary.contactLedge)assert(ledge?.collision!==false&&ledge);
+  const maxRise=ledge?Math.max(...ledge.vertices.map(v=>v.y))-start.y:0;
+  assert(maxRise>=0&&maxRise<=.25);
+  const row={label:boundary.label,samples:[],pass:false};report.boundaries.push(row);
+  await page.keyboard.down('w');
+  try{
+   for(let i=0;i<24;i++){
+    await page.waitForTimeout(150);const state=await page.evaluate(()=>__isetanGround.read()),p=state.feet;row.samples.push(state);
+    assert((p[boundary.axis]-boundary.limit)*boundary.sign>=0,boundary.label+' crossed '+JSON.stringify(p));
+    assert(p.y>=start.y-.06&&p.y<=start.y+maxRise+.06,boundary.label+' lost floor');
+   }
+  }finally{await page.keyboard.up('w');}
+  const end=row.samples.at(-1);assert(end.grounded&&Math.abs(end.feet[boundary.axis]-start[boundary.axis])>.2);
+  row.pass=true;console.log('PASS Chrome',boundary.label);
+ }
  await page.screenshot({path:out+'/arrival.png'});assert.deepEqual(report.errors,[]);report.pass=true;
 }catch(e){report.error=String(e);throw e;}finally{await writeFile(out+'/report.json',JSON.stringify(report,null,2)+'\n');await browser.close();}

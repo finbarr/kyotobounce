@@ -52,9 +52,11 @@ The [northern garden enclosure](notes/GARDEN-ROOF-ENCLOSURE-V2.md) replaces the 
 
 The [eastern Skyway mouth](notes/EAST-SKYWAY-MOUTH-V2.md) removes an old shell face that appeared to wall off the escalator landing. The 10F restaurant route and central Skyway remain connected. The [eastern canopy repair](notes/EAST-CANOPY-INTERFACE-V2.md) removes the duplicate opaque shell beneath its glazing and nine detached tie assemblies. The [canopy junction](notes/EAST-CANOPY-JUNCTION-V2.md) now connects both retained roof edges with fitted glazing and framing, replacing the hanging opaque facing around the landing.
 
+The [East Square ramp landing](notes/EAST-SQUARE-LANDING-V2.md) now has a complete guard return. Native and Chrome walks pass along the ramp and through its open turn onto the square in both directions.
+
 Next priorities:
 
-1. Inspect the onward East Square and restaurant-terrace routes, including the short stairs and ramp around the raised garden. Fix broken floor connections, obstructions and incomplete guards found along those routes.
+1. Inspect the public passages along East Square's eastern and southern edges and their connections to the lift and toilet corridor. Fix concrete floor gaps, blocked openings or missing guards found there.
 2. Refine the garden's western roof rooms, paving, planting, seating and signs from operator photographs.
 3. Continue the atrium's immediately reachable public spaces and entrances. Deeper store interiors and distant southern frontage follow once these routes are coherent.
 

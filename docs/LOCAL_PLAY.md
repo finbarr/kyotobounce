@@ -112,6 +112,8 @@ The [canopy above the descent](../research/kyoto-station/notes/EAST-CANOPY-INTER
 has its obsolete opaque shell and detached ties removed.
 Its [junction with the atrium roof](../research/kyoto-station/notes/EAST-CANOPY-JUNCTION-V2.md)
 now has fitted glazing and framing around the open escalator landing.
+The [East Square ramp landing](../research/kyoto-station/notes/EAST-SQUARE-LANDING-V2.md)
+has a guard around its exposed end, with the turn onto the square open.
 
 `web/v2/assets.json` identifies the current private reconstruction under `.local/v2/current/`. Its layout and GLB hashes are checked before launch, along with escalator and comb-support correspondence. An optional hardware GLB is also hash-checked. Only the spawn metadata changes; large geometry stays symlinked. The launch command creates a public asset overlay, matching browser manifest, native layout and asset receipt under `.local/v2/PORT/`. It also keeps the database and worker log there, separate from published saves.
 
