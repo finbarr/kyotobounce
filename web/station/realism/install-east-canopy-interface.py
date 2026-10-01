@@ -50,6 +50,20 @@ for group in ('beams','boxes'):
  for o in bpy.data.objects:
   if o.get('kyoto_seed','').startswith(group+'/'):
    id=o.get('kyoto_surface',o.name);assert id in lookup;o['kyoto_seed']=group+'/'+str(lookup[id])
+added=[]
+if spec.get('addedPanelsSha256'):
+ nb=(component/'native-panels.json').read_bytes();assert sha(nb)==spec['addedPanelsSha256'];added=json.loads(nb)['panels'];assert all(p['id'].startswith('east-canopy-junction-')for p in added)
+ collection=bpy.data.collections.new('Eastern canopy and atrium roof junction');bpy.context.scene.collection.children.link(collection)
+ materials={m['id']:m for m in new['authoredMaterials']}
+ for p in added:
+  assert p['id'] not in objects
+  mesh=bpy.data.meshes.new(p['id']);mesh.from_pydata([(v['x'],v['z'],v['y'])for v in p['vertices']],[],[p['triangles'][i:i+3][::-1]for i in range(0,len(p['triangles']),3)]);mesh.update()
+  mat=bpy.data.materials[materials[p['appearance']]['label']];mesh.materials.append(mat)
+  normals=[tuple(p['normals'][l.vertex_index][k]for k in ('x','z','y'))for l in mesh.loops]
+  for poly in mesh.polygons:poly.use_smooth=True
+  mesh.normals_split_custom_set(normals);attribute=mesh.attributes.new('kyoto_authored_normal','FLOAT_VECTOR','CORNER')
+  for i,value in enumerate(normals):attribute.data[i].vector=value
+  o=bpy.data.objects.new(p['id'],mesh);collection.objects.link(o);o['kyoto_surface']=p['id'];o['kyoto_seed']='panels/'+str(len(new['panels']));o['kyoto_physical']=p['material'];o['kyoto_role']=p['role'];o['kyoto_collision']=True;o['kyoto_geometry_signature']=signature(o);new['panels'].append(p)
 out=component/'source';out.mkdir(exist_ok=True);newraw=json.dumps(new,separators=(',',':'))+'\n';(out/'station-layout.json').write_text(newraw)
 bpy.data.texts.remove(bpy.data.texts['Kyoto runtime seed.json'])
 seed=bpy.data.texts.load(str((out/'station-layout.json').resolve()),internal=True);seed.name='Kyoto runtime seed.json'
@@ -69,6 +83,11 @@ for o in bpy.data.objects:
  if group in ('panels','beams','boxes'):
   assert new[group][int(index)]['id']==o.get('kyoto_surface',o.name),(group,o.name)
 for id in cuts:assert objects[id]['kyoto_seed']=='panels/'+str(next(i for i,p in enumerate(new['panels'])if p['id']==id))
-proof=dict(parentSourceSha256=sha(Path(base['sourceScene']).read_bytes()),sourceSha256=sha((out/'KyotoAtrium.blend').read_bytes()),layoutSha256=sha(newraw.encode()),modifiedPanels=list(cuts),removedObjects=removed,removedPanelFaces=sum(len(v)for v in cuts.values()),savedGeometryUVsExact=True,savedAuthoredNormalsExact=True,maximumPreviewNormalError=max_normal,retainedBindingsMatch=True)
+for p in added:
+ o=objects[p['id']];m=o.data;assert [v for face in m.polygons for v in reversed(face.vertices)]==p['triangles']
+ assert [(v.co.x,v.co.z,v.co.y)for v in m.vertices]==[(v['x'],v['y'],v['z'])for v in p['vertices']]
+ for loop in m.loops:
+  assert tuple(m.attributes['kyoto_authored_normal'].data[loop.index].vector)==tuple(p['normals'][loop.vertex_index][k]for k in ('x','z','y'))
+proof=dict(addedPanels=len(added),addedGeometryNormalsExact=True,parentSourceSha256=sha(Path(base['sourceScene']).read_bytes()),sourceSha256=sha((out/'KyotoAtrium.blend').read_bytes()),layoutSha256=sha(newraw.encode()),modifiedPanels=list(cuts),removedObjects=removed,removedPanelFaces=sum(len(v)for v in cuts.values()),savedGeometryUVsExact=True,savedAuthoredNormalsExact=True,maximumPreviewNormalError=max_normal,retainedBindingsMatch=True)
 proof['pass']=True
 (component/'retired-surfaces.json').write_text(json.dumps(surfaces)+'\n');(component/'source-installation.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof),flush=True)

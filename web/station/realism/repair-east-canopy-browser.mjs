@@ -1,5 +1,6 @@
 // Delete only the source-identified opaque shell and detached tie faces.
 import assert from 'node:assert/strict';
+import {appendJunction} from './append-canopy-junction.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {MeshoptDecoder} from 'meshoptimizer';
@@ -35,9 +36,10 @@ for(const n of j.nodes){if(n.mesh!==undefined)n.mesh=meshMap.get(n.mesh);if(n.ch
 const coverage=[...new Set(source.map(s=>s.id))].map(id=>{const ss=surfaces.filter(s=>s.id===id),sourceArea=ss.reduce((n,s)=>n+s.area,0),browserArea=ss.reduce((n,s)=>n+s.matched,0);return{id,sourceArea,browserArea,error:Math.abs(sourceArea-browserArea)};});
 await writeFile(component+'/removal-audit.json',JSON.stringify({changes,coverage,unmatched:surfaces.filter(s=>s.area-s.matched>.00003).map(({id,points,area,matched})=>({id,points,area,matched}))})+'\n');
 for(const c of coverage)assert(c.error<Math.max(.01,c.sourceArea*2e-6),'Incomplete retirement '+JSON.stringify(c));
+let additionOffset=null;if(spec.componentGlbSha256){const report=await read(component+'/report.json'),bytes=await readFile(component+'/'+report.outputs.glbFile);assert.equal(sha(bytes),spec.componentGlbSha256);additionOffset=offset;const added=appendJunction(j,readGLB(bytes),offset);parts.push(added);offset+=added.length;}
 j.buffers[0].byteLength=offset;const output=writeGLB(j,Buffer.concat(parts));assert(readGLB(output).bin.subarray(0,bin.length).equals(bin));
 const out=component+'/station';await mkdir(out,{recursive:true});
 const station=await read(base.station);station.layoutSha256=sha(newRaw);const detail=await read(base.detail);detail.candidateMotionIntegration.layoutSha256=sha(newRaw);
 const next={...base,layout:component+'/source/station-layout.json',layoutSha256:sha(newRaw),geometry:out+'/atrium.runtime.glb',geometrySha256:sha(output),station:out+'/station.json',detail:out+'/atrium-detail.json',motionLayout:component+'/source/station-layout.json',sourceScene:component+'/source/KyotoAtrium.blend',sourceComponents:[]};
 await writeFile(next.geometry,output);await writeFile(next.station,JSON.stringify(station)+'\n');await writeFile(next.detail,JSON.stringify(detail)+'\n');await writeFile(out+'/assets.json',JSON.stringify(next,null,2)+'\n');
-const proof={pass:true,layoutSha256:next.layoutSha256,geometrySha256:next.geometrySha256,removedTriangles:changes.reduce((s,c)=>s+c.removed.length,0),coverage,retainedBuffersExact:true};await writeFile(component+'/browser-removal.json',JSON.stringify(proof,null,2)+'\n');console.log(JSON.stringify({removedTriangles:proof.removedTriangles,maximumAreaErrorM2:Math.max(...coverage.map(c=>c.error)),layoutSha256:next.layoutSha256,geometrySha256:next.geometrySha256}));
+const proof={pass:true,additionOffset,layoutSha256:next.layoutSha256,geometrySha256:next.geometrySha256,removedTriangles:changes.reduce((s,c)=>s+c.removed.length,0),coverage,retainedBuffersExact:true};await writeFile(component+'/browser-removal.json',JSON.stringify(proof,null,2)+'\n');console.log(JSON.stringify({removedTriangles:proof.removedTriangles,maximumAreaErrorM2:Math.max(...coverage.map(c=>c.error)),layoutSha256:next.layoutSha256,geometrySha256:next.geometrySha256}));
