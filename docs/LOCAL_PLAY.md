@@ -119,6 +119,9 @@ The [garden paving](../research/kyoto-station/notes/GARDEN-PAVING-V2.md) now has
 pale stone slabs and narrow joints throughout the rooftop walk.
 The [garden arrival](../research/kyoto-station/notes/GARDEN-ARRIVAL-V2.md) is open
 across the paved approach, with low rails along the lawn edges.
+The [southern rooftop outlooks](../research/kyoto-station/notes/GARDEN-SOUTH-ENCLOSURE-V2.md)
+open from the garden around a finished central enclosure, with views of the
+tracks through framed glass screens.
 The [East Square ramp landing](../research/kyoto-station/notes/EAST-SQUARE-LANDING-V2.md)
 has a guard around its exposed end, with the turn onto the square open.
 From the square, climb the short stair beside NIWA and enter the

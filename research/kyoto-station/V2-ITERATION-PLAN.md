@@ -56,6 +56,8 @@ The [rooftop garden paving](notes/GARDEN-PAVING-V2.md) replaces the generic floo
 
 The [garden arrival](notes/GARDEN-ARRIVAL-V2.md) now has open paved approaches in place of the tall provisional screens. Low yellow rails define the southern lawn edges, with fitted posts and footings clear of the entry paths.
 
+The [southern rooftop outlooks](notes/GARDEN-SOUTH-ENCLOSURE-V2.md) restore the public areas on both sides of the central roof room shown on the operator map. Connected paving, framed viewing screens and a finished enclosure replace the railing and broken municipal shell that blocked this part of the roof.
+
 The [eastern Skyway mouth](notes/EAST-SKYWAY-MOUTH-V2.md) removes an old shell face that appeared to wall off the escalator landing. The 10F restaurant route and central Skyway remain connected. The [eastern canopy repair](notes/EAST-CANOPY-INTERFACE-V2.md) removes the duplicate opaque shell beneath its glazing and nine detached tie assemblies. The [canopy junction](notes/EAST-CANOPY-JUNCTION-V2.md) now connects both retained roof edges with fitted glazing and framing, replacing the hanging opaque facing around the landing.
 
 The [East Square ramp landing](notes/EAST-SQUARE-LANDING-V2.md) now has a complete guard return. Native and Chrome walks pass along the ramp and through its open turn onto the square in both directions.
@@ -66,7 +68,7 @@ The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) rem
 
 Next priorities:
 
-1. Inspect and refit the coarse southern roof enclosure visible from the garden arrival. Check its open shell faces and projecting edges against references before continuing with planting detail.
+1. Inspect remaining unfinished roof junctions visible from the garden, especially the western passage mouth. The southern outlooks and central enclosure are now connected and fitted.
 2. Refine the garden's planting and seating from operator photographs, starting with the western row of coarse triangular planting. The arrival is now open, and the passage walls and public paving are fitted.
 3. Complete the southern hotel lobby's public vertical connections once its 6F receiving floor and lift alignment are established from the operator plans. Continue the atrium's immediately reachable public spaces; deeper store interiors and distant southern frontage follow once these routes are coherent.
 
