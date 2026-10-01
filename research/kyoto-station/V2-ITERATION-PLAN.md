@@ -50,7 +50,9 @@ The user now wants most effort on the atrium and everything reachable from it, e
 
 The [northern garden enclosure](notes/GARDEN-ROOF-ENCLOSURE-V2.md) replaces the coarse garden-facing wall treatment and redundant railings with concrete panels, pale ribbed metal and a supported viewing screen. The [western Isetan entrance and 11F hall](notes/GARDEN-STORE-ENTRY-V2.md) provide the return route to the upper atrium.
 
-The [western rooftop passage](notes/GARDEN-WEST-PASSAGE-V2.md) now has fitted concrete bases, vertical metal cladding and closed service frontages beside the garden-to-Isetan walk. The railings against the roof rooms are removed, and a bounded cut clears the original shell protruding through the new wall. Paving and garden finishes remain provisional.
+The [western rooftop passage](notes/GARDEN-WEST-PASSAGE-V2.md) now has fitted concrete bases, vertical metal cladding and closed service frontages beside the garden-to-Isetan walk. The railings against the roof rooms are removed, and a bounded cut clears the original shell protruding through the new wall.
+
+The [rooftop garden paving](notes/GARDEN-PAVING-V2.md) replaces the generic floor finish with pale stone slabs, narrow joints and mineral grain across the arrival, garden court and western passage. The stair finish and all collision geometry remain unchanged.
 
 The [eastern Skyway mouth](notes/EAST-SKYWAY-MOUTH-V2.md) removes an old shell face that appeared to wall off the escalator landing. The 10F restaurant route and central Skyway remain connected. The [eastern canopy repair](notes/EAST-CANOPY-INTERFACE-V2.md) removes the duplicate opaque shell beneath its glazing and nine detached tie assemblies. The [canopy junction](notes/EAST-CANOPY-JUNCTION-V2.md) now connects both retained roof edges with fitted glazing and framing, replacing the hanging opaque facing around the landing.
 
@@ -62,7 +64,7 @@ The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) rem
 
 Next priorities:
 
-1. Refine the garden and western passage paving, planting, seating and signs from operator photographs. Choose one visible area per increment; the western passage walls are now fitted.
+1. Refine the garden's planting, seating and arrival screens from operator photographs. The western row of coarse triangular planting and the tall arrival screens are the clearest remaining mismatches; choose one area per increment. The passage walls and public paving are now fitted.
 2. Complete the southern hotel lobby's public vertical connections once its 6F receiving floor and lift alignment are established from the operator plans.
 3. Continue the atrium's immediately reachable public spaces and entrances. Deeper store interiors and distant southern frontage follow once these routes are coherent.
 

@@ -115,6 +115,8 @@ now has fitted glazing and framing around the open escalator landing.
 The [western rooftop passage](../research/kyoto-station/notes/GARDEN-WEST-PASSAGE-V2.md)
 leads from the garden to Isetan between fitted concrete and metal walls, with
 closed service doors and cabinets beside the clear public path.
+The [garden paving](../research/kyoto-station/notes/GARDEN-PAVING-V2.md) now has
+pale stone slabs and narrow joints throughout the rooftop walk.
 The [East Square ramp landing](../research/kyoto-station/notes/EAST-SQUARE-LANDING-V2.md)
 has a guard around its exposed end, with the turn onto the square open.
 From the square, climb the short stair beside NIWA and enter the
