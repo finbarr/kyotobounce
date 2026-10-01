@@ -60,6 +60,7 @@ tools/*
 !tools/build_atrium_detail.py
 !tools/build_stair_materials.py
 !tools/optimize-browser-assets.mjs
+!tools/compact-static-glb.mjs
 art-source/*
 !art-source/physics/
 !art-source/phase3/

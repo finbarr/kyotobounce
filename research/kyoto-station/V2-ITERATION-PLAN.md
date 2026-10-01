@@ -1,168 +1,219 @@
-# Kyoto Bounce v2: continuous improvement, one completed task at a time
-
-## User direction — 28 September 2026
-
-Continue over a long period with no overall time cap or single-milestone endpoint. Keep the useful station artwork, source geometry, research and export tools. Work forward, finish the current task, commit it, update the playable v2 build, and then move to the next task. Before/after presentations and routine approval checkpoints are not required.
-
-All existing levels are disposable, including targets, hints, starts, progression and the private Locker/Pillar repairs. They impose no constraints on v2 architecture. Stop investigating or repairing their failures. Design fresh levels around completed areas later.
-
-This supersedes the previous iteration pilot and the old plan's course-preservation requirements, time limits and repair queues. It does not authorize deleting production scores or deploying changes. The replacement goal is active.
-
-## Current structural priority — 28 September 2026
-
-The user reports missing railway/rear areas and broken interior routes. Repair disconnected stairs, blocked hallways, abrupt walls and missing landings before further shop decoration. The unfinished restaurant ceiling-services work is safely shelved in Git.
-
-Latest structural delivery: the [Hachijo Street crossing](notes/HACHIJO-CROSSING-V2.md) connects the subway South lobby beneath the road to the sunken garden, two street lifts, a usable stair and an Avanti entrance lobby. Operator photographs correct the northern lift's provisional indoor placement; the original indoor floor openings are restored. The [Exit 5 street lift](notes/EXIT-FIVE-LIFT-V2.md) connects the public subway passage to the northeast forecourt, completing the onward street connection from Central 1. The [Porta East connection](notes/PORTA-EAST-V2.md) opens West North Street and the public North-gate hall into connected east-area aisles, cross-passages and shop entrances. The [Central 1 passenger lift](notes/SUBWAY-LIFT-V2.md) connects the subway platform and paid concourse with an operating car, protected landing doors and a usable vestibule. The [four subway platform escalators](notes/SUBWAY-ESCALATORS-V2.md) add operating upward lanes beside the four usable stairways. The [Porta plaza connection](notes/PORTA-PLAZA-V2.md) opens the subway hall and B2 cross-passage into connected plaza B1 aisles, with a fitted stair between levels. The [interior connection notes](notes/INTERIOR-CONNECTIONS-V2.md) record the integrated railway, southern entrances and earlier repairs.
-
-The [South subway platform lift](notes/SUBWAY-SOUTH-LIFT-V2.md) adds the second platform lift shown in the city's station diagram. It connects the southern paid hall and island platform with guarded landing doors, preserving both platform aisles and the existing stair approach.
-
-The [Porta west public lift](notes/PORTA-WEST-LIFT-V2.md) connects the western cross-passage to the forecourt, with a fitted opening through the retained paving and protected landing doors. Both shopping streets and the B2 stair approach remain clear.
-
-The [central elevator and western receiving halls](notes/CENTRAL-LIFT-V2.md) connect all five stops: parking B3, Porta B2, the western B1 hall, the recessed ground entrance and the upper north–south passage. Fourteen native route walks and 34 Chrome lift checks pass. The [Isetan parking stair](notes/ISETAN-PARKING-V2.md) now joins both B3 parking aisles to the store’s B2–2F core. The [corrected Isetan north lift](notes/ISETAN-NORTH-CORE-V2.md) connects B3 parking through 5F, clear of the Grand Stairway. Its former openings are closed and the lower halls extend to the new landings. Vehicle ramps, further lift cars and higher store floors remain unfinished.
-
-The [Isetan basement connections](notes/ISETAN-BASEMENT-V2.md) open B1 and both B2 food-hall entrances, connect aisle loops and add a guarded internal stair. The [ground entrance and stair](notes/ISETAN-GROUND-V2.md) extend that connection into an open ground-floor receiving hall. The [second-floor entrance](notes/ISETAN-SECOND-V2.md) opens the north–south passage into a receiving hall and aisle loop, reachable from the central public lift. The [internal stair](notes/ISETAN-STAIR-V2.md) now extends the northern core through B2, B1, ground and 2F, with a protected upper opening and northern bypass. The [third-floor connection](notes/ISETAN-THIRD-V2.md) extends the northern stair to 3F and joins its receiving hall to the retained western landing, with protected floor openings and a continuous aisle loop. Store escalators, further lift cars, higher floors and further western rooms remain unfinished.
-
-The [Granvia ground entrance](notes/GRANVIA-ENTRANCE-V2.md) connects the forecourt to the hotel lobby by stair, paired escalators and lift, retaining the M3F and theatre approaches. The [Granvia parking connection](notes/GRANVIA-PARKING-V2.md) adds the separate pair of north-bank lifts between B3 and the 2F lobby, with protected shafts and usable approaches. Higher hotel stops remain unfinished.
-
-The [Isetan fourth-floor halls](notes/ISETAN-FOURTH-V2.md) open both Muromachi Square entrances and connect the north, south and western aisles. Bounded cuts remove the overextended parapets and foundations protruding through the store, preserving the public stairs above. Both entrances, the aisle loops and the affected northern stairs pass native checks; five Chrome routes and gameplay also pass. The [Grand Stairway audit](notes/GRAND-STAIR-CIRCULATION-V2.md) resolves the suspected flight 02 obstruction as a test route crossing the central handrail: both actual passenger lanes pass all 14 flights in both native directions, plus a complete Chrome ascent and descent.
-
-The [retained Porta pavilion stair](notes/PORTA-PAVILION-V2.md) restores the forecourt entrance and opens both stair lanes onto North Street. Adjacent shop bays, the west cross-passage and lift approach remain usable. Its exact exit number remains unconfirmed.
-
-The [western platforms 30–34](notes/WESTERN-PLATFORMS-V2.md) connect to platform 0 through an opened ground approach and head concourse. Three platform strips, four terminating tracks, buffers and canopies occupy the former solid building shell. The upper façade is retained. Precise track alignment, final signs and detailed finishes remain unfinished.
-
-The [Isetan 3F–4F escalators](notes/ISETAN-ESCALATORS-V2.md) now provide an operating internal up/down connection, with fitted floor and ceiling openings, guarded upper wells and clear approaches. Both native and Chrome rides pass, together with the surrounding aisle walks.
-
-The [Isetan fifth-floor connection](notes/ISETAN-FIFTH-V2.md) opens the retained Grand Stairway doorway into connected store aisles, fills the missing floor and landing threshold, and adds the next operating escalator pair between 4F and 5F. Fitted cuts clear the hall while preserving the public stairs above. The previous 3F–4F pair remains usable.
-
-The [Isetan sixth-floor connection](notes/ISETAN-SIXTH-V2.md) refits the southern Grand Stairway entrance clear of its public flight, fills the missing store floor and joins the south, west and north aisles. The new 5F–6F escalator pair continues the central stack, with the existing 4F–5F transfer retained.
-
-The [sixth-floor northern entrance and lift](notes/ISETAN-SIXTH-NORTH-V2.md) join the public stair landing to the northern store hall and extend the existing north car through 6F. Both sixth-floor public entrances, the central escalators and the north lift now connect to the hall network.
-
-The [seventh-floor connection](notes/ISETAN-SEVENTH-V2.md) opens the southern Grand Stairway entrance into connected store aisles and adds the operating 6F–7F escalator pair. The western aisle turns around the upper public stair structure. Floor retirement and texture-coordinate fixes remove the overlap and dark patches found during inspection.
-
-The [seventh-floor northern entrance and lift](notes/ISETAN-SEVENTH-NORTH-V2.md) join the public stair landing to the north hall and extend the existing car through 7F. Both seventh-floor public entrances and the central escalators now connect to that hall network.
-
-The [eighth-floor connection](notes/ISETAN-EIGHTH-V2.md) opens the southern stair entrance into connected store halls and adds the operating 7F–8F escalator pair. Four overextended foundations are fitted around the halls, and the floating FUKUNAGA901 café is aligned with the floor and given a clear entrance.
-
-## Current focus — 30 September 2026
-
-The user now wants most effort on the atrium and everything reachable from it, especially the walk up to the gardens at the top. The [eighth-floor northern entrance and lift](notes/ISETAN-EIGHTH-NORTH-V2.md) complete the current store connection. The [upper landing and rooftop garden connection](notes/ATRIUM-GARDEN-ROUTE-V2.md) now passes the full Muromachi Square ascent and descent in native play and Chrome. Continue with the garden and adjacent public routes. Further store floors and lift banks can wait unless they directly repair an atrium connection.
-
-The [northern garden enclosure](notes/GARDEN-ROOF-ENCLOSURE-V2.md) replaces the coarse garden-facing wall treatment and redundant railings with concrete panels, pale ribbed metal and a supported viewing screen. The [western Isetan entrance and 11F hall](notes/GARDEN-STORE-ENTRY-V2.md) provide the return route to the upper atrium.
-
-The [western rooftop passage](notes/GARDEN-WEST-PASSAGE-V2.md) now has fitted concrete bases, vertical metal cladding and closed service frontages beside the garden-to-Isetan walk. The railings against the roof rooms are removed, and a bounded cut clears the original shell protruding through the new wall.
-
-The [rooftop garden paving](notes/GARDEN-PAVING-V2.md) replaces the generic floor finish with pale stone slabs, narrow joints and mineral grain across the arrival, garden court and western passage. The stair finish and all collision geometry remain unchanged.
-
-The [garden arrival](notes/GARDEN-ARRIVAL-V2.md) now has open paved approaches in place of the tall provisional screens. Low yellow rails define the southern lawn edges, with fitted posts and footings clear of the entry paths.
-
-The [southern rooftop outlooks](notes/GARDEN-SOUTH-ENCLOSURE-V2.md) restore the public areas on both sides of the central roof room shown on the operator map. Connected paving, framed viewing screens and a finished enclosure replace the railing and broken municipal shell that blocked this part of the roof.
-
-The [western passage wall junction](notes/GARDEN-WEST-JUNCTION-V2.md) now has a finished rear, garden-facing end and fitted coping. The existing public wall treatment continues around its exposed volume; the garden's western outlook and low glass guard remain open.
-
-The [western garden planting](notes/GARDEN-WEST-PLANTING-V2.md) replaces the dark triangular row with low leafy shrubs, recessed soil, fitted rims and ribbed yellow planters. The western path and its end turns remain clear.
-
-The [eastern Skyway mouth](notes/EAST-SKYWAY-MOUTH-V2.md) removes an old shell face that appeared to wall off the escalator landing. The 10F restaurant route and central Skyway remain connected. The [eastern canopy repair](notes/EAST-CANOPY-INTERFACE-V2.md) removes the duplicate opaque shell beneath its glazing and nine detached tie assemblies. The [canopy junction](notes/EAST-CANOPY-JUNCTION-V2.md) now connects both retained roof edges with fitted glazing and framing, replacing the hanging opaque facing around the landing.
-
-The [East Square ramp landing](notes/EAST-SQUARE-LANDING-V2.md) now has a complete guard return. Native and Chrome walks pass along the ramp and through its open turn onto the square in both directions.
-
-The [East Square gallery](notes/EAST-GALLERY-V2.md) opens the blocked raised entrance beside NIWA into a continuous corridor, lobby and facilities rooms. Six native and Chrome routes pass. The [eastern public lift](notes/EAST-PUBLIC-LIFT-V2.md) now connects that lobby to the 2F theatre foyer and 1F forecourt, with protected doors and walkable receiving routes at all three stops.
-
-The [obsolete southern café cleanup](notes/EAST-SQUARE-OBSOLETE-CAFE-V2.md) removes the floating earlier NIWA shell, furniture and signs. The registered eastern café remains intact. The [southern hotel hall](notes/EAST-SQUARE-SOUTH-HALL-V2.md) now opens the straight return beside the rounded frontage into a supported lobby, sloped public corridor and eastern terrace. The terrace has guards along its exposed edges. Hotel lifts, the 6F escalators and clinic interiors remain unfinished.
-
-Next priorities:
-
-1. Refine the garden's central low planting beds, seating and lawn from operator photographs. The [four bamboo beds](notes/GARDEN-BAMBOO-V2.md) now have jointed canes, branching foliage, pale support frames and ribbed planters. The western planting row, arrival, southern outlooks, passage walls and public paving are fitted.
-2. Inspect the remaining roof-room ends and coarse equipment visible beyond the garden's western guard. Establish their forms from reference photographs while preserving the open outlook. The western passage wall's exposed back and end are now finished.
-3. Complete the southern hotel lobby's public vertical connections once its 6F receiving floor and lift alignment are established from the operator plans. Continue the atrium's immediately reachable public spaces; deeper store interiors and distant southern frontage follow once these routes are coherent.
-
-The [connected subway reconstruction](notes/SUBWAY-REBUILD-V2.md) establishes the shared island, four stair cores and connected public routes. The [eastern ASTY street](notes/HACHIJO-ASTY-V2.md) joins the two Hachijo entrance halls. The [western ASTY street and public stair](notes/ASTY-WEST-V2.md) extend that route to the west entrance, fifteen room shells, forecourt exits and the upper public passage beside Kintetsu. Both external terrace stairs remain usable. The [station-side escalators](notes/STATION-ESCALATORS-V2.md) complete the shared stair halls. Tenant interiors remain unfinished.
-
-Live findings and evidence: [Interior connection audit](notes/INTERIOR-CONNECTIONS-V2.md).
-
-## Replacement goal
-
-Continuously improve Kyoto Bounce v2’s atrium and the public spaces reachable from it, prioritizing a coherent walk up the Grand Stairway to the rooftop gardens and repairing broken stairs, blocked passages and missing connections using research; finish, test, commit and merge each improvement into the playable local main build before starting the next, while preserving smooth gameplay, reliable physics and a single reusable checkout.
-
-## Working loop
-
-1. **Choose one task.** Select the highest-value next improvement from the current playable build and the short queue. State its area/files, concrete outcome and relevant checks. Keep tasks small enough to finish independently: one architectural connection, one material group, one usable route or one new level. Avoid an open-ended task such as “finish the station.”
-2. **Stay on that task until done.** Investigate, implement, inspect the actual result and resolve failures caused by the change. Do not start a different feature or turn incidental findings into a parallel project. Put unrelated findings in the queue. A required dependency becomes part of the current task; use the smallest adequate solution. If genuinely blocked on external access or user input, report the specific blocker rather than calling the task finished.
-3. **Deliver the finished task.** Integrate it into the local playable v2 build, run the relevant checks, commit its source changes, merge the completed task into local `main`, and identify the matching private generated assets. Keep the preview accessible with a stable launch command or local URL. A component that exists only in an isolated study is not a delivered improvement.
-4. **Report briefly and continue.** Give the commit, what improved, where it can be played, and any material limitation. Then choose the next task without waiting for routine approval. User messages steer the ongoing work.
-
-No scheduled end-of-batch review or elapsed-time stop is required. This is an ongoing goal; a completed task is a delivery, not completion of the entire goal. Continue until the user stops or redirects the work, or an actual external blocker prevents progress.
-
-## First task
-
-Establish a playable local v2 foundation from the best existing reconstruction, initially using the eastern courtyard/NIWA area as an accessible spawn. Reuse the existing game engine, saved artwork and compatible native worker.
-
-Remove old levels/progression from the v2 entry flow and provide free exploration with walking, throwing and recall. Use separate local v2 data while developing. Keep the current published game/data untouched until an explicitly authorized release. Preserve required engine behavior without preserving old level fixtures or migration compatibility.
-
-Done when the build opens directly into the v2 experience, the improved station is visible, the player can walk and throw through complete physical rest, recall works, and relevant browser/runtime checks pass. Commit and deliver that foundation before starting further station improvements.
-
-## Delivered foundation
-
-The first task is integrated in the local v2 build. `npm run dev:v2` uses the latest complete gate bank02 station, courtyard spawn, free walking/throwing/recall and a separate database. Asset identities are in `web/v2/assets.json`; launch instructions and verification commands are in `docs/LOCAL_PLAY.md`. Native and Chrome play-loop checks pass. The next task is the first courtyard/café improvement below.
-
-## Subsequent priorities
-
-Latest delivery: [Daruma ceiling and room illumination](notes/DARUMA-CEILING-V2.md) adds the pale shop ceiling, fitted equipment and a static capture lit by the authored shop fixtures. The realtime light pool stays at two. The corridor overhead task is deferred while the structural repair queue above is active.
-
-The [Daruma wall fittings](notes/DARUMA-WALL-FITTINGS-V2.md) adds the two photographed historical prints, dark dado, kickplate and upper service-wall joins.
-
-The [Daruma central table and circulation](notes/DARUMA-CENTRAL-TABLE-V2.md) adds the photographed communal table and a fitted eighteen-seat arrangement, moves the rear service area into the deeper footprint, and verifies a full native walking loop.
-
-The [Daruma Kyoto kitchen and counter](notes/DARUMA-KITCHEN-V2.md) uses a newly located firsthand Kyoto interior photograph to correct the counter finish and add pitchers, condiment pots, notices and serving-hatch equipment. The subsequent table pass corrects the communal dining area and circulation from the same photograph.
-
-The [Restaurant timber, counters and stools](notes/RESTAURANT-MATERIALS-V2.md) replaces flat shop finishes with aligned grain and upholstery, smooths the existing stool cylinders, and corrects Daruma’s washed-out local illumination. Geometry remains unchanged. The subsequent Kyoto-specific kitchen pass develops the serving opening and counter fittings; wall photographs remain unfinished.
-
-The [Daruma glazed shopfront and counter](notes/DARUMA-FRONTAGE-V2.md) replaces shop 4’s placeholder with its photographed glazed side, signs, entrance, ticket terminal and visible counter seating. Native routes, source correspondence, Chrome gameplay and bounded practical lighting pass. Its timber, counter and stool finishes are now integrated in the subsequent material pass.
-
-The [Kotetsu shopfront](notes/KOTETSU-FRONTAGE-V2.md) replaces shop 3’s solid placeholder with a photo-guided timber and metal frontage, original tiger screen, ticket terminal and usable doorway. Native doorway/aisle walks, saved-source correspondence and Chrome gameplay pass. Continue with the neighboring shopfront; the deeper dining room remains unfinished.
-
-The [restaurant entrance directories](notes/RESTAURANT-DISPLAYS-V2.md) add two framed displays with all ten current operator-listed shop names. The doorway stays clear and the artwork is integrated into the editable source. Continue with the interior shop frontage and photographed menu/display fittings.
-
-The [restaurant practical lighting](notes/RESTAURANT-LIGHTING-V2.md) connects seven existing aisle fixtures to the two-light pool. Warm light reveals the floor and nearby walls while the active light count stays fixed. Source and runtime checks pass. Next, build the entrance menu/display frontage from the saved photograph, with current operator information where text is needed.
-
-The [restaurant charcoal tile floor](notes/RESTAURANT-FLOOR-V2.md) adds narrow joints, material variation and a single local reflection capture. The collision geometry is unchanged; native gameplay and Chrome controls pass. Continue with the entrance frontage and the interior practical fixtures visible in the saved photograph.
-
-The [restaurant entrance lantern frame](notes/RESTAURANT-ENTRY-FRAME-V2.md) adds the photographed cream diffusers, dark crossbars and kickplates. Six native doorway walks and Chrome views pass. Its source is integrated into the same editable station.
-
-The western interior landing, Muromachi Square, fourteen Grand
-Stairway flights, northern banks, southern approach, restaurant and central
-Skyway are integrated into the current editable scene and playable bundle.
-Native route checks pass in both directions; source correspondence, Chrome
-controls and core gameplay checks pass. Evidence and remaining modeling limits
-are in [WESTERN-UPPER-CONNECTION-V2.md](notes/WESTERN-UPPER-CONNECTION-V2.md).
-Continue with the new upper route's finishes and lighting, inspecting exposed
-approach edges and railings before adding small decorations.
-
-The structural repair queue above supersedes the earlier finish/detail priorities. Record unrelated defects briefly and keep the current repair focused until it is delivered.
-
-## Keep iteration inexpensive
-
-- Start with the existing research and assets. Research only questions that materially affect the current task. If evidence remains ambiguous, record a plausible approximation once and continue where it is safe and visually credible; do not present inference as measurement.
-- Settle large forms and connections before polishing tiny fixtures. Refine camera calibration only when it changes a meaningful modeling decision. No required before/after pairs, comparison galleries or presentation packages. Inspect the current result in a real browser; retain screenshots only when useful for diagnosis or a brief update.
-- Preview changed components against cached station context. Reuse loaders/exporters before building infrastructure. Measure tool latency and remove repeated full-scene work from the inner loop where practical. Full exports belong at integration checkpoints, not every small edit.
-- Cache checks of unchanged sources by content hash. Preserve necessary provenance, visual/collision correspondence and asset identity without repeating exhaustive hash sweeps or exactness reports for unrelated content.
-- Track time spent in research, editing, export, verification and infrastructure at a useful coarse level. If one step repeatedly dominates, fix or avoid that specific cost within the task; do not start an open-ended tooling rewrite. Timing informs efficiency, not a deadline for abandoning unfinished work.
-- Work locally with the existing graphics setup. Do not restart GPU procurement, remote fleets or delegation without a new user instruction.
-
-## Required behavior and proportionate checks
-
-Old course placement checks, authored trajectories, progression and level-specific acceptance tests are retired v2 requirements. Remove obsolete expectations as the v2 flow/catalog replaces them. Do not reshape the station, tune hints or relocate old targets to keep them passing.
-
-Preserve the core engine invariants: authoritative outcomes, a shot finishing only after translation AND spin stop, recall forfeiture, and matching visible/colliding geometry for traversable and ball-contact surfaces. Small decorative details can remain noncolliding where appropriate.
-
-Run the repository's required checks for the files changed. Keep core runtime tests, replace obsolete level fixtures with v2 fixtures, and avoid record-creating production tests. Rebuild/restart the native worker for C# changes; geometry-only tasks can reuse a compatible worker.
-
-For each delivery, inspect the actual local game in Chrome and exercise the affected behavior: movement/camera, throwing/rest/recall, and changed escalators or collision boundaries. Use repeatable frame-time samples at fixed resolution and check music for stalls when rendering/audio changes warrant it. Reuse valid unchanged checks. Fix reproducible regressions introduced by the task. Reserve broad v2 campaign and long performance/audio soak checks for release candidates; short checks are not full-release acceptance.
-
-## Commits, assets and publication
-
-Make a bounded local commit for each completed task, with a concise explanation and validation. Keep original art and generated binaries/media out of Git as required by `docs/ASSETS.md`; record the current asset manifest/hash and retain the editable source. Keep the current bundle in `.local/v2/current/` and at most one temporary candidate. After the candidate passes, promote it and remove superseded full-scene exports, layouts and compiled builds. Keep original research, editable sources and small build receipts. Git holds source history; do not retain a full station export per commit. Merge each completed task into local `main` before beginning another. Reuse a suitable checkout; archive finished worktrees after preserving their required ignored assets and stopping their services.
-
-This retention rule also covers diagnostic copies such as `layout-used.json`, `probe-layout.json` and `preview.glb`, and graphical checkpoint builds under `artifacts/`. Moving them to an evidence folder does not make them necessary history. Retain the small report and source identity; remove the large superseded input/export once the current result is verified. Check checkout disk usage at delivery so duplication is caught during the task that creates it.
-
-“Deliver” means an integrated, checked, locally playable improvement and its commit. Local merges are authorized by the user’s iteration workflow. Push and production deployment require their own authorization. Do not pause for permission to continue ordinary implementation and local delivery within this goal.
+# Kyoto station simplification plan
+
+## Direction
+
+30 September 2026. Focus the game on Kyoto Station's connected public spaces:
+the atrium, its open upper and lower levels, the railway, and the outdoor spaces
+that belong to the station. Build the architecture that makes these spaces
+interesting to explore and throw a ball through.
+
+This plan supersedes the earlier expansion and decoration queues. The old goal
+is paused. The unfinished central planting candidate is set aside; it has not
+been merged into the playable build. The simplification is authorized. The first delivery is the forecourt boundary:
+retain the façades and tower, hide the city beyond, constrain the camera, and
+remove distant objects from the source and runtime together. See the
+[delivery record](notes/FORECOURT-BOUNDARY.md). Interior and elevator removal
+remain the next bounded task.
+
+## Scope rule
+
+Build the station's contiguous public airspace: spaces connected by open portals,
+stairs, ramps, escalators and public passages without opening doors or windows.
+Model the surfaces that bound that space and the public levels visible through
+its glazing. Closed doors and windows do not justify constructing inaccessible
+rooms, shafts or other hidden volumes behind them. Elevator doors remain only
+where their public-facing side is reachable within this continuous space.
+Upper restaurant interiors are an explicit
+exception: their fitouts are outside this scope even where the entrance is open.
+
+The proposed boundary for attached retail and hotel areas is their station-facing
+public circulation. Preserve a through-route when it connects two retained
+station spaces; omit deep retail floors, dining rooms, hotel rooms, parking and
+service areas. Door-free access does not extend the project into neighboring
+buildings or the surrounding city.
+
+| Area | Treatment |
+| --- | --- |
+| Central atrium and concourse | Keep and prioritize the full volume, roof, structural frame, stairs, balconies, bridges, floor openings and major finishes. |
+| Basement glazing and open wells | Keep the glass, frames, curved edges, visible lower levels and connected descents. Preserve real depth and sightlines through the glazing. |
+| Grand Stairway and upper public routes | Keep all connected landings, Muromachi Square, Skyway, East Square and other open terraces. Repair gaps and obstructions. |
+| Rooftop gardens | Keep the accessible garden, paths, guards and recognizable planting. Defer further leaf, planter and furniture refinement. |
+| Platforms and railway | Keep the station's platforms, tracks, canopies, concourses and their public connections, including the rear railway frontage. Operational trains and railway simulation are outside scope. |
+| Station entrances and outdoor edges | Keep north and south entrances, attached terraces and enough forecourt to approach and understand the building. End the world at clear station boundaries. |
+| Isetan and Granvia portions of the station | Keep the façades, roof and structural masses that enclose the atrium or define an outdoor station space. Keep needed public through-passages. Remove deep internal floors and fitouts. |
+| Shops, cafés and upper restaurants | Keep simple frontages and shallow visible backing where needed. Remove dining rooms, kitchens, merchandise, detailed counters and decorative fitouts from the playable export. Do not close a retained public passage to accomplish this. |
+| Elevators | Delete cars, shafts, machinery, controls and operating logic. Keep only closed doors and visible surrounds facing the contiguous public space, with matching surface collision. Do not retain or build an elevator enclosure behind them. |
+| Forecourt surroundings | Keep the façades that frame the north forecourt, including the Kyoto Tower building and circular tower. Keep matching ball collision on these visible surfaces. Hide the city behind that first building line with a soft fog boundary and prevent the camera moving beyond it. Remove distant city geometry, unrelated roads and off-station extensions such as Avanti. Do not build neighboring interiors. |
+
+An open doorway is not a reason to invent a room. A glazed boundary is not a
+reason to fill the view behind it with an opaque wall. Model visible depth where
+it contributes to the retained station, especially the basement beneath the
+atrium.
+
+## Delivery order
+
+### 1 Bound the station and forecourt
+
+Make a station boundary and a keep/remove list from the current editable scene,
+using object ownership, location and the existing plans. Separate station
+structure from neighboring buildings before deleting anything: the municipal
+source contains both, so removing every object named “municipal” would cut the
+station itself.
+
+Retain the forecourt-facing building line and Kyoto Tower as recognizable
+backdrop and bounce surfaces. Define a camera boundary behind that line, with
+fog concealing the cut and the city beyond. Apply the boundary to free flight,
+focus jumps, orbit, briefing and replay cameras. The tower must remain visible
+and usable for ball contact from inside the boundary. Remove the remaining
+outside buildings and off-station routes from the source, browser export and
+collision layout together. Keep entrance thresholds and attached
+outdoor circulation intact. Rebuild the export from retained objects so deleted
+geometry, textures and unused buffers disappear from the files as well as the
+screen. Fit exposed ends where removal would otherwise leave holes or floating
+slabs.
+
+**Done when:** the station and forecourt façades define the playable world;
+Kyoto Tower is retained with working ball collision; the city beyond the
+façades is hidden and cameras cannot escape the boundary; atrium, upper-route
+and platform access still work; removed buildings have no visible or invisible
+collision leftovers; one smaller current bundle replaces the old bundle.
+Commit and merge this removal before starting the next task.
+
+### 2 Remove unnecessary interiors and mechanisms
+
+Remove the deep restaurant, retail, hotel and parking branches listed above.
+Preserve useful station through-routes and the enclosing station shell. Reduce
+shopfronts to the detail visible from those routes. Do not build additional
+rooms to justify previous stair or elevator work.
+
+Delete elevator cars, shafts, machinery, interactions and UI. Retain only doors
+and visible surrounds that form a boundary of the contiguous public space,
+with collision on those surfaces. Remove the inaccessible volume behind them.
+Apply the same rule to other hidden rooms and service spaces.
+
+Keep stairs, ramps and escalators that serve the retained public circulation.
+If an area currently depends on an elevator, include it only if a real open
+public route connects it to the rest of the station; repair that route where
+needed. Otherwise omit the area. Do not invent a connection to preserve it.
+
+**Done when:** every retained area has a continuous walking route; there are no
+elevator-only destinations, dangling controls, empty shafts or corridors ending
+in arbitrary new walls. Removed destinations no longer appear in the live route
+queue or tests. Commit and merge.
+
+### 3 Make the atrium and basement the strongest part of the game
+
+Inspect the atrium at ground level, from its balconies, and through its basement
+glazing. Prioritize spatial errors: incorrect floor openings, opaque glass,
+missing lower floors, blocked views, broken stair connections, intersecting
+slabs and abrupt wall ends. Then improve the major glass, steel, stone and
+lighting treatments that make the space recognizable.
+
+Existing research records two broad curved basement wells and a smaller oval
+opening; preserve their distinct geometry while checking the current scene.
+The older research does not fully establish the oval's purpose. Do not invent
+an elevator or room to explain it. Resolve unclear details only when they affect
+the retained route or view.
+
+**Done when:** the atrium, open lower circulation and upper balconies read as a
+connected space from player height. The basement is visible through the intended
+glass; routes and ball-contact geometry agree with what the player sees.
+Deliver individual repairs as they are finished.
+
+### 4 Complete the railway and the station side facing it
+
+Audit the retained platform approaches, conventional tracks, terminal platforms,
+Shinkansen area and other railway spaces inside the station boundary. Correct
+missing or misleading connections, platform edges, canopy supports, bridges and
+views from the main building. Keep the track layout and rear station structure
+as major features. Stop at the station's railway extent; do not extend into a
+city or railway-network reconstruction.
+
+**Done when:** station concourses connect coherently to the retained platforms,
+tracks and canopies form a convincing railway space, and the back of the station
+has complete visible structure. Finish and merge one connected area at a time.
+
+### 5 Refine the connected upper outdoor spaces
+
+Walk the complete Grand Stairway, Skyway, East Square and garden routes. Repair
+remaining architectural gaps and confusing transitions first. Refine large
+surfaces, glazing, sightlines and distinctive fixtures next. Detailed planting,
+furniture and shop decoration follow only when they materially improve one of
+these spaces.
+
+## Keep the build small
+
+The current playable bundle at commit `fbb61e8` was inspected for this plan:
+
+| Measured item | Current value |
+| --- | ---: |
+| Layout JSON | 524,904,895 bytes, about 501 MiB |
+| Browser station GLB | 279,111,436 bytes, about 266 MiB |
+| Serialized mesh definitions | 2,423 |
+| Material definitions | 1,098 |
+| Lift definitions | 15 |
+| Escalator definitions | 48 |
+
+These are file sizes and asset counts, not frame-rate measurements. The unfinished
+planting export exceeded JavaScript's single-string limit. Its proposed shared
+vertex change passed a geometry check, but has not passed runtime or source
+integration and is not part of the playable bundle. Reassess whether it is still
+needed after the removal pass instead of making it another active project.
+
+The current append pipeline retains earlier binary buffers when retiring
+geometry. Hiding objects or removing their indices alone will not recover all
+that storage. The simplification must produce a compact export containing only
+the retained station and assets it uses. Share repeated geometry and materials,
+avoid duplicating decorative vertices in collision data, and keep render-only
+detail out of physics where appropriate.
+
+Record the resulting file sizes, load time and representative frame times.
+Measure performance in Chrome on this laptop without simultaneous heavy Blender
+work. Do not assume elevators or surrounding buildings are the largest runtime
+cost until the measurements show it.
+
+## Verification and iteration
+
+Each task gets one concrete outcome, one temporary candidate, relevant checks,
+a local commit and a merge into `main`. Keep one current editable source and
+playable bundle. Remove superseded generated exports after promotion; use Git
+for code history and keep existing research references without copying them.
+Set aside unfinished source changes safely before the first removal, without
+creating another complete station copy.
+
+Use a small set of representative routes: entrance through the atrium and its
+basement, Grand Stairway to the garden and Skyway, and concourse to platforms and
+the rear station side. Test the routes affected by each change in the native
+runtime and Chrome. Check representative views through glass, support at edges,
+and ball collisions; preserve full translation-and-spin rest and recall
+forfeiture. Retire elevator-operation and removed-room checks. Keep the repository's
+required build and code checks for the files actually changed.
+
+Research only a concrete route, structural or material uncertainty in the task
+in progress. Do not resume old room, elevator or surrounding-city checklists.
+Deliver brief notes on the change and its checks; no before/after gallery is
+required. Push and deployment remain separate from local delivery.
+
+## References
+
+The operator's [floor guide](https://www.kyoto-station-building.co.jp/floorguide/)
+and [directions](https://www.kyoto-station-building.co.jp/directions/) remain the
+starting points for public-route research. Their plans guide connections; they
+do not define this game's scope or provide survey dimensions.
+
+Use the existing [central hall basement research](notes/CENTRAL-HALL-BASEMENT.md),
+[basement video inspection](notes/BASEMENT-360-INSPECTION.md),
+[atrium to garden route](notes/ATRIUM-GARDEN-ROUTE-V2.md) and
+[western platform notes](notes/WESTERN-PLATFORMS-V2.md) where relevant. Previous
+delivery notes are evidence of past work, not instructions to keep expanding it.
+
+## Replacement goal statement
+
+Iteratively simplify and improve Kyoto Station's connected indoor and outdoor
+public spaces, prioritizing the atrium, basement glazing, railway and open routes
+to the upper terraces and gardens; retain the forecourt façades and Kyoto Tower
+inside a fogged camera boundary, remove the city beyond them, unnecessary
+interiors and elevator systems including shafts, retaining only doors and
+surrounds that bound the contiguous public airspace, and finish, verify, commit
+and merge each useful change into one compact playable build before starting
+the next.

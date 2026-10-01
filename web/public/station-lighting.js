@@ -28,28 +28,10 @@ export function createDiningCaptureLighting(authoredLights){
   return group;
 }
 
-export function stationDaylightTexture(){
-  const width=256,height=128,pixels=new Uint16Array(width*height*4);
-  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
-    const elevation=Math.cos(y/(height-1)*Math.PI),azimuth=x/width*Math.PI*2;
-    const up=Math.max(0,elevation),haze=Math.pow(1-up,4);
-    // Original low-frequency cloud bands, periodic in azimuth. These provide
-    // broad exterior reflection structure, not an invented station/city photo.
-    const cloud=Math.max(0,Math.sin(azimuth*3+up*14)+.45*Math.sin(azimuth*7-up*19)-.75)*.22*Math.sin(Math.PI*up);
-    const sky=[.24+.8*haze+cloud,.48+.65*haze+cloud,.78+.48*haze+cloud];
-    const rgb=elevation>=0?sky:[.21,.24,.23];
-    const p=(y*width+x)*4;for(let c=0;c<3;c++)pixels[p+c]=THREE.DataUtils.toHalfFloat(rgb[c]);pixels[p+3]=THREE.DataUtils.toHalfFloat(1);
-  }
-  const texture=new THREE.DataTexture(pixels,width,height,THREE.RGBAFormat,THREE.HalfFloatType);
-  texture.name='K026 original daylight radiance';texture.colorSpace=THREE.LinearSRGBColorSpace;
-  // Equirectangular v=1 is zenith; row zero was generated as the upper sky.
-  texture.flipY=true;texture.mapping=THREE.EquirectangularReflectionMapping;texture.magFilter=THREE.LinearFilter;texture.minFilter=THREE.LinearFilter;texture.needsUpdate=true;
-  return texture;
-}
-
 export function configureStationDaylight(renderer,scene,sun){
   renderer.toneMappingExposure=1.0;
-  scene.background=stationDaylightTexture();scene.fog=new THREE.Fog(0xc1d0d7,195,440);
+  scene.fog=new THREE.Fog(0xc1d0d7,195,440);
+  scene.background=scene.fog.color.clone();
   for(const light of scene.children)if(light.isHemisphereLight){light.color.set(0xcbddeb);light.groundColor.set(0x8b8b7e);light.intensity=.78;}
   // Keep the accepted fixed sun direction/footprint; deepen shelter by reducing
   // uniform fill, while localized station irradiance restores its readable bounce.

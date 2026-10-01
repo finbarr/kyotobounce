@@ -185,7 +185,7 @@ export function dressStation(renderer,scene,sun,station,data){
       for(const light of scene.children)if(light.isHemisphereLight)light.intensity=enabled?.36:.78;
       renderer.toneMappingExposure=enabled?.88:1;
       if(scene.background?.isTexture)scene.background.dispose();
-      if(enabled){scene.background=new THREE.Color(0x101d32);scene.fog.color.set(0x28374a);}
+      if(enabled){scene.fog.color.set(0x28374a);scene.background=scene.fog.color.clone();}
       else configureStationDaylight(renderer,scene,sun);
     },
     dispose(){textures.dispose();reflections.dispose();installations.dispose();scene.background?.dispose?.();},

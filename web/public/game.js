@@ -4,6 +4,7 @@ import {levelEntryAim} from './level-entry.js';
 import {levelIdFromPath} from './level-links.js';
 import {freezeStaticTransforms} from './static-transforms.js';
 import {FlyCamera,flyTargets} from './fly-camera.js';
+import {StationBoundary} from './station-boundary.js';
 import {CameraObstacles,easeCameraClearance} from './camera-obstacles.js';
 import {replayIdFromPath} from './replay-links.js';
 import {playerName} from './player-name.js';
@@ -51,7 +52,9 @@ const sun=new THREE.DirectionalLight(0xfff0d5,3.1);sun.position.set(-40,100,-50)
 const aimCamera=new THREE.PerspectiveCamera(55,document.documentElement.clientWidth/document.documentElement.clientHeight,.035,450);
 const ballCamera=aimCamera.clone();
 let camera=aimCamera;
+const boundary=new StationBoundary();
 const fly=new FlyCamera(aimCamera),scoutTargets=flyTargets();
+fly.setBoundary(boundary);
 const toThree=p=>new THREE.Vector3(p.x,p.y,-p.z);
 const ball=new THREE.Mesh(new THREE.SphereGeometry(.023,24,16),new THREE.MeshStandardMaterial({color:0xf1673d,roughness:.42,metalness:.04}));
 for(const axis of [0,1]){const ring=new THREE.Mesh(new THREE.TorusGeometry(.0231,.0012,6,48),new THREE.MeshStandardMaterial({color:0x34252c,roughness:.65,transparent:true,depthWrite:false}));ring.rotation.x=axis*Math.PI/2;ball.add(ring);}scene.add(ball);
@@ -393,7 +396,7 @@ function sendInput(){if(names?.active||briefing?.blocked||!workerReady||!loaded|
 setInterval(sendInput,1000/30);
 
 function createAvatar(id){
-  const avatar=makeAvatar(robotAsset,{character:id===guestId||ui?.state.mode==='replay'?characterChoice:'ori'});scene.add(avatar.group);avatars.set(id,avatar);return avatar;
+  const avatar=makeAvatar(robotAsset,{character:id===guestId||ui?.state.mode==='replay'?characterChoice:'ori'});scene.add(avatar.group);boundary.applyFog(avatar.group);avatars.set(id,avatar);return avatar;
 }
 
 async function load(){
@@ -427,6 +430,7 @@ async function load(){
     cameraObstacles.addDynamicMeshes(lifts.parts.map(p=>p.mesh));
     startup.progress(90,'Lighting the glass, stone and steel…');await yieldLoadingUI();
     stationLook=dressStation(renderer,scene,sun,station,data);
+    boundary.applyFog(scene);
     await yieldLoadingUI();stationLook.updateLights(camera.position,0);
     stationLook.captureEnvironment();
     if(data.stationInstallations){
@@ -695,6 +699,8 @@ function animate(now){
   camera.updateMatrixWorld();
   briefing.update(camera,dt);
   if(fly.active){fly.move(keys,dt,{spaceAscends:!replaying,movement:mobile.movement});camera=fly.camera;}
+  // All camera paths share the same world limit, including briefing and replay.
+  boundary.constrain(camera.position);camera.updateMatrixWorld();
   // Keep the followed subject in the unobstructed scene, not behind the score rail.
   if(replayViewport)camera.setViewOffset(innerWidth,innerHeight,innerWidth/2-replayViewport.x-replayViewport.width/2,innerHeight/2-replayViewport.y-replayViewport.height/2,innerWidth,innerHeight);
   else if(fly.active&&camera.view?.enabled)camera.clearViewOffset();
