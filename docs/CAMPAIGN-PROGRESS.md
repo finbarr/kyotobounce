@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**28 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**29 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -86,6 +86,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 26. Grand Descent | 2 / 2, stair landing, square, balcony and lower-passage targets across a 25.4 m descent | 6 / 6: ±0.5° yaw/pitch, full charge minus 10/20 ms; every sample collected all four targets and rested | First attempt cleared at 847,747 points; overview, full backspin hint, movement/home, saved replay, scrub and retry passed |
 | 27. Skyway Circuit | 2 / 2, three glass banks and a final deck target in the high gallery | 6 / 6: ±0.25° yaw/pitch, full charge minus 10/20 ms; every sample collected all four targets and rested | First attempt cleared at 827,652 points; overview, readable glass patches, complete hint, movement/home, saved replay, scrub and retry passed |
 | 28. Tower Return | 2 / 2, tower shaft bank and two return patches across the forecourt | 6 / 6: ±0.25° yaw/pitch, ±8 ms charge; every sample collected all three targets and rested | First attempt cleared at 412,889 points; tall-route overview, POWER hint, movement/home, saved replay, scrub and retry passed |
+| 29. Passage Rebound | 2 / 2, three wall banks and a return-ramp target in the eastern public passage | 6 / 6: ±0.25° yaw/pitch, ±6 ms charge; every sample collected all targets and rested on the upper public floor | First attempt cleared at 833,575 points; overview, complete backspin/POWER hint, movement/home, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -611,7 +612,55 @@ checks pass target collection, authoritative score/replay parity, full rest,
 completion, leaderboard placement and recall forfeiture. Proof hashes match
 the current catalog and inputs.
 
-**Next: author level 29**, continuing the finale chapter in the existing
+Level 29, **Passage Rebound**, uses the eastern public passage at elevation
+30.29 m. A 28 m/s POWER shot with 12° upward aim and −80 backspin banks along
+both side walls, turns off the end wall and returns onto the ramp. Its recorded
+route measures 89.6 m. The wall targets have radii 0.45, 0.65 and 0.55 m;
+the ramp target has a 0.70 m radius. The second circle sits above the handrail.
+
+Both exact proofs collect all four targets and reach full translation and spin
+rest in 36.68 seconds. All six nearby inputs clear and rest in 14.79–39.28 seconds.
+Every finish is on the upper public floor. Native placement validates each
+whole circle on its face. Evidence is under `.local/campaign/east-passage/`.
+
+Chrome clears first try at 833,575 points. Overview, the complete hint,
+movement/home, saved replay, scrub and retry pass, including independent replay
+score parity. No music steps are skipped before or during the shot, and no page
+errors occur. The final-flight sample has 16.7 ms median/p95 frames. Across the
+recorded flight windows, p95 is 17 ms except for one 33 ms window; none has long
+tasks or playback underruns. A 1.85-second cold-entry task remains recorded for
+the final stability audit.
+
+### Passage threshold repair
+
+The nearby-shot tests exposed a 5 cm unsupported gap beneath the recessed clinic
+doors. A ball could roll beyond the corridor floor and fall onto geometry below.
+Three flush thresholds now bridge the gap under the existing closed doors.
+They add 36 triangles; existing panels, other native records, materials, lights,
+moving hardware and encoded browser geometry stay unchanged.
+
+`web/station/realism/repair-passage-thresholds.mjs` builds matching native and
+browser additions. `install-atrium-details.py` installs those exact panels into
+the editable Blender source and verifies the saved meshes and embedded layout.
+The formerly falling input now rests on the public floor. The proof also
+requires every variation to finish no more than 0.4 m below its starting floor.
+No physics forces or rest conditions changed.
+
+The scope audit checks 262 saved native shots across all 28 earlier courses.
+None of their trajectory bounds intersects any threshold with a 0.5 m margin.
+Existing course inputs and targets are retained; their layout bindings advance
+with the matched station. Geometry, source, native regression, browser and scope
+receipts remain in the single local campaign evidence directory and threshold
+component. The full catalog audit remains due after level 30.
+
+Typecheck, unit tests and the browser build pass. Local service checks pass
+scoring, saved replays, completion and recall forfeiture. Exploration and the
+player-created course flow also pass, including tamper rejection. The verified
+candidate replaces the current bundle; its temporary full assets are removed.
+The restarted preview reports the exact layout used by the native and Chrome
+proofs. No release, asset pack or production change is published.
+
+**Next: author level 30**, completing the finale chapter in the existing
 connected station spaces and retained forecourt. Finish its native proof,
 nearby variations, Chrome playtesting and local merge before the next level.
 

@@ -1,6 +1,6 @@
 {
-  "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
-  "sourceLayout": "4c9fc3592f25bdaa7b240e62681845cb74d62e27f61b990a714083b5dee9415b",
+  "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
+  "sourceLayout": "c5725f8214e3c02d3c86fff9ad12badb18fecb24c6df991ce8fa88d5f126d777",
   "targetCount": 30,
   "courses": [
     {
@@ -2579,6 +2579,96 @@
       "features": {
         "minNonFloorTargets": 1,
         "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "passage-rebound",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 773.8693467336683,
+        "range": "full",
+        "input": {
+          "yaw": 105,
+          "pitch": 12,
+          "top": -80,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 773.8693467336683,
+          "range": "full",
+          "input": {
+            "yaw": 104.75,
+            "pitch": 12,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 773.8693467336683,
+          "range": "full",
+          "input": {
+            "yaw": 105.25,
+            "pitch": 12,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 773.8693467336683,
+          "range": "full",
+          "input": {
+            "yaw": 105,
+            "pitch": 11.75,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 773.8693467336683,
+          "range": "full",
+          "input": {
+            "yaw": 105,
+            "pitch": 12.25,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 767.8693467336683,
+          "range": "full",
+          "input": {
+            "yaw": 105,
+            "pitch": 12,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 779.8693467336683,
+          "range": "full",
+          "input": {
+            "yaw": 105,
+            "pitch": 12,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 3,
+        "minSharpTurns": 1,
+        "minFinishRise": -0.4
       }
     }
   ]

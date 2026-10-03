@@ -4,7 +4,7 @@
     "revision": 1,
     "name": "First Bounce",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -82,7 +82,7 @@
     "revision": 1,
     "name": "Blue Wall Bank",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -160,7 +160,7 @@
     "revision": 1,
     "name": "Clock In",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -238,7 +238,7 @@
     "revision": 1,
     "name": "Ticket Slalom",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -331,7 +331,7 @@
     "revision": 1,
     "name": "Glass Return",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -422,7 +422,7 @@
     "revision": 1,
     "name": "Basement Drop",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -500,7 +500,7 @@
     "revision": 1,
     "name": "Pier Pressure",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -593,7 +593,7 @@
     "revision": 1,
     "name": "Ceiling Skip",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -686,7 +686,7 @@
     "revision": 1,
     "name": "Upward Bound",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -765,7 +765,7 @@
     "revision": 1,
     "name": "Glass Loop",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -858,7 +858,7 @@
     "revision": 1,
     "name": "Bridge Pinball",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -951,7 +951,7 @@
     "revision": 1,
     "name": "Step Down",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1044,7 +1044,7 @@
     "revision": 1,
     "name": "Terrace Triple",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1152,7 +1152,7 @@
     "revision": 1,
     "name": "Timber Turn",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1258,7 +1258,7 @@
     "revision": 1,
     "name": "Promenade Pinball",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1366,7 +1366,7 @@
     "revision": 1,
     "name": "Stair Skip",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1459,7 +1459,7 @@
     "revision": 1,
     "name": "Soft Landing",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1550,7 +1550,7 @@
     "revision": 1,
     "name": "Garden Corner",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1658,7 +1658,7 @@
     "revision": 1,
     "name": "Planter Skip",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1764,7 +1764,7 @@
     "revision": 1,
     "name": "Rooftop Circuit",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1887,7 +1887,7 @@
     "revision": 1,
     "name": "Platform Zero",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -1995,7 +1995,7 @@
     "revision": 1,
     "name": "Column Switchback",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -2103,7 +2103,7 @@
     "revision": 1,
     "name": "Canopy Crossing",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -2211,7 +2211,7 @@
     "revision": 1,
     "name": "Platform Descent",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -2319,7 +2319,7 @@
     "revision": 1,
     "name": "Underpass Circuit",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -2455,7 +2455,7 @@
     "revision": 1,
     "name": "Grand Descent",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -2578,7 +2578,7 @@
     "revision": 1,
     "name": "Skyway Circuit",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -2701,7 +2701,7 @@
     "revision": 1,
     "name": "Tower Return",
     "creator": "station",
-    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
     "physics": "kyoto-p3-3",
     "scoring": "waypoint-v4",
     "start": {
@@ -2782,6 +2782,129 @@
       "difficulty": "Expert",
       "distance": 226,
       "brief": "Send a high arc onto Kyoto Tower, then bring it back across two forecourt targets. The shaft patch sits nearly 59 metres above the launch pad."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
+  },
+  {
+    "id": "passage-rebound",
+    "revision": 1,
+    "name": "Passage Rebound",
+    "creator": "station",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 137,
+        "y": 30.293458938598633,
+        "z": -19.899999618530273
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "east-square-hall-passage-floor-2"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 142.7818603515625,
+          "y": 32.79907989501953,
+          "z": -21.700002670288086
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "radius": 0.44999998807907104,
+        "surface": "east-square-hall-clinic-wall-2",
+        "id": "outbound-wall"
+      },
+      {
+        "center": {
+          "x": 158.0634307861328,
+          "y": 32,
+          "z": -18.100000381469727
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": -0.9999999403953552
+        },
+        "radius": 0.6499999761581421,
+        "surface": "east-square-hall-passage-north",
+        "id": "opposite-wall"
+      },
+      {
+        "center": {
+          "x": 165.30001831054688,
+          "y": 30.8984375,
+          "z": -19.821741104125977
+        },
+        "normal": {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.550000011920929,
+        "surface": "east-square-hall-east-end",
+        "id": "end-bank"
+      },
+      {
+        "center": {
+          "x": 159.80059814453125,
+          "y": 30.15842628479004,
+          "z": -19.984058380126953
+        },
+        "normal": {
+          "x": 0.049937617033720016,
+          "y": 0.9987522959709167,
+          "z": 0
+        },
+        "radius": 0.699999988079071,
+        "surface": "east-square-hall-passage-floor-3",
+        "id": "return-ramp"
+      }
+    ],
+    "hint": {
+      "yaw": 105,
+      "pitch": 12,
+      "top": -80,
+      "kick": 0,
+      "powerRange": "full",
+      "holdMs": 773.8693467336683,
+      "note": "Apply H for 12° upward aim and −80 backspin in POWER mode. Release at the white 28.0 m/s mark. Bank both side walls, turn off the end wall and collect the return-ramp patch. Let the ball reach full rest."
+    },
+    "order": 28,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Station Finales",
+      "difficulty": "Expert",
+      "distance": 89.6,
+      "brief": "Three wall banks at the eastern end of the public passage. Clear the ramp rail, turn off the end wall and bounce back onto the sloping floor."
     },
     "throwModel": "robot-v4",
     "allowedInputs": {

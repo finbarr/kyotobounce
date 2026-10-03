@@ -70,7 +70,7 @@ async function run(slot){
    }
    if(features?.minFinishRise){
     receipt.finishRise=result.poses.at(-1).p.y-challenge.start.center.y;
-    assert.ok(receipt.finishRise>=features.minFinishRise,'The ball must finish on the upper level');
+    assert.ok(receipt.finishRise>=features.minFinishRise,'The ball must finish at the required height relative to its start');
    }
    if(features&&kind==='hint'){
     const nonFloor=result.waypointHits.filter(h=>h.normal.y<.5);
