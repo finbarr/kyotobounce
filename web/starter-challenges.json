@@ -76,5 +76,83 @@
         200
       ]
     }
+  },
+  {
+    "id": "atrium-blue-bank",
+    "revision": 1,
+    "name": "Blue Wall Bank",
+    "creator": "station",
+    "layout": "fe661f4a2c98891d7d00f9a3be27aac31888b94d40eb518245834d22ac1c4116",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v3",
+    "start": {
+      "center": {
+        "x": -29,
+        "y": 0,
+        "z": -5.200000762939453
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.45,
+      "surface": "concourse"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -33.099998474121094,
+          "y": 1.380285382270813,
+          "z": -4.980000972747803
+        },
+        "normal": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.6499999761581421,
+        "surface": "central-lift-ground-front-south-joined",
+        "id": "blue-wall"
+      }
+    ],
+    "hint": {
+      "yaw": -90,
+      "pitch": 15,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 1826,
+      "powerRange": "precision",
+      "note": "Bank the purple patch on the blue west frontage. Use 8.0 m/s and a slight upward aim, then let the rebound settle anywhere."
+    },
+    "order": 1,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "Atrium Beginnings",
+      "difficulty": "Easy",
+      "distance": 59,
+      "brief": "Turn the atrium wall into your first bank. Hit the purple wall patch and watch the ball rebound across the hall."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

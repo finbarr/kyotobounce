@@ -19,6 +19,17 @@ asset pack to verify these levels or attempt a deployment.
 
 ## Native proof
 
+Record a scouting shot through the already-running local service:
+
+```sh
+node web/levels/record-shot.mjs .local/campaign/input.json .local/campaign/capture.json
+```
+
+The input contains `start: {x,y,z}` and `hint: {yaw,pitch,top,kick,powerRange,holdMs}`.
+The receipt contains native contacts, the recorded path and the actual server
+charge duration. Choose course targets from those contacts, then use the proof
+runner to repeat the intended hint and measure nearby inputs.
+
 ```sh
 KYOTO_WORKER_EXECUTABLE='/absolute/path/to/compatible/worker' \
   npm run test:campaign -- .local/campaign/proof

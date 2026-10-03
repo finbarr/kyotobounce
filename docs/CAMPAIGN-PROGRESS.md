@@ -30,12 +30,13 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**1 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**2 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
 | --- | --- | --- | --- |
 | 1. First Bounce | 2 / 2, full translation and spin rest | 6 / 6: ±15° yaw, ±5° pitch, 2.0–3.6 m/s | First attempt cleared; overview, movement/home, hint, result and saved replay passed |
+| 2. Blue Wall Bank | 2 / 2, including a sharp wall rebound | 6 / 6: ±5° yaw, ±5° pitch, 7.5–8.5 m/s | First attempt cleared; visible wall patch, overview, hint and replay passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved 32,120 authoritative points; its
@@ -51,9 +52,17 @@ fresh/returning entry and creator recording, tamper rejection and cancellation.
 The proof runner and runtime tests now use the rebuilt station and new catalog.
 Old campaign preservation checks, proof inputs and audit claims were replaced.
 
-**Next: level 2**, a readable single wall bank inside the atrium. Start by scouting
-the existing west frontage or ticket-gate structures and recording a native shot;
-choose the target from an actual rebound. No new room or geometry is needed.
+Level 2 uses a 0.65 m radius patch entirely on the existing blue west frontage.
+The exact 8.0 m/s hint travels 59.0 m and settles after 29.46 seconds. Chrome
+banked 43,565 points on its first attempt, with a 16.7 ms median frame time,
+112 BPM music, no skipped music steps and no page errors. Native and browser
+receipts are in `.local/campaign/blue-bank-proof/` and
+`.local/campaign/blue-bank-browser/`. Returning-player and creator-return checks
+also passed with the two-level catalog. No station geometry changed.
+
+**Next: level 3**, an upward bank on an existing ticket-gate fixture, preferably
+the mounted clock. Scout it from the atrium floor and record the actual impact;
+keep the hint and target tolerant enough for this early campaign stage.
 
 Before final acceptance, remove any remaining standalone retired-level probes
 under `web/tests/` rather than adapting their old course IDs or routes.
