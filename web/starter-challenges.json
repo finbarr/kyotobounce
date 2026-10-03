@@ -1146,5 +1146,111 @@
         200
       ]
     }
+  },
+  {
+    "id": "wood-square-timber-turn",
+    "revision": 1,
+    "name": "Timber Turn",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 7,
+        "y": 19.610965728759766,
+        "z": -27
+      },
+      "normal": {
+        "x": 0,
+        "y": 0.9999999403953552,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "add-wood4f-turf"
+    },
+    "goal": {
+      "center": {
+        "x": 2.3783926963806152,
+        "y": 19.610965728759766,
+        "z": -29.6177978515625
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.75,
+      "surface": "add-wood4f-turf"
+    },
+    "waypoints": [
+      {
+        "center": {
+          "x": 5.840000152587891,
+          "y": 20.31599998474121,
+          "z": -30.5
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "radius": 0.25,
+        "surface": "add-wood4f-timber-play",
+        "id": "timber-bank"
+      },
+      {
+        "center": {
+          "x": 4.199999809265137,
+          "y": 19.93000030517578,
+          "z": -24.549999237060547
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        "radius": 0.30000001192092896,
+        "surface": "add-wood4f-column-6-6-0",
+        "id": "column-return"
+      }
+    ],
+    "hint": {
+      "yaw": -165,
+      "pitch": 0,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 1826,
+      "note": "Use 8.0 m/s precision power, a level aim and no spin. Bank the triangular timber structure, skip across the turf and hit the purple column base. The returning roll can settle in the gold circle for a landing bonus."
+    },
+    "order": 13,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Above the Atrium",
+      "difficulty": "Medium",
+      "distance": 16.3,
+      "brief": "Play two banks across Wood Square: the timber triangle, then the column base. Bring the ball back onto the turf for the gold landing bonus."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

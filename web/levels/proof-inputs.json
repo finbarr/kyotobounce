@@ -1212,6 +1212,95 @@
         "minSharpTurns": 1,
         "minHeightDrop": 8
       }
+    },
+    {
+      "id": "wood-square-timber-turn",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 1826,
+        "range": "precision",
+        "input": {
+          "yaw": -165,
+          "pitch": 0,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -165.5,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -164.5,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -165,
+            "pitch": -0.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -165,
+            "pitch": 0.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 1806,
+          "range": "precision",
+          "input": {
+            "yaw": -165,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 1846,
+          "range": "precision",
+          "input": {
+            "yaw": -165,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 2
+      }
     }
   ]
 }

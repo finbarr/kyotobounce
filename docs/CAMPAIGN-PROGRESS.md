@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**13 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**14 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -71,6 +71,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 11. Bridge Pinball | 2 / 2, opposite glass-pane banks above the ticket hall | 6 / 6: ±1° yaw/pitch, ±40 ms charge; every sample rested | First attempt cleared; chapter selection, unobstructed aiming, overview and replay controls passed |
 | 12. Step Down | 2 / 2, sloping ceiling bank and 3.03 m drop to a stair tread | 6 / 6: ±1° yaw, ±0.5° pitch, 11.6–12 m/s; every sample rested | First attempt cleared; cutaway shows the start and both patches, replay and retry passed |
 | 13. Terrace Triple | 2 / 2, ledge bounce, 8.85 m descent and return-wall bank | 6 / 6: ±0.25° yaw, ±0.5° pitch, ±12 ms charge; every sample rested | First attempt cleared all three targets; overview, hint, saved replay, scrub and retry passed |
+| 14. Timber Turn | 2 / 2, timber and column banks with a return landing bonus | 6 / 6: ±0.5° yaw/pitch, ±20 ms charge; every sample earned the bonus at full rest | First attempt earned the landing bonus; visible timber patch, overview and saved replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -250,9 +251,25 @@ steps and no page errors. Service scoring/replay/completion/recall, typecheck,
 unit tests and browser build pass. Evidence: `.local/campaign/balcony-drop/`.
 Station geometry and native physics are unchanged.
 
-**Next: author level 14**, using another connected upper public walkway for a
-distinct bank or rail-gap shot. Finish native proof, nearby variations, Chrome
-playtesting and the local merge before level 15.
+Level 14 uses the public Wood Square at 19.61 m. A level 8.0 m/s shot hits a
+0.25 m patch on the triangular timber play structure, skips across the turf and
+banks a 0.30 m patch on the column base. Its return roll finishes in a 0.75 m
+gold circle. Both patches pass native face and ball-clearance validation. The
+16.3 m recorded route rests in 11.93 seconds; all six neighbors collect both
+targets, earn the landing bonus and rest in 11.86–12.04 seconds. Native proof
+confirms sharp turns at both marked contacts.
+
+Chrome earns the landing bonus first try at 431,143 points. The timber patch is
+visible while aiming; the overview shows both targets and the return circle.
+Movement/home, hint, saved replay, scrub and retry pass. Sampled median/p95
+frames are 16.7/16.8 ms, with zero skipped music steps and no page errors.
+Service scoring/replay/completion/recall, typecheck, unit tests and browser build
+pass. Evidence: `.local/campaign/wood-square/`. Station geometry and native
+physics are unchanged.
+
+**Next: author level 15**, closing the upper-walkway chapter with a distinct
+route through existing station fixtures. Finish native proof, nearby variations,
+Chrome playtesting and the local merge before moving to the grand staircase.
 
 ## Floor repair
 
@@ -298,6 +315,13 @@ These rest checks supersede the earlier authoring timings above.
   the final run had none throughout. The cause remains unprofiled; include
   sloped-ceiling cutaway transitions in the final stability pass. Receipt:
   `.local/campaign/step-down/cold-view-note.json`.
+- A rejected Wood Square scout from `(6.5, 19.61, -27)` at yaw −165°, pitch 0°,
+  1,826 ms precision charge left the square and failed to rest within 100 seconds.
+  It ended the observation near `(8.33, -1.38, -44.02)` with 5,431 overlap
+  recoveries against a railway subgrade surface. Diagnose this off-route case
+  during the platform/final runtime audit; a timeout must never finish a shot.
+  The selected level starts at x = 7 and all its tested variations remain on the
+  square. Receipt: `.local/campaign/wood-square/rejected-route.json`.
 
 Before final acceptance, remove any remaining standalone retired-level probes
 under `web/tests/` rather than adapting their old course IDs or routes.
