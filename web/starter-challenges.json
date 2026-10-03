@@ -1989,5 +1989,113 @@
         200
       ]
     }
+  },
+  {
+    "id": "column-switchback",
+    "revision": 1,
+    "name": "Column Switchback",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 32.559993743896484,
+        "y": 0,
+        "z": -35.20000076293945
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "concourse"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 35.99787139892578,
+          "y": 0.3720875680446625,
+          "z": -38.97200012207031
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": 0.9999999403953552
+        },
+        "radius": 0.10000000149011612,
+        "surface": "platform-zero-canopy-column-20",
+        "id": "column-bank"
+      },
+      {
+        "center": {
+          "x": 46.26664733886719,
+          "y": 0.5,
+          "z": -21.950422286987305
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        "radius": 0.44999998807907104,
+        "surface": "south-concourse-lower-east-body",
+        "id": "station-wall"
+      },
+      {
+        "center": {
+          "x": 48.464027404785156,
+          "y": 0,
+          "z": -24.803298950195312
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.8999999761581421,
+        "surface": "concourse",
+        "id": "return-floor"
+      }
+    ],
+    "hint": {
+      "yaw": 135,
+      "pitch": 15,
+      "top": -100,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 1583,
+      "note": "Use 7.0 m/s precision power, 15° upward aim and 100 backspin. Catch the narrow canopy column, bank the station wall, then collect the floor patch on the return. Wait for full translation and spin rest."
+    },
+    "order": 21,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Platforms & Tracks",
+      "difficulty": "Hard",
+      "distance": 43.7,
+      "brief": "Clip the narrow canopy column, cross back toward the station wall and collect the final floor patch on the return."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

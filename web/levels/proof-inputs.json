@@ -1953,6 +1953,95 @@
         "minCeilingRebounds": 1,
         "minFinishRise": -0.05
       }
+    },
+    {
+      "id": "column-switchback",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 1583,
+        "range": "precision",
+        "input": {
+          "yaw": 135,
+          "pitch": 15,
+          "top": -100,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 1583,
+          "range": "precision",
+          "input": {
+            "yaw": 134.75,
+            "pitch": 15,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1583,
+          "range": "precision",
+          "input": {
+            "yaw": 135.25,
+            "pitch": 15,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1583,
+          "range": "precision",
+          "input": {
+            "yaw": 135,
+            "pitch": 14.75,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1583,
+          "range": "precision",
+          "input": {
+            "yaw": 135,
+            "pitch": 15.25,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1573,
+          "range": "precision",
+          "input": {
+            "yaw": 135,
+            "pitch": 15,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1593,
+          "range": "precision",
+          "input": {
+            "yaw": 135,
+            "pitch": 15,
+            "top": -100,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 2
+      }
     }
   ]
 }

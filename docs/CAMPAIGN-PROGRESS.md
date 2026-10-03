@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**21 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**22 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -79,6 +79,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 19. Planter Skip | 2 / 2, low planter bank and return patch followed by full rest in the gold ring | 6 / 6: ±1° yaw/pitch, ±20 ms charge; every sample earned the bonus | First attempt earned the bonus; garden overview, visible patches, hint and saved replay controls passed |
 | 20. Rooftop Circuit | 2 / 2, concrete and glass banks, outward/return floor patches and full rest on the garden level | 6 / 6: ±0.5° yaw/pitch, ±10 ms charge; every sample collected all four targets | First attempt cleared; four-target overview, complete hint, saved replay, scrub and retry passed |
 | 21. Platform Zero | 2 / 2, canopy rebound, hanging-sign bank and return floor patch | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 20/40 ms; every sample rested on the platform | First attempt cleared; chapter selection, visible canopy patch, overview, complete hint and saved replay controls passed |
+| 22. Column Switchback | 2 / 2, narrow canopy-column and station-wall banks followed by a floor patch | 6 / 6: ±0.25° yaw/pitch, ±10 ms charge; every sample collected all targets and rested | First attempt cleared; overview, backspin hint, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -408,8 +409,30 @@ Typecheck, unit tests, browser build and the full local runtime suite pass,
 including authoritative scoring/replays, progression, recall, exploration and
 creator recording, save and tamper rejection.
 
-**Next: author level 22**, continuing along the platforms. Finish its native
-proof, nearby variations, Chrome playtesting and local merge before level 23.
+Level 22, **Column Switchback**, banks the narrow canopy column beside Platform
+0, crosses back to the station wall, then collects a floor patch on its return.
+The 7.0 m/s, 15° hint uses 100 backspin and follows a 43.7 m path. The column's
+0.10 m target fits its 0.26 m face; the wall and floor patches have 0.45 m and
+0.90 m radii. Both exact solutions stop in 26.96 seconds and make sharp turns
+at both marked banks. All six neighboring shots clear in 26.81–26.99 seconds.
+
+Chrome clears first try at 417,632 points. Overview, movement/home, the complete
+backspin hint, saved replay, scrub and retry pass. Sampled gameplay median/p95
+frames are 16.7 ms, with zero skipped music steps and no page errors. Initial
+loading includes a 1.85-second main-thread task, retained in the browser receipt
+for the final stability audit. Service checks pass authoritative scores, replay
+parity, completion, leaderboard and recall. Typecheck, unit tests and browser
+build pass. Evidence: `.local/campaign/platform-column/`.
+
+The small column patch was covered by its own aiming label. Target labels now
+sit above the contact point with a short leader line, keeping the painted disk
+visible. Chrome checks pass on the column, stairs, basement ceiling and opening
+course. Station geometry and native physics are unchanged. The superseded
+low-angle scout was replaced with a concise local note.
+
+**Next: author level 23**, continuing through the platforms and tracks. Finish
+its native proof, nearby variations, Chrome playtesting and local merge before
+level 24.
 
 ## Floor repair
 
