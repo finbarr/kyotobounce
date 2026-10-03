@@ -154,5 +154,83 @@
         200
       ]
     }
+  },
+  {
+    "id": "atrium-clock-in",
+    "revision": 1,
+    "name": "Clock In",
+    "creator": "station",
+    "layout": "fe661f4a2c98891d7d00f9a3be27aac31888b94d40eb518245834d22ac1c4116",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v3",
+    "start": {
+      "center": {
+        "x": 1.643333911895752,
+        "y": 0,
+        "z": -7
+      },
+      "normal": {
+        "x": 0,
+        "y": 0.9999999403953552,
+        "z": 0
+      },
+      "radius": 0.3,
+      "surface": "hall-bay-floor-surface"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 1.423334002494812,
+          "y": 5.5,
+          "z": -13.257608413696289
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "radius": 0.30000001192092896,
+        "surface": "atrium-gate-clock-body",
+        "id": "gate-clock"
+      }
+    ],
+    "hint": {
+      "yaw": 180,
+      "pitch": 50,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 2800,
+      "powerRange": "precision",
+      "note": "Use full precision charge (12 m/s), a 50° upward aim and no spin. Hit the clock above the central ticket gates, then let the ball settle."
+    },
+    "order": 2,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "Atrium Beginnings",
+      "difficulty": "Easy",
+      "distance": 68.3,
+      "brief": "Look up: the clock above the ticket gates is your target. Bank its purple face and let the rebound drop back through the atrium."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

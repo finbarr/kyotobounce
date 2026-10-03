@@ -43,8 +43,14 @@ try{
  await page.locator('#game').focus();await page.keyboard.press('h');await page.waitForTimeout(500);await page.screenshot({scale:'css',path:resolve(out,'aim.png')});
  const holds=holdArg.split(',').map(Number);assert.ok(holds.length<=2&&holds.every(n=>n>=0&&n<=2800),'At most one retry');
  for(const hold of holds){
+  // Screenshot readback and initial shader loading can stall before gameplay.
+  // Compare audio counters around the actual charge/flight, separately.
+  await page.waitForTimeout(200);
+  const audioBefore=await page.evaluate(()=>kyotoState.audio);
   await page.keyboard.down('Space');await page.waitForTimeout(hold);await page.keyboard.up('Space');
-  await page.waitForFunction(()=>window.kyotoState?.phase==='Result'&&window.kyotoState?.result,null,{timeout:120000});const s=await page.evaluate(()=>window.kyotoState);shots.push(s);console.log(JSON.stringify({hold,power:s.result?.thrower?.power,score:s.result?.score,destination:s.result?.destinationReached,final:s.ball,frameMsP50:[...s.render.frameMs].sort((a,b)=>a-b)[60],audio:s.audio}));
+  await page.waitForFunction(()=>window.kyotoState?.phase==='Result'&&window.kyotoState?.result,null,{timeout:120000});const s=await page.evaluate(()=>window.kyotoState);
+  s.audioBefore=audioBefore;s.skippedMusicStepsDuringShot=s.audio.skippedMusicSteps-audioBefore.skippedMusicSteps;
+  shots.push(s);console.log(JSON.stringify({hold,power:s.result?.thrower?.power,score:s.result?.score,destination:s.result?.destinationReached,final:s.ball,frameMsP50:[...s.render.frameMs].sort((a,b)=>a-b)[60],audio:s.audio,skippedMusicStepsDuringShot:s.skippedMusicStepsDuringShot}));
   await page.waitForFunction(score=>document.getElementById('result-title').textContent===`${score.toLocaleString()} PTS`,s.result.score);
   await page.screenshot({scale:'css',path:resolve(out,`result-${shots.length}.png`)});
   if(s.result?.success&&s.result?.score>0)break;

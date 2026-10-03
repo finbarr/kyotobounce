@@ -30,13 +30,14 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**2 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**3 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
 | --- | --- | --- | --- |
 | 1. First Bounce | 2 / 2, full translation and spin rest | 6 / 6: ±15° yaw, ±5° pitch, 2.0–3.6 m/s | First attempt cleared; overview, movement/home, hint, result and saved replay passed |
 | 2. Blue Wall Bank | 2 / 2, including a sharp wall rebound | 6 / 6: ±5° yaw, ±5° pitch, 7.5–8.5 m/s | First attempt cleared; visible wall patch, overview, hint and replay passed |
+| 3. Clock In | 2 / 2, including the mounted clock rebound | 6 / 6: ±2° yaw, ±2° pitch, 11.5–12 m/s | Two first-attempt clears, identical 52,622-point solutions; overview and replay passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved 32,120 authoritative points; its
@@ -60,9 +61,18 @@ receipts are in `.local/campaign/blue-bank-proof/` and
 `.local/campaign/blue-bank-browser/`. Returning-player and creator-return checks
 also passed with the two-level catalog. No station geometry changed.
 
-**Next: level 3**, an upward bank on an existing ticket-gate fixture, preferably
-the mounted clock. Scout it from the atrium floor and record the actual impact;
-keep the hint and target tolerant enough for this early campaign stage.
+Level 3 targets the existing mounted clock with a 0.30 m radius patch. Full
+precision charge and 50° elevation produce a 68.3 m route, ending at full rest
+in the basement after 26.82 seconds. Evidence is in `.local/campaign/clock-proof/`
+and `.local/campaign/clock-browser/`. Its first browser session reported one
+skipped music step without a phase baseline; a focused rerun recorded zero during
+charge/flight, 112 BPM and a 16.7 ms sampled median frame time. The browser proof
+now records audio counters before each shot so loading/capture delays can be
+distinguished from gameplay.
+
+**Next: level 4**, link two distinct banks around the existing ticket-gate
+structures or atrium frontage. Record a new route; avoid reusing a previous
+level's exact shot with one extra target. Keep architecture fixed.
 
 Before final acceptance, remove any remaining standalone retired-level probes
 under `web/tests/` rather than adapting their old course IDs or routes.
