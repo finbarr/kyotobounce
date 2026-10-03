@@ -2402,6 +2402,95 @@
         "minSharpTurns": 0,
         "minHeightDrop": 25
       }
+    },
+    {
+      "id": "skyway-circuit",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2800,
+        "range": "precision",
+        "input": {
+          "yaw": 45,
+          "pitch": 15.5,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 44.75,
+            "pitch": 15.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 45.25,
+            "pitch": 15.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 45,
+            "pitch": 15.25,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 45,
+            "pitch": 15.75,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2790,
+          "range": "precision",
+          "input": {
+            "yaw": 45,
+            "pitch": 15.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2780,
+          "range": "precision",
+          "input": {
+            "yaw": 45,
+            "pitch": 15.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 3,
+        "minSharpTurns": 3
+      }
     }
   ]
 }

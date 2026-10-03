@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**26 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**27 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -84,6 +84,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 24. Platform Descent | 2 / 2, upper stair bank, sloping-roof rebound and platform patch 7.35 m below the start | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 10/20 ms; every sample collected all targets and rested | First attempt cleared; stair overview, complete backspin hint, saved replay, scrub and retry passed |
 | 25. Underpass Circuit | 2 / 2, ceiling, opposing walls and floor banks plus the gold landing | 6 / 6: ±1° yaw, ±0.5° pitch, full charge minus 20/40 ms; every sample collected all targets and landed at rest | First attempt cleared at 1,641,513 points; readable aiming marker, overview, movement/home, saved replay, scrub and retry passed |
 | 26. Grand Descent | 2 / 2, stair landing, square, balcony and lower-passage targets across a 25.4 m descent | 6 / 6: ±0.5° yaw/pitch, full charge minus 10/20 ms; every sample collected all four targets and rested | First attempt cleared at 847,747 points; overview, full backspin hint, movement/home, saved replay, scrub and retry passed |
+| 27. Skyway Circuit | 2 / 2, three glass banks and a final deck target in the high gallery | 6 / 6: ±0.25° yaw/pitch, full charge minus 10/20 ms; every sample collected all four targets and rested | First attempt cleared at 827,652 points; overview, readable glass patches, complete hint, movement/home, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -547,7 +548,39 @@ placement and recall forfeiture. One service check was interrupted by a verified
 924-second laptop sleep; the same check passes with a scoped idle-sleep
 assertion. Its interruption evidence is retained locally.
 
-**Next: author level 27**, continuing the finale chapter in the existing
+Level 27, **Skyway Circuit**, uses the glass gallery at elevation 45.08 m.
+A full 12 m/s precision throw at 15.5° with no spin banks between the glass
+walls, skips off the deck, collects a low return-glass patch and reaches the
+final floor target. Its recorded route measures 37.8 m. The three glass
+circles have radii 0.30, 0.30 and 0.10 m; the floor circle is 0.70 m.
+
+Native placement validates each whole circle on its supporting face. The launch
+and return patch are centered using measured contact positions, keeping the
+route clear of mullions and the small patch between the rails. Both exact
+proofs collect every target with three sharp glass rebounds and reach full
+translation and spin rest in 27.14 seconds. All six neighboring inputs clear
+and rest in 26.68–28.03 seconds. Superseded scouts are summarized in
+`scout-notes.json`; current traces remain under
+`.local/campaign/skyway-circuit/proof/`. Station geometry and physics are unchanged.
+
+Chrome clears first try at 827,652 points. The overview, complete hint,
+movement/home, saved replay, scrub and retry pass. A separate scout check
+inspects the small third disk close up, then restores the unchanged launch
+position and hint. Screenshots and receipts are under `browser/` and
+`target-view/` in the same evidence directory.
+
+Sampled final-flight median/p95 frames are 16.7 ms, with no skipped music steps
+before or during the shot and no page errors. The performance receipt retains
+a 2.25-second initial main-thread task and a 335 ms task in the window ending
+during charging. All flight windows have no long tasks or playback underruns.
+Include these startup/entry measurements in the final stability audit.
+
+Typecheck, unit tests, browser build and the updated catalog check pass. Local
+service checks pass all four targets, full rest, authoritative scoring,
+independent saved-replay parity, completion, leaderboard placement and recall
+forfeiture. The native proof hashes match the committed catalog and inputs.
+
+**Next: author level 28**, continuing the finale chapter in the existing
 connected station spaces and retained forecourt. Finish its native proof,
 nearby variations, Chrome playtesting and local merge before the next level.
 

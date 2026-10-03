@@ -2572,5 +2572,128 @@
         200
       ]
     }
+  },
+  {
+    "id": "skyway-circuit",
+    "revision": 1,
+    "name": "Skyway Circuit",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 10.450004577636719,
+        "y": 45.08330535888672,
+        "z": 15.5
+      },
+      "normal": {
+        "x": -0.00000287841839963221,
+        "y": 1,
+        "z": -3.978215943334362e-7
+      },
+      "radius": 0.25,
+      "surface": "central-skyway-deck"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 12.137612342834473,
+          "y": 46.979488372802734,
+          "z": 16.899856567382812
+        },
+        "normal": {
+          "x": 0.016513513401150703,
+          "y": 0.0000026559030175121734,
+          "z": -0.9998636245727539
+        },
+        "radius": 0.30000001192092896,
+        "surface": "central-skyway-glass-99",
+        "id": "first-glass"
+      },
+      {
+        "center": {
+          "x": 14.649999618530273,
+          "y": 46.55000305175781,
+          "z": 14.40500259399414
+        },
+        "normal": {
+          "x": -0.016513213515281677,
+          "y": -0.000003107810243818676,
+          "z": 0.9998636841773987
+        },
+        "radius": 0.30000001192092896,
+        "surface": "central-skyway-glass-228",
+        "id": "opposite-glass"
+      },
+      {
+        "center": {
+          "x": 16.8700008392334,
+          "y": 45.9900016784668,
+          "z": 16.978010177612305
+        },
+        "normal": {
+          "x": 0.016511959955096245,
+          "y": 0.0000035270957141619874,
+          "z": -0.9998636841773987
+        },
+        "radius": 0.10000000149011612,
+        "surface": "central-skyway-glass-103",
+        "id": "return-glass"
+      },
+      {
+        "center": {
+          "x": 18.167572021484375,
+          "y": 45.08332824707031,
+          "z": 15.646050453186035
+        },
+        "normal": {
+          "x": -0.00000287841839963221,
+          "y": 1,
+          "z": -3.978215943334362e-7
+        },
+        "radius": 0.699999988079071,
+        "surface": "central-skyway-deck",
+        "id": "floor-finish"
+      }
+    ],
+    "hint": {
+      "yaw": 45,
+      "pitch": 15.5,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2800,
+      "note": "Apply H for 15.5° upward aim and no spin, then throw at full 12.0 m/s precision power. Bank between the two glass walls, skip off the deck and hit the small return-glass patch below the handrail. Collect the floor patch and wait for full rest."
+    },
+    "order": 26,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Station Finales",
+      "difficulty": "Expert",
+      "distance": 37.8,
+      "brief": "Thread three glass banks along the Skyway, 45 metres above the station floor. A low return patch tests your control before the final deck target."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
