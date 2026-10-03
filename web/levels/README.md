@@ -31,6 +31,9 @@ charge duration. Choose course targets from those contacts, then use the proof
 runner to repeat the intended hint and measure nearby inputs.
 An optional `observeSeconds` (20–120) bounds scouting time. A timeout fails and
 writes a `.failure.json` diagnostic; it never treats a moving ball as complete.
+Set `playbackRate: 2` to use the game's built-in fast-forward while scouting.
+Native inputs, contacts and rest conditions stay the same; receipt durations
+remain simulation seconds.
 
 ```sh
 KYOTO_WORKER_EXECUTABLE='/absolute/path/to/compatible/worker' \

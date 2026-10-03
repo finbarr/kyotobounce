@@ -46,6 +46,19 @@ try{
  await page.keyboard.press('l');await page.getByRole('button',{name:'↶ Start',exact:true}).click();
  await page.waitForFunction(start=>Math.hypot(kyotoState.feet.x-start.x,kyotoState.feet.z-start.z)<.1,start);
  await page.getByRole('button',{name:'Close levels'}).click();
+ // A steep lob points the launch view into the sky. Inspect its landing with
+ // actual orbit/scout controls, then restore H without changing the shot.
+ if(course.hint.pitch>=65){
+  await page.locator('#game').focus();await page.keyboard.press('h');
+  await page.keyboard.down('ArrowUp');await page.waitForTimeout(700);await page.keyboard.up('ArrowUp');
+  await page.keyboard.press('f');await page.waitForFunction(()=>kyotoState.camera.mode==='fly');
+  await page.keyboard.down('e');await page.waitForTimeout(250);await page.keyboard.up('e');await page.waitForTimeout(200);
+  await page.screenshot({scale:'css',path:resolve(out,'scout.png')});
+  assert.ok(await page.locator('#fly-targets .fly-target:not([hidden])').filter({hasText:/WAYPOINT/}).count(),'Scouting exposes the landing waypoint');
+  const aim=await page.evaluate(()=>({yaw:kyotoState.yaw,pitch:kyotoState.pitch,top:kyotoState.top,kick:kyotoState.kick}));
+  for(const key of ['yaw','pitch','top','kick'])assert.equal(aim[key],course.hint[key],'Scouting preserves the launch '+key);
+  await page.keyboard.press('f');await page.waitForFunction(()=>kyotoState.camera.mode==='aim');
+ }
  await page.locator('#game').focus();await page.keyboard.press('h');await page.waitForTimeout(500);await page.screenshot({scale:'css',path:resolve(out,'aim.png')});
  const holds=holdArg.split(',').map(Number);assert.ok(holds.length<=2&&holds.every(n=>n>=0&&n<=2800),'At most one retry');
  for(const hold of holds){
@@ -58,6 +71,9 @@ try{
   await page.waitForFunction(()=>window.kyotoState?.phase==='Result'&&window.kyotoState?.result,null,{timeout:120000});const s=await page.evaluate(()=>window.kyotoState);
   s.audioBefore=audioBefore;s.skippedMusicStepsDuringShot=s.audio.skippedMusicSteps-audioBefore.skippedMusicSteps;
   shots.push(s);console.log(JSON.stringify({hold,power:s.result?.thrower?.power,score:s.result?.score,destination:s.result?.destinationReached,final:s.ball,frameMsP50:[...s.render.frameMs].sort((a,b)=>a-b)[60],audio:s.audio,skippedMusicStepsDuringShot:s.skippedMusicStepsDuringShot}));
+  // The result handler sets the final text before starting its 800 ms count-up.
+  // Capture the settled score rather than matching that initial transient value.
+  await page.waitForTimeout(850);
   await page.waitForFunction(score=>document.getElementById('result-title').textContent===`${score.toLocaleString()} PTS`,s.result.score);
   await page.screenshot({scale:'css',path:resolve(out,`result-${shots.length}.png`)});
   if(s.result?.success&&s.result?.score>0)break;

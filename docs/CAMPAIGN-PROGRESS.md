@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**16 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**17 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -74,6 +74,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 14. Timber Turn | 2 / 2, timber and column banks with a return landing bonus | 6 / 6: ±0.5° yaw/pitch, ±20 ms charge; every sample earned the bonus at full rest | First attempt earned the landing bonus; visible timber patch, overview and saved replay controls passed |
 | 15. Promenade Pinball | 2 / 2, glass and wall banks followed by a return floor patch | 6 / 6: ±0.5° yaw/pitch, ±15 ms charge in POWER; every sample rested | First attempt cleared all three targets; POWER hint, overview and saved replay controls passed |
 | 16. Stair Skip | 2 / 2, marked stair tread and a 3.92 m descent onto Muromachi Square | 8 / 8: ±1° yaw/pitch, ±20 ms charge, ±10 backspin; every sample rested | First attempt cleared both targets; readable aiming labels, full spin hint, overview and saved replay controls passed |
+| 17. Soft Landing | 2 / 2, uphill lob and full rest in the gold ring 2.62 m above the start | 6 / 6: ±1° yaw/pitch, ±15 ms charge; every sample earned the gold bonus | First attempt earned the bonus; overview, scout/return, complete spin hint and saved replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -309,9 +310,33 @@ while the tight Bridge Pinball view hides it and keeps the target and reticle
 visible. Superseded stair candidates were removed after the final native
 proof; only concise sensitivity notes remain.
 
-**Next: author level 17**, continuing up the existing staircase toward the
-gardens with a different route. Finish native proof, nearby variations, Chrome
-playtesting and the local merge before level 18.
+Level 17, **Soft Landing**, climbs from the seventh to the wider eighth stair
+landing. A 75° lob at 9.9 m/s precision power uses maximum backspin (−200) to
+brake on the upper floor. The 0.50 m purple waypoint precedes a 0.70 m gold
+finish ring; both are validated on `north-circulation-landing-08`. The recorded
+route is 14.1 m. Both exact solutions stop in 10.03 seconds, and all six nearby
+shots earn the bonus in 8.82–10.16 seconds. All finish on the upper landing,
+2.62 m above the start. Station geometry and native physics are unchanged.
+
+Chrome earns the gold bonus on its first attempt at 210,954 points. The overview exposes the
+start, stair flight, waypoint and destination. The 75° launch view looks upward;
+the hint explains using F to scout the landing first. Actual orbit, scout,
+ascent and return controls expose both circles without changing yaw, pitch or
+spin. Movement/home, the complete H hint, saved replay, scrub and retry pass.
+Service checks confirm authoritative scoring, replay parity, completion and
+recall forfeiture. Sampled median/p95 frames are 16.7/16.8 ms, with zero skipped
+music steps and no page errors. Typecheck, unit tests and browser build pass. Evidence:
+`.local/campaign/stair-rise/`.
+
+The scouting recorder accepts `playbackRate: 2` to use the game's existing
+fast-forward and shorten authoring waits. Native contact and rest rules remain
+unchanged. Browser proof also checks scouting for steep lobs and waits for the
+score's count-up animation before capturing the result. Superseded full traces
+were removed; only concise sensitivity notes remain.
+
+**Next: author level 18**, continuing toward the top of the existing grand
+staircase and its garden approach. Finish native proof, nearby variations,
+Chrome playtesting and the local merge before level 19.
 
 ## Floor repair
 
@@ -364,6 +389,12 @@ These rest checks supersede the earlier authoring timings above.
   during the platform/final runtime audit; a timeout must never finish a shot.
   The selected level starts at x = 7 and all its tested variations remain on the
   square. Receipt: `.local/campaign/wood-square/rejected-route.json`.
+- One Soft Landing camera check timed out after 120 seconds during startup
+  while a separate native proof worker was running. Service telemetry showed
+  loading with zero rendered frames. The same check succeeded once the native
+  proof ended; cause is unproven, and the first helper did not retain browser
+  errors. Include cold startup and resource contention in the final stability
+  audit. Receipt: `.local/campaign/stair-rise/startup-note.json`.
 
 Before final acceptance, remove any remaining standalone retired-level probes
 under `web/tests/` rather than adapting their old course IDs or routes.

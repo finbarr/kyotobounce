@@ -1453,5 +1453,96 @@
         200
       ]
     }
+  },
+  {
+    "id": "staircase-soft-landing",
+    "revision": 1,
+    "name": "Soft Landing",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -111.5,
+        "y": 32.77108383178711,
+        "z": 8.940696716308594e-8
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-07"
+    },
+    "goal": {
+      "center": {
+        "x": -117.37001037597656,
+        "y": 35.3950080871582,
+        "z": 0.2199999988079071
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.699999988079071,
+      "surface": "north-circulation-landing-08"
+    },
+    "waypoints": [
+      {
+        "center": {
+          "x": -116.30000305175781,
+          "y": 35.3950080871582,
+          "z": 0.21999996900558472
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "north-circulation-landing-08",
+        "id": "upper-landing"
+      }
+    ],
+    "hint": {
+      "yaw": -90,
+      "pitch": 75,
+      "top": -200,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2280,
+      "note": "Use 9.9 m/s precision power, a high 75° lob and maximum backspin (−200). Scout the upper landing with F before aiming. Land on the purple patch and let the ball stop inside the gold ring for the bonus."
+    },
+    "order": 16,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "Staircase & Gardens",
+      "difficulty": "Hard",
+      "distance": 14.1,
+      "brief": "Lob from the seventh to the eighth stair landing and brake with backspin. Touch the purple patch, then settle in the gold ring beyond it."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

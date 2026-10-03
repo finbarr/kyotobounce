@@ -1502,6 +1502,96 @@
         "minSharpTurns": 0,
         "minHeightDrop": 3.8
       }
+    },
+    {
+      "id": "staircase-soft-landing",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2280,
+        "range": "precision",
+        "input": {
+          "yaw": -90,
+          "pitch": 75,
+          "top": -200,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 2280,
+          "range": "precision",
+          "input": {
+            "yaw": -91,
+            "pitch": 75,
+            "top": -200,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2280,
+          "range": "precision",
+          "input": {
+            "yaw": -89,
+            "pitch": 75,
+            "top": -200,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2280,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 74,
+            "top": -200,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2280,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 76,
+            "top": -200,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2265,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 75,
+            "top": -200,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2295,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 75,
+            "top": -200,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 0,
+        "minSharpTurns": 0,
+        "minFinishRise": 2.6
+      }
     }
   ]
 }
