@@ -1301,6 +1301,95 @@
         "minNonFloorTargets": 2,
         "minSharpTurns": 2
       }
+    },
+    {
+      "id": "promenade-pinball",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 661,
+        "range": "full",
+        "input": {
+          "yaw": 135,
+          "pitch": -8,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 661,
+          "range": "full",
+          "input": {
+            "yaw": 134.5,
+            "pitch": -8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 661,
+          "range": "full",
+          "input": {
+            "yaw": 135.5,
+            "pitch": -8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 661,
+          "range": "full",
+          "input": {
+            "yaw": 135,
+            "pitch": -8.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 661,
+          "range": "full",
+          "input": {
+            "yaw": 135,
+            "pitch": -7.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 646,
+          "range": "full",
+          "input": {
+            "yaw": 135,
+            "pitch": -8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 676,
+          "range": "full",
+          "input": {
+            "yaw": 135,
+            "pitch": -8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 2
+      }
     }
   ]
 }

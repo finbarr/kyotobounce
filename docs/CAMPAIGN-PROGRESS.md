@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**14 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**15 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -72,6 +72,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 12. Step Down | 2 / 2, sloping ceiling bank and 3.03 m drop to a stair tread | 6 / 6: ±1° yaw, ±0.5° pitch, 11.6–12 m/s; every sample rested | First attempt cleared; cutaway shows the start and both patches, replay and retry passed |
 | 13. Terrace Triple | 2 / 2, ledge bounce, 8.85 m descent and return-wall bank | 6 / 6: ±0.25° yaw, ±0.5° pitch, ±12 ms charge; every sample rested | First attempt cleared all three targets; overview, hint, saved replay, scrub and retry passed |
 | 14. Timber Turn | 2 / 2, timber and column banks with a return landing bonus | 6 / 6: ±0.5° yaw/pitch, ±20 ms charge; every sample earned the bonus at full rest | First attempt earned the landing bonus; visible timber patch, overview and saved replay controls passed |
+| 15. Promenade Pinball | 2 / 2, glass and wall banks followed by a return floor patch | 6 / 6: ±0.5° yaw/pitch, ±15 ms charge in POWER; every sample rested | First attempt cleared all three targets; POWER hint, overview and saved replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -267,9 +268,25 @@ Service scoring/replay/completion/recall, typecheck, unit tests and browser buil
 pass. Evidence: `.local/campaign/wood-square/`. Station geometry and native
 physics are unchanged.
 
-**Next: author level 15**, closing the upper-walkway chapter with a distinct
-route through existing station fixtures. Finish native proof, nearby variations,
-Chrome playtesting and the local merge before moving to the grand staircase.
+Level 15 finishes **Above the Atrium** on the third-floor promenade at 15.5 m.
+It introduces the POWER range: 24.0 m/s at 8° down banks the parapet glazing,
+crosses to the opposite wall and returns to a floor patch. Target radii are
+0.40 m, 0.30 m and 0.80 m, validated on their native faces. The recorded route
+is 45.5 m; the exact hint rests on the promenade in 24.62 seconds. All six
+neighbors collect all targets and rest in 14.43–24.92 seconds. Both yaw samples
+continue to the railway area after collecting the targets; the other samples
+finish on the promenade. There is no destination requirement.
+
+Chrome clears first try at 427,400 points. The POWER selector and white 24.0 m/s
+mark match the hint, and the overview exposes all three patches. Movement/home,
+saved replay, scrub and retry pass. Sampled median/p95 frames are 16.7/16.8 ms,
+with zero skipped music steps and no page errors. Service scoring/replay/
+completion/recall, typecheck, unit tests and browser build pass. Evidence:
+`.local/campaign/promenade/`. Station geometry and native physics are unchanged.
+
+**Next: author level 16**, opening the grand-staircase and gardens chapter with
+a route that uses the existing stair geometry. Finish native proof, nearby
+variations, Chrome playtesting and the local merge before level 17.
 
 ## Floor repair
 

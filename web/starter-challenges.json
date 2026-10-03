@@ -1252,5 +1252,113 @@
         200
       ]
     }
+  },
+  {
+    "id": "promenade-pinball",
+    "revision": 1,
+    "name": "Promenade Pinball",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 1.7999999523162842,
+        "y": 15.5,
+        "z": -42.5
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "add-promenade3f-long-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 4.953370094299316,
+          "y": 16.263931274414062,
+          "z": -45.98749923706055
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "radius": 0.4000000059604645,
+        "surface": "add-promenade3f-opening-guard-37",
+        "id": "parapet-glass"
+      },
+      {
+        "center": {
+          "x": 11.17634105682373,
+          "y": 15.941374778747559,
+          "z": -39.03000259399414
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        "radius": 0.30000001192092896,
+        "surface": "add-promenade3f-wall-13-0",
+        "id": "promenade-wall"
+      },
+      {
+        "center": {
+          "x": 13.433194160461426,
+          "y": 15.5,
+          "z": -43.30949020385742
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.800000011920929,
+        "surface": "add-promenade3f-long-floor",
+        "id": "return-skip"
+      }
+    ],
+    "hint": {
+      "yaw": 135,
+      "pitch": -8,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "full",
+      "holdMs": 661,
+      "note": "Switch to POWER and release at 24.0 m/s. Aim 8° down with no spin. Bank the parapet glass, cross to the purple wall patch, then skip onto the marked floor on the return. Collect all three patches and let the ball stop."
+    },
+    "order": 14,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Above the Atrium",
+      "difficulty": "Hard",
+      "distance": 45.5,
+      "brief": "Use the POWER range for a fast zigzag along the promenade: glass, opposite wall, then the floor patch on the return. Collect all three targets."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
