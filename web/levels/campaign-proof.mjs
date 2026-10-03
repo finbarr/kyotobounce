@@ -60,7 +60,7 @@ async function run(slot){
    await writeFile(resolve(out,`${index}-${challenge.id}.json`),JSON.stringify(result));
    if(features&&kind==='hint'){
     const nonFloor=result.waypointHits.filter(h=>h.normal.y<.5);
-    receipt.nonFloorTargets=nonFloor.length;receipt.sharpTurns=0;
+    receipt.nonFloorTargets=nonFloor.length;receipt.sharpTurns=0;receipt.ceilingRebounds=0;
     const delta=(a,b)=>[b.x-a.x,b.y-a.y,b.z-a.z];
     for(const hit of nonFloor){
      const i=result.poses.findIndex(p=>p.t>=hit.time),poses=result.poses;
@@ -68,9 +68,11 @@ async function run(slot){
      const before=delta(poses[i-5].p,poses[i-2].p),after=delta(poses[i+2].p,poses[i+5].p),length=Math.hypot(...before)*Math.hypot(...after);
      const angle=length?Math.acos(Math.max(-1,Math.min(1,before.reduce((n,v,k)=>n+v*after[k],0)/length)))*180/Math.PI:0;
      if(angle>=45)receipt.sharpTurns++;
+     if(hit.normal.y<-.995&&before[1]>.0001&&after[1]<-.0001)receipt.ceilingRebounds++;
     }
     assert.ok(receipt.nonFloorTargets>=features.minNonFloorTargets,'The route must collect its wall/ceiling targets');
     assert.ok(receipt.sharpTurns>=features.minSharpTurns,'The route must make a sharp turn at a wall/ceiling target');
+    if(features.minCeilingRebounds)assert.ok(receipt.ceilingRebounds>=features.minCeilingRebounds,'The ceiling bank must reverse upward travel into downward travel');
     if(features.minHeightDrop){
      receipt.heightDrop=result.launchPosition.y-Math.min(...result.poses.map(p=>p.p.y));
      assert.ok(receipt.heightDrop>=features.minHeightDrop,'The shot must descend into the lower public space');

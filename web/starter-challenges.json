@@ -587,5 +587,98 @@
         200
       ]
     }
+  },
+  {
+    "id": "basement-ceiling-skip",
+    "revision": 1,
+    "name": "Ceiling Skip",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 1.6399997472763062,
+        "y": -4.913582801818848,
+        "z": 12.5
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "hall-b1-north-bay-1-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 1.419999122619629,
+          "y": -1.5499999523162842,
+          "z": 8.567221641540527
+        },
+        "normal": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "hall-b1-north-aisle-ceiling",
+        "id": "ceiling"
+      },
+      {
+        "center": {
+          "x": 1.41997230052948,
+          "y": -4.913582801818848,
+          "z": 3.7445571422576904
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.6499999761581421,
+        "surface": "porta-connection-b1-deck",
+        "id": "floor-return"
+      }
+    ],
+    "hint": {
+      "yaw": -180,
+      "pitch": 35,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2800,
+      "note": "Use full precision charge (12 m/s), aim 35° upward and keep spin at zero. Bank the ceiling patch, then the floor patch beneath the central glass opening."
+    },
+    "order": 7,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Below the Glass",
+      "difficulty": "Medium",
+      "distance": 30,
+      "brief": "Bank the low B1 ceiling, then the floor beneath the central glass opening. Collect both purple patches as the rebound crosses the public basement."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

@@ -622,6 +622,96 @@
         "minNonFloorTargets": 2,
         "minSharpTurns": 2
       }
+    },
+    {
+      "id": "basement-ceiling-skip",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2800,
+        "range": "precision",
+        "input": {
+          "yaw": -180,
+          "pitch": 35,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 80
+      },
+      "neighbors": [
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 178,
+            "pitch": 35,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": -178,
+            "pitch": 35,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": -180,
+            "pitch": 34,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": -180,
+            "pitch": 36,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 2739,
+          "range": "precision",
+          "input": {
+            "yaw": -180,
+            "pitch": 35,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 2678,
+          "range": "precision",
+          "input": {
+            "yaw": -180,
+            "pitch": 35,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 1,
+        "minSharpTurns": 0,
+        "minCeilingRebounds": 1
+      }
     }
   ]
 }

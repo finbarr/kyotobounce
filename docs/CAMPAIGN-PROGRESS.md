@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**7 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**8 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -65,6 +65,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 5. Glass Return | 2 / 2, glass rebound and return landing bonus | 6 / 6: ±2° yaw/pitch, ±20 ms charge; every sample earned the bonus at full rest | First attempt earned the landing bonus; overview, saved replay, scrub and retry passed |
 | 6. Basement Drop | 2 / 2, a 6.42 m descent from release to B1 | 6 / 6: ±3° yaw/pitch, ±60 ms charge; every sample rested | First attempt cleared; chapter selection, overview, hint, saved replay, scrub and retry passed |
 | 7. Pier Pressure | 2 / 2, opposite pier banks with two sharp turns | 6 / 6: ±2° yaw/pitch, ±60 ms charge; every sample rested | First attempt cleared both targets; overview, hint, saved replay, scrub and retry passed |
+| 8. Ceiling Skip | 2 / 2, ceiling rebound followed by a B1 floor hit | 6 / 6: ±2° yaw, ±1° pitch, 11.5–12 m/s; every sample rested | First attempt cleared; ceiling patch visible while aiming, overview and saved replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -145,9 +146,24 @@ Service scoring/replay/progression/recall checks, typecheck, unit tests and the
 browser build pass. Evidence: `.local/campaign/basement-bank/`.
 No station geometry, physics or shared rendering changed for this increment.
 
-**Next: author level 8**, introducing an overhead bank on an existing B1 soffit
-followed by a floor target. Record the native route and choose targets on its
-actual contacts; finish verification and the local merge before level 9.
+Level 8 starts in the open northern B1 frontage. Its full precision shot at
+35° elevation hits a 0.50 m ceiling patch, then a 0.65 m floor patch beneath the
+central glass opening. The 30.0 m recorded route stays within the public
+basement and reaches full rest in 19.27 seconds. Native proof explicitly checks
+that upward motion reverses downward at the ceiling contact, as well as both
+target hits and zero translation/spin at rest.
+
+The flatter hint keeps the ceiling target visible above the power controls.
+Chrome clears first try at 221,866 points with 16.7 ms sampled median/p95 frames,
+112 BPM music, zero skipped steps and no page errors. Scoring, saved replay,
+scrub, retry, progression and recall checks pass. Typecheck, unit tests and the
+browser build pass. Receipts: `.local/campaign/ceiling-skip/`. Station geometry,
+physics and browser presentation code are unchanged for this level.
+
+**Next: author level 9**, exploring an escalator-assisted climb from B1 back to
+the atrium with a fixed target at the upper landing. Check different moving-step
+phases as well as nearby aim/power settings; finish verification and the local
+merge before level 10.
 
 ## Floor repair
 
