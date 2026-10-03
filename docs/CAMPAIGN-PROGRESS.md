@@ -101,21 +101,44 @@ after 17.84 seconds. The neighboring shots rest within 16–21 seconds. Evidence
 The successful Chrome run had 16.7 ms sampled median/p95 frames and no skipped
 music steps during charge/flight. No geometry or physics changed.
 
-**Next: investigate Ticket Slalom's long-running Chrome shot**, recorded below.
-Then author **level 5**, an atrium glass-bank route with an optional landing bonus.
+**Next: author level 5**, an atrium glass-bank route with an optional landing bonus.
 Use the existing glazing around the public basement opening, record a new shot,
 and keep the finish zone generous enough to teach the bonus. This should finish
 the introductory chapter before the campaign moves into the basement.
 
+## Floor repair
+
+Ticket Slalom's long-running shot was reproduced in the production native solver
+at 1,824.5 ms charge. The 1 cm paving joints had backing 2 mm below the tiles;
+alternating tile-edge contacts prevented sustained support. The repaired floor
+has a closed, continuous exterior, flush grout and the same basement openings.
+Its buried tile walls are removed. Physics and finish rules are unchanged.
+
+The editable source, native mesh and selected browser export match. Existing
+texture coordinates are transferred from the source, and all unrelated encoded
+browser geometry and textures are retained. Four alternate browser triangles
+cover the same 0.543286 m² region within 2 μm; the fragment audit records that
+comparison. The current bundle replaces the candidate, with no extra station copy.
+
+- All 81 charges from 1,824–1,834 ms in 0.125 ms steps reach zero velocity and
+  spin in 16.16–20.55 seconds, including both reproduced failures.
+- All four levels pass two exact hints and six neighbors each: 32 full clears.
+  Current hint rest times are 20.78, 30.96, 26.85 and 19.61 seconds respectively.
+- Chrome clears Ticket Slalom on its first attempt in 19.61 seconds at 226,900
+  points with ×20 from its two waypoints. Replay, scrub, retry and movement pass;
+  sampled median frame time is 16.7 ms, with zero skipped music steps or page errors.
+- Local service checks pass all four courses' authoritative scores, saved replays,
+  progression and recall forfeiture. Creator recording, save, identical-shot clear
+  with destination, tamper rejection and cancellation also pass.
+- Typecheck, unit tests, browser build and the final Unity editor regression pass.
+
+Geometry/source/rest receipts are in
+`.local/v2/current/receipts/atrium-floor-grout/`; native routes are in
+`.local/campaign/grout-proof/` and Chrome evidence in `.local/campaign/grout-browser/`.
+These rest checks supersede the earlier authoring timings above.
+
 ## Outstanding final checks
 
-- A fresh scoring-v4 Chrome run collected both Ticket Slalom targets and correctly
-  displayed ×20, but the ball continued translating past the 120-second observation
-  deadline. The input log measured 1,828 ms between charge/release, close to the
-  1,826 ms hint; the native service check had finished successfully. Cause is
-  unresolved. Keep this as a failed playthrough, not a completed route.
-  Receipt and screenshot: `.local/campaign/scoring-v4/browser/`.
-  Browser checks now retain launch/failure state to diagnose a recurrence.
 - The first cold Chrome view of Ticket Slalom had a 6.7-second render/main-thread
   stall and missed a short movement input. The warmed rerun passed. Cause is
   unprofiled; investigate cold level entry as part of the final stability check.
@@ -131,3 +154,20 @@ are `web/levels/proof-inputs.json`. Full native traces and Chrome receipts stay 
 `.local/campaign/`, outside Git. A campaign is complete only when all 30 entries
 have native and browser evidence and the combined menu, scoring, replays,
 progression, creator flow and music have passed local checks.
+
+## Floor regression workflow
+
+The focused rest fixture is `web/levels/ticket-slalom-rest.json`. Run
+`Kyoto.Editor.BatchTasks.CampaignRest` through Unity batch mode with `KYOTO_LAYOUT`,
+`KYOTO_REST_INPUT` and `KYOTO_REST_REPORT` set to absolute paths. Omit `-quit`;
+the batch task enters Play mode and exits after the test. This is a failing
+40-second observation limit, never a gameplay finish timer.
+
+The floor repair uses `prepare-atrium-grout.py` (Shapely 2.1+),
+`build-atrium-grout.mjs` and `install-atrium-grout.py`, then the normal browser
+exporter with `--only-object hall-bay-floor-surface` for the parent and candidate.
+Use `verify-atrium-floor-fragments.py` if the parent uses equivalent alternate
+triangulation. `install-atrium-grout-browser.mjs` replaces visible fragments while retaining
+all other encoded geometry and textures. Selected exports still consider nearby
+station objects when removing hidden overlaps. Use Blender's `--python-exit-code 1`
+so a failed source/export assertion stops the workflow.

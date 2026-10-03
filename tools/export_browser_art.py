@@ -10,6 +10,7 @@ parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--source',type=Path,default=ROOT/'art-source/atrium/KyotoAtrium.blend')
 parser.add_argument('--layout',type=Path,default=ROOT/'runtime/station-layout.json')
 parser.add_argument('--output',type=Path)
+parser.add_argument('--only-object',action='append',default=[],help='Export selected objects while retaining all surrounding overlap blockers')
 parser.add_argument('--restore-attributes-prefix',action='append',default=[],help='Restore precise authored attributes for matching material labels')
 args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
 SOURCE=args.source.resolve();LAYOUT=args.layout.resolve()
@@ -37,9 +38,21 @@ from export_attributes import interpolate_at_stored_positions,restore_glb_attrib
 def visible_object(obj):
  return obj.type=='MESH' and not (obj.get('kyoto_dynamic') or obj.get('kyoto_lane') or obj.hide_render or obj.get('kyoto_authoring_helper') or obj.get('kyoto_auxiliary')=='walking surface' or obj.get('kyoto_motion_aux'))
 visible_objects=[obj for obj in source_scene.objects if visible_object(obj)]
+if args.only_object:
+ selected=[o for o in visible_objects if o.name in args.only_object]
+ assert {o.name for o in selected}==set(args.only_object), 'Selected export object is missing or hidden'
+ def world_bounds(o):
+  e=o.evaluated_get(deps);points=[e.matrix_world@Vector(p) for p in e.bound_box]
+  return [(min(p[k] for p in points),max(p[k] for p in points)) for k in range(3)]
+ selected_bounds=[world_bounds(o) for o in selected]
+ def nearby(o):
+  bounds=world_bounds(o)
+  return any(all(bounds[k][0]<=b[k][1]+.0003 and bounds[k][1]>=b[k][0]-.0003 for k in range(3)) for b in selected_bounds)
+ visible_objects=[o for o in visible_objects if nearby(o)]
 coplanar=CoplanarSurfaces(visible_objects,deps,records)
 groups={};counts={'sourceObjects':0,'triangles':0,'skippedDynamic':0,'skippedProxies':0,'degenerateSourceTriangles':0}
 for obj in list(source_scene.objects):
+ if args.only_object and obj.name not in args.only_object:continue
  if obj.type!='MESH':continue
  if obj.get('kyoto_dynamic') or obj.get('kyoto_lane'):
   counts['skippedDynamic']+=1;continue
@@ -98,7 +111,7 @@ for obj in list(source_scene.objects):
     g['faces'].append((base,base+1,base+2));counts['triangles']+=1
  e.to_mesh_clear()
 counts['coplanarDeduplication']=coplanar.audit
-for required in ('west-north-slab-edge-2-0-0','west-south-substrate-2-2','west-south-slab-edge-3-2-2'):
+for required in (() if args.only_object else ('west-north-slab-edge-2-0-0','west-south-substrate-2-2','west-south-slab-edge-3-2-2')):
  assert required in coplanar.audit['objects'], f'Expected overlapping cap {required} not found; review source revision'
 print('COLLECTED_BROWSER_ART',counts['sourceObjects'],'objects',counts['triangles'],'triangles',len(groups),'batches',flush=True)
 scene=bpy.data.scenes.new('Browser export');bpy.context.window.scene=scene

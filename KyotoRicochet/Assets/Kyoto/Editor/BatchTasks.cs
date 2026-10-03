@@ -39,6 +39,7 @@ namespace Kyoto.Editor
         public static void RobotPower(){Start("robot-power");}
         public static void StationSpin(){Start("station-spin");}
         public static void FlightContacts(){Start("flight-contacts");}
+        public static void CampaignRest(){Start("campaign-rest");}
         public static void EscalatorWalking(){Start("escalator-walking");}
         public static void Phase2Routes(){Start("phase2-routes");}
         public static void Phase2Courses(){Start("phase2-courses");}
@@ -87,6 +88,7 @@ namespace Kyoto.Editor
                     else if(task=="robot-power")RobotPowerVerification.Run();
                     else if(task=="station-spin")StationSpinVerification.Run();
                     else if(task=="flight-contacts")FlightContactVerification.Run();
+                    else if(task=="campaign-rest")CampaignRestVerification.Run();
                     else if(task=="escalator-walking")EscalatorWalkingVerification.Run();
                     else if(task=="phase2-routes")Phase2RouteVerification.RunCandidate(CandidateLayoutPath());
                     else if(task=="phase2-courses")Phase2CourseSearch.Run();

@@ -16,7 +16,7 @@ process.env.KYOTO_LAYOUT=resolve(process.env.KYOTO_LAYOUT||'.local/v2/4425/stati
 const bytes=await readFile(process.env.KYOTO_LAYOUT),layout=createHash('sha256').update(bytes).digest('hex');
 const campaignBytes=await readFile('web/starter-challenges.json'),courses=JSON.parse(campaignBytes);
 const proofBytes=await readFile('web/levels/proof-inputs.json'),fixture=JSON.parse(proofBytes);
-const assets=JSON.parse(await readFile('web/v2/assets.json'));
+const assets=JSON.parse(await readFile(process.env.KYOTO_V2_ASSETS||'web/v2/assets.json'));
 assert.equal(fixture.sourceLayout,assets.layoutSha256,'Campaign belongs to the current reconstructed station');
 assert.equal(fixture.layout,layout,'Start npm run dev:v2 or select the matching local KYOTO_LAYOUT');
 assert.deepEqual(fixture.courses.map(c=>c.id),courses.map(c=>c.id),'Every published level has a proof fixture');
