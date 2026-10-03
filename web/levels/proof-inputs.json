@@ -1592,6 +1592,96 @@
         "minSharpTurns": 0,
         "minFinishRise": 2.6
       }
+    },
+    {
+      "id": "garden-corner",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 1826,
+        "range": "precision",
+        "input": {
+          "yaw": -150,
+          "pitch": 6,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -151,
+            "pitch": 6,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -149,
+            "pitch": 6,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -150,
+            "pitch": 5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -150,
+            "pitch": 7,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1796,
+          "range": "precision",
+          "input": {
+            "yaw": -150,
+            "pitch": 6,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1856,
+          "range": "precision",
+          "input": {
+            "yaw": -150,
+            "pitch": 6,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 2,
+        "minFinishRise": -0.05
+      }
     }
   ]
 }

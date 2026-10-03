@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**17 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**18 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -75,6 +75,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 15. Promenade Pinball | 2 / 2, glass and wall banks followed by a return floor patch | 6 / 6: ±0.5° yaw/pitch, ±15 ms charge in POWER; every sample rested | First attempt cleared all three targets; POWER hint, overview and saved replay controls passed |
 | 16. Stair Skip | 2 / 2, marked stair tread and a 3.92 m descent onto Muromachi Square | 8 / 8: ±1° yaw/pitch, ±20 ms charge, ±10 backspin; every sample rested | First attempt cleared both targets; readable aiming labels, full spin hint, overview and saved replay controls passed |
 | 17. Soft Landing | 2 / 2, uphill lob and full rest in the gold ring 2.62 m above the start | 6 / 6: ±1° yaw/pitch, ±15 ms charge; every sample earned the gold bonus | First attempt earned the bonus; overview, scout/return, complete spin hint and saved replay controls passed |
+| 18. Garden Corner | 2 / 2, end-wall and glass banks followed by a floor patch | 6 / 6: ±1° yaw/pitch, ±30 ms charge; every sample rested in the upper approach | First attempt cleared all three targets; overview, hint, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -334,9 +335,22 @@ unchanged. Browser proof also checks scouting for steep lobs and waits for the
 score's count-up animation before capturing the result. Superseded full traces
 were removed; only concise sensitivity notes remain.
 
-**Next: author level 18**, continuing toward the top of the existing grand
-staircase and its garden approach. Finish native proof, nearby variations,
-Chrome playtesting and the local merge before level 19.
+Level 18, **Garden Corner**, turns through the upper arrival balcony into the
+garden approach. Its 8.0 m/s, 6° shot banks a 0.45 m end-wall patch and a 0.35 m
+glass-guard patch, then crosses a 0.85 m floor target. The recorded route is
+33 m. Both exact solutions stop in 21.41 seconds; all six neighbors collect
+every target and rest in the upper approach in 21.06–21.65 seconds.
+
+Chrome clears first try at 427,084 points. Overview, movement/home, complete
+hint, saved replay, scrub and retry pass, with 16.7 ms sampled median/p95 frames,
+zero skipped music steps during the shot and no page errors. Three steps were
+skipped before charging, so cold transitions remain in the final stability audit.
+Service scoring, replay parity, completion and recall checks pass. Typecheck,
+unit tests and browser build pass. Evidence: `.local/campaign/garden-approach/`.
+Station geometry, native physics and browser code are unchanged.
+
+**Next: author level 19**, using the existing rooftop garden. Finish native
+proof, nearby variations, Chrome playtesting and the local merge before level 20.
 
 ## Floor repair
 

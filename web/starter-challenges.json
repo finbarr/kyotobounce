@@ -1544,5 +1544,113 @@
         200
       ]
     }
+  },
+  {
+    "id": "garden-corner",
+    "revision": 1,
+    "name": "Garden Corner",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -156.1999969482422,
+        "y": 49.193702697753906,
+        "z": -18.5
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "garden-store-entry-hall-infill-1"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -158,
+          "y": 50.4112548828125,
+          "z": -21.137882232666016
+        },
+        "normal": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.44999998807907104,
+        "surface": "garden-store-entry-arrival-west-wall",
+        "id": "end-wall"
+      },
+      {
+        "center": {
+          "x": -157.3889617919922,
+          "y": 49.798824310302734,
+          "z": -22.150001525878906
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": 0.9999999403953552
+        },
+        "radius": 0.3499999940395355,
+        "surface": "garden-store-entry-arrival-south-guard",
+        "id": "glass-turn"
+      },
+      {
+        "center": {
+          "x": -155.00892639160156,
+          "y": 49.193702697753906,
+          "z": -19.725553512573242
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
+        },
+        "radius": 0.8500000238418579,
+        "surface": "garden-store-entry-hall-infill-1",
+        "id": "arrival-floor"
+      }
+    ],
+    "hint": {
+      "yaw": -150,
+      "pitch": 6,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 1826,
+      "note": "Use 8.0 m/s precision power, 6° upward aim and no spin. Bank the end-wall patch into the low glass guard, then bounce through the broad floor patch toward the garden approach. Collect all three patches and wait for full rest."
+    },
+    "order": 17,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "Staircase & Gardens",
+      "difficulty": "Medium",
+      "distance": 33,
+      "brief": "Turn the corner at the top of the grand staircase: end wall, glass guard, then arrival floor. Three targets lead into the garden approach."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
