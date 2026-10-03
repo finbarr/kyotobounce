@@ -2205,5 +2205,113 @@
         200
       ]
     }
+  },
+  {
+    "id": "platform-descent",
+    "revision": 1,
+    "name": "Platform Descent",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -28.375,
+        "y": 7.349999904632568,
+        "z": -52.70000076293945
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "central-transfer-bridge-north-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -23.639999389648438,
+          "y": 5.425000190734863,
+          "z": -52.92000198364258
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.12999999523162842,
+        "surface": "railway-2-3-stair-0-10",
+        "id": "upper-tread"
+      },
+      {
+        "center": {
+          "x": -19.27044677734375,
+          "y": 7.770008087158203,
+          "z": -52.920005798339844
+        },
+        "normal": {
+          "x": -0.448620468378067,
+          "y": -0.8937223553657532,
+          "z": 0
+        },
+        "radius": 0.6499999761581421,
+        "surface": "railway-2-3-stair-roof",
+        "id": "roof-bank"
+      },
+      {
+        "center": {
+          "x": -9.203712463378906,
+          "y": 0,
+          "z": -52.92000198364258
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 1.5,
+        "surface": "east-transfer-rebuilt-railway-2-3-platform-0",
+        "id": "platform-skip"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": -30,
+      "top": -80,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2800,
+      "note": "Apply H for 30° downward aim and 80 backspin, then throw at full 12.0 m/s precision power. Bank off the marked upper tread into the sloping roof, then descend to the platform patch. Wait for full translation and spin rest."
+    },
+    "order": 23,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Platforms & Tracks",
+      "difficulty": "Hard",
+      "distance": 67,
+      "brief": "Drive a downward shot into the upper stair, rebound from its sloping roof and collect the platform patch below. Backspin shapes the descent from the cross-station passage."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
