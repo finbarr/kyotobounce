@@ -104,7 +104,7 @@ motion(0);
 const look = dressStation(renderer, scene, sun, station, data);
 look.updateLights(camera.position, 0);
 $("status").textContent = "Capturing fixed reflections";
-look.captureEnvironment();
+await look.captureEnvironment();
 if (variant !== "baseline") {
   const { freezeStaticTransforms } = await import(
     "/current/static-transforms.js"

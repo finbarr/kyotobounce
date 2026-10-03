@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**30 / 30 delivered; final campaign audit in progress.** Level 1, **First Bounce**, is on the west atrium floor.
+**30 / 30 delivered and verified locally.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -685,12 +685,10 @@ pass authoritative scoring, saved replay parity, completion and recall forfeitur
 
 The cold CPU recording attributes the 1.84-second startup task to station
 reflection capture, mostly texture uploads and shader initialization. That work
-and a fresh complete-catalog verification remain for final acceptance.
+and a fresh complete-catalog verification are covered by the final audit below.
 
-**Next: final campaign and stability audit.** Verify all 30 current hints,
-navigation, progression, replay/scoring, creator flow and recall. Resolve the
-profiled cold-start stall, retest Chrome entry and play, and remove standalone
-retired-level probes. Keep all work local; no deployment or asset publication.
+**Next: none for this goal.** All 30 levels and the final acceptance checks below
+are complete locally. Deployment remains explicitly out of scope.
 
 ## Floor repair
 
@@ -777,34 +775,73 @@ reaching full rest in 14.43–24.99 seconds. The scope receipt is
 `prior-route-scope.json`; refreshed routes are in
 `.local/campaign/promenade/proof/`.
 
-## Outstanding final checks
+## Final acceptance — 2026-10-03
 
-- The first cold Chrome view of Ticket Slalom had a 6.7-second render/main-thread
-  stall and missed a short movement input. The warmed rerun passed. Cause is
-  unprofiled; investigate cold level entry as part of the final stability check.
-  The measured report is retained in the local browser directory's
-  `cold-view-note.json`. Gameplay proof now waits for the view to finish drawing
-  and retains loading/performance reports; that does not resolve the cold stall.
-- One Step Down overview run recorded 14 skipped music steps before charging,
-  with a 4.28-second maximum scheduler gap. Its shot had no skipped steps, and
-  the final run had none throughout. The cause remains unprofiled; include
-  sloped-ceiling cutaway transitions in the final stability pass. Receipt:
-  `.local/campaign/step-down/cold-view-note.json`.
-- One Soft Landing camera check timed out after 120 seconds during startup
-  while a separate native proof worker was running. Service telemetry showed
-  loading with zero rendered frames. The same check succeeded once the native
-  proof ended; cause is unproven, and the first helper did not retain browser
-  errors. Include cold startup and resource contention in the final stability
-  audit. Receipt: `.local/campaign/stair-rise/startup-note.json`.
+The campaign has exactly 30 courses in six chapters. Each current target set and
+hint matches retained evidence for two repeated native clears, every authored
+nearby variation and a successful real Chrome playthrough. That covers **60
+repeated solutions and 186 variations**, all at full translation and spin rest.
+`coverage.json` maps the evidence to each current course. A fresh native sweep
+also clears all 30 on the final served layout, including every landing bonus.
 
-Before final acceptance, remove any remaining standalone retired-level probes
-under `web/tests/` rather than adapting their old course IDs or routes.
+The complete runtime suite passes authoritative scoring, saved replay parity,
+completion, leaderboard placement, recall forfeiture, exploration and the
+player-created course flow. Altered design proofs are rejected; cancellation and
+restart during flight cannot create a stale result. Additional entry checks pass
+first-level spawn, saved selection after reconnect and return from the designer.
 
-The catalog is `web/starter-challenges.json`; reproducible inputs and tolerances
-are `web/levels/proof-inputs.json`. Full native traces and Chrome receipts stay in
-`.local/campaign/`, outside Git. A campaign is complete only when all 30 entries
-have native and browser evidence and the combined menu, scoring, replays,
-progression, creator flow and music have passed local checks.
+Fresh Chrome playthroughs clear First Bounce, Atrium Finale, Ticket Slalom,
+Step Down and Soft Landing. Each saved replay independently reproduces its server
+score. Movement/home, complete hints, replay scrubbing and retry pass. The opening
+Space-to-next-level action advances once without throwing from a held key;
+finishing level 30 opens the level picker. All five runs have zero page errors
+and zero skipped music steps.
+
+### Loading and music
+
+CPU recordings identified texture uploads and first-use shader work in reflection
+capture, then cutaway shader compilation on first level entry. Texture uploads
+now yield between batches. Reflection shaders compile asynchronously against the
+actual linear cubemap render target; screen and cutaway variants warm up before
+entry. Probe positions, materials, geometry, resolution and gameplay physics are
+unchanged. This follows the texture initialization and shader preparation APIs in
+the [Three.js renderer documentation](https://threejs.org/docs/pages/WebGLRenderer.html).
+
+The final guarded Chrome audit visits every course at **1440×900 and 1280×720**,
+checks target/start/goal label clearance, every chapter's five entries and every
+hint's aim and spin. All **60 views pass** on this laptop's Apple M2 Metal renderer.
+A separate native worker starts alongside the browser; timestamps prove it remains
+running throughout cold entry. Both processes finish successfully.
+
+- Station ready: **8.79 seconds** with that extra worker running.
+- Largest cold-loading task: **712 ms**; largest task after entry: **57 ms**.
+- Highest frame-time p95 across recorded navigation windows: **33.3 ms**.
+- **Zero skipped music steps and zero page errors** throughout the audit.
+
+Loading can still briefly occupy the main thread under competing CPU work. The
+original startup timeout and multi-second entry stalls do not recur in this
+checked workload. The benchmark fails on a music skip, a loading task of 750 ms
+or longer, or a task of 200 ms or longer after entry. Optional CPU profiles are saved alongside its measurements.
+
+### Verification and delivery
+
+`npm run typecheck`, `KYOTO_CAMPAIGN_COMPLETE=1 npm test`, `npm run build:web` and
+`npm run test:runtime` pass. The fresh native receipt's catalog and input hashes
+match the current files. The restarted v2 preview verifies matching visual,
+collision, hardware and moving-step exports; the Blender source hash matches the
+saved source proof. The unrelated Unity package-lock edit remains untouched.
+
+Removed 35 standalone probes for the retired courses/scoring and their obsolete
+command references. Current fixtures are `web/levels/proof-inputs.json`; browser
+acceptance is `web/levels/browser-proof.mjs`, with optional `KYOTO_PROOF_NEXT=1`.
+Run the complete navigation/stability audit using
+`node web/benchmarks/campaign-stability.mjs .local/campaign/final-audit/browser`
+against the isolated preview. Set `KYOTO_PROFILE=1` for a CPU recording.
+
+Detailed receipts, traces and screenshots remain under
+`.local/campaign/final-audit/`, outside Git. There is one active campaign checkout
+and one current station bundle. No release, asset pack or production change was
+published; all campaign delivery is merged into local `main`.
 
 ## Floor regression workflow
 

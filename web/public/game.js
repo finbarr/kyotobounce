@@ -413,7 +413,7 @@ async function load(){
     stationLook=dressStation(renderer,scene,sun,station,data);
     boundary.applyFog(scene);
     await yieldLoadingUI();stationLook.updateLights(camera.position,0);
-    stationLook.captureEnvironment();
+    await stationLook.captureEnvironment();
     if(data.stationInstallations){
       const lights=document.createElement('button');lights.id='station-light-mode';lights.textContent='Station lights: Day';lights.setAttribute('aria-pressed','false');
       let night=false;lights.onclick=()=>{night=!night;stationLook.setNight(night);lights.textContent=night?'Station lights: Evening':'Station lights: Day';lights.setAttribute('aria-pressed',String(night));};
@@ -423,7 +423,21 @@ async function load(){
     robotShadow=contactShadow(scene,station);ballShadow=contactShadow(scene,station);
     if(guestId)createAvatar(guestId);
     startup.progress(96,'Warming up the graphics…');await yieldLoadingUI();
-    await renderer.compileAsync(scene,camera);
+    // Overviews use one or two global cut planes. Prepare all three program
+    // variants now so entering a level never compiles a new station shader.
+    const viewport=renderer.getViewport(new THREE.Vector4()),planes=renderer.clippingPlanes;
+    const emptyScene=new THREE.Scene();
+    try{
+      renderer.setViewport(0,0,1,1);
+      for(const count of [1,2,0]){
+        renderer.clippingPlanes=Array.from({length:count},()=>new THREE.Plane(new THREE.Vector3(0,-1,0),1e6));
+        // Three updates its global clipping state during render, before
+        // compileAsync reads it. An empty draw sets that state cheaply.
+        renderer.render(emptyScene,camera);
+        await renderer.compileAsync(scene,camera);
+        renderer.render(scene,camera);await yieldLoadingUI();
+      }
+    }finally{renderer.clippingPlanes=planes;renderer.setViewport(viewport);}
     await blur.prepare();
     renderer.render(scene,camera);await yieldLoadingUI();
     loaded=true;startupMs=performance.now();

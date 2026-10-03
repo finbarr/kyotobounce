@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {yieldLoadingUI} from './loading.js';
 
 // Coordinates are renderer world space (native Z is negated). The blend weights
 // are attached to architecture, never to the camera or a per-frame probe selector.
@@ -77,7 +78,7 @@ ${canopy?`
     const chunk=THREE.ShaderChunk.envmap_physical_pars_fragment.replaceAll('textureCubeUV( envMap,','stationRadiance(');
     shader.fragmentShader=shader.fragmentShader.replace('#include <envmap_physical_pars_fragment>',functions+chunk);
   }
-  function capture(){
+  async function capture(){
     if(captured||disposed)return;captured=true;
     const started=performance.now(),old=scene.environment,hidden=[];
     // No ball, trail, target, avatar or mutable practical light baked into probes.
@@ -94,18 +95,43 @@ ${canopy?`
     // higher resolution serves the broad mirror panels; no frame loop is added.
     const courtCube=courtyardMaterials.length?new THREE.WebGLCubeRenderTarget(512,{type:THREE.HalfFloatType,generateMipmaps:false,minFilter:THREE.LinearFilter}):null;
     const courtProbe=courtCube?new THREE.CubeCamera(.3,180,courtCube):null;
+    async function prepareCapture(camera,target){
+      const previous=renderer.getRenderTarget(),face=renderer.getActiveCubeFace(),mip=renderer.getActiveMipmapLevel();
+      // Cubemaps use linear output without the canvas tone mapping. Compiling
+      // against the canvas warms a different program and still stalls here.
+      try{renderer.setRenderTarget(target);await renderer.compileAsync(scene,camera.children[0]);}
+      finally{renderer.setRenderTarget(previous,face,mip);}
+    }
     try{
+      // Upload each texture before the first cubemap render. Otherwise the
+      // first face performs every decode/upload in one long main-thread task.
+      const textures=new Set();
+      scene.traverseVisible(o=>{
+        for(const material of Array.isArray(o.material)?o.material:[o.material])
+          if(material)for(const value of Object.values(material))if(value?.isTexture)textures.add(value);
+      });
+      let slice=performance.now();
+      for(const texture of textures){
+        renderer.initTexture(texture);
+        if(performance.now()-slice>12){await yieldLoadingUI();slice=performance.now();}
+      }
+      // These captures use different lights and no environment. Warm their
+      // shader programs before rendering, as well as the final game programs.
+      await prepareCapture(probe,cube);
+      pmrem.compileCubemapShader();
+      await yieldLoadingUI();
       for(const zone of zones){
         const camera=zone===COURT_PROBE?courtProbe:probe,targetCube=zone===COURT_PROBE?courtCube:cube;
         camera.position.fromArray(zone.position);
         if(zone===DINING_PROBE){
           const lighting=createDiningCaptureLighting(authoredLights);scene.add(lighting);
           stats.diningCaptureLights=lighting.children.filter(o=>o.isLight).length;
-          try{camera.update(renderer,scene);}
+          try{await prepareCapture(camera,targetCube);camera.update(renderer,scene);}
           finally{scene.remove(lighting);for(const light of lighting.children)if(light.isLight)light.dispose();}
         }else camera.update(renderer,scene);
         const target=pmrem.fromCubemap(targetCube.texture);target.texture.name=`K026 ${zone.name} PMREM`;targets.push(target);stats.captures++;
         stats.pmremBytes+=target.width*target.height*8;
+        await yieldLoadingUI();
       }
       uniforms.stationHall.value=targets[0].texture;uniforms.stationGallery.value=targets[1].texture;uniforms.stationGarden.value=targets[2].texture;
       if(canopy)uniforms.stationExterior.value=targets[3].texture;

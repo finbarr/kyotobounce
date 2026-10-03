@@ -9,9 +9,9 @@ for(const name of ['node_modules','runtime']){await rm(join(app,name),{force:tru
 const manifest=JSON.parse(await readFile(join(candidate,'manifest.json')));
 for(const name of ['station.json','atrium-detail.json']){const p=join(app,'web/public/assets',name);const data=JSON.parse(await readFile(p));if(name==='station.json')data.layoutSha256=manifest.layoutSha256;else data.sourceLayoutSha256=manifest.layoutSha256;data.k029Candidate={baseLayout:'7dcbc8a4c2883d14b075f200a20afebda415ed5c2179e31cc2d6bf8f21396775',layers:manifest.layers};await rm(p);await writeFile(p,JSON.stringify(data));}
 for(const name of ['grand','upright','miniature']){const to=join(app,'web/public/assets',`k029-${name}.glb`);await rm(to,{force:true});await symlink(join(candidate,`k029-${name}.glb`),to);}
-let game=await readFile('web/public/game.js','utf8');game=game.replace('    stationLook.captureEnvironment();',`    if(data.layoutSha256==='${manifest.layoutSha256}') { for(const name of ['grand','upright','miniature']){const exhibit=await loader.loadAsync('/assets/k029-'+name+'.glb');exhibit.scene.traverse(o=>{if(o.isMesh){o.geometry.computeBoundsTree();o.receiveShadow=true;o.castShadow=!o.material.transparent;}});station.add(exhibit.scene);}station.updateMatrixWorld(true);
+let game=await readFile('web/public/game.js','utf8');game=game.replace('    await stationLook.captureEnvironment();',`    if(data.layoutSha256==='${manifest.layoutSha256}') { for(const name of ['grand','upright','miniature']){const exhibit=await loader.loadAsync('/assets/k029-'+name+'.glb');exhibit.scene.traverse(o=>{if(o.isMesh){o.geometry.computeBoundsTree();o.receiveShadow=true;o.castShadow=!o.material.transparent;}});station.add(exhibit.scene);}station.updateMatrixWorld(true);
     window.k029Layout='${manifest.layoutSha256}'; }
-    stationLook.captureEnvironment();`);
+    await stationLook.captureEnvironment();`);
 const gamePath=join(app,'web/public/game.js');await rm(gamePath);await writeFile(gamePath,game);
 // Local QA starter only; cloned rules/geometry, new candidate layout, private DB.
 const starter=JSON.parse(await readFile('web/starter-challenges.json'));

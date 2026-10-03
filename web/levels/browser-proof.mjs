@@ -119,6 +119,27 @@ try{
  if(await page.locator('#replay-play').textContent()==='Pause')await page.locator('#replay-play').click();
  await page.locator('#replay-scrub').focus();await page.keyboard.press('End');await page.waitForFunction(t=>Math.abs(window.kyotoState.replayTime-t)<.02,replay.duration);await page.screenshot({scale:'css',path:resolve(out,'replay-end.png')});
  await page.keyboard.press('Home');await page.waitForFunction(()=>window.kyotoState.replayTime<=0);await page.screenshot({scale:'css',path:resolve(out,'replay-start.png')});await page.locator('#close-replay').click();await page.waitForFunction(()=>window.kyotoState.mode==='play');
+ if(process.env.KYOTO_PROOF_NEXT==='1'){
+  const catalog=JSON.parse(await readFile('web/starter-challenges.json')),next=catalog.find(c=>c.order===course.order+1),before=commands.length;
+  await page.locator('#game').focus();await page.keyboard.down('Space');
+  if(next){
+   await page.waitForFunction(id=>kyotoState.challenge?.id===id&&kyotoState.briefing,next.id);
+   await page.keyboard.down('Space');await page.keyboard.up('Space');
+   assert.equal(commands.slice(before).filter(c=>c.type==='select-challenge').length,1);
+   assert(!commands.slice(before).some(c=>c.type==='charge'||c.type==='release'),'Advancing and held-key repeat do not throw');
+   await page.screenshot({path:resolve(out,'next-level.png')});
+   await page.keyboard.press('Escape');await page.waitForFunction(()=>!kyotoState.briefingTransition);
+   if(!await page.locator('#campaign-chapter').isVisible())await page.keyboard.press('l');
+   await page.locator('#campaign-chapter').selectOption(String(course.campaign.chapter));
+   await page.locator(`#course-list button[data-challenge="${course.id}"]`).click();await page.waitForFunction(id=>kyotoState.challenge?.id===id,course.id);
+   if(await page.evaluate(()=>kyotoState.briefing))await page.locator('#briefing-play').click();
+   await page.waitForFunction(()=>!kyotoState.briefingTransition);
+  }else{
+   await page.getByRole('button',{name:'Close levels'}).waitFor();await page.keyboard.up('Space');
+   assert(!commands.slice(before).some(c=>['select-challenge','charge','release'].includes(c.type)),'Campaign end opens level selection without throwing');
+   await page.screenshot({path:resolve(out,'campaign-complete.png')});await page.getByRole('button',{name:'Close levels'}).click();
+  }
+ }
  // Recall/retry through actual input preserves the selected course and aiming affordance.
  await page.keyboard.press('r');await page.waitForFunction(()=>window.kyotoState?.phase==='Aim');await page.keyboard.press('h');await page.screenshot({scale:'css',path:resolve(out,'retry.png')});
  assert.deepEqual(errors,[]);status='pass';
