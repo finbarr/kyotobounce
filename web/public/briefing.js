@@ -8,6 +8,7 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
  let active=false,transition=0,challenge,eye=new THREE.Vector3(),target=new THREE.Vector3(),lastEye=new THREE.Vector3(),lastQ=new THREE.Quaternion();
  const routeGuide=$('briefing-route'),svgNS='http://www.w3.org/2000/svg';let guidePoints=[],guideLine;
  const clip=new THREE.Plane(new THREE.Vector3(0,-1,0),5);
+ const roofClip=new THREE.Plane(new THREE.Vector3(0,-1,0),5);
  function open(c){
   if(!c)return;onOpen();challenge=c;active=true;transition=0;host.hidden=false;document.body.classList.add('is-briefing');
   routeGuide.replaceChildren();guidePoints=[];guideLine=null;
@@ -48,19 +49,25 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
     const classic=['combo-v7'].includes(challenge.scoring);
     const halfWidth=bounds.size.length()*.5+(classic?THREE.MathUtils.clamp(span.length()*.35,3,12):0)+2;
     const range=Math.max(14,halfWidth/Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/Math.min(camera.aspect*.67,.85));
-    eye.copy(target).addScaledVector(side,range*.47).add(new THREE.Vector3(0,range*.88,0));
+    const ceiling=challenge.waypoints?.find(w=>w.normal?.y<-.5&&w.normal.y>-.995);
+    // Look over the stairwell walls when a ceiling bank leads to a lower tread.
+    eye.copy(target).addScaledVector(side,range*(ceiling ? .22 : .47)).add(new THREE.Vector3(0,range*(ceiling ? .98 : .88),0));
     camera.position.copy(eye);camera.up.set(0,1,0);camera.lookAt(target);camera.updateMatrixWorld();
     // Follow a change of height so the upper floor cannot cover either end
     // of a basement route. Keep every target disk and the starting pad below it.
     const horizontal=span.x*span.x+span.z*span.z;
     const slope=Math.abs(span.y)>1&&horizontal>4?span.y/horizontal:0;
     clip.normal.set(span.x*slope,-1,span.z*slope).normalize();
-    clip.constant=Math.max(...routeTargets(challenge).map(d=>{
-     const normal=v(d.normal||{x:0,y:1,z:0}).normalize();
-     const extent=d.radius*Math.sqrt(Math.max(0,1-clip.normal.dot(normal)**2));
-     return -clip.normal.dot(v(d.center))+extent;
-    }))+.08;
-    renderer.clippingPlanes=[clip];
+    // A sloping ceiling bank needs a cut parallel to its face to reveal the
+    // lower steps. A horizontal cut also removes the upper landing's roof.
+    if(ceiling)clip.normal.copy(v(ceiling.normal)).normalize();
+    const planes=ceiling?[clip,roofClip]:[clip];
+    for(const plane of planes)plane.constant=Math.max(...routeTargets(challenge).map(d=>{
+      const normal=v(d.normal||{x:0,y:1,z:0}).normalize();
+      const extent=d.radius*Math.sqrt(Math.max(0,1-plane.normal.dot(normal)**2));
+      return -plane.normal.dot(v(d.center))+extent;
+     }))+.08;
+    renderer.clippingPlanes=planes;
     placeLabel('map-start',a,camera);if(challenge.goal)placeLabel('map-goal',v(challenge.goal.center),camera);
     if(guideLine){
      routeGuide.setAttribute('viewBox',`0 0 ${innerWidth} ${innerHeight}`);

@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**11 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**12 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -69,6 +69,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 9. Upward Bound | 2 / 2, moving-step contact and a 4.91 m climb | 6 / 6: ±1° yaw/pitch, ±20 ms charge; 4 / 4 additional step phases; every sample rested upstairs | First attempt cleared; upward cutaway, hint, saved replay, scrub and retry passed |
 | 10. Glass Loop | 2 / 2, back-wall and inside-glass targets with two sharp turns | 6 / 6: ±0.5° yaw, ±1° pitch, ±30 ms charge; every sample rested | First attempt cleared; both patches visible, overview, hint and saved replay controls passed |
 | 11. Bridge Pinball | 2 / 2, opposite glass-pane banks above the ticket hall | 6 / 6: ±1° yaw/pitch, ±40 ms charge; every sample rested | First attempt cleared; chapter selection, unobstructed aiming, overview and replay controls passed |
+| 12. Step Down | 2 / 2, sloping ceiling bank and 3.03 m drop to a stair tread | 6 / 6: ±1° yaw, ±0.5° pitch, 11.6–12 m/s; every sample rested | First attempt cleared; cutaway shows the start and both patches, replay and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -214,9 +215,24 @@ The shot recorder now rejects a placement on a different floor from the requeste
 start. For low ceilings, set `startRayHeight` below the ceiling; the bridge uses
 2 m instead of the default 3 m. This keeps authoring on the public walking floor.
 
-**Next: author level 12**, using the bridge's connected public balcony or access
-corridor for a longer bank or a change of height. Finish the native proof,
-nearby variations, Chrome playtest and local merge before level 13.
+Level 12 uses the access stairs west of the glass bridge. Full precision power
+at 10° elevation hits a 0.40 m patch on the sloping ceiling, then a 0.12 m patch
+entirely within a lower stair tread. The hint rests on the steps in 5.38 seconds.
+All six nearby shots collect both targets and rest in 5.31–24.52 seconds; some
+continue onto the lower landing. Native proof checks the sharp ceiling bank
+and a drop of more than 2.9 m from release.
+
+Sloped-ceiling courses now use a cut along the ceiling face, a horizontal roof
+cut and a steeper overview camera to expose the lower tread behind the stair
+walls. The final Chrome run clears first try at 210,476 points, with zero skipped
+music steps or page errors. Overview, hint, saved replay, scrub and retry pass.
+Service scoring/replay/completion/recall, typecheck, unit tests, focused waypoint
+presentation checks and browser build pass. Evidence: `.local/campaign/step-down/`.
+Station geometry and native physics are unchanged.
+
+**Next: author level 13**, returning to an open atrium balcony for a longer shot
+with a view into the hall. Finish native proof, nearby variations, Chrome
+playtesting and the local merge before level 14.
 
 ## Floor repair
 
@@ -257,6 +273,11 @@ These rest checks supersede the earlier authoring timings above.
   The measured report is retained in the local browser directory's
   `cold-view-note.json`. Gameplay proof now waits for the view to finish drawing
   and retains loading/performance reports; that does not resolve the cold stall.
+- One Step Down overview run recorded 14 skipped music steps before charging,
+  with a 4.28-second maximum scheduler gap. Its shot had no skipped steps, and
+  the final run had none throughout. The cause remains unprofiled; include
+  sloped-ceiling cutaway transitions in the final stability pass. Receipt:
+  `.local/campaign/step-down/cold-view-note.json`.
 
 Before final acceptance, remove any remaining standalone retired-level probes
 under `web/tests/` rather than adapting their old course IDs or routes.

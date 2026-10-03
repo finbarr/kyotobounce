@@ -945,5 +945,98 @@
         200
       ]
     }
+  },
+  {
+    "id": "bridge-step-down",
+    "revision": 1,
+    "name": "Step Down",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -44.599998474121094,
+        "y": 9.589427947998047,
+        "z": -12.100000381469727
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "gate-west-access-upper-landing"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -47.4410514831543,
+          "y": 11.351957321166992,
+          "z": -11.880000114440918
+        },
+        "normal": {
+          "x": 0.49795761704444885,
+          "y": -0.8672013282775879,
+          "z": 0
+        },
+        "radius": 0.4000000059604645,
+        "surface": "gate-west-access-stair-ceiling",
+        "id": "sloping-ceiling"
+      },
+      {
+        "center": {
+          "x": -48.849998474121094,
+          "y": 8.039054870605469,
+          "z": -11.879999160766602
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.11999999731779099,
+        "surface": "gate-west-access-step-3",
+        "id": "lower-tread"
+      }
+    ],
+    "hint": {
+      "yaw": -90,
+      "pitch": 10,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2800,
+      "note": "Use full precision power, 10° elevation and no spin. Bank the sloping ceiling to drive the ball onto the marked lower tread. Collect both patches; the ball may finish on any step once it stops completely."
+    },
+    "order": 11,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Above the Atrium",
+      "difficulty": "Hard",
+      "distance": 11.7,
+      "brief": "Bank the sloping ceiling and drop onto the tiny purple stair tread. Collect both patches before the ball settles on the steps."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
