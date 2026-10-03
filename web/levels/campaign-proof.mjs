@@ -58,6 +58,20 @@ async function run(slot){
    receipt.allWaypoints=challenge.waypoints?.every(w=>hitIds.has(w.id))??true;
    receipt.fullClear=receipt.allWaypoints&&(!challenge.goal||result.destinationReached===true);
    await writeFile(resolve(out,`${index}-${challenge.id}.json`),JSON.stringify(result));
+   if(challenge.requiredSurface){
+    receipt.requiredSurfaceHit=result.contacts.some(c=>c.qualifying&&c.surface===challenge.requiredSurface);
+    assert.ok(receipt.requiredSurfaceHit,'The shot must touch its required moving surface');
+   }
+   if(shot.period){
+    receipt.releasePhase=((result.releaseTime%shot.period)+shot.period)%shot.period;
+    const error=Math.abs(receipt.releasePhase-shot.phase);
+    receipt.phaseError=Math.min(error,shot.period-error);
+    assert.ok(receipt.phaseError<=.1,'The moving-step phase sample must be within 100 ms of its requested phase');
+   }
+   if(features?.minFinishRise){
+    receipt.finishRise=result.poses.at(-1).p.y-challenge.start.center.y;
+    assert.ok(receipt.finishRise>=features.minFinishRise,'The ball must finish on the upper level');
+   }
    if(features&&kind==='hint'){
     const nonFloor=result.waypointHits.filter(h=>h.normal.y<.5);
     receipt.nonFloorTargets=nonFloor.length;receipt.sharpTurns=0;receipt.ceilingRebounds=0;

@@ -680,5 +680,84 @@
         200
       ]
     }
+  },
+  {
+    "id": "basement-upward-bound",
+    "revision": 1,
+    "name": "Upward Bound",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 1.7999999523162842,
+        "y": -4.913582801818848,
+        "z": 5.862729072570801
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "porta-connection-b1-deck"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 14,
+          "y": -0.0020019523799419403,
+          "z": 5.699999809265137
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.25,
+        "surface": "hall-basement-east-escalator-1-upper-pit-cover",
+        "id": "upper-exit"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": 0,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 122,
+      "note": "Use 1.0 m/s with a level aim and no spin. Set the ball gently onto the upward escalator and let it carry it to the purple exit plate. The score locks only after the ball stops completely."
+    },
+    "order": 8,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Below the Glass",
+      "difficulty": "Medium",
+      "distance": 14.7,
+      "brief": "Catch the upward escalator from B1 to the atrium. Touch its moving steps and the purple fixed exit plate at the top, then let the ball settle."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    },
+    "requiredSurface": "hall-basement-east-escalator-1"
   }
 ]

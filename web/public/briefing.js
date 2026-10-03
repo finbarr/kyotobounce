@@ -50,10 +50,10 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
     const range=Math.max(14,halfWidth/Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/Math.min(camera.aspect*.67,.85));
     eye.copy(target).addScaledVector(side,range*.47).add(new THREE.Vector3(0,range*.88,0));
     camera.position.copy(eye);camera.up.set(0,1,0);camera.lookAt(target);camera.updateMatrixWorld();
-    // Follow a descent with the cutaway so the upper floor cannot cover its
-    // basement target. Keep every target disk and the starting pad below it.
+    // Follow a change of height so the upper floor cannot cover either end
+    // of a basement route. Keep every target disk and the starting pad below it.
     const horizontal=span.x*span.x+span.z*span.z;
-    const slope=b.y<a.y-1&&horizontal>4?span.y/horizontal:0;
+    const slope=Math.abs(span.y)>1&&horizontal>4?span.y/horizontal:0;
     clip.normal.set(span.x*slope,-1,span.z*slope).normalize();
     clip.constant=Math.max(...routeTargets(challenge).map(d=>{
      const normal=v(d.normal||{x:0,y:1,z:0}).normalize();

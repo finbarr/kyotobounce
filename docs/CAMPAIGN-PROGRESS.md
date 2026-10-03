@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**8 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**9 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -66,6 +66,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 6. Basement Drop | 2 / 2, a 6.42 m descent from release to B1 | 6 / 6: ±3° yaw/pitch, ±60 ms charge; every sample rested | First attempt cleared; chapter selection, overview, hint, saved replay, scrub and retry passed |
 | 7. Pier Pressure | 2 / 2, opposite pier banks with two sharp turns | 6 / 6: ±2° yaw/pitch, ±60 ms charge; every sample rested | First attempt cleared both targets; overview, hint, saved replay, scrub and retry passed |
 | 8. Ceiling Skip | 2 / 2, ceiling rebound followed by a B1 floor hit | 6 / 6: ±2° yaw, ±1° pitch, 11.5–12 m/s; every sample rested | First attempt cleared; ceiling patch visible while aiming, overview and saved replay controls passed |
+| 9. Upward Bound | 2 / 2, moving-step contact and a 4.91 m climb | 6 / 6: ±1° yaw/pitch, ±20 ms charge; 4 / 4 additional step phases; every sample rested upstairs | First attempt cleared; upward cutaway, hint, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -160,10 +161,26 @@ scrub, retry, progression and recall checks pass. Typecheck, unit tests and the
 browser build pass. Receipts: `.local/campaign/ceiling-skip/`. Station geometry,
 physics and browser presentation code are unchanged for this level.
 
-**Next: author level 9**, exploring an escalator-assisted climb from B1 back to
-the atrium with a fixed target at the upper landing. Check different moving-step
-phases as well as nearby aim/power settings; finish verification and the local
-merge before level 10.
+Level 9 gently drops the ball onto the upward B1 escalator. Its level, spin-free
+1.0 m/s hint collects a 0.25 m patch on the fixed upper exit plate and reaches
+full rest in 30.99 seconds. Every proof checks actual qualifying contact with
+the moving steps and a finish at least 4.8 m above the start. Four additional
+shots sample quarter-cycle step phases; their measured release times are within
+34 ms of the requested phases. All ten variations clear and rest in 29.06–31.85
+seconds. A wider +2° pitch sample fell back into B1, so the verified pitch
+tolerance is ±1°; the level hint explicitly calls for a level aim.
+
+The overview cutaway now follows upward routes as well as descents, revealing
+the lower starting pad and the upper target together. Chrome clears the final
+version first try at 112,848 points, with 16.7/16.8 ms sampled median/p95 frames,
+112 BPM music, zero skipped steps and no page errors. Authoritative scoring,
+saved replay parity, completion and recall checks pass. Typecheck, unit tests,
+the catalog check and browser build pass. Evidence: `.local/campaign/upward-bound/`.
+No station geometry or physics changed.
+
+**Next: author level 10**, a basement chapter finale using two fixed targets
+along the connected public aisles. Finish its native proof, nearby variations,
+Chrome playtest and local merge before moving to the atrium bridges.
 
 ## Floor repair
 
