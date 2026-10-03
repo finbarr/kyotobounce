@@ -71,6 +71,10 @@ async function run(slot){
     }
     assert.ok(receipt.nonFloorTargets>=features.minNonFloorTargets,'The route must collect its wall/ceiling targets');
     assert.ok(receipt.sharpTurns>=features.minSharpTurns,'The route must make a sharp turn at a wall/ceiling target');
+    if(features.minHeightDrop){
+     receipt.heightDrop=result.launchPosition.y-Math.min(...result.poses.map(p=>p.p.y));
+     assert.ok(receipt.heightDrop>=features.minHeightDrop,'The shot must descend into the lower public space');
+    }
    }
    if(challenge.scoring==='waypoint-v4'){
     for(const target of challenge.waypoints)assert.ok(hitIds.has(target.id),`Shot misses waypoint ${target.id}`);

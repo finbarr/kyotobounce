@@ -416,5 +416,83 @@
         200
       ]
     }
+  },
+  {
+    "id": "basement-drop",
+    "revision": 1,
+    "name": "Basement Drop",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 1.2000000476837158,
+        "y": 0,
+        "z": -0.5
+      },
+      "normal": {
+        "x": 0,
+        "y": 0.9999999403953552,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "hall-bay-floor-surface"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 1.4199997186660767,
+          "y": -4.913582801818848,
+          "z": 6.640918254852295
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.6499999761581421,
+        "surface": "porta-connection-b1-deck",
+        "id": "b1-floor"
+      }
+    ],
+    "hint": {
+      "yaw": 0,
+      "pitch": 30,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 1217,
+      "note": "Use 5.5 m/s, aim 30° upward and keep spin at zero. Clear the central glass rim and bounce on the purple B1 floor patch, then let the ball settle."
+    },
+    "order": 5,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Below the Glass",
+      "difficulty": "Easy",
+      "distance": 38.6,
+      "brief": "Lob over the central glass rim into the basement. Touch the purple floor patch almost five metres below the atrium to clear the level."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

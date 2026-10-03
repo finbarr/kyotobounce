@@ -50,8 +50,17 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
     const range=Math.max(14,halfWidth/Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/Math.min(camera.aspect*.67,.85));
     eye.copy(target).addScaledVector(side,range*.47).add(new THREE.Vector3(0,range*.88,0));
     camera.position.copy(eye);camera.up.set(0,1,0);camera.lookAt(target);camera.updateMatrixWorld();
-    // Cut just above the patches so indoor wall targets are not hidden by the roof.
-    clip.constant=Math.max(...routeTargets(challenge).map(d=>d.center.y+d.radius*Math.sqrt(Math.max(0,1-(d.normal?.y??1)**2))))+.08;renderer.clippingPlanes=[clip];
+    // Follow a descent with the cutaway so the upper floor cannot cover its
+    // basement target. Keep every target disk and the starting pad below it.
+    const horizontal=span.x*span.x+span.z*span.z;
+    const slope=b.y<a.y-1&&horizontal>4?span.y/horizontal:0;
+    clip.normal.set(span.x*slope,-1,span.z*slope).normalize();
+    clip.constant=Math.max(...routeTargets(challenge).map(d=>{
+     const normal=v(d.normal||{x:0,y:1,z:0}).normalize();
+     const extent=d.radius*Math.sqrt(Math.max(0,1-clip.normal.dot(normal)**2));
+     return -clip.normal.dot(v(d.center))+extent;
+    }))+.08;
+    renderer.clippingPlanes=[clip];
     placeLabel('map-start',a,camera);if(challenge.goal)placeLabel('map-goal',v(challenge.goal.center),camera);
     if(guideLine){
      routeGuide.setAttribute('viewBox',`0 0 ${innerWidth} ${innerHeight}`);

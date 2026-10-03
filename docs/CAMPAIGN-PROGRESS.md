@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**5 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**6 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -63,6 +63,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 3. Clock In | 2 / 2, including the mounted clock rebound | 6 / 6: ±2° yaw, ±2° pitch, 11.5–12 m/s | Two first-attempt clears; overview and replay passed |
 | 4. Ticket Slalom | 2 / 2, two distinct cabinet banks and sharp turns | 6 / 6: ±0.5° yaw/pitch, ±30 ms charge; every sample rested | First gameplay attempt cleared both targets; overview and replay passed |
 | 5. Glass Return | 2 / 2, glass rebound and return landing bonus | 6 / 6: ±2° yaw/pitch, ±20 ms charge; every sample earned the bonus at full rest | First attempt earned the landing bonus; overview, saved replay, scrub and retry passed |
+| 6. Basement Drop | 2 / 2, a 6.42 m descent from release to B1 | 6 / 6: ±3° yaw/pitch, ±60 ms charge; every sample rested | First attempt cleared; chapter selection, overview, hint, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -117,10 +118,25 @@ scoring, bonus award, saved replay parity, progression and recall forfeiture.
 Native, browser and service receipts are in `.local/campaign/glass-return/`.
 Typecheck, unit tests and browser build pass. No station geometry changed.
 
-**Next: author level 6**, beginning the basement chapter with a public descent
-or a lower landing visible through the atrium glazing. Record an actual native
-route, choose a readable target on existing geometry, and finish its verification
-and local merge before starting level 7.
+Level 6 opens **Below the Glass** with a lob over the central oval glazing.
+Its 0.65 m radius floor patch is 4.91 m below the launch pad. The 5.5 m/s hint
+at 30° elevation clears the rim and reaches full translation and spin rest in
+21.83 seconds. Both exact runs and all six neighbors clear; nearby rest times
+range from 11.92–24.14 seconds. The proof also verifies the native trajectory
+descends more than 6 m from release into B1.
+
+The overview cutaway follows descents so the upper floor does not hide lower
+targets; every target disk and the start remain below the cut plane. Native,
+service and Chrome evidence is in `.local/campaign/basement-drop/`. The service
+passes authoritative scoring, saved replay parity, completion and recall.
+Chrome clears on its first attempt at 122,107 points; the final run has 16.7 ms
+sampled median/p95 frames, 112 BPM music, zero skipped music steps and no page
+errors. Typecheck, the portable suite, browser build and focused presentation
+checks pass. No station geometry or physics changed.
+
+**Next: author level 7**, a bank from inside the connected B1 public space.
+Use the existing glazing, piers or escalator casing for a readable rebound;
+finish verification and the local merge before starting level 8.
 
 ## Floor repair
 

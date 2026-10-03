@@ -443,6 +443,96 @@
         "minNonFloorTargets": 1,
         "minSharpTurns": 1
       }
+    },
+    {
+      "id": "basement-drop",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 1217,
+        "range": "precision",
+        "input": {
+          "yaw": 0,
+          "pitch": 30,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 80
+      },
+      "neighbors": [
+        {
+          "holdMs": 1217,
+          "range": "precision",
+          "input": {
+            "yaw": -3,
+            "pitch": 30,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1217,
+          "range": "precision",
+          "input": {
+            "yaw": 3,
+            "pitch": 30,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1217,
+          "range": "precision",
+          "input": {
+            "yaw": 0,
+            "pitch": 27,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1217,
+          "range": "precision",
+          "input": {
+            "yaw": 0,
+            "pitch": 33,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1157,
+          "range": "precision",
+          "input": {
+            "yaw": 0,
+            "pitch": 30,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1277,
+          "range": "precision",
+          "input": {
+            "yaw": 0,
+            "pitch": 30,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 0,
+        "minSharpTurns": 0,
+        "minHeightDrop": 6
+      }
     }
   ]
 }
