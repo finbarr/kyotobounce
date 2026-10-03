@@ -325,5 +325,96 @@
         200
       ]
     }
+  },
+  {
+    "id": "atrium-glass-return",
+    "revision": 1,
+    "name": "Glass Return",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -5.999999523162842,
+        "y": 0,
+        "z": -1
+      },
+      "normal": {
+        "x": 0,
+        "y": 0.9999999403953552,
+        "z": 0
+      },
+      "radius": 0.5,
+      "surface": "hall-bay-floor-surface"
+    },
+    "goal": {
+      "center": {
+        "x": -6.21999979019165,
+        "y": 0,
+        "z": -0.7300000786781311
+      },
+      "normal": {
+        "x": 0,
+        "y": 0.9999999403953552,
+        "z": 0
+      },
+      "radius": 2,
+      "surface": "hall-bay-floor-surface"
+    },
+    "waypoints": [
+      {
+        "center": {
+          "x": -5.780377388000488,
+          "y": 0.7264112234115601,
+          "z": 1.4486229419708252
+        },
+        "normal": {
+          "x": 0.016419781371951103,
+          "y": -0.00006737915828125551,
+          "z": -0.9998652338981628
+        },
+        "radius": 0.4000000059604645,
+        "surface": "hall-bay-well-glass-west",
+        "id": "basement-glass"
+      }
+    ],
+    "hint": {
+      "yaw": 0,
+      "pitch": 0,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 1135,
+      "powerRange": "precision",
+      "note": "Use 5.2 m/s with a level aim and no spin. Bank the purple glass patch and let the rebound return to the gold circle beside your start for the landing bonus."
+    },
+    "order": 4,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "Atrium Beginnings",
+      "difficulty": "Easy",
+      "distance": 32,
+      "brief": "Bank the glass around the basement opening. Hit its purple patch to clear the level; bring the ball back beside your start for the gold landing bonus."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

@@ -22,7 +22,7 @@ With equal movement and landing bonuses, eighteen banks match one waypoint.
 The rule is `waypoint-v4`; retired scoring records do not mix with current scores.
 The local native worker was rebuilt and the preview restarted for this version.
 
-All four delivered courses passed fresh service checks for collection, full rest,
+The first four courses passed fresh service checks for collection, full rest,
 the new multiplier, authoritative replay parity and progression. A real zero-target
 shot earned 16,379 points and ranked below a one-target clear at 111,978;
 both saved replays reproduce their scores. Evidence is in
@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**4 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**5 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -62,6 +62,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 2. Blue Wall Bank | 2 / 2, including a sharp wall rebound | 6 / 6: ±5° yaw, ±5° pitch, 7.5–8.5 m/s | First attempt cleared; visible wall patch, overview, hint and replay passed |
 | 3. Clock In | 2 / 2, including the mounted clock rebound | 6 / 6: ±2° yaw, ±2° pitch, 11.5–12 m/s | Two first-attempt clears; overview and replay passed |
 | 4. Ticket Slalom | 2 / 2, two distinct cabinet banks and sharp turns | 6 / 6: ±0.5° yaw/pitch, ±30 ms charge; every sample rested | First gameplay attempt cleared both targets; overview and replay passed |
+| 5. Glass Return | 2 / 2, glass rebound and return landing bonus | 6 / 6: ±2° yaw/pitch, ±20 ms charge; every sample earned the bonus at full rest | First attempt earned the landing bonus; overview, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -101,10 +102,25 @@ after 17.84 seconds. The neighboring shots rest within 16–21 seconds. Evidence
 The successful Chrome run had 16.7 ms sampled median/p95 frames and no skipped
 music steps during charge/flight. No geometry or physics changed.
 
-**Next: author level 5**, an atrium glass-bank route with an optional landing bonus.
-Use the existing glazing around the public basement opening, record a new shot,
-and keep the finish zone generous enough to teach the bonus. This should finish
-the introductory chapter before the campaign moves into the basement.
+Level 5 banks a 0.40 m patch on the western basement glazing and returns toward
+a 2 m radius landing circle beside the start. The waypoint clears the course;
+the landing adds an optional bonus. The 5.2 m/s, level, spin-free hint reaches
+full rest in 23.48 seconds. All six nearby shots collect the waypoint and earn
+the bonus within 22.82–23.97 seconds. The native solver checks the entire ball
+fits inside the landing circle, rather than just its center.
+
+Chrome cleared the course with the bonus on its first attempt. Sampled median
+and p95 frame times were 16.7 and 16.8 ms, music stayed at 112 BPM with no skipped steps,
+and there were no page errors. The overview now keeps numbered target badges
+clear of the start and landing labels. Local service checks pass authoritative
+scoring, bonus award, saved replay parity, progression and recall forfeiture.
+Native, browser and service receipts are in `.local/campaign/glass-return/`.
+Typecheck, unit tests and browser build pass. No station geometry changed.
+
+**Next: author level 6**, beginning the basement chapter with a public descent
+or a lower landing visible through the atrium glazing. Record an actual native
+route, choose a readable target on existing geometry, and finish its verification
+and local merge before starting level 7.
 
 ## Floor repair
 

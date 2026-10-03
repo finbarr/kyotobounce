@@ -17,11 +17,15 @@ try{
   await c.request('select-challenge',{challengeId:id},'selected');await delay(200);
   const {result:r,state}=await c.throw(course.hint.holdMs,course.hint,120000);
   assert(r.success&&r.saved&&Number.isSafeInteger(r.score)&&r.score>0);
-  assert.equal(r.reason,'Ball stopped');assert(state.diagnostics.sleeping);
+  assert.equal(r.reason,r.destinationReached?'Target settled':'Ball stopped');assert(state.diagnostics.sleeping);
   assert.equal(Math.hypot(...Object.values(state.velocity)),0);assert.equal(Math.hypot(...Object.values(state.spin)),0);
   assert.equal(r.waypointHits.length,course.waypoints.length);
   assert.equal(r.breakdown.waypointMultiplier,10*2**(course.waypoints.length-1),'First waypoint is worth ×10; later targets double it');
   assert.equal(r.breakdown.bankBonus,.5*r.breakdown.styleBanks,'Bank rewards stay additive');
+  if(course.goal){
+   assert.equal(r.destinationReached,true,'The authored hint earns its landing bonus');
+   assert(r.breakdown.destinationBonus>0,'Supported rest in the gold circle awards the destination bonus');
+  }
   const replay=(await c.request('replay',{attempt:r.attempt},'replay')).replay;
   assert.equal(replay.score,r.score);assert.equal(replay.layout,c.state.layout);
   assert.deepEqual(scoreAttempt(replay),r.breakdown,'Server score is reproducible from native replay evidence');

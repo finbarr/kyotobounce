@@ -52,14 +52,18 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
     camera.position.copy(eye);camera.up.set(0,1,0);camera.lookAt(target);camera.updateMatrixWorld();
     // Cut just above the patches so indoor wall targets are not hidden by the roof.
     clip.constant=Math.max(...routeTargets(challenge).map(d=>d.center.y+d.radius*Math.sqrt(Math.max(0,1-(d.normal?.y??1)**2))))+.08;renderer.clippingPlanes=[clip];
+    placeLabel('map-start',a,camera);if(challenge.goal)placeLabel('map-goal',v(challenge.goal.center),camera);
     if(guideLine){
      routeGuide.setAttribute('viewBox',`0 0 ${innerWidth} ${innerHeight}`);
      const project=p=>{const q=p.clone().project(camera);return {x:(q.x*.5+.5)*innerWidth,y:(-q.y*.5+.5)*innerHeight};};
      const route=[project(a),...guidePoints.map(g=>project(g.point)),...(challenge.goal?[project(v(challenge.goal.center))]:[])];
      guideLine.setAttribute('points',route.map(p=>`${p.x},${p.y}`).join(' '));
-     const placed=[];for(const [i,g]of guidePoints.entries()){const p=route[i+1],x=p.x;let y=p.y-20;while(placed.some(q=>Math.hypot(q.x-x,q.y-y)<23))y-=24;placed.push({x,y});g.circle.setAttribute('cx',x);g.circle.setAttribute('cy',y);g.label.setAttribute('x',x);g.label.setAttribute('y',y);g.leader.setAttribute('x1',p.x);g.leader.setAttribute('y1',p.y);g.leader.setAttribute('x2',x);g.leader.setAttribute('y2',y);}
+     // A return shot can put its landing label over the nearby glass target.
+     // Keep numbered waypoint badges clear of both floor labels as well.
+     const labels=[$('map-start'),...(challenge.goal?[$('map-goal')]:[])].map(el=>el.getBoundingClientRect());
+     const placed=[];for(const [i,g]of guidePoints.entries()){const p=route[i+1],x=p.x;let y=p.y-20;while(placed.some(q=>Math.hypot(q.x-x,q.y-y)<23)||labels.some(r=>x+12>r.left&&x-12<r.right&&y+12>r.top&&y-12<r.bottom))y-=24;placed.push({x,y});g.circle.setAttribute('cx',x);g.circle.setAttribute('cy',y);g.label.setAttribute('x',x);g.label.setAttribute('y',y);g.leader.setAttribute('x1',p.x);g.leader.setAttribute('y1',p.y);g.leader.setAttribute('x2',x);g.leader.setAttribute('y2',y);}
     }
-    placeLabel('map-start',a,camera);if(challenge.goal)placeLabel('map-goal',v(challenge.goal.center),camera);lastEye.copy(camera.position);lastQ.copy(camera.quaternion);return true;
+    lastEye.copy(camera.position);lastQ.copy(camera.quaternion);return true;
    }
    if(transition>0){
     transition=Math.max(0,transition-dt/(matchMedia('(prefers-reduced-motion: reduce)').matches?.01:.7));const blend=transition*transition*(3-2*transition);
