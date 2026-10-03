@@ -87,6 +87,27 @@ Rebuild the worker and restart the preview before runtime acceptance:
 npm run build:worker
 ```
 
+## Canopy contact regression
+
+`canopy-contact.json` captures the native launch that touched a roof waypoint
+inside its ring but reported a normal 11° away from the authored face. Run the
+focused regression after changing the platform 2/3 canopy collision:
+
+```sh
+KYOTO_LAYOUT="$PWD/.local/v2/4425/station-layout.json" \
+KYOTO_CANOPY_INPUT="$PWD/web/levels/canopy-contact.json" \
+KYOTO_CANOPY_REPORT="$PWD/.local/campaign/canopy-contact.json" \
+  /Applications/Unity/Hub/Editor/6000.3.23f1/Unity.app/Contents/MacOS/Unity \
+  -batchmode -nographics -projectPath "$PWD/KyotoRicochet" \
+  -executeMethod Kyoto.Editor.BatchTasks.CanopyContact \
+  -logFile "$PWD/.local/campaign/canopy-contact.log"
+```
+
+This checks that the refined roof triangles preserve the authored faces, every
+contact inside the target passes the game's normal-alignment threshold, and
+the shot reaches full translation and spin rest. Rebuild the worker and restart
+the preview before the normal campaign and runtime checks.
+
 ## Service and Chrome
 
 ```sh

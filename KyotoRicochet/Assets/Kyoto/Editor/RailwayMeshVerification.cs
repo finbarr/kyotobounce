@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Kyoto.Editor
 {
-    public static class RailwayBaseVerification
+    public static class RailwayMeshVerification
     {
         [Serializable] public class Report
         {
@@ -21,14 +21,14 @@ namespace Kyoto.Editor
             double s=(qu*vv-qv*uv)/den,t=(qv*uu-qu*uv)/den;
             return s>=-.00002&&t>=-.00002&&s+t<=1.00002;
         }
-        public static Report Check(Transform root,StationLayout layout)
+        public static Report Check(Transform root,StationLayout layout,string idFragment="railway-subgrade",string role=null)
         {
             var report=new Report();
             foreach(var source in layout.panels)
             {
-                if(!source.collision||!source.id.Contains("railway-subgrade"))continue;
+                if(!source.collision||!source.id.Contains(idFragment)||(role!=null&&source.role!=role))continue;
                 var child=root.Find(source.id);var collider=child?child.GetComponent<MeshCollider>():null;
-                if(!collider)throw new Exception("Missing railway-base collider: "+source.id);
+                if(!collider)throw new Exception("Missing railway collider: "+source.id);
                 var mesh=collider.sharedMesh;var points=mesh.vertices;var indices=mesh.triangles;
                 for(int i=0;i<points.Length;i++)points[i]=child.TransformPoint(points[i]);
                 report.meshes++;report.sourceTriangles+=source.triangles.Length/3;report.collisionTriangles+=indices.Length/3;
@@ -53,10 +53,10 @@ namespace Kyoto.Editor
                     }
                     if(!contained)throw new Exception("Refined collision leaves an authored face or reverses its winding: "+source.id);
                 }
-                if(Math.Abs(sourceArea-collisionArea)>sourceArea*.00001)throw new Exception("Railway-base surface area changed");
+                if(Math.Abs(sourceArea-collisionArea)>sourceArea*.00001)throw new Exception("Railway surface area changed");
                 report.sourceArea+=sourceArea;report.collisionArea+=collisionArea;
             }
-            if(report.meshes==0||report.maximumEdge>8.0001f)throw new Exception("Railway-base refinement is missing");
+            if(report.meshes==0||report.maximumEdge>8.0001f)throw new Exception("Railway refinement is missing");
             return report;
         }
     }

@@ -126,10 +126,11 @@ namespace Kyoto
                 // Their convex hull uses the same eight corners as the visible mesh.
                 bool solidEscalator=p.id.Contains("-escalator-")
                     &&(p.role=="escalator-body"||p.id.Contains("-skirt-"))&&p.vertices.Length<=36;
+                bool refineRailway=p.id.Contains("railway-subgrade")||(p.role=="roof"&&p.id.StartsWith("railway-2-3-east-roof-"));
                 Vector3 meshOrigin=Vector3.zero;
-                if(p.role=="city-ground"||solidEscalator||p.id.Contains("railway-subgrade"))
+                if(p.role=="city-ground"||solidEscalator||refineRailway)
                 {
-                    // Keep the curb and railway-base faces near their collider's origin.
+                    // Keep curb and railway faces near their collider's origin.
                     // World-coordinate vertices caused millimetre-scale PhysX
                     // contact errors; rendering uses the same translated mesh.
                     meshOrigin=mesh.bounds.center;
@@ -162,7 +163,7 @@ namespace Kyoto
                 if((p.playerOnly?walking:collision)&&p.collision)
                 {
                     var collider=obj.AddComponent<MeshCollider>();
-                    collider.sharedMesh=p.id.Contains("railway-subgrade")?RefineRailwayBase(mesh):mesh;
+                    collider.sharedMesh=refineRailway?RefineRailwayMesh(mesh):mesh;
                     collider.convex=solidEscalator;collider.sharedMaterial=Physical(p.material);collider.contactOffset=.001f;
                     if(!p.playerOnly)
                     {
@@ -230,9 +231,9 @@ namespace Kyoto
                 municipal.Create(parent,collision,appearance!=null,Physical);
             }
         }
-        static Mesh RefineRailwayBase(Mesh source)
+        static Mesh RefineRailwayMesh(Mesh source)
         {
-            // The railway base contains triangles hundreds of metres long.
+            // The railway base and platform roofs contain very long triangles.
             // PhysX queries against them can miss a 23 mm ball and produce
             // tilted penetration normals on a flat face. Bisect their longest
             // edges; the surface, winding and openings remain unchanged.

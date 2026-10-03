@@ -46,15 +46,18 @@ try{
  await page.keyboard.press('l');await page.getByRole('button',{name:'↶ Start',exact:true}).click();
  await page.waitForFunction(start=>Math.hypot(kyotoState.feet.x-start.x,kyotoState.feet.z-start.z)<.1,start);
  await page.getByRole('button',{name:'Close levels'}).click();
- // A steep lob points the launch view into the sky. Inspect its landing with
- // actual orbit/scout controls, then restore H without changing the shot.
- if(course.hint.pitch>=65){
+ // Steep lobs and roof routes need a scout view of their targets. Inspect them
+ // with actual orbit/scout controls, then restore H without changing the shot.
+ if(course.hint.pitch>=65||/\bscout\b/i.test(course.hint.note||'')){
   await page.locator('#game').focus();await page.keyboard.press('h');
   await page.keyboard.down('ArrowUp');await page.waitForTimeout(700);await page.keyboard.up('ArrowUp');
   await page.keyboard.press('f');await page.waitForFunction(()=>kyotoState.camera.mode==='fly');
-  await page.keyboard.down('e');await page.waitForTimeout(250);await page.keyboard.up('e');await page.waitForTimeout(200);
+  const roofRoute=/\broof\b/i.test(course.hint.note||'');
+  await page.keyboard.down('e');await page.waitForTimeout(roofRoute?750:250);await page.keyboard.up('e');await page.waitForTimeout(200);
   await page.screenshot({scale:'css',path:resolve(out,'scout.png')});
-  assert.ok(await page.locator('#fly-targets .fly-target:not([hidden])').filter({hasText:/WAYPOINT/}).count(),'Scouting exposes the landing waypoint');
+  const visibleTargets=await page.locator('#fly-targets .fly-target:not([hidden])').filter({hasText:/WAYPOINT/}).count();
+  assert.ok(visibleTargets>0,'Scouting exposes the landing waypoint');
+  if(roofRoute)assert.equal(visibleTargets,course.waypoints.length,'Scouting above the canopy exposes every roof-route target');
   const aim=await page.evaluate(()=>({yaw:kyotoState.yaw,pitch:kyotoState.pitch,top:kyotoState.top,kick:kyotoState.kick}));
   for(const key of ['yaw','pitch','top','kick'])assert.equal(aim[key],course.hint[key],'Scouting preserves the launch '+key);
   await page.keyboard.press('f');await page.waitForFunction(()=>kyotoState.camera.mode==='aim');

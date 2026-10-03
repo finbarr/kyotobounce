@@ -13,7 +13,7 @@ namespace Kyoto.Editor
         [Serializable] class Inputs {public Vector3 origin;public float yaw,pitch,minHoldMs,maxHoldMs,stepMs,observeSeconds;}
         [Serializable] class Sample {public float time,contactAge,supportDistance;public Vector3 position,velocity,spin,normal,supportNormal;public bool supported,supportCast;public string surface;public int budget,overlaps;}
         [Serializable] class Trial {public float holdMs;public bool sleeping;public Sample final;public List<Sample> samples=new List<Sample>();}
-        [Serializable] class Report {public string status="running";public RailwayBaseVerification.Report geometry;public List<Trial> trials=new List<Trial>();}
+        [Serializable] class Report {public string status="running";public RailwayMeshVerification.Report geometry;public List<Trial> trials=new List<Trial>();}
         static Sample Read(BallBody b){
             bool cast=b.gameObject.scene.GetPhysicsScene().SphereCast(b.Body.position,b.Profile.radius_m,-b.ContactNormal,out var hit,.0004f,CollisionLayers.StaticBallMask,QueryTriggerInteraction.Ignore);
             return new Sample{time=b.Clock,contactAge=b.Clock-b.LastContactTime,position=b.Body.position,velocity=b.Velocity,spin=b.AngularVelocity,normal=b.ContactNormal,supported=b.Supported,supportCast=cast,supportNormal=hit.normal,supportDistance=hit.distance,surface=b.LastContactSurface,budget=b.ContactBudgetExhaustions,overlaps=b.StaticOverlapRecoveries};
@@ -33,7 +33,7 @@ namespace Kyoto.Editor
             var report=new Report();
             try{
                 using(var sim=new ShotSimulation(true,layout)){
-                    if(Environment.GetEnvironmentVariable("KYOTO_VERIFY_RAILWAY_BASE")=="1")report.geometry=RailwayBaseVerification.Check(sim.Root,layout);
+                    if(Environment.GetEnvironmentVariable("KYOTO_VERIFY_RAILWAY_BASE")=="1")report.geometry=RailwayMeshVerification.Check(sim.Root,layout);
                     for(float hold=input.minHoldMs;hold<=input.maxHoldMs;hold+=input.stepMs){
                         var trial=new Trial{holdMs=hold};report.trials.Add(trial);
                         float speed=Mathf.Lerp(.5f,12f,hold/2800);

@@ -2042,6 +2042,96 @@
         "minNonFloorTargets": 2,
         "minSharpTurns": 2
       }
+    },
+    {
+      "id": "canopy-crossing",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2800,
+        "range": "precision",
+        "input": {
+          "yaw": 180,
+          "pitch": 55,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 179.5,
+            "pitch": 55,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 180.5,
+            "pitch": 55,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 180,
+            "pitch": 54.75,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 180,
+            "pitch": 55.25,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2790,
+          "range": "precision",
+          "input": {
+            "yaw": 180,
+            "pitch": 55,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2780,
+          "range": "precision",
+          "input": {
+            "yaw": 180,
+            "pitch": 55,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 0,
+        "minSharpTurns": 0,
+        "minHeightDrop": 2.5
+      }
     }
   ]
 }

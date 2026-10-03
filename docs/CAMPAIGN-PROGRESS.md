@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**22 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**23 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -80,6 +80,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 20. Rooftop Circuit | 2 / 2, concrete and glass banks, outward/return floor patches and full rest on the garden level | 6 / 6: ±0.5° yaw/pitch, ±10 ms charge; every sample collected all four targets | First attempt cleared; four-target overview, complete hint, saved replay, scrub and retry passed |
 | 21. Platform Zero | 2 / 2, canopy rebound, hanging-sign bank and return floor patch | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 20/40 ms; every sample rested on the platform | First attempt cleared; chapter selection, visible canopy patch, overview, complete hint and saved replay controls passed |
 | 22. Column Switchback | 2 / 2, narrow canopy-column and station-wall banks followed by a floor patch | 6 / 6: ±0.25° yaw/pitch, ±10 ms charge; every sample collected all targets and rested | First attempt cleared; overview, backspin hint, saved replay, scrub and retry passed |
+| 23. Canopy Crossing | 2 / 2, both faces of the platform canopy followed by the track-bed patch below | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 10/20 ms; every sample collected all targets and rested | First attempt cleared; overview, scouting above the roof, complete hint, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -430,9 +431,30 @@ visible. Chrome checks pass on the column, stairs, basement ceiling and opening
 course. Station geometry and native physics are unchanged. The superseded
 low-angle scout was replaced with a concise local note.
 
-**Next: author level 23**, continuing through the platforms and tracks. Finish
-its native proof, nearby variations, Chrome playtesting and local merge before
-level 24.
+Level 23, **Canopy Crossing**, clears the tracks, skips across both sloped faces
+of the next platform canopy and drops onto a track-bed patch. The full 12 m/s,
+55° hint follows a 49.0 m native path. Roof targets have 0.45 m and 0.65 m radii;
+the lower target has a 1.0 m radius. Both exact solutions collect all three
+targets and stop in 18.72 seconds. All six nearby shots clear and reach full
+translation and spin rest in 17.41–34.29 seconds.
+
+Chrome clears first try at 426,809 points. Overview, movement/home, the complete
+hint, saved replay, scrub and retry pass. The roofs sit above the launch view;
+F enters scouting and E gains height to inspect both marked roof faces before
+returning to the unchanged launch. Sampled gameplay median/p95 frames are
+16.7/16.8 ms, with zero skipped music steps and no page errors. The browser
+receipt retains a 1.77-second loading task for the final cold-start audit.
+Evidence: `.local/campaign/track-crossing/`.
+
+Typecheck, unit tests, browser build and the full local runtime suite pass.
+The runtime suite covers authoritative scoring, replay parity and completion
+for First Bounce, Promenade Pinball and Canopy Crossing, plus recall forfeiture,
+free exploration and creator recording, save, identical-shot proof, tamper
+rejection and cancellation. No production data or assets were changed.
+
+**Next: author level 24**, continuing through the platforms and station-side
+public space. Finish its native proof, nearby variations, Chrome playtesting
+and local merge before level 25.
 
 ## Floor repair
 
@@ -491,6 +513,33 @@ Evidence is in `.local/campaign/platform-entry/rest-final.json`,
 `railway-worker-summary.json` and `prior-route-scope.json`. The native worker
 was rebuilt and the isolated preview restarted. Ball forces, damping and finish
 conditions are unchanged; no station asset copies were created.
+
+## Canopy contact repair
+
+Canopy Crossing exposed a missed waypoint on the platform 2/3 roof. The ball
+touched inside the disk, but the native collision normal was 11.01° away from
+the authored face and failed the normal-alignment check. The exact launch is
+retained in `web/levels/canopy-contact.json`.
+
+The same mesh refinement now applies to the two roof panels. Their 24 source
+triangles become 3,896 collision triangles, with a maximum edge of 5.88 m. The
+geometry verifier checks containment, winding and area against the original
+faces. Visible geometry and target sizes remain unchanged. Beams and braces
+are excluded by the roof-role filter.
+
+The focused regression passes: the inside contact is within 0.02° of the face,
+and the shot stops translating and spinning. The worker was rebuilt and the
+preview restarted. Both exact course shots and all six nearby inputs now
+collect every target and reach full rest. Evidence is under
+`.local/campaign/track-crossing/`, including `contact-baseline.json`,
+`contact-refined.json` and the current `proof/` receipts.
+
+The prior-course audit checked 182 native shots across all 22 earlier levels.
+Only Promenade Pinball touched these roof panels. Its two exact shots and six
+neighbors pass again on the rebuilt worker, collecting all three targets and
+reaching full rest in 14.43–24.99 seconds. The scope receipt is
+`prior-route-scope.json`; refreshed routes are in
+`.local/campaign/promenade/proof/`.
 
 ## Outstanding final checks
 
