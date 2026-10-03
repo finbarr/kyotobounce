@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**6 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**7 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -64,6 +64,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 4. Ticket Slalom | 2 / 2, two distinct cabinet banks and sharp turns | 6 / 6: ±0.5° yaw/pitch, ±30 ms charge; every sample rested | First gameplay attempt cleared both targets; overview and replay passed |
 | 5. Glass Return | 2 / 2, glass rebound and return landing bonus | 6 / 6: ±2° yaw/pitch, ±20 ms charge; every sample earned the bonus at full rest | First attempt earned the landing bonus; overview, saved replay, scrub and retry passed |
 | 6. Basement Drop | 2 / 2, a 6.42 m descent from release to B1 | 6 / 6: ±3° yaw/pitch, ±60 ms charge; every sample rested | First attempt cleared; chapter selection, overview, hint, saved replay, scrub and retry passed |
+| 7. Pier Pressure | 2 / 2, opposite pier banks with two sharp turns | 6 / 6: ±2° yaw/pitch, ±60 ms charge; every sample rested | First attempt cleared both targets; overview, hint, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -134,9 +135,19 @@ sampled median/p95 frames, 112 BPM music, zero skipped music steps and no page
 errors. Typecheck, the portable suite, browser build and focused presentation
 checks pass. No station geometry or physics changed.
 
-**Next: author level 7**, a bank from inside the connected B1 public space.
-Use the existing glazing, piers or escalator casing for a readable rebound;
-finish verification and the local merge before starting level 8.
+Level 7 uses a 0.40 m patch on an inner B1 pier and a 0.25 m patch on the
+opposite wall. Its 5.5 m/s, 10° upward shot banks the first face, bounces on the
+aisle floor and collects the return patch. The exact hint reaches full rest in
+10.33 seconds; all six neighbors collect both targets and rest in 10.34–11.11
+seconds. Chrome clears first try at 216,011 points, with 16.7/16.8 ms sampled
+median/p95 frames, 112 BPM music, no skipped steps and no page errors.
+Service scoring/replay/progression/recall checks, typecheck, unit tests and the
+browser build pass. Evidence: `.local/campaign/basement-bank/`.
+No station geometry, physics or shared rendering changed for this increment.
+
+**Next: author level 8**, introducing an overhead bank on an existing B1 soffit
+followed by a floor target. Record the native route and choose targets on its
+actual contacts; finish verification and the local merge before level 9.
 
 ## Floor repair
 

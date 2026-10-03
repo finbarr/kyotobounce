@@ -494,5 +494,98 @@
         200
       ]
     }
+  },
+  {
+    "id": "basement-pier-pressure",
+    "revision": 1,
+    "name": "Pier Pressure",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 4.4800004959106445,
+        "y": -4.913582801818848,
+        "z": -0.3000001907348633
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.3499999940395355,
+      "surface": "hall-b1-south-aisle-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 4.69962215423584,
+          "y": -3.5212857723236084,
+          "z": 1.6938550472259521
+        },
+        "normal": {
+          "x": 0.016440508887171745,
+          "y": 0,
+          "z": -0.9998648762702942
+        },
+        "radius": 0.4000000059604645,
+        "surface": "hall-b1-lower-source-pier-2",
+        "id": "inner-pier"
+      },
+      {
+        "center": {
+          "x": 4.7893548011779785,
+          "y": -4.225794315338135,
+          "z": -1.2027183771133423
+        },
+        "normal": {
+          "x": -0.016540171578526497,
+          "y": 0,
+          "z": 0.9998632073402405
+        },
+        "radius": 0.25,
+        "surface": "hall-b1-south-outer-pier-17",
+        "id": "return-pier"
+      }
+    ],
+    "hint": {
+      "yaw": 0,
+      "pitch": 10,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 1217,
+      "note": "Use 5.5 m/s, aim 10° upward and keep spin at zero. Bank the pier in front, bounce on the floor, then catch the purple wall patch behind your start."
+    },
+    "order": 6,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Below the Glass",
+      "difficulty": "Medium",
+      "distance": 10.7,
+      "brief": "Bank the pier in front of you, then the wall behind your launch pad. Collect both purple patches across the B1 aisle and let the ball settle."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

@@ -533,6 +533,95 @@
         "minSharpTurns": 0,
         "minHeightDrop": 6
       }
+    },
+    {
+      "id": "basement-pier-pressure",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 1217,
+        "range": "precision",
+        "input": {
+          "yaw": 0,
+          "pitch": 10,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 70
+      },
+      "neighbors": [
+        {
+          "holdMs": 1217,
+          "range": "precision",
+          "input": {
+            "yaw": -2,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 70
+        },
+        {
+          "holdMs": 1217,
+          "range": "precision",
+          "input": {
+            "yaw": 2,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 70
+        },
+        {
+          "holdMs": 1217,
+          "range": "precision",
+          "input": {
+            "yaw": 0,
+            "pitch": 8,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 70
+        },
+        {
+          "holdMs": 1217,
+          "range": "precision",
+          "input": {
+            "yaw": 0,
+            "pitch": 12,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 70
+        },
+        {
+          "holdMs": 1157,
+          "range": "precision",
+          "input": {
+            "yaw": 0,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 70
+        },
+        {
+          "holdMs": 1277,
+          "range": "precision",
+          "input": {
+            "yaw": 0,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 70
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 2
+      }
     }
   ]
 }
