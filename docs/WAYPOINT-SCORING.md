@@ -21,9 +21,10 @@ Every shot that settles inside the station can rank, including shots that miss a
 ## Current tuning
 
 See [ARCADE-SCORING.md](ARCADE-SCORING.md) for the authoritative rules.
-The multiplier is `2^collected + 0.5 × distinct banks`. Even with zero waypoints (×1),
-target points are `10,000 × multiplier`. Waypoints double only their own component;
-banks never compound. Five waypoints earn 320,000 before additive bank credit.
+The waypoint multiplier is ×1 with zero hits, ×10 with the first hit, then
+×20, ×40, ×80…; add `0.5 × distinct banks` to get the combined multiplier.
+Target points are `10,000 × multiplier`. Later waypoints double only their own component;
+banks never compound. Five waypoints earn 1,600,000 before additive bank credit.
 A new bank adds 5,000 target points regardless of collection order or impact speed.
 
 Translating flight and rolling add 100 points per second after all multipliers and
@@ -37,9 +38,9 @@ Full route completion remains separate: every waypoint must be collected, or the
 
 ## Shared contract
 
-`scoring: 'waypoint-v3'` runs alongside active `combo-v7`.
+`scoring: 'waypoint-v4'` runs alongside active `combo-v7`.
 `goal: Disk | null`; `waypoints: {id, center, normal, radius, surface}[]`.
-The native worker advertises `capabilities: ['waypoint-v3']`; the service refuses
+The native worker advertises `capabilities: ['waypoint-v4']`; the service refuses
 new-mode placement/save/select on an older worker.
 
 Native `waypoint-hit` records contain session `id`, `attempt`, `waypointId`,
@@ -49,8 +50,8 @@ IDs are unique within the course and are awarded at most once per attempt.
 
 The score breakdown contains `waypointCount`, `waypointIds`, `waypointHits`,
 `waypointBase`, `waypointMultiplier`, `destinationReached`, `destinationBonus`,
-bank fields, `total` and `potential`. `waypointMultiplier = 2^waypointCount` is
-the current waypoint component, `bankBonus = 0.5 × styleBanks`, and
+bank fields, `total` and `potential`. `waypointMultiplier` is 1 for zero hits and
+`10 × 2^(waypointCount − 1)` otherwise. `bankBonus = 0.5 × styleBanks`, and
 `comboMultiplier` is their sum. Hit celebrations display the combined multiplier;
 bank celebrations display their additive increment. The native destination-rest attestation is distinct from the
 public completion flag. Final and live scoring consume the same native records.

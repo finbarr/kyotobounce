@@ -23,7 +23,7 @@ export function waypointRouteComplete(c:Challenge,hits:WaypointHit[],destination
  const targets=c.waypoints||[],ids=new Set(hits.map(h=>h.waypointId));
  return targets.length>0?targets.every(w=>ids.has(w.id)):!!c.goal&&destinationReached;
 }
-export const BASE_POINTS=10000,BANK_BONUS=.5,WAYPOINT_FACTOR=2,MOVEMENT_POINTS_PER_SECOND=100;
+export const BASE_POINTS=10000,BANK_BONUS=.5,FIRST_WAYPOINT_MULTIPLIER=10,WAYPOINT_FACTOR=2,MOVEMENT_POINTS_PER_SECOND=100;
 // Ignore only sub-millimetre drift; rolling and flight earn the same flat rate.
 const MIN_MOVEMENT_SPEED=.001;
 export const proximityRange=(c:Challenge)=>clamp(distance(c.start.center,c.goal!.center)*.35,3,12);
@@ -88,7 +88,7 @@ export class ComboTracker {
    seen.add(family);banks++;lastTime=hit.time;lastPoint=hit.point;lastBank=hit.label;
   }
   const safe=(n:number)=>Math.min(Number.MAX_SAFE_INTEGER,Math.max(0,Math.round(n)));
-  const waypointCount=hits.length,waypointMultiplier=WAYPOINT_FACTOR**waypointCount;
+  const waypointCount=hits.length,waypointMultiplier=waypointCount?FIRST_WAYPOINT_MULTIPLIER*WAYPOINT_FACTOR**(waypointCount-1):1;
   // Bank credit never doubles when a waypoint is collected. Order does not matter.
   const bankBonus=BANK_BONUS*banks,bankMultiplier=1+bankBonus,comboMultiplier=waypointMultiplier+bankBonus;
   const waypointBase=BASE_POINTS*waypointMultiplier;

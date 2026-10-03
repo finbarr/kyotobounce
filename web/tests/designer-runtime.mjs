@@ -20,8 +20,8 @@ try{
   assert.ok(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)>=3-1e-5,'Targets stay spatially separated');
   assert.ok(d.waypointTimes[i]-d.waypointTimes[j]>=.45-1e-5,'Rapid bounces do not each create targets');
  }
- await assert.rejects(client.request('save-challenge',{name:'Unrecorded',start:d.start,goal:d.goal,waypoints:d.waypoints,scoring:'waypoint-v3'},'saved-challenge'),/Record a design ball/);await delay(1100);
- const draft={name:'Recorded wall-bank test',start:d.start,goal:d.goal,waypoints:d.waypoints,scoring:'waypoint-v3',designProof:d.proof};
+ await assert.rejects(client.request('save-challenge',{name:'Unrecorded',start:d.start,goal:d.goal,waypoints:d.waypoints,scoring:'waypoint-v4'},'saved-challenge'),/Record a design ball/);await delay(1100);
+ const draft={name:'Recorded wall-bank test',start:d.start,goal:d.goal,waypoints:d.waypoints,scoring:'waypoint-v4',designProof:d.proof};
  await assert.rejects(client.request('save-challenge',{...draft,designProof:'forged'},'saved-challenge'),/recorded route changed/);await delay(1100);
  await assert.rejects(client.request('save-challenge',{...draft,waypoints:d.waypoints.map((w,i)=>i? w:{...w,id:'edited-target'})},'saved-challenge'),/recorded route changed/);await delay(1100);
  const {challenge}=await client.request('save-challenge',draft,'saved-challenge');assert.ok(challenge.hint);assert.equal(challenge.hint.powerRange,'precision');

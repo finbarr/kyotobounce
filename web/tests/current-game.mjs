@@ -7,7 +7,7 @@ try{
  const guest=store.guest(),disk={center:{x:0,y:0,z:0},radius:1,surface:'floor'};
  const current={id:'current',revision:2,creator:guest.id,name:'Current course',start:disk,goal:disk,layout:'station',physics:PHYSICS_VERSION,scoring:SCORING_VERSION,throwModel:THROW_MODEL};
  store.saveChallenge(current);
- const old=[{...current,id:'old-layout',layout:'previous-station'},{...current,id:'old-physics',physics:'previous-physics'},{...current,id:'old-scoring',scoring:'retired'},{...current,id:'old-launch',throwModel:'retired'}];
+ const old=[{...current,id:'old-layout',layout:'previous-station'},{...current,id:'old-physics',physics:'previous-physics'},{...current,id:'old-scoring',scoring:'retired'},{...current,id:'old-waypoint-scoring',scoring:'waypoint-v3'},{...current,id:'old-launch',throwModel:'retired'}];
  for(const c of old)store.saveChallenge(c);
  // Existing development databases can have several rows for the same course.
  store.db.prepare('INSERT INTO challenges VALUES (?,?,?,?,?)').run(current.id,1,current.creator,JSON.stringify({...current,revision:1}),0);
@@ -24,6 +24,7 @@ try{
  assert.equal(store.db.prepare('SELECT count(*) n FROM attempts').get().n,1);
  assert.equal(member.selected.revision,2,'An old selected preference resolves to the current course');
  assert.equal(store.replay('old-revision'),null);assert.equal(store.replay('old-layout'),null);
+ assert.equal(store.replay('old-waypoint-scoring'),null,'Retired waypoint values cannot compete on current leaderboards');
  assert.equal((await game.command(member,{type:'replay',attempt:'current-shot'})).replay.score,10000);
  assert.equal('archived' in game.catalog(),false);
  const stable=JSON.stringify(store.replay('current-shot'));await game.ready({layout:current.layout,physics:current.physics});assert.equal(JSON.stringify(store.replay('current-shot')),stable,'Restart retains current scores');

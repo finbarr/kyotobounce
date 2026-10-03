@@ -27,7 +27,9 @@ try{
   await c.request('design-start',{start:placed.disk},'design-ready');await delay(200);
   assert(player().grounded&&distance(feet(),shotStart)<.1,'Stand on the requested shot floor');
  }
- const shot=await c.throw(150,{powerRange:'precision',yaw:0,pitch:15,top:20},60000);
+ // A garden shot can roll for more than a minute. Observe its actual rest;
+ // the test deadline does not finish or freeze the native ball.
+ const shot=await c.throw(150,{powerRange:'precision',yaw:0,pitch:15,top:20},120000);
  assert.equal(shot.result.saved,false,'Exploration never saves an invented score');assert.equal(shot.result.challenge,null);
  assert.equal(c.state.phase,'Result');assert(magnitude(c.state.velocity)<.01,'Translation stops');assert(magnitude(c.state.spin)<.01,'Spin stops');
  assert.equal(c.state.diagnostics?.endReason,'Ball stopped','Finish on full physical rest');

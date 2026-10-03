@@ -47,7 +47,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  const replayControls=['replay-play','replay-restart','replay-scrub','replay-recenter','replay-free','share-replay'];
  function replayTimeLabel(){const duration=state.replay?.duration||0,t=Math.max(0,Math.min(duration,state.replayTime));const clock=t=>{t=Math.round(t*10)/10;return `${Math.floor(t/60)}:${(t%60).toFixed(1).padStart(4,'0')}`;},label=`${clock(t)} / ${clock(duration)}`;if($('replay-time').textContent!==label){$('replay-time').textContent=label;$('replay-scrub').setAttribute('aria-valuetext',`${t.toFixed(1)} of ${duration.toFixed(1)} seconds`);}}
  const classicScoreGuide=$('score-guide').innerHTML;
- const state={chapter:null,mode:'play',session:null,challenges:[],progress:new Map(),selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v3'},selectedWaypoint:null,editId:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
+ const state={chapter:null,mode:'play',session:null,challenges:[],progress:new Map(),selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v4'},selectedWaypoint:null,editId:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
  const designPath=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x5fffe3,transparent:true,opacity:.8,depthWrite:false}));scene.add(designPath);designPath.visible=false;
  let capturedDesign=null,designRequest=null,designSaving=false,designNotice='';
  function setMode(mode){showLevels(false);state.mode=mode;onModeChange(mode);}
@@ -112,11 +112,11 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
   state.selected=session.challenge;
   if(changed){state.lastResult=null;showLevels(false);state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
   $('course-title').textContent=state.selected?.name||'EXPLORE KYOTO.';$('challenge-detail').hidden=!state.selected;
-  if(state.selected){const c=state.selected;$('challenge-description').textContent=c.scoring==='waypoint-v3'?`Throw from anywhere · ${c.waypoints?.length||0} waypoints · ${c.goal?(c.waypoints?.length?'optional destination bonus':'destination required'):'no destination required'} · all shots can rank · collect every waypoint to clear`:`Throw from anywhere · settle inside ${c.goal.radius.toFixed(2)} m${c.requiredSurface?' · required route contact':''}`;if(c.campaign)$('challenge-description').textContent=c.campaign.brief+' '+$('challenge-description').textContent;state.hint=state.selected.hint||null;$('use-hint').hidden=!state.hint;$('hint-note').textContent=state.hint?.note||'';$('edit-challenge').hidden=state.selected.creator!==getGuestId();}
+  if(state.selected){const c=state.selected;$('challenge-description').textContent=c.scoring==='waypoint-v4'?`Throw from anywhere · ${c.waypoints?.length||0} waypoints · ${c.goal?(c.waypoints?.length?'optional destination bonus':'destination required'):'no destination required'} · all shots can rank · collect every waypoint to clear`:`Throw from anywhere · settle inside ${c.goal.radius.toFixed(2)} m${c.requiredSurface?' · required route contact':''}`;if(c.campaign)$('challenge-description').textContent=c.campaign.brief+' '+$('challenge-description').textContent;state.hint=state.selected.hint||null;$('use-hint').hidden=!state.hint;$('hint-note').textContent=state.hint?.note||'';$('edit-challenge').hidden=state.selected.creator!==getGuestId();}
   if(state.mode==='play')drawDisks(state.selected);
   $('timing-hint').hidden=!state.selected?.hint?.period;
   $('score-guide').hidden=false;
-  if(state.selected?.scoring==='waypoint-v3')$('score-guide').innerHTML='<summary>HOW TO SCORE</summary><p>10,000 base × (waypoint multiplier + bank bonus). Each unique waypoint doubles the waypoint multiplier: ×2, ×4, ×8… Each distinct bank adds +0.5× separately. Waypoints never double the bank bonus. Movement adds a flat 100 points per second after multipliers.</p><p>The gold destination is an optional landing bonus equal to your target score (10,000 × combo if no waypoints). Every shot that settles inside the station enters the leaderboard, even with zero targets (×1 base). Collect every waypoint to clear the course; destination-only courses need a landing to clear. Score locks at full rest; recall and leaving the station forfeit.</p>';
+  if(state.selected?.scoring==='waypoint-v4')$('score-guide').innerHTML='<summary>HOW TO SCORE</summary><p>10,000 base × (waypoint multiplier + bank bonus). The first waypoint raises the waypoint multiplier to ×10. Each later unique waypoint doubles it: ×20, ×40, ×80… Each distinct bank adds +0.5× separately. Waypoints never double the bank bonus. Movement adds a flat 100 points per second after multipliers.</p><p>The gold destination is an optional landing bonus equal to your target score (10,000 × combo if no waypoints). Every shot that settles inside the station enters the leaderboard, even with zero targets (×1 base). Collect every waypoint to clear the course; destination-only courses need a landing to clear. Score locks at full rest; recall and leaving the station forfeit.</p>';
   else $('score-guide').innerHTML=classicScoreGuide;
   $('show-overview').disabled=session.busy||session.restoring;
   renderCatalog();
@@ -187,7 +187,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  function openEditor(edit=false){
   if(designRequest||state.session?.busy){notice('Finish or recall the active shot first.');return;}
   const current=edit?state.selected:null;clearDesign();state.editId=current?.id||null;
-  state.draft={start:current?.start||null,goal:null,waypoints:[],scoring:'waypoint-v3'};state.selectedWaypoint=null;
+  state.draft={start:current?.start||null,goal:null,waypoints:[],scoring:'waypoint-v4'};state.selectedWaypoint=null;
   $('challenge-name').value=current?.name||'';startDesign(state.draft.start);
  }
  function exitDesign(){
@@ -276,7 +276,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
     renderCatalog();
    }
    if(m.type==='design-ready'){
-    designRequest=null;clearDesign();state.draft={start:state.draft.start,goal:null,waypoints:[],scoring:'waypoint-v3'};state.selectedWaypoint=null;setMode('design');drawDisks(null);renderEditor();presentation();notice('Design ball ready · Walk, aim and throw.');
+    designRequest=null;clearDesign();state.draft={start:state.draft.start,goal:null,waypoints:[],scoring:'waypoint-v4'};state.selectedWaypoint=null;setMode('design');drawDisks(null);renderEditor();presentation();notice('Design ball ready · Walk, aim and throw.');
    }
    if(m.type==='design-cancelled'){
     designRequest=null;clearDesign();setMode('play');resetView('level');drawDisks(state.selected);renderEditor();presentation();resume();
@@ -289,7 +289,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
     if(state.mode==='design'||m.design){
      setMode('editor');cancel();$('result-card').hidden=true;
      if(m.design&&!m.design.error){
-      const d=m.design;state.draft={start:d.start,goal:d.goal,waypoints:d.waypoints||[],scoring:'waypoint-v3'};state.selectedWaypoint=null;
+      const d=m.design;state.draft={start:d.start,goal:d.goal,waypoints:d.waypoints||[],scoring:'waypoint-v4'};state.selectedWaypoint=null;
       capturedDesign={proof:d.proof,geometry:designGeometry(state.draft)};designPath.geometry.dispose();designPath.geometry=new THREE.BufferGeometry().setFromPoints(d.path.map(v));
       $('design-review-status').textContent=`Recorded ${state.draft.waypoints.length} spaced waypoint${state.draft.waypoints.length===1?'':'s'}${d.goal?' and a finish zone':''}. ${d.note||'Explore the cyan path, name your level, then save and play.'}`;
       focusTarget(state.draft.start);sound.cue('start');
@@ -302,7 +302,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
      notice('Ball stopped · R to recall · Hold Space to throw again');return;
     }
     feedback.result(m);liveScore=m.breakdown||null;scoreAttempt=m.attempt;state.lastResult=m;$('result-card').hidden=state.mode!=='play';
-    const b=m.breakdown,waypoint=b?.version==='waypoint-v3',rank=waypoint?(['forfeit','route-missed','incomplete'].includes(b.outcome)?b.outcome:b.destinationReached?'perfect':b.waypointCount?'chain':'miss'):b?.outcome||(m.success?'perfect':'miss');
+    const b=m.breakdown,waypoint=b?.version==='waypoint-v4',rank=waypoint?(['forfeit','route-missed','incomplete'].includes(b.outcome)?b.outcome:b.destinationReached?'perfect':b.waypointCount?'chain':'miss'):b?.outcome||(m.success?'perfect':'miss');
     const allClear=allWaypointsCollected(b,m.challenge);$('result-card').dataset.clear=String(allClear);
     $('result-card').dataset.rank=rank;
     $('result-label').textContent=allClear?'100% WAYPOINT CLEAR':m.success?'CHALLENGE COMPLETE':'SHOT FINISHED';

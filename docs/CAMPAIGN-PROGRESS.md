@@ -14,6 +14,29 @@ Keep the architecture fixed unless a chosen level exposes a concrete blocker.
 Use the current station bundle and one checkout. Retired levels and their fixtures
 are replaced, with no compatibility or archival work.
 
+## Current scoring
+
+Waypoints now start at **×10**, then double to ×20, ×40, ×80…; each distinct
+bank adds +0.5×. Zero-target shots retain their ×1 base and can still rank.
+With equal movement and landing bonuses, eighteen banks match one waypoint.
+The rule is `waypoint-v4`; retired scoring records do not mix with current scores.
+The local native worker was rebuilt and the preview restarted for this version.
+
+All four delivered courses passed fresh service checks for collection, full rest,
+the new multiplier, authoritative replay parity and progression. A real zero-target
+shot earned 16,379 points and ranked below a one-target clear at 111,978;
+both saved replays reproduce their scores. Evidence is in
+`.local/campaign/scoring-v4/balance.json`. Geometry and authored launch inputs
+are unchanged, so the earlier native route/tolerance evidence still applies.
+
+Chrome cleared First Bounce at 111,941 points with the visible ×10 component;
+its result, saved replay, scrub and retry controls passed. The sampled median
+frame time was 16.7 ms and no music steps were skipped during the shot. Receipt:
+`.local/campaign/scoring-v4/opening-browser/result.json`.
+Typecheck, unit tests and browser build passed. All runtime checks passed after
+extending the garden test's observation window to allow natural rest beyond one
+minute; no physics or finish condition was changed.
+
 ## Sequence
 
 | Levels | Area | Teaching and challenge |
@@ -37,11 +60,11 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | --- | --- | --- | --- |
 | 1. First Bounce | 2 / 2, full translation and spin rest | 6 / 6: ±15° yaw, ±5° pitch, 2.0–3.6 m/s | First attempt cleared; overview, movement/home, hint, result and saved replay passed |
 | 2. Blue Wall Bank | 2 / 2, including a sharp wall rebound | 6 / 6: ±5° yaw, ±5° pitch, 7.5–8.5 m/s | First attempt cleared; visible wall patch, overview, hint and replay passed |
-| 3. Clock In | 2 / 2, including the mounted clock rebound | 6 / 6: ±2° yaw, ±2° pitch, 11.5–12 m/s | Two first-attempt clears, identical 52,622-point solutions; overview and replay passed |
-| 4. Ticket Slalom | 2 / 2, two distinct cabinet banks and sharp turns | 6 / 6: ±0.5° yaw/pitch, ±30 ms charge; every sample rested | First gameplay attempt cleared both targets; 66,621 points, overview and replay passed |
+| 3. Clock In | 2 / 2, including the mounted clock rebound | 6 / 6: ±2° yaw, ±2° pitch, 11.5–12 m/s | Two first-attempt clears; overview and replay passed |
+| 4. Ticket Slalom | 2 / 2, two distinct cabinet banks and sharp turns | 6 / 6: ±0.5° yaw/pitch, ±30 ms charge; every sample rested | First gameplay attempt cleared both targets; overview and replay passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
-runs settled naturally. The Chrome run saved 32,120 authoritative points; its
+runs settled naturally. The Chrome run saved an authoritative score; its
 sampled median and p95 frame times were 16.7 ms, with 112 BPM music and no skipped
 music steps. This is one local playthrough, not a station-wide performance claim.
 
@@ -56,7 +79,7 @@ Old campaign preservation checks, proof inputs and audit claims were replaced.
 
 Level 2 uses a 0.65 m radius patch entirely on the existing blue west frontage.
 The exact 8.0 m/s hint travels 59.0 m and settles after 29.46 seconds. Chrome
-banked 43,565 points on its first attempt, with a 16.7 ms median frame time,
+cleared it on the first attempt, with a 16.7 ms median frame time,
 112 BPM music, no skipped music steps and no page errors. Native and browser
 receipts are in `.local/campaign/blue-bank-proof/` and
 `.local/campaign/blue-bank-browser/`. Returning-player and creator-return checks
@@ -78,13 +101,21 @@ after 17.84 seconds. The neighboring shots rest within 16–21 seconds. Evidence
 The successful Chrome run had 16.7 ms sampled median/p95 frames and no skipped
 music steps during charge/flight. No geometry or physics changed.
 
-**Next: level 5**, an atrium glass-bank route with an optional landing bonus.
+**Next: investigate Ticket Slalom's long-running Chrome shot**, recorded below.
+Then author **level 5**, an atrium glass-bank route with an optional landing bonus.
 Use the existing glazing around the public basement opening, record a new shot,
 and keep the finish zone generous enough to teach the bonus. This should finish
 the introductory chapter before the campaign moves into the basement.
 
 ## Outstanding final checks
 
+- A fresh scoring-v4 Chrome run collected both Ticket Slalom targets and correctly
+  displayed ×20, but the ball continued translating past the 120-second observation
+  deadline. The input log measured 1,828 ms between charge/release, close to the
+  1,826 ms hint; the native service check had finished successfully. Cause is
+  unresolved. Keep this as a failed playthrough, not a completed route.
+  Receipt and screenshot: `.local/campaign/scoring-v4/browser/`.
+  Browser checks now retain launch/failure state to diagnose a recurrence.
 - The first cold Chrome view of Ticket Slalom had a 6.7-second render/main-thread
   stall and missed a short movement input. The warmed rerun passed. Cause is
   unprofiled; investigate cold level entry as part of the final stability check.

@@ -10,7 +10,7 @@ export function waypointCard(host,{document=globalThis.document,reduced=()=>matc
  let key='',nodes=[],previous=new Set();
  return {
   update(score,course,silent=false){
-   const targets=course?.scoring==='waypoint-v3'?course.waypoints||[]:[];
+   const targets=course?.scoring==='waypoint-v4'?course.waypoints||[]:[];
    host.hidden=!targets.length;
    const nextKey=JSON.stringify(targets.map(w=>[w.id,w.label]));
    if(key!==nextKey){

@@ -64,7 +64,7 @@ export function arcadeFeedback(sound){
    const rewind=current&&(score.styleBanks<bankCount||(score.waypointCount||0)<waypointCount);
    if(attempt!==lastAttempt||rewind){api.reset();lastAttempt=attempt;}
    currentCourse=challenge;punches.update(score,challenge,silent||!!rewind);
-   const events=rewind||silent?[]:scoreEvents(current,score,challenge);if(rewind)display=score.version==='waypoint-v3'?score.total:score.potential;current=score;bankCount=score.styleBanks;waypointCount=score.waypointCount||0;tagged=score.version==='waypoint-v3'?score.destinationReached:score.goalVisited;
+   const events=rewind||silent?[]:scoreEvents(current,score,challenge);if(rewind)display=score.version==='waypoint-v4'?score.total:score.potential;current=score;bankCount=score.styleBanks;waypointCount=score.waypointCount||0;tagged=score.version==='waypoint-v4'?score.destinationReached:score.goalVisited;
    for(const event of events){
     if(event.kind==='clear'){if(!clearFired)clearPending=event;continue;}
     if(event.kind==='special'){if(event.tier<=highestTier)continue;highestTier=event.tier;}
@@ -99,7 +99,7 @@ export function arcadeFeedback(sound){
    setHidden($('combo-burst'),!burstTime);setHidden($('combo-line'),phase!=='Flight'||!burstTime);
    if(!burstTime&&animations.length)cancelAnimations();
    if(!current)return;
-   const waypoint=current.version==='waypoint-v3',allClear=allWaypointsCollected(current,currentCourse),value=waypoint||phase==='Result'?current.total:current.potential,tier=allClear?6:heatTier(current),next=HEAT_STAGES[tier+1];
+   const waypoint=current.version==='waypoint-v4',allClear=allWaypointsCollected(current,currentCourse),value=waypoint||phase==='Result'?current.total:current.potential,tier=allClear?6:heatTier(current),next=HEAT_STAGES[tier+1];
    display=reduced()||rate===0?value:display+(value-display)*(1-Math.exp(-dt*18));setText($('combo-total'),format(display));
    hud.style.setProperty('--combo-tint','#'+HEAT_STAGES[tier].color.toString(16).padStart(6,'0'));setData(hud,'tier',tier);
    setText($('special-name'),tier?HEAT_STAGES[tier].name:'SPECIAL');setText($('special-next'),next?`${format(next.at)} PTS`:'MAXIMUM OVERDRIVE');

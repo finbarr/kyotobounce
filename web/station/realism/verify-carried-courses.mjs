@@ -62,7 +62,7 @@ async function run(slot){
     assert.ok(receipt.nonFloorTargets>=features.minNonFloorTargets,'The route must collect its wall/ceiling targets');
     assert.ok(receipt.sharpTurns>=features.minSharpTurns,'The route must make a sharp turn at a wall/ceiling target');
    }
-   if(challenge.scoring==='waypoint-v3'){
+   if(challenge.scoring==='waypoint-v4'){
     for(const target of challenge.waypoints)assert.ok(hitIds.has(target.id),`Shot misses waypoint ${target.id}`);
     if(challenge.goal)assert.equal(result.destinationReached,true,'Shot must settle inside the destination after every waypoint');
    }else assert.ok(result.success,'Suggested classic shot must reach its destination');
@@ -73,7 +73,7 @@ async function run(slot){
  worker.send({type:'leave',id});
 }
 for(const sig of ['SIGINT','SIGTERM'])process.on(sig,()=>{worker.stop();process.exit(130);});
-try{await worker.start();await until(()=>worker.ready,65000);assert.ok(worker.capabilities.includes('waypoint-v3'));await Promise.all(Array.from({length:4},(_,i)=>run(i)));}
+try{await worker.start();await until(()=>worker.ready,65000);assert.ok(worker.capabilities.includes('waypoint-v4'));await Promise.all(Array.from({length:4},(_,i)=>run(i)));}
 finally{worker.stop();await writeFile(resolve(out,'summary.json'),JSON.stringify({layout,proofInputLayout:fixture.layout,proofInputSha256:createHash('sha256').update(proofBytes).digest('hex'),meaning:"Regression of previously prepared private courses; only their layout hash was updated. This does not validate a new course revision.",parentCatalogSha256:createHash('sha256').update(parentBytes).digest('hex'),candidateLayout:candidateLayout||null,physics:ready?.physics,executable:process.env.KYOTO_WORKER_EXECUTABLE,campaignHash:createHash('sha256').update(campaignBytes).digest('hex'),receipts:receipts.sort((a,b)=>a.index-b.index)},null,2));}
 assert.equal(receipts.length,jobs.length);
 // Exact authored solutions prove feasibility. Nearby shots separately expose

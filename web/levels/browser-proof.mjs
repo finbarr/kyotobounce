@@ -14,7 +14,7 @@ const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use
 const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
 const page=await context.newPage();page.setDefaultTimeout(30000);const shots=[],commands=[],errors=[],replays=[];
 page.on('pageerror',e=>errors.push(String(e)));page.on('websocket',ws=>{ws.on('framereceived',f=>{try{const m=JSON.parse(String(f.payload));if(m.type==='replay')replays.push(m.replay);}catch{}});ws.on('framesent',f=>{try{const m=JSON.parse(String(f.payload));if(m.type!=='input')commands.push({at:Date.now(),...m});}catch{}});});
-let status='fail';
+let status='fail',launchState=null;
 try{
  await page.goto(origin);
  await page.locator('#loading-name input[name="player"]').fill('Campaign browser check',{timeout:120000});
@@ -32,7 +32,9 @@ try{
   if(!await page.locator('#show-overview').isVisible())await page.keyboard.press('l');
   await page.locator('#show-overview').click();
  }
- await page.waitForFunction(()=>kyotoState.briefing);await page.screenshot({scale:'css',path:resolve(out,'briefing.png')});
+ await page.waitForFunction(()=>kyotoState.briefing);
+ assert.match(await page.locator('.briefing-points').innerText(),/FIRST WAYPOINT\s+×10 TARGETS/,'Briefing explains the first target reward');
+ await page.screenshot({scale:'css',path:resolve(out,'briefing.png')});
  await page.locator('#briefing-play').click();await page.waitForFunction(()=>window.kyotoState?.pointerLocked&&!window.kyotoState?.briefingTransition);
  // Let the first view finish drawing before sending a brief key hold.
  // Loading/render stalls remain in the client-performance receipt below.
@@ -51,6 +53,7 @@ try{
   // Compare audio counters around the actual charge/flight, separately.
   await page.waitForTimeout(200);
   const audioBefore=await page.evaluate(()=>kyotoState.audio);
+  launchState=await page.evaluate(()=>kyotoState);
   await page.keyboard.down('Space');await page.waitForTimeout(hold);await page.keyboard.up('Space');
   await page.waitForFunction(()=>window.kyotoState?.phase==='Result'&&window.kyotoState?.result,null,{timeout:120000});const s=await page.evaluate(()=>window.kyotoState);
   s.audioBefore=audioBefore;s.skippedMusicStepsDuringShot=s.audio.skippedMusicSteps-audioBefore.skippedMusicSteps;
@@ -60,8 +63,9 @@ try{
   if(s.result?.success&&s.result?.score>0)break;
   if(shots.length<holds.length){await page.keyboard.press('r');await page.waitForFunction(()=>window.kyotoState?.phase==='Aim');await page.keyboard.press('h');await page.waitForTimeout(300);}
  }
- const final=shots.at(-1);assert.equal(final.challenge.scoring,'waypoint-v3');assert.equal(final.result.success,true);assert.ok(final.result.score>0);
+ const final=shots.at(-1);assert.equal(final.challenge.scoring,'waypoint-v4');assert.equal(final.result.success,true);assert.ok(final.result.score>0);
  assert.equal(final.result.waypointHits.length,final.challenge.waypoints.length);
+ assert.equal(final.result.breakdown.waypointMultiplier,final.challenge.waypoints.length?10*2**(final.challenge.waypoints.length-1):1);
  if(final.challenge.goal)assert.equal(final.result.destinationReached,true,'The authored solution includes its destination bonus');
  assert.ok(Object.values(final.velocity).every(v=>v===0)&&Object.values(final.spin).every(v=>v===0));
  // Watch the persisted replay and scrub with actual controls; do not fabricate state.
@@ -69,6 +73,7 @@ try{
  await page.locator('#watch-result').click();await page.waitForFunction(()=>window.kyotoState?.mode==='replay');
  const replay=(await (await replayResponse).json()).replay;replays.push(replay);
  assert.ok(replay?.poses?.length>1);assert.equal(replay.score,final.result.score);assert.equal(replay.layout,final.challenge.layout);assert.deepEqual(replay.waypointHits,final.result.waypointHits);
+ assert.deepEqual(replay.scoreFrames.at(-1).score,final.result.breakdown,'Saved live score matches the final result');
  if(final.challenge.requiredSurface)assert.ok(replay.contacts.some(c=>c.surface===final.challenge.requiredSurface),'Required route contact');
  if(await page.locator('#replay-play').textContent()==='Pause')await page.locator('#replay-play').click();
  await page.locator('#replay-scrub').focus();await page.keyboard.press('End');await page.waitForFunction(t=>Math.abs(window.kyotoState.replayTime-t)<.02,replay.duration);await page.screenshot({scale:'css',path:resolve(out,'replay-end.png')});
@@ -76,4 +81,4 @@ try{
  // Recall/retry through actual input preserves the selected course and aiming affordance.
  await page.keyboard.press('r');await page.waitForFunction(()=>window.kyotoState?.phase==='Aim');await page.keyboard.press('h');await page.screenshot({scale:'css',path:resolve(out,'retry.png')});
  assert.deepEqual(errors,[]);status='pass';
-}finally{if(status!=='pass')await page.screenshot({path:resolve(out,'failure.png')}).catch(()=>{});await writeFile(resolve(out,'result.json'),JSON.stringify({status,scope:'Actual full-game DOM/keyboard completion, at most one retry; final layout binding must match native proof',shots,commands,errors,replays},null,2));await context.close();await browser.close();}
+}finally{const failureState=status!=='pass'?await page.evaluate(()=>window.kyotoState).catch(()=>null):null;if(status!=='pass')await page.screenshot({path:resolve(out,'failure.png')}).catch(()=>{});await writeFile(resolve(out,'result.json'),JSON.stringify({status,scope:'Actual full-game DOM/keyboard completion, at most one retry; final layout binding must match native proof',launchState,failureState,shots,commands,errors,replays},null,2));await context.close();await browser.close();}

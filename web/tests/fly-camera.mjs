@@ -33,7 +33,7 @@ for(let i=0;i<30;i++)fly.move(new Set(['KeyQ','ShiftLeft']),.1);
 assert.equal(fly.camera.position.y,-35,'Recovery boundary follows the lowest station surface plus padding');
 underground.position.set(310,10,0);fly.enter(underground);fly.move(new Set(),.1);
 assert.equal(fly.camera.position.x,310,'Expanded exterior geometry remains reachable');
-const disk={center:{x:0,y:0,z:0},radius:.5,surface:'floor'},course={start:disk,goal:disk,waypoints:[],scoring:'waypoint-v3'};
+const disk={center:{x:0,y:0,z:0},radius:.5,surface:'floor'},course={start:disk,goal:disk,waypoints:[],scoring:'waypoint-v4'};
 assert.equal(designGeometry(course),designGeometry({...course,start:{...disk,normal:{x:0,y:1,z:0}}}));
 assert.notEqual(designGeometry(course),designGeometry({...course,goal:{...disk,radius:.6}}));
 console.log('PASS free-camera speed, boost, normalized movement, mouse direction, saved camera isolation and recorded geometry comparison');

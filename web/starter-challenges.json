@@ -6,7 +6,7 @@
     "creator": "station",
     "layout": "fe661f4a2c98891d7d00f9a3be27aac31888b94d40eb518245834d22ac1c4116",
     "physics": "kyoto-p3-3",
-    "scoring": "waypoint-v3",
+    "scoring": "waypoint-v4",
     "start": {
       "center": {
         "x": -20,
@@ -84,7 +84,7 @@
     "creator": "station",
     "layout": "fe661f4a2c98891d7d00f9a3be27aac31888b94d40eb518245834d22ac1c4116",
     "physics": "kyoto-p3-3",
-    "scoring": "waypoint-v3",
+    "scoring": "waypoint-v4",
     "start": {
       "center": {
         "x": -29,
@@ -162,7 +162,7 @@
     "creator": "station",
     "layout": "fe661f4a2c98891d7d00f9a3be27aac31888b94d40eb518245834d22ac1c4116",
     "physics": "kyoto-p3-3",
-    "scoring": "waypoint-v3",
+    "scoring": "waypoint-v4",
     "start": {
       "center": {
         "x": 1.643333911895752,
@@ -240,7 +240,7 @@
     "creator": "station",
     "layout": "fe661f4a2c98891d7d00f9a3be27aac31888b94d40eb518245834d22ac1c4116",
     "physics": "kyoto-p3-3",
-    "scoring": "waypoint-v3",
+    "scoring": "waypoint-v4",
     "start": {
       "center": {
         "x": 7.000006675720215,

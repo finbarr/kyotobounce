@@ -10,15 +10,15 @@ Each qualifying distinct surface adds +0.5× to the combo, independent of impact
 
 Supported rest inside the target keeps 100%. Outside, accuracy falls linearly with distance from the usable target edge, including height. The falloff range is 35% of start-to-target distance, clamped to 3–12 m. A target visit secures at least 25% if the completed shot finishes outside. Distant untagged misses still bank movement points. Required routes affect course completion, not score eligibility.
 
-## Waypoint courses (`waypoint-v3`)
+## Waypoint courses (`waypoint-v4`)
 
-Courses have up to 32 required waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; two collected waypoints produce ×4, or 40,000 target points before bank credit. The outer edge of each drawn ring matches its scoring radius.
+Courses have up to 32 required waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; two collected waypoints produce ×20, or 200,000 target points before bank credit. The outer edge of each drawn ring matches its scoring radius.
 
-The combined multiplier is **`2^W + 0.5 × B`**, where `W` is collected waypoints and `B` is qualifying distinct banks. Even with zero waypoints (×1), target points are **`10,000 × combined multiplier`**. This replaces the cumulative 10k/20k/40k award sum. Each waypoint doubles only the waypoint component; bank credit is always additive and never gets doubled by later waypoints. Order does not affect the final multiplier.
+The waypoint component is **×1 with no targets, then ×10, ×20, ×40, ×80…**. With `W > 0` collected waypoints it is `10 × 2^(W − 1)`. Add `0.5 × B` for qualifying distinct banks to get the combined multiplier. Target points are **`10,000 × combined multiplier`**. The first waypoint raises its component to ×10; each later waypoint doubles only that component. Bank credit is always additive and never gets doubled by later waypoints. Order does not affect the final multiplier.
 
-Example: waypoint → bank → waypoint → bank → bank → waypoint gives **2× → 2.5× → 4.5× → 5× → 5.5× → 9.5×**, or 95,000 target points. Three waypoints alone earn 80,000; three banks add 15,000 regardless of when they occurred. Twelve banks in classic mode produce 7×, instead of an exponential surface chain.
+Example: waypoint → bank → waypoint → bank → bank → waypoint gives **10× → 10.5× → 20.5× → 21× → 21.5× → 41.5×**, or 415,000 target points. Three waypoints alone earn 400,000; three banks add 15,000 regardless of when they occurred. Four banks without a waypoint earn 30,000, while one waypoint alone earns 100,000. Eighteen banks match that first waypoint before movement and landing bonuses. Twelve banks in classic mode produce 7×.
 
-Banks can continue throughout waypoint shots, including after destination entry. `waypointMultiplier` is the current `2^W` component, `bankBonus` is `0.5 × B`, and `comboMultiplier` is their sum. `waypointBase` contains target points before bank credit; `bankMultiplier` is the surface-only `1 + bankBonus`, never a factor applied to waypoint points.
+Banks can continue throughout waypoint shots, including after destination entry. `waypointMultiplier` is the current waypoint component, `bankBonus` is `0.5 × B`, and `comboMultiplier` is their sum. `waypointBase` contains target points before bank credit; `bankMultiplier` is the surface-only `1 + bankBonus`, never a factor applied to waypoint points.
 
 Supported rest in the destination adds a bonus equal to the target score. Missing targets preserves earned points: **every shot that settles inside the station ranks**, even with zero waypoint hits. Zero waypoints start at 10,000; banks add 5,000 each; movement adds 100 per second. A destination-only landing doubles its target score too.
 
@@ -26,7 +26,7 @@ Course completion is separate: every waypoint is needed for an all-clear and pro
 
 Movement time is measured from consecutive authoritative 180 Hz positions, excluding numerical drift below 0.001 m/s. Fractional seconds accrue individual points (`floor(movingSeconds × 100)`). The bonus continues while the ball translates after a target hit, is added after landing accuracy and the destination bonus, and is forfeited on recall or leaving the station.
 
-The server calculates live frames and final results from the same native records. Clients cannot submit a score. The game is pre-launch: current partial and complete records remain valid; retired station/course records are discarded. Courses keep their current IDs and revisions; no legacy scoring implementation or migration is retained.
+The server calculates live frames and final results from the same native records. Clients cannot submit a score. The game is pre-launch: current partial and complete records remain valid; retired station/course/scoring records are discarded. `waypoint-v4` identifies this tuning so old ×2-first scores cannot mix with current leaderboards. Courses keep their current IDs and revisions; no legacy scoring implementation or migration is retained. All 32 waypoints with a destination bonus remain below the safe-integer limit.
 
 ## Launch position
 

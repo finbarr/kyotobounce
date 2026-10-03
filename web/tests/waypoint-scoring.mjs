@@ -6,14 +6,21 @@ import {designGeometry} from '../public/design-geometry.js';
 const p=(x,y=0,z=0)=>({x,y,z}),q={x:0,y:0,z:0,w:1};
 const start={center:p(0),radius:.75,surface:'floor'},goal={center:p(20),radius:1,surface:'floor'};
 const targets=Array.from({length:3},(_,i)=>({id:`w${i}`,center:p(i),normal:p(0,1),radius:.5,surface:'floor'}));
-const c={id:'waypoint-test',revision:1,name:'Targets',creator:'test',layout:'test',physics:'kyoto-p3-3',throwModel:'robot-v4',scoring:'waypoint-v3',start,goal:null,waypoints:targets};
+const c={id:'waypoint-test',revision:1,name:'Targets',creator:'test',layout:'test',physics:'kyoto-p3-3',throwModel:'robot-v4',scoring:'waypoint-v4',start,goal:null,waypoints:targets};
 const hits=targets.map((w,i)=>({waypointId:w.id,time:i+1,point:w.center,normal:w.normal,surface:w.surface}));
 const result=(extra={})=>({challenge:c,success:false,destinationReached:false,reason:'Ball stopped',score:0,surfaces:0,contacts:[],poses:[{t:0,p:p(0,1),q},{t:12,p:p(20,.023),q}],waypointHits:hits,...extra});
-const earned=scoreAttempt(result());assert.equal(earned.waypointBase,80000);assert.equal(earned.total,81200);assert.equal(earned.movementPoints,1200);assert.equal(earned.waypointMultiplier,8,'Label is the current waypoint component');
+const earned=scoreAttempt(result());assert.equal(earned.waypointBase,400000);assert.equal(earned.total,401200);assert.equal(earned.movementPoints,1200);assert.equal(earned.waypointMultiplier,40,'Label is the current waypoint component');
 assert.equal(scoreAttempt(result({challenge:{...c,goal}})).total,earned.total,'Missing a destination never removes waypoint points');
-const dest=scoreAttempt(result({challenge:{...c,goal},success:true,destinationReached:true}));assert.equal(dest.destinationBonus,earned.total-earned.movementPoints);assert.equal(dest.total,161200);
+const dest=scoreAttempt(result({challenge:{...c,goal},success:true,destinationReached:true}));assert.equal(dest.destinationBonus,earned.total-earned.movementPoints);assert.equal(dest.total,801200);
 assert.equal(scoreAttempt(result({challenge:{...c,goal,waypoints:[]},waypointHits:[],destinationReached:true})).total,21200,'Destination-only course earns base points and the landing bonus');
 assert.equal(scoreAttempt(result({waypointHits:[]})).total,11200,'Zero waypoints still bank the base and movement');assert.equal(scoreAttempt(result({reason:'Recalled'})).total,0);assert.equal(scoreAttempt(result({challenge:{...c,requiredSurface:'missing'}})).total,earned.total);
+// Reproduce the reported balance problem without inventing a client score.
+const banksOnly=n=>scoreAttempt(result({waypointHits:[],contacts:Array.from({length:n},(_,i)=>({surface:`bank-${i}`,label:`Bank ${i}`,qualifying:true,speed:4,time:i*.5+.1,point:p(i*1.4)}))}));
+const firstTarget=scoreAttempt(result({waypointHits:[hits[0]]}));
+assert.equal(firstTarget.total,101200);
+assert.equal(banksOnly(4).total,31200);
+assert.ok(firstTarget.total>banksOnly(17).total,'A single waypoint outweighs seventeen banks with equal movement time');
+assert.equal(firstTarget.total,banksOnly(18).total,'Eighteen distinct banks match the first waypoint, not two');
 assert.equal(scoreAttempt(result({waypointHits:[...hits,...hits]})).total,earned.total,'Repeated waypoint contacts score once');
 assert.throws(()=>scoreAttempt(result({waypointHits:[{...hits[0],normal:p(0,-1)}]})),/contact/);
 assert.throws(()=>scoreAttempt(result({waypointHits:[{...hits[0],point:p(0,.02)}]})),/contact/);
@@ -23,7 +30,10 @@ const quiet=structuredClone(result());quiet.poses.push({...quiet.poses.at(-1),t:
 const postGoalBank={surface:'wall',label:'Wall',qualifying:true,speed:3,time:11,point:p(30)};
 assert.equal(scoreAttempt(result({challenge:{...c,goal:{...goal,center:p(0)}},contacts:[postGoalBank]})).styleBanks,1,'Waypoint mode does not freeze banks at destination entry');
 const many=Array.from({length:32},(_,i)=>({...targets[0],id:`n${i}`}));const manyHits=many.map(w=>({...hits[0],waypointId:w.id}));
-const huge=scoreAttempt(result({challenge:{...c,waypoints:many},waypointHits:manyHits,contacts:Array.from({length:100},(_,i)=>({...postGoalBank,surface:`wall${i}`,time:i*.2,point:p(i)})),poses:[{t:0,p:p(0),q},{t:60,p:p(20),q}]}));assert.equal(huge.total,10000*(2**32+.5*huge.styleBanks)+6000);assert.ok(Number.isSafeInteger(huge.total));assert.ok(Number.isFinite(huge.bankMultiplier));
+const huge=scoreAttempt(result({challenge:{...c,waypoints:many},waypointHits:manyHits,contacts:Array.from({length:100},(_,i)=>({...postGoalBank,surface:`wall${i}`,time:i*.2,point:p(i)})),poses:[{t:0,p:p(0),q},{t:60,p:p(20),q}]}));assert.equal(huge.total,10000*(10*2**31+.5*huge.styleBanks)+6000);assert.ok(Number.isSafeInteger(huge.total));assert.ok(Number.isFinite(huge.bankMultiplier));
+const maxLanding=scoreAttempt(result({challenge:{...c,waypoints:many,goal},waypointHits:manyHits,destinationReached:true}));
+assert.equal(maxLanding.total,10000*10*2**31*2+1200);
+assert.ok(Number.isSafeInteger(maxLanding.total)&&maxLanding.total<Number.MAX_SAFE_INTEGER,'All 32 waypoints plus landing retain exact scores without clipping');
 
 // The accepted example is order-independent: banks never acquire waypoint doublings.
 const sequence=new ComboTracker(c);sequence.poses([{t:0,p:p(0,1),q}]);
@@ -34,31 +44,31 @@ for(const action of ['waypoint','bank','waypoint','bank','bank','waypoint']){
  else sequence.contact({...postGoalBank,surface:`bank-${bankIndex++}`,time,point:p(time*2),speed:100});
  sequence.poses([{t:time,p:p(time,1),q}]);values.push(sequence.value().comboMultiplier);
 }
-assert.deepEqual(values,[2,2.5,4.5,5,5.5,9.5]);
-assert.equal(sequence.value().total,95600);
+assert.deepEqual(values,[10,10.5,20.5,21,21.5,41.5]);
+assert.equal(sequence.value().total,415600);
 const reordered=scoreAttempt(result({contacts:sequence.contacts,waypointHits:hits}));
-assert.equal(reordered.comboMultiplier,9.5,'Identical targets and banks produce the same multiplier regardless of order');
+assert.equal(reordered.comboMultiplier,41.5,'Identical targets and banks produce the same multiplier regardless of order');
 assert.equal(reordered.total-reordered.movementPoints,sequence.value().total-sequence.value().movementPoints);
 const one=scoreAttempt(result({waypointHits:[hits[0]],contacts:[postGoalBank]}));
 const two=scoreAttempt(result({waypointHits:hits.slice(0,2),contacts:[postGoalBank]}));
-assert.equal(one.potential-one.movementPoints,25000);assert.equal(two.potential-two.movementPoints,45000);
-assert.equal(two.potential-one.potential,20000,'The next waypoint doubles only the 20000 target component, never the 5000 bank credit');
+assert.equal(one.potential-one.movementPoints,105000);assert.equal(two.potential-two.movementPoints,205000);
+assert.equal(two.potential-one.potential,100000,'The next waypoint doubles only the 100000 target component, never the 5000 bank credit');
 for(const partial of [one,two]){assert.equal(partial.total,partial.potential);assert.equal(partial.outcome,'tagged');}
 const partialLanding=scoreAttempt(result({challenge:{...c,goal},success:true,destinationReached:true,waypointHits:hits.slice(0,2)}));
-assert.equal(partialLanding.total,81200,'Partial routes bank target points and destination bonus');assert.equal(partialLanding.destinationBonus,40000);assert.equal(partialLanding.outcome,'perfect');
-assert.equal(scoreAttempt(result({waypointHits:[hits[0],hits[0],hits[1]]})).total,41200,'Duplicate hits cannot stand in for the missing target');
+assert.equal(partialLanding.total,401200,'Partial routes bank target points and destination bonus');assert.equal(partialLanding.destinationBonus,200000);assert.equal(partialLanding.outcome,'perfect');
+assert.equal(scoreAttempt(result({waypointHits:[hits[0],hits[0],hits[1]]})).total,201200,'Duplicate hits cannot stand in for the missing target');
 const inPlay=new ComboTracker(c);inPlay.waypoint(hits[0]);inPlay.poses(result().poses);assert.ok(inPlay.value().total>0,'Live partial routes still show points in play');assert.equal(inPlay.value({final:true}).total,inPlay.value().total);
 assert.equal(scoreAttempt(result({waypointHits:[],contacts:sequence.contacts})).total,26200,'Surface-only shots rank without exponential bank growth');
-assert.equal(scoreAttempt(result({contacts:[...sequence.contacts,...sequence.contacts]})).comboMultiplier,9.5,'Repeated surfaces never farm bank credit');
-assert.equal(scoreAttempt(result({contacts:sequence.contacts.map(h=>({...h,speed:1}))})).comboMultiplier,9.5,'Speed above qualification does not increase bank value');
+assert.equal(scoreAttempt(result({contacts:[...sequence.contacts,...sequence.contacts]})).comboMultiplier,41.5,'Repeated surfaces never farm bank credit');
+assert.equal(scoreAttempt(result({contacts:sequence.contacts.map(h=>({...h,speed:1}))})).comboMultiplier,41.5,'Speed above qualification does not increase bank value');
 
 const store=new Store(':memory:');try{
  store.saveChallenge(c);
  const worker={ready:true,capabilities:[],request:async()=>({}),send(){}};const game=new Competition(store,worker,()=>{});game.layout=c.layout;game.physics=c.physics;const member={id:'session',guest:{id:'test'},restoring:false};
  await assert.rejects(game.command(member,{type:'place',slot:'waypoint',origin:p(0),direction:p(0,-1),radius:.5}),/does not support/);
  await assert.rejects(game.command(member,{type:'release',waypointHits:hits}),/intent only/);
- worker.capabilities=['waypoint-v3'];
- const save={type:'save-challenge',name:'Targets',start,goal:null,waypoints:targets,scoring:'waypoint-v3',designProof:'native-proof'};
+ worker.capabilities=['waypoint-v4'];
+ const save={type:'save-challenge',name:'Targets',start,goal:null,waypoints:targets,scoring:'waypoint-v4',designProof:'native-proof'};
  await assert.rejects(game.command(member,save),/Record a design ball/);
  member.designProof={token:'native-proof',geometry:designGeometry(save),hint:{yaw:0,pitch:15,top:0,kick:0,holdMs:100,powerRange:'precision'}};
  await assert.rejects(game.command(member,{...save,waypoints:[targets[0],targets[0]]}),/unique/);
@@ -74,6 +84,16 @@ const store=new Store(':memory:');try{
  }
  store.db.prepare('UPDATE challenges SET body=? WHERE id=?').run(JSON.stringify(c),c.id);
  member.attempt='zero-targets';game.pending.set(member.attempt,{id:member.id,challenge:c});game.result({...result({waypointHits:[]}),id:member.id,attempt:member.attempt,layout:c.layout,physics:c.physics,duration:12,impacts:0});assert.equal(member.lastResult.score,11200);assert.equal(member.lastResult.success,false);assert.equal(store.replay('zero-targets').score,11200);
+ for(const [attempt,waypointHits,contacts]of [
+  ['first-waypoint',[hits[0]],[]],
+  ['four-banks',[],Array.from({length:4},(_,i)=>({...postGoalBank,surface:`bank-${i}`,point:p(i*2),time:i+.1}))]
+ ]){
+  member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:c});
+  game.result({...result({waypointHits,contacts}),id:member.id,attempt,layout:c.layout,physics:c.physics,duration:12,impacts:contacts.length});
+  assert.deepEqual(scoreAttempt(store.replay(attempt)),member.lastResult.breakdown,'Saved scoring remains reproducible from native records');
+ }
+ assert.ok(store.attemptRank(c,'first-waypoint')<store.attemptRank(c,'four-banks'),'Actual leaderboard ranks one waypoint above four banks without targets');
+ assert.equal(store.replay('four-banks').score,31200,'The service calculates bank points from the native records');
  member.guest=store.guest();
  for(const [attempt,expected]of [['record-one',true],['record-tie',false]]){
   member.attempt=attempt;game.pending.set(attempt,{id:member.id,challenge:c});

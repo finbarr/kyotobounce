@@ -69,7 +69,7 @@ for(const blocked of [{...state,diagnostics:{sleeping:false}},{...state,velocity
 assert.equal(celebrateAvatar(make('ori'),{...result,saved:false}),false);
 assert.equal(celebrateAvatar(make('ori'),{...result,breakdown:{outcome:'forfeit'}}),false);
 for(const character of ['ori','koma','don']){
- const a=make(character),clear={...result,score:10000,challenge:{scoring:'waypoint-v3',waypoints:[{id:'a'}]},breakdown:{version:'waypoint-v3',waypointIds:['a'],destinationReached:false,outcome:'chain'}};
+ const a=make(character),clear={...result,score:10000,challenge:{scoring:'waypoint-v4',waypoints:[{id:'a'}]},breakdown:{version:'waypoint-v4',waypointIds:['a'],destinationReached:false,outcome:'chain'}};
  assert.equal(celebrateAvatar(a,clear),true);assert.equal(a.celebration.tier,5);assert.equal(a.celebration.duration,7.2);
  poseAvatar(a,player,'Result',state,0);poseAvatar(a,player,'Result',state,6.8);assert.equal(isAvatarCelebrating(a),true,'A full route earns the extended jackpot dance on every character');
  for(const side of ['L','R'])assert.ok(a.bones[`hand.${side}`].quaternion.angleTo(a.restWrists[side])<.46,'Extended dances keep aligned empty wrists');

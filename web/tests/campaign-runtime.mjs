@@ -20,9 +20,12 @@ try{
   assert.equal(r.reason,'Ball stopped');assert(state.diagnostics.sleeping);
   assert.equal(Math.hypot(...Object.values(state.velocity)),0);assert.equal(Math.hypot(...Object.values(state.spin)),0);
   assert.equal(r.waypointHits.length,course.waypoints.length);
+  assert.equal(r.breakdown.waypointMultiplier,10*2**(course.waypoints.length-1),'First waypoint is worth ×10; later targets double it');
+  assert.equal(r.breakdown.bankBonus,.5*r.breakdown.styleBanks,'Bank rewards stay additive');
   const replay=(await c.request('replay',{attempt:r.attempt},'replay')).replay;
   assert.equal(replay.score,r.score);assert.equal(replay.layout,c.state.layout);
   assert.deepEqual(scoreAttempt(replay),r.breakdown,'Server score is reproducible from native replay evidence');
+  assert.deepEqual(replay.scoreFrames.at(-1).score,r.breakdown,'Saved live score ends at the authoritative final score');
   const progress=await c.request('course-progress',{},'course-progress');
   assert(progress.entries.find(p=>p.challengeId===id).completed);
   const board=await c.request('leaderboard',{challengeId:id,revision:course.revision},'leaderboard');

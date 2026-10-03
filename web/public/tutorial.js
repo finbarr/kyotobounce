@@ -42,7 +42,7 @@ export function tutorialUI({onAim,onContinue}){
     move:['1 / 4','Find your line.',mobile?'Drag MOVE to walk. The checkered pad marks your start; you can throw anywhere.':'W A S D to walk. The checkered pad is a starting suggestion — you can throw from anywhere.','Next: aim →'],
     aim:['2 / 4','Aim for purple.',mobile?'Hit the purple patch. Drag the scene to aim, or use the hint below.':'Click the scene, then move the mouse to aim. Your ball must touch the purple waypoint. H sets the suggested aim.','Use suggested aim'],
     charge:['3 / 4',charging?'Release at white!':'A gentle throw.',mobile?'Hold THROW, then release at the white 2.8 m/s mark. More charge = more speed.':'Hold Space or the mouse button. Release near the white 2.8 m/s mark. More charge means more speed.','Reset suggested aim'],
-    flight:['4 / 4','Watch your score grow.',mobile?'Purple targets double your multiplier. Let the ball settle to score. Tap 2× to speed up; Recall forfeits.':'Each purple waypoint doubles your target multiplier. Let the ball settle to bank your score. Hold Space for 2×; R recalls and forfeits this shot.',''],
+    flight:['4 / 4','Watch your score grow.',mobile?'The first purple target gives ×10; later targets double it. Let the ball settle to score. Tap 2× to speed up; Recall forfeits.':'The first purple waypoint gives ×10; each later waypoint doubles it. Let the ball settle to bank your score. Hold Space for 2×; R recalls and forfeits this shot.',''],
    }[step];
    if(!copy)return;
    $('tutorial-step').textContent=copy[0];$('tutorial-title').textContent=copy[1];$('tutorial-copy').textContent=copy[2];$('tutorial-action').textContent=copy[3];$('tutorial-action').hidden=!copy[3]||charging;
