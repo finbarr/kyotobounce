@@ -683,7 +683,9 @@ function animate(now){
   $('reticle').style.display=reticle?.visible?'block':'none';
   if(reticle){setStyle($('reticle'),'left',`${reticle.x*100}%`);setStyle($('reticle'),'top',`${reticle.y*100}%`);}
   for(const a of avatars.values()){
-    const close=camera.position.distanceTo(a.group.position.clone().add(new THREE.Vector3(0,1.0,0)))<(inFlight?2.2:1.1);
+    // A wall can push the aiming camera into the robot's silhouette.
+    // Hide it before its body fills the view and covers nearby targets.
+    const close=camera.position.distanceTo(a.group.position.clone().add(new THREE.Vector3(0,1.0,0)))<(inFlight?2.2:1.6);
     a.group.visible=!close;
   }
   if(now>noticeUntil)$('notice').classList.add('quiet');

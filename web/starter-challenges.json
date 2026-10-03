@@ -852,5 +852,98 @@
         200
       ]
     }
+  },
+  {
+    "id": "bridge-pinball",
+    "revision": 1,
+    "name": "Bridge Pinball",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 6.000001430511475,
+        "y": 9.589427947998047,
+        "z": -13.350000381469727
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "gate-passage-bridge-walking-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 4.423755168914795,
+          "y": 11.187495231628418,
+          "z": -11.955001831054688
+        },
+        "normal": {
+          "x": 0.016668498516082764,
+          "y": 0,
+          "z": -0.9998611211776733
+        },
+        "radius": 0.4000000059604645,
+        "surface": "gate-passage-glass-front-7",
+        "id": "front-glass"
+      },
+      {
+        "center": {
+          "x": 1.203369140625,
+          "y": 10.535379409790039,
+          "z": -14.276653289794922
+        },
+        "normal": {
+          "x": -0.016658134758472443,
+          "y": 0,
+          "z": 0.9998612403869629
+        },
+        "radius": 0.4000000059604645,
+        "surface": "gate-passage-glass-rear-5",
+        "id": "rear-glass"
+      }
+    ],
+    "hint": {
+      "yaw": -55,
+      "pitch": 10,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 1826,
+      "note": "Use 8.0 m/s at 10° elevation with no spin. Bank the front window, then the rear window across the walkway. Collect both purple patches and let the ball roll to a complete stop."
+    },
+    "order": 10,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Above the Atrium",
+      "difficulty": "Medium",
+      "distance": 49.6,
+      "brief": "Play the glass bridge above the ticket hall. Bank the purple patch on each side of the walkway in one shot."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

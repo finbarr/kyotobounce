@@ -943,6 +943,95 @@
         "minNonFloorTargets": 2,
         "minSharpTurns": 2
       }
+    },
+    {
+      "id": "bridge-pinball",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 1826,
+        "range": "precision",
+        "input": {
+          "yaw": -55,
+          "pitch": 10,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -56,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -54,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -55,
+            "pitch": 9,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -55,
+            "pitch": 11,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1786,
+          "range": "precision",
+          "input": {
+            "yaw": -55,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1866,
+          "range": "precision",
+          "input": {
+            "yaw": -55,
+            "pitch": 10,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 2
+      }
     }
   ]
 }

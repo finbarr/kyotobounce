@@ -16,7 +16,10 @@ assert(observeSeconds>=20&&observeSeconds<=120,'Observe for 20–120 seconds; a 
 const c=new Client(origin.replace(/^http/,'ws'));
 try{
  await c.join();
- const start=await c.place(input.start,input.startRadius||.4,'start');
+ const rayHeight=input.startRayHeight??3;
+ assert(Number.isFinite(rayHeight)&&rayHeight>0&&rayHeight<=3,'Start ray height must be in (0, 3] metres');
+ const start=(await c.request('place',{slot:'start',radius:input.startRadius||.4,origin:{...input.start,y:input.start.y+rayHeight},direction:{x:0,y:-1,z:0}},'placement')).disk;
+ assert(Math.abs(start.center.y-input.start.y)<.1,'Start ray found another floor; shorten startRayHeight below the ceiling');
  await c.request('design-start',{start},'design-ready');await delay(200);
  const shot=await c.throw(input.hint.holdMs,input.hint,observeSeconds*1000);
  const r=shot.result,thrower=r.thrower;

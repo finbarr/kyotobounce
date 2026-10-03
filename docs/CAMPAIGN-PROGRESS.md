@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**10 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**11 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -68,6 +68,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 8. Ceiling Skip | 2 / 2, ceiling rebound followed by a B1 floor hit | 6 / 6: ±2° yaw, ±1° pitch, 11.5–12 m/s; every sample rested | First attempt cleared; ceiling patch visible while aiming, overview and saved replay controls passed |
 | 9. Upward Bound | 2 / 2, moving-step contact and a 4.91 m climb | 6 / 6: ±1° yaw/pitch, ±20 ms charge; 4 / 4 additional step phases; every sample rested upstairs | First attempt cleared; upward cutaway, hint, saved replay, scrub and retry passed |
 | 10. Glass Loop | 2 / 2, back-wall and inside-glass targets with two sharp turns | 6 / 6: ±0.5° yaw, ±1° pitch, ±30 ms charge; every sample rested | First attempt cleared; both patches visible, overview, hint and saved replay controls passed |
+| 11. Bridge Pinball | 2 / 2, opposite glass-pane banks above the ticket hall | 6 / 6: ±1° yaw/pitch, ±40 ms charge; every sample rested | First attempt cleared; chapter selection, unobstructed aiming, overview and replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -193,9 +194,29 @@ steps or page errors. Service scoring, replay parity, completion and recall,
 typecheck, unit tests and browser build pass. Evidence:
 `.local/campaign/basement-finale/`. No geometry, physics or browser code changed.
 
-**Next: author level 11**, opening the atrium bridges and balconies chapter.
-Choose a visible fixed bank or gap on an existing public bridge; finish native
-proof, nearby variations, Chrome playtesting and the local merge before level 12.
+Level 11 opens **Above the Atrium** on the public glazed bridge at 9.59 m.
+An 8.0 m/s shot at 10° elevation hits 0.40 m patches on opposite window panes,
+then rolls into the connected west corridor. The recorded path is 49.6 m; the
+exact hint rests in 30.82 seconds and all six neighbors rest in 25.39–32.26
+seconds. Native proof confirms sharp turns at both glass contacts.
+
+The narrow bridge pushed the aiming camera to 1.24 m from the robot, hiding the
+target behind its body. The existing near-camera hiding threshold is now 1.6 m
+while aiming. Chrome shows an unobstructed target and clears first try at 227,868
+points; sampled median/p95 frames are 16.7/16.8 ms, with zero skipped music steps
+and no page errors. A separate Chrome check retains the robot in the normal
+atrium aiming view. Overview, chapter selection, saved replay, scrub and retry
+pass. Service scoring/replay/completion/recall, typecheck, unit tests, focused
+camera checks and browser build pass. Evidence: `.local/campaign/bridge-bank/`.
+Station geometry and native physics are unchanged.
+
+The shot recorder now rejects a placement on a different floor from the requested
+start. For low ceilings, set `startRayHeight` below the ceiling; the bridge uses
+2 m instead of the default 3 m. This keeps authoring on the public walking floor.
+
+**Next: author level 12**, using the bridge's connected public balcony or access
+corridor for a longer bank or a change of height. Finish the native proof,
+nearby variations, Chrome playtest and local merge before level 13.
 
 ## Floor repair
 
