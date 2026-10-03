@@ -70,12 +70,6 @@ unchanged and responds to heartbeat pings during long SwiftShader stalls; the
 430ms gameplay release is scheduled in this bridge for accurate input timing.
 This software-rendered capture is not a hardware frame-rate acceptance claim.
 
-The scoring regression suite needs a local First Bank revision on the new layout:
-stop only this task's service, run `node web/tests/heart-in-runtime-seed.mjs`, then
-restart it and run `KYOTO_TEST_ORIGIN=http://127.0.0.1:4281 KYOTO_TEST_OUTPUT=.local/station-detail/evidence/runtime.json npm run test:runtime`.
-The seed appends a revision in `.local/4281/data/kyoto.sqlite` only; historical
-rows remain immutable. This is a private test fixture, not a published course.
-
 ## Clean full-game visual acceptance
 
 `node web/tests/heart-in-clean-browser.mjs` writes `evidence/clean/` using Mesa

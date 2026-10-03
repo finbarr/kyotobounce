@@ -44,7 +44,7 @@ logged. Shot Details exposes the current buffer and frame/network timings.
 Run portable checks with `npm run typecheck`, `npm test`, `npm run build:web`.
 After rebuilding the native worker, use an isolated local service for
 `npm run test:runtime`, `web/tests/shot-stream-runtime.mjs`,
-`web/tests/network-stall-runtime.mjs` and `web/tests/connection-runtime.mjs`.
+`web/tests/network-stall-runtime.mjs` and `web/tests/connection-recovery-runtime.mjs`.
 Use `KYOTO_TEST_ORIGIN` for its URL. Never create test scores on production.
 
 Browser/service protocol: `shot-stream-v4` (live 2× playout). The native stream

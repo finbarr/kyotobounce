@@ -22,7 +22,7 @@ The current physics version is `kyoto-p3-3`. The game is pre-launch: startup dis
 
 Focused Unity verification uses `Kyoto.Editor.BatchTasks.FlightContacts`, with `KYOTO_LAYOUT` set to the canonical layout path and `KYOTO_CONTACT_REPORT` set to an output JSON path. Run it with Unity's `-batchmode -nographics -executeMethod` options, without `-quit` (the play-mode task exits itself).
 
-Service checks: `npm run typecheck`, `npm test`, `npm run build:web`. After rebuilding the native worker, run `npm run test:runtime` and `node web/tests/flight-controls.mjs` against an isolated `KYOTO_TEST_ORIGIN`.
+Service checks: `npm run typecheck`, `npm test`, `npm run build:web`. After rebuilding the native worker, run `npm run test:runtime` against an isolated `KYOTO_TEST_ORIGIN`. Current native route inputs are in `web/levels/proof-inputs.json`; run them with `npm run test:campaign`.
 
 ## Station floor spin response
 
