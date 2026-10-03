@@ -34,6 +34,12 @@ try{
  }
  await page.waitForFunction(()=>kyotoState.briefing);
  assert.match(await page.locator('.briefing-points').innerText(),/FIRST WAYPOINT\s+×10 TARGETS/,'Briefing explains the first target reward');
+ const overviewMarkers=await page.evaluate(()=>{
+  const obstacles=[document.querySelector('.briefing-heading'),document.querySelector('.briefing-bottom'),document.getElementById('result-leaderboard')].filter(el=>el?.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>el.getBoundingClientRect());
+  return [...document.querySelectorAll('#briefing-route circle')].map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,clear:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&obstacles.every(b=>r.right<=b.left||r.left>=b.right||r.bottom<=b.top||r.top>=b.bottom)};});
+ });
+ assert.equal(overviewMarkers.length,course.waypoints.length);assert(overviewMarkers.every(m=>m.clear),'Overview waypoint badges stay clear of headings, controls and the leaderboard');
+ await writeFile(resolve(out,'overview-markers.json'),JSON.stringify(overviewMarkers,null,2));
  await page.screenshot({scale:'css',path:resolve(out,'briefing.png')});
  await page.locator('#briefing-play').click();await page.waitForFunction(()=>window.kyotoState?.pointerLocked&&!window.kyotoState?.briefingTransition);
  // Let the first view finish drawing before sending a brief key hold.

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import {routeBounds,routeTargets} from './waypoint-targets.js';
+import {routeBounds,routeTargets,fitRouteCamera} from './waypoint-targets.js';
 const $=id=>document.getElementById(id),v=p=>new THREE.Vector3(p.x,p.y,-p.z);
-export function challengeBriefing({renderer,onStart,onOpen,isReady}){
+export function challengeBriefing({renderer,boundary,onStart,onOpen,isReady}){
  const host=document.createElement('section');host.id='briefing';host.hidden=true;host.setAttribute('aria-label','Challenge overview');
  host.innerHTML=`<svg id="briefing-route" aria-hidden="true"></svg><div class="briefing-heading"><span class="eyebrow">STAGE PREVIEW / コース</span><h2 id="briefing-name"></h2><p id="briefing-description">Find your line through Kyoto Station.</p><button id="briefing-back">← STAGE SELECT <kbd>ESC</kbd></button></div><div class="map-label start-label" id="map-start"><b aria-hidden="true">⚑</b><span>SUGGESTED START<small id="map-start-radius"></small></span></div><div class="map-label goal-label" id="map-goal"><b>◎</b><span><strong id="map-goal-name">LAND HERE</strong><small id="map-goal-radius"></small></span></div><div class="briefing-bottom"><div class="briefing-facts"><span id="briefing-distance"></span><p id="briefing-rule"></p><p class="map-key"><i></i> Checkered pad = suggested start. Walk and throw anywhere.<br><i></i> Settle the ball inside the gold target.</p></div><div class="briefing-points"><span>BASE SCORE <b>10,000 × COMBO</b></span><span>EACH NEW BANK <b>+0.5×</b></span><span>BULLSEYE LANDING <b>KEEP 100%</b></span><small>Link distinct banks. Outer rings keep 75 / 50 / 25%. Add 100 PTS / SEC while moving.</small></div><button id="briefing-play" class="primary">LET’S BOUNCE <span>▶</span><small>SPACE TO START</small></button></div><div class="cutaway-note">STATION CUTAWAY · TARGET GUIDE</div>`;
  document.body.append(host);
@@ -9,8 +9,12 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
  const routeGuide=$('briefing-route'),svgNS='http://www.w3.org/2000/svg';let guidePoints=[],guideLine;
  const clip=new THREE.Plane(new THREE.Vector3(0,-1,0),5);
  const roofClip=new THREE.Plane(new THREE.Vector3(0,-1,0),5);
+ let framing=null;
+ const heading=host.querySelector('.briefing-heading'),bottomPanel=host.querySelector('.briefing-bottom');
+ const layoutObserver=new ResizeObserver(()=>{framing=null;});
+ for(const el of [heading,bottomPanel,$('map-start'),$('map-goal')])layoutObserver.observe(el);
  function open(c){
-  if(!c)return;onOpen();challenge=c;active=true;transition=0;host.hidden=false;document.body.classList.add('is-briefing');
+  if(!c)return;onOpen();challenge=c;active=true;transition=0;framing=null;host.hidden=false;document.body.classList.add('is-briefing');
   routeGuide.replaceChildren();guidePoints=[];guideLine=null;
   if(c.waypoints?.length){
    guideLine=document.createElementNS(svgNS,'polyline');guideLine.setAttribute('class','route-guide-line');routeGuide.append(guideLine);
@@ -50,19 +54,38 @@ export function challengeBriefing({renderer,onStart,onOpen,isReady}){
     const halfWidth=bounds.size.length()*.5+(classic?THREE.MathUtils.clamp(span.length()*.35,3,12):0)+2;
     const range=Math.max(14,halfWidth/Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/Math.min(camera.aspect*.67,.85));
     const ceiling=challenge.waypoints?.find(w=>w.normal?.y<-.5&&w.normal.y>-.995);
-    // Look over the stairwell walls when a ceiling bank leads to a lower tread.
-    eye.copy(target).addScaledVector(side,range*(ceiling ? .22 : .47)).add(new THREE.Vector3(0,range*(ceiling ? .98 : .88),0));
-    camera.position.copy(eye);camera.up.set(0,1,0);camera.lookAt(target);camera.updateMatrixWorld();
+    // Tall routes must fit above the bottom controls, not just in the full
+    // canvas. Reserve room for the start/goal labels and numbered badges.
+    if(!framing||framing.width!==innerWidth||framing.height!==innerHeight||framing.fov!==camera.fov||framing.aspect!==camera.aspect){
+     const top=heading.getBoundingClientRect().bottom+Math.max($('map-start').offsetHeight,$('map-goal').offsetHeight,32)+32,bottom=bottomPanel.getBoundingClientRect().top-24;
+     const board=$('result-leaderboard'),boardLeft=board?.getClientRects().length?board.getBoundingClientRect().left:innerWidth;
+     const rect={left:24/innerWidth*2-1,right:(boardLeft-24)/innerWidth*2-1,top:1-top/innerHeight*2,bottom:1-bottom/innerHeight*2};
+     // Start above stairwell walls, then try shallower views if framing a tall
+     // route would put the eye above the station's camera ceiling.
+     const angles=ceiling?[[.22,.98],[.47,.88],[.7,.71],[.88,.47],[.98,.2]]:[[.47,.88],[.7,.71],[.88,.47],[.98,.2]];
+     for(const [across,above]of angles){
+      eye.copy(target).addScaledVector(side,range*across).add(new THREE.Vector3(0,range*above,0));boundary.constrain(eye);
+      camera.position.copy(eye);camera.up.set(0,1,0);camera.lookAt(target);camera.updateMatrixWorld();
+      if(rect.right>rect.left&&rect.top>rect.bottom)fitRouteCamera(camera,challenge,rect);
+      if(boundary.contains(camera.position))break;
+     }
+     // Project labels from the same constrained eye that will render the scene.
+     boundary.constrain(camera.position);camera.updateMatrixWorld();
+     framing={width:innerWidth,height:innerHeight,fov:camera.fov,aspect:camera.aspect,eye:camera.position.clone(),quaternion:camera.quaternion.clone()};
+    }else{camera.position.copy(framing.eye);camera.quaternion.copy(framing.quaternion);camera.updateMatrixWorld();}
     // Follow a change of height so the upper floor cannot cover either end
     // of a basement route. Keep every target disk and the starting pad below it.
-    const horizontal=span.x*span.x+span.z*span.z;
-    const slope=Math.abs(span.y)>1&&horizontal>4?span.y/horizontal:0;
-    clip.normal.set(span.x*slope,-1,span.z*slope).normalize();
+    // A bank over ten metres above both ends needs its own sloping cut. Keep
+    // ordinary corridor views level so their nearby roofs are removed evenly.
+    const disks=routeTargets(challenge),low=disks.reduce((a,b)=>a.center.y<b.center.y?a:b),high=disks.reduce((a,b)=>a.center.y>b.center.y?a:b);
+    const cutSpan=high.center.y>Math.max(a.y,b.y)+10?v(high.center).sub(v(low.center)):span,horizontal=cutSpan.x*cutSpan.x+cutSpan.z*cutSpan.z;
+    const slope=Math.abs(cutSpan.y)>1&&horizontal>4?cutSpan.y/horizontal:0;
+    clip.normal.set(cutSpan.x*slope,-1,cutSpan.z*slope).normalize();
     // A sloping ceiling bank needs a cut parallel to its face to reveal the
     // lower steps. A horizontal cut also removes the upper landing's roof.
     if(ceiling)clip.normal.copy(v(ceiling.normal)).normalize();
     const planes=ceiling?[clip,roofClip]:[clip];
-    for(const plane of planes)plane.constant=Math.max(...routeTargets(challenge).map(d=>{
+    for(const plane of planes)plane.constant=Math.max(...disks.map(d=>{
       const normal=v(d.normal||{x:0,y:1,z:0}).normalize();
       const extent=d.radius*Math.sqrt(Math.max(0,1-plane.normal.dot(normal)**2));
       return -plane.normal.dot(v(d.center))+extent;

@@ -461,7 +461,7 @@ function renderTimeline(now){
   if(after.phase==='Flight'&&before.phase!=='Flight')phase=time<after.releaseTime?'Release':'Flight';
   return {before,after,alpha,time,phase};
 }
-briefing=challengeBriefing({renderer,isReady:()=>loaded&&workerReady&&!ui?.state.session?.restoring,onOpen:()=>{cancel();ui?.dismissResult();},onStart:capture=>{
+briefing=challengeBriefing({renderer,boundary,isReady:()=>loaded&&workerReady&&!ui?.state.session?.restoring,onOpen:()=>{cancel();ui?.dismissResult();},onStart:capture=>{
   sound.cue('start');if(snapshot?.phase==='Result')recall();
   // Every way out of the briefing starts with the same aim, including Escape.
   // Mouse capture is optional; it must not be what initializes the camera.

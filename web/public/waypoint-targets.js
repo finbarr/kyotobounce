@@ -7,6 +7,22 @@ export function routeBounds(c){
  if(box.isEmpty())box.set(new THREE.Vector3(-1,-1,-1),new THREE.Vector3(1,1,1));
  return {center:box.getCenter(new THREE.Vector3()),size:box.getSize(new THREE.Vector3()),box};
 }
+// Fit the complete target disks inside an unobstructed rectangle in NDC.
+// Keep the view angle and projection; move the eye sideways/up and back only.
+export function fitRouteCamera(camera,course,{left,right,bottom,top}){
+ const tanX=1/camera.projectionMatrix.elements[0],tanY=1/camera.projectionMatrix.elements[5];
+ const xAxis=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0),yAxis=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1),back=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,2);
+ let lowX=-Infinity,highX=Infinity,lowY=-Infinity,highY=Infinity,near=0;
+ for(const d of routeTargets(course))for(const x of [-1,1])for(const y of [-1,1])for(const z of [-1,1]){
+  const p=v(d.center).add(new THREE.Vector3(x,y,z).multiplyScalar(d.radius)).sub(camera.position);
+  const px=p.dot(xAxis),py=p.dot(yAxis),pz=p.dot(back);near=Math.max(near,pz+camera.near+.01);
+  lowX=Math.max(lowX,px+right*tanX*pz);highX=Math.min(highX,px+left*tanX*pz);
+  lowY=Math.max(lowY,py+top*tanY*pz);highY=Math.min(highY,py+bottom*tanY*pz);
+ }
+ const distance=Math.max(near,(lowX-highX)/((right-left)*tanX),(lowY-highY)/((top-bottom)*tanY));
+ const x=(lowX+highX-(right+left)*tanX*distance)*.5,y=(lowY+highY-(top+bottom)*tanY*distance)*.5;
+ camera.position.addScaledVector(back,distance).addScaledVector(xAxis,x).addScaledVector(yAxis,y);camera.updateMatrixWorld();
+}
 // The painted border belongs inside the native contact disk. An outward
 // outline makes near misses look like hits, especially at target intersections.
 export function waypointGeometry(radius){

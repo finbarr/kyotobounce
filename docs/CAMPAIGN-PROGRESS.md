@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**27 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**28 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -85,6 +85,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 25. Underpass Circuit | 2 / 2, ceiling, opposing walls and floor banks plus the gold landing | 6 / 6: ±1° yaw, ±0.5° pitch, full charge minus 20/40 ms; every sample collected all targets and landed at rest | First attempt cleared at 1,641,513 points; readable aiming marker, overview, movement/home, saved replay, scrub and retry passed |
 | 26. Grand Descent | 2 / 2, stair landing, square, balcony and lower-passage targets across a 25.4 m descent | 6 / 6: ±0.5° yaw/pitch, full charge minus 10/20 ms; every sample collected all four targets and rested | First attempt cleared at 847,747 points; overview, full backspin hint, movement/home, saved replay, scrub and retry passed |
 | 27. Skyway Circuit | 2 / 2, three glass banks and a final deck target in the high gallery | 6 / 6: ±0.25° yaw/pitch, full charge minus 10/20 ms; every sample collected all four targets and rested | First attempt cleared at 827,652 points; overview, readable glass patches, complete hint, movement/home, saved replay, scrub and retry passed |
+| 28. Tower Return | 2 / 2, tower shaft bank and two return patches across the forecourt | 6 / 6: ±0.25° yaw/pitch, ±8 ms charge; every sample collected all three targets and rested | First attempt cleared at 412,889 points; tall-route overview, POWER hint, movement/home, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -580,7 +581,37 @@ service checks pass all four targets, full rest, authoritative scoring,
 independent saved-replay parity, completion, leaderboard placement and recall
 forfeiture. The native proof hashes match the committed catalog and inputs.
 
-**Next: author level 28**, continuing the finale chapter in the existing
+Level 28, **Tower Return**, sends a 75 m/s POWER shot over the hotel onto
+Kyoto Tower's shaft, 58.6 m above the launch pad. The rebound returns across
+two forecourt patches. Its recorded route measures 226.0 m; the tower circle
+has a 0.60 m radius and each paving circle has a 1.00 m radius.
+
+Native placement validates each whole disk on its face. Both exact hints
+collect all three targets and stop translating and spinning in 29.45 seconds.
+All six nearby inputs clear and rest in 29.25–32.06 seconds. Evidence is under
+`.local/campaign/tower-return/`. Geometry and native physics are unchanged.
+
+The overview now fits complete target disks between its heading, controls and
+leaderboard, and projects labels from the constrained camera position. A steep
+intermediate bank gets a sloping cutaway that removes foreground roofs.
+Chrome checks every current course at 1440×900 and 1280×720; the final cutaway
+is also inspected on Tower Return and Skyway Circuit. Geometry tests cover
+the complete disk rims at desktop, laptop and portrait aspect ratios.
+
+Chrome clears at 412,889 points with all three targets, full rest and independent
+saved-replay score parity. The overview, complete hint, movement/home, replay,
+scrub and retry pass. No music steps are skipped before or during the shot;
+sampled final-flight median/p95 frames are 16.7/16.8 ms, with no page errors.
+The performance receipt retains a 2.00-second initial main-thread task and a
+53 ms task in the window ending during charging. Flight windows have no long
+tasks or playback underruns. Cold entry remains part of the final audit.
+
+Typecheck, unit tests, browser build and catalog checks pass. Local service
+checks pass target collection, authoritative score/replay parity, full rest,
+completion, leaderboard placement and recall forfeiture. Proof hashes match
+the current catalog and inputs.
+
+**Next: author level 29**, continuing the finale chapter in the existing
 connected station spaces and retained forecourt. Finish its native proof,
 nearby variations, Chrome playtesting and local merge before the next level.
 

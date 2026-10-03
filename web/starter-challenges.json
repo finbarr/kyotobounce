@@ -2695,5 +2695,113 @@
         200
       ]
     }
+  },
+  {
+    "id": "tower-return",
+    "revision": 1,
+    "name": "Tower Return",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 31.000001907348633,
+        "y": -0.6026611924171448,
+        "z": 115
+      },
+      "normal": {
+        "x": 0.0013038988690823317,
+        "y": 0.9998714923858643,
+        "z": 0.015976296737790108
+      },
+      "radius": 0.25,
+      "surface": "municipal-plaza-643860320"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 31.21404266357422,
+          "y": 57.980316162109375,
+          "z": 176.7159423828125
+        },
+        "normal": {
+          "x": 0.2591322660446167,
+          "y": 0.08130709826946259,
+          "z": -0.9624134302139282
+        },
+        "radius": 0.6000000238418579,
+        "surface": "municipal-building-3207476640",
+        "id": "tower-bank"
+      },
+      {
+        "center": {
+          "x": 57.119178771972656,
+          "y": -0.8513427376747131,
+          "z": 136.05918884277344
+        },
+        "normal": {
+          "x": -0.013398034498095512,
+          "y": 0.9998947978019714,
+          "z": -0.005560604855418205
+        },
+        "radius": 1,
+        "surface": "municipal-plaza-643758320",
+        "id": "forecourt-return"
+      },
+      {
+        "center": {
+          "x": 59.149330139160156,
+          "y": -0.8478752374649048,
+          "z": 131.7911376953125
+        },
+        "normal": {
+          "x": -0.013398034498095512,
+          "y": 0.9998947978019714,
+          "z": -0.005560604855418205
+        },
+        "radius": 1,
+        "surface": "municipal-plaza-643758320",
+        "id": "paving-skip"
+      }
+    ],
+    "hint": {
+      "yaw": 0,
+      "pitch": 50,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "full",
+      "holdMs": 2096.4824120603016,
+      "note": "Apply H for 50° upward aim and no spin in POWER mode. Release at the white 75.0 m/s mark to clear the hotel and bank the tower shaft. Let the ball bounce back across both forecourt patches, then wait for full rest."
+    },
+    "order": 27,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Station Finales",
+      "difficulty": "Expert",
+      "distance": 226,
+      "brief": "Send a high arc onto Kyoto Tower, then bring it back across two forecourt targets. The shaft patch sits nearly 59 metres above the launch pad."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

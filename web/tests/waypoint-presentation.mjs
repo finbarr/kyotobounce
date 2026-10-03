@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import {scoreAt,heatTier,collectedIds,scoreEvents,pendingScoreEvent,HEAT_STAGES,allWaypointsCollected} from '../public/waypoint-score.js';
 import {celebrationProfile} from '../public/celebration.js';
-import {routeBounds,waypointGeometry} from '../public/waypoint-targets.js';
+import {routeBounds,routeTargets,fitRouteCamera,waypointGeometry} from '../public/waypoint-targets.js';
+import {readFile} from 'node:fs/promises';
 import {ballHeat} from '../public/ball-heat.js';
 import * as THREE from 'three';
 const frames=[{t:0,score:{version:'waypoint-v4',total:0,waypointIds:[]}},{t:2,score:{version:'waypoint-v4',total:310000,waypointIds:['a','b']}}];
@@ -79,3 +80,27 @@ console.log('PASS all-waypoint ID validation, one-shot priority, optional destin
 
 assert.equal(scoreEvents(base,bank).find(e=>e.kind==='bank').bonus,.5,'Bank feedback displays the additive award');
 assert.equal(scoreEvents(bank,{...bank,waypointCount:4,waypointMultiplier:16,comboMultiplier:16.5}).find(e=>e.kind==='waypoint').multiplier,16.5,'Waypoint feedback displays the actual combined multiplier');
+
+// Tall tower and descent routes used to place their low patches behind the
+// overview controls. Check every real target rim against the available view.
+const campaign=JSON.parse(await readFile(new URL('../starter-challenges.json',import.meta.url)));
+for(const course of campaign)for(const [width,height,rect]of [
+ [1440,900,{left:-.96,right:.57,bottom:-.37,top:.36}],
+ [1280,720,{left:-.96,right:.53,bottom:-.25,top:.25}],
+ [390,844,{left:-.88,right:.88,bottom:-.32,top:.30}],
+]){
+ const camera=new THREE.PerspectiveCamera(65,width/height,.08,1000),bounds=routeBounds(course);
+ const a=new THREE.Vector3(course.start.center.x,course.start.center.y,-course.start.center.z),end=(course.goal||course.waypoints.at(-1)||course.start).center,span=new THREE.Vector3(end.x,end.y,-end.z).sub(a),side=new THREE.Vector3(-span.z,0,span.x).normalize();if(side.lengthSq()<.1)side.set(0,0,1);
+ const range=Math.max(14,(bounds.size.length()*.5+2)/Math.tan(THREE.MathUtils.degToRad(camera.fov*.5))/Math.min(camera.aspect*.67,.85));
+ camera.position.copy(bounds.center).addScaledVector(side,range*.47).add(new THREE.Vector3(0,range*.88,0));camera.lookAt(bounds.center);camera.updateMatrixWorld();
+ const orientation=camera.quaternion.clone(),projection=camera.projectionMatrix.clone();fitRouteCamera(camera,course,rect);
+ assert(camera.quaternion.equals(orientation)&&camera.projectionMatrix.equals(projection),'Fitting preserves angle and projection for the gameplay transition');
+ for(const d of routeTargets(course)){
+  const normal=new THREE.Vector3(d.normal.x,d.normal.y,-d.normal.z).normalize(),rotation=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),normal),center=new THREE.Vector3(d.center.x,d.center.y,-d.center.z);
+  for(let i=0;i<32;i++){
+   const angle=i*Math.PI/16,p=new THREE.Vector3(Math.cos(angle)*d.radius,Math.sin(angle)*d.radius,0).applyQuaternion(rotation).add(center).project(camera);
+   assert(p.x>=rect.left-1e-6&&p.x<=rect.right+1e-6&&p.y>=rect.bottom-1e-6&&p.y<=rect.top+1e-6&&p.z>=-1&&p.z<=1,`${course.id}: complete target disk fits ${width}x${height} between overview controls`);
+  }
+ }
+}
+console.log('PASS current campaign target disks fit the clear overview area at desktop, laptop and portrait sizes');

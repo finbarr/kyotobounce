@@ -2491,6 +2491,95 @@
         "minNonFloorTargets": 3,
         "minSharpTurns": 3
       }
+    },
+    {
+      "id": "tower-return",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2096.4824120603016,
+        "range": "full",
+        "input": {
+          "yaw": 0,
+          "pitch": 50,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 2096.4824120603016,
+          "range": "full",
+          "input": {
+            "yaw": -0.25,
+            "pitch": 50,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2096.4824120603016,
+          "range": "full",
+          "input": {
+            "yaw": 0.25,
+            "pitch": 50,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2096.4824120603016,
+          "range": "full",
+          "input": {
+            "yaw": 0,
+            "pitch": 49.75,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2096.4824120603016,
+          "range": "full",
+          "input": {
+            "yaw": 0,
+            "pitch": 50.25,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2088.4824120603016,
+          "range": "full",
+          "input": {
+            "yaw": 0,
+            "pitch": 50,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2104.4824120603016,
+          "range": "full",
+          "input": {
+            "yaw": 0,
+            "pitch": 50,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 1,
+        "minSharpTurns": 1
+      }
     }
   ]
 }
