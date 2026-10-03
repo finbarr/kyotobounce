@@ -127,9 +127,9 @@ namespace Kyoto
                 bool solidEscalator=p.id.Contains("-escalator-")
                     &&(p.role=="escalator-body"||p.id.Contains("-skirt-"))&&p.vertices.Length<=36;
                 Vector3 meshOrigin=Vector3.zero;
-                if(p.role=="city-ground"||solidEscalator)
+                if(p.role=="city-ground"||solidEscalator||p.id.Contains("railway-subgrade"))
                 {
-                    // Keep the narrow curb faces near their collider's origin.
+                    // Keep the curb and railway-base faces near their collider's origin.
                     // World-coordinate vertices caused millimetre-scale PhysX
                     // contact errors; rendering uses the same translated mesh.
                     meshOrigin=mesh.bounds.center;
@@ -161,7 +161,9 @@ namespace Kyoto
                 if(p.playerOnly)obj.layer=CollisionLayers.WalkingAssist;else if(p.ballStairs)obj.layer=CollisionLayers.BallStairs;
                 if((p.playerOnly?walking:collision)&&p.collision)
                 {
-                    var collider=obj.AddComponent<MeshCollider>();collider.sharedMesh=mesh;collider.convex=solidEscalator;collider.sharedMaterial=Physical(p.material);collider.contactOffset=.001f;
+                    var collider=obj.AddComponent<MeshCollider>();
+                    collider.sharedMesh=p.id.Contains("railway-subgrade")?RefineRailwayBase(mesh):mesh;
+                    collider.convex=solidEscalator;collider.sharedMaterial=Physical(p.material);collider.contactOffset=.001f;
                     if(!p.playerOnly)
                     {
                     var surface=obj.AddComponent<Surface>();surface.surfaceId=p.id;
@@ -227,6 +229,32 @@ namespace Kyoto
                     throw new System.InvalidOperationException("Municipal geometry does not match the shared layout reference.");
                 municipal.Create(parent,collision,appearance!=null,Physical);
             }
+        }
+        static Mesh RefineRailwayBase(Mesh source)
+        {
+            // The railway base contains triangles hundreds of metres long.
+            // PhysX queries against them can miss a 23 mm ball and produce
+            // tilted penetration normals on a flat face. Bisect their longest
+            // edges; the surface, winding and openings remain unchanged.
+            const float maxEdgeSquared=8f*8f;
+            var vertices=new List<Vector3>();var indices=new List<int>();
+            void Triangle(Vector3 a,Vector3 b,Vector3 c)
+            {
+                float ab=(b-a).sqrMagnitude,bc=(c-b).sqrMagnitude,ca=(a-c).sqrMagnitude;
+                if(Mathf.Max(ab,Mathf.Max(bc,ca))<=maxEdgeSquared)
+                {
+                    int start=vertices.Count;vertices.Add(a);vertices.Add(b);vertices.Add(c);
+                    indices.Add(start);indices.Add(start+1);indices.Add(start+2);return;
+                }
+                if(bc>=ab&&bc>=ca){var old=a;a=b;b=c;c=old;}
+                else if(ca>=ab){var old=a;a=c;c=b;b=old;}
+                var midpoint=(a+b)*.5f;
+                Triangle(a,midpoint,c);Triangle(midpoint,b,c);
+            }
+            var points=source.vertices;var triangles=source.triangles;
+            for(int i=0;i<triangles.Length;i+=3)Triangle(points[triangles[i]],points[triangles[i+1]],points[triangles[i+2]]);
+            var result=new Mesh{name=source.name+" collision",indexFormat=vertices.Count>65535?IndexFormat.UInt32:IndexFormat.UInt16};
+            result.SetVertices(vertices);result.SetTriangles(indices,0);result.RecalculateBounds();return result;
         }
         static GameObject Child(Transform parent,string name,Vector3 local)
         {

@@ -58,6 +58,35 @@ KYOTO_WORKER_EXECUTABLE='/absolute/path/to/compatible/worker' \
 traces, screenshots and logs stay under `.local/campaign/`, outside Git. Reuse
 small proof directories when iterating; never duplicate the station per level.
 
+## Railway-base rest regression
+
+After native collision changes, run the focused charge scan and authored-surface
+comparison in Unity. Close other editors/builds for this project first:
+
+```sh
+KYOTO_LAYOUT="$PWD/.local/v2/4425/station-layout.json" \
+KYOTO_REST_INPUT="$PWD/web/levels/railway-rest.json" \
+KYOTO_REST_REPORT="$PWD/.local/campaign/railway-rest.json" \
+KYOTO_VERIFY_RAILWAY_BASE=1 \
+  /Applications/Unity/Hub/Editor/6000.3.23f1/Unity.app/Contents/MacOS/Unity \
+  -batchmode -nographics -projectPath "$PWD/KyotoRicochet" \
+  -executeMethod Kyoto.Editor.BatchTasks.CampaignRest \
+  -logFile "$PWD/.local/campaign/railway-rest.log"
+```
+
+Omit `-quit`: the batch task enters Play mode and exits after verification.
+The fixture checks 81 exact charges, including both reproduced rest failures.
+Its `observeSeconds: 80` is a test observation window; a moving or spinning ball
+at the limit fails. The verifier defaults to 40 seconds and accepts 20–120.
+Geometry checks confirm the smaller collision triangles remain on the authored
+faces, preserve winding and area, and have no edge longer than 8 m.
+
+Rebuild the worker and restart the preview before runtime acceptance:
+
+```sh
+npm run build:worker
+```
+
 ## Service and Chrome
 
 ```sh

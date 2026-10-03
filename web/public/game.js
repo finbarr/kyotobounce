@@ -671,9 +671,14 @@ function animate(now){
   if(cameraClearance<1e-4)lookTarget.addScaledVector(offset,-1);
   if(p&&!inFlight&&!manualCamera&&['play','design'].includes(ui.state.mode))lookTarget.copy(release).addScaledVector(aim,30);
   camera.lookAt(lookTarget);
-  // Downward throws need space below the outgoing ray for the lower landing.
+  // Leave room below the launch ray for lower landings and the falling arc of
+  // upward throws; otherwise ceiling targets can sit behind the power meter.
+  // Taper near vertical so a distant reticle stays below the top HUD.
   // The reticle is projected from the real launch ray after this framing shift.
-  if(p&&!inFlight&&!manualCamera&&['play','design'].includes(ui.state.mode))camera.rotateX(-THREE.MathUtils.degToRad(THREE.MathUtils.clamp(-pitch*.65,0,10)));
+  if(p&&!inFlight&&!manualCamera&&['play','design'].includes(ui.state.mode)){
+    const framingDrop=pitch<0?THREE.MathUtils.clamp(-pitch*.65,0,10):THREE.MathUtils.clamp((pitch-25)*.4,0,12)*THREE.MathUtils.clamp((80-pitch)/20,0,1);
+    camera.rotateX(-THREE.MathUtils.degToRad(framingDrop));
+  }
   camera.updateMatrixWorld();
   briefing.update(camera,dt);
   if(fly.active){fly.move(keys,dt,{spaceAscends:!replaying,movement:mobile.movement});camera=fly.camera;}

@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**20 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**21 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -78,6 +78,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 18. Garden Corner | 2 / 2, end-wall and glass banks followed by a floor patch | 6 / 6: ±1° yaw/pitch, ±30 ms charge; every sample rested in the upper approach | First attempt cleared all three targets; overview, hint, saved replay, scrub and retry passed |
 | 19. Planter Skip | 2 / 2, low planter bank and return patch followed by full rest in the gold ring | 6 / 6: ±1° yaw/pitch, ±20 ms charge; every sample earned the bonus | First attempt earned the bonus; garden overview, visible patches, hint and saved replay controls passed |
 | 20. Rooftop Circuit | 2 / 2, concrete and glass banks, outward/return floor patches and full rest on the garden level | 6 / 6: ±0.5° yaw/pitch, ±10 ms charge; every sample collected all four targets | First attempt cleared; four-target overview, complete hint, saved replay, scrub and retry passed |
+| 21. Platform Zero | 2 / 2, canopy rebound, hanging-sign bank and return floor patch | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 20/40 ms; every sample rested on the platform | First attempt cleared; chapter selection, visible canopy patch, overview, complete hint and saved replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -386,10 +387,29 @@ Service authoritative scoring, replay parity, completion and recall checks pass,
 as do typecheck, unit tests and browser build. Evidence:
 `.local/campaign/garden-finale/`. Browser code is unchanged.
 
-**Next: author level 21**, opening the platforms chapter. Inspect the outstanding
-railway-subgrade rest failure below while choosing a public platform route.
-Finish native proof, nearby variations, Chrome playtesting and the local merge
-before level 22.
+Level 21, **Platform Zero**, opens **Platforms & Tracks** with an upward bank
+into the canopy, a rebound from its hanging platform sign and a return floor
+patch. Full 12 m/s precision power at 52° follows a 66.7 m native route. The
+0.55 m canopy, 0.22 m sign and 0.85 m floor disks were validated on their actual
+faces. Both exact solutions rest in 26.67 seconds; all six neighbors collect
+every target and rest on the platform in 24.43–35.36 seconds.
+
+Chrome clears first try at 422,605 points. Overview, movement/home, full hint,
+saved replay, scrub and retry pass, with 16.7/16.8 ms sampled gameplay median/p95
+frames, zero skipped music steps and no page errors. Initial loading still has
+a 2.1-second main-thread task, retained for the final cold-start audit. Evidence:
+`.local/campaign/platform-entry/`. The upward aiming view leaves more space for
+canopy targets above the power meter; this adjustment tapers near vertical to
+keep steep-lob reticles below the top controls. Launch inputs are unchanged.
+
+The final camera check passes Soft Landing, Stair Skip, Ceiling Skip and First
+Bounce with unchanged hint inputs and visible reticles clear of the controls.
+Typecheck, unit tests, browser build and the full local runtime suite pass,
+including authoritative scoring/replays, progression, recall, exploration and
+creator recording, save and tamper rejection.
+
+**Next: author level 22**, continuing along the platforms. Finish its native
+proof, nearby variations, Chrome playtesting and local merge before level 23.
 
 ## Floor repair
 
@@ -422,6 +442,33 @@ Geometry/source/rest receipts are in
 `.local/campaign/grout-proof/` and Chrome evidence in `.local/campaign/grout-browser/`.
 These rest checks supersede the earlier authoring timings above.
 
+## Railway-base precision repair
+
+The rejected Wood Square scout exposed a second rest fault under the tracks:
+the small ball could penetrate a flat railway-base triangle and receive a
+tilted recovery normal. The original 1,826 ms charge reproduced the failure;
+centering the mesh alone still failed at 1,827 ms. The collider now uses local
+coordinates and bisects long edges to at most 8 m. Only the railway base is
+refined, from 128 to 26,700 collision triangles. Its visible shape, authored
+faces, openings and material remain unchanged. The source comparison checks
+every triangle's containment, winding and area. This follows the
+[PhysX guidance on large triangles](https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/docs/Geometry.html#triangle-meshes).
+
+- All 81 charges from 1,824–1,834 ms in 0.125 ms steps reach zero translation
+  and spin in 12.18–47.28 seconds. An 80-second observation window allows the
+  longer rolling routes to finish naturally; timeouts still fail.
+- The rebuilt worker independently repeats the two reproduced cases at exact
+  1,826 and 1,827 ms inputs. Both settle on the railway base in 16.40 and 29.44
+  seconds, with zero and two overlap recoveries respectively.
+- All prior 20 levels have matching native hint receipts; none of those exact
+  routes contacts the changed base. The complete catalog audit remains due
+  after level 30.
+
+Evidence is in `.local/campaign/platform-entry/rest-final.json`,
+`railway-worker-summary.json` and `prior-route-scope.json`. The native worker
+was rebuilt and the isolated preview restarted. Ball forces, damping and finish
+conditions are unchanged; no station asset copies were created.
+
 ## Outstanding final checks
 
 - The first cold Chrome view of Ticket Slalom had a 6.7-second render/main-thread
@@ -435,13 +482,6 @@ These rest checks supersede the earlier authoring timings above.
   the final run had none throughout. The cause remains unprofiled; include
   sloped-ceiling cutaway transitions in the final stability pass. Receipt:
   `.local/campaign/step-down/cold-view-note.json`.
-- A rejected Wood Square scout from `(6.5, 19.61, -27)` at yaw −165°, pitch 0°,
-  1,826 ms precision charge left the square and failed to rest within 100 seconds.
-  It ended the observation near `(8.33, -1.38, -44.02)` with 5,431 overlap
-  recoveries against a railway subgrade surface. Diagnose this off-route case
-  during the platform/final runtime audit; a timeout must never finish a shot.
-  The selected level starts at x = 7 and all its tested variations remain on the
-  square. Receipt: `.local/campaign/wood-square/rejected-route.json`.
 - One Soft Landing camera check timed out after 120 seconds during startup
   while a separate native proof worker was running. Service telemetry showed
   loading with zero rendered frames. The same check succeeded once the native
@@ -463,7 +503,7 @@ progression, creator flow and music have passed local checks.
 The focused rest fixture is `web/levels/ticket-slalom-rest.json`. Run
 `Kyoto.Editor.BatchTasks.CampaignRest` through Unity batch mode with `KYOTO_LAYOUT`,
 `KYOTO_REST_INPUT` and `KYOTO_REST_REPORT` set to absolute paths. Omit `-quit`;
-the batch task enters Play mode and exits after the test. This is a failing
+the batch task enters Play mode and exits after the test. This defaults to a failing
 40-second observation limit, never a gameplay finish timer.
 
 The floor repair uses `prepare-atrium-grout.py` (Shapely 2.1+),

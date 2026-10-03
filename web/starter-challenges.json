@@ -1881,5 +1881,113 @@
         200
       ]
     }
+  },
+  {
+    "id": "platform-zero",
+    "revision": 1,
+    "name": "Platform Zero",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 15.399996757507324,
+        "y": 0,
+        "z": -36.43999481201172
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "concourse"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 20.56387710571289,
+          "y": 5.5,
+          "z": -36.659996032714844
+        },
+        "normal": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        },
+        "radius": 0.550000011920929,
+        "surface": "platform-zero-canopy-east",
+        "id": "canopy-bank"
+      },
+      {
+        "center": {
+          "x": 21.969999313354492,
+          "y": 4.699999809265137,
+          "z": -36.659996032714844
+        },
+        "normal": {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.2199999988079071,
+        "surface": "platform-zero-platform-sign-22-board",
+        "id": "platform-sign"
+      },
+      {
+        "center": {
+          "x": 13.891153335571289,
+          "y": 0,
+          "z": -36.659996032714844
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.8500000238418579,
+        "surface": "concourse",
+        "id": "return-floor"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": 52,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2800,
+      "note": "Use full 12.0 m/s precision power, 52° upward aim and no spin. Bank the canopy into the hanging platform sign, then collect the floor patch on the return. Wait for the ball to stop translating and spinning."
+    },
+    "order": 20,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Platforms & Tracks",
+      "difficulty": "Hard",
+      "distance": 66.7,
+      "brief": "Go up into the canopy, bank the hanging platform sign and collect the floor patch as the ball returns along Platform 0."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
