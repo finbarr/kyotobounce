@@ -30,7 +30,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**3 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**4 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -38,6 +38,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 1. First Bounce | 2 / 2, full translation and spin rest | 6 / 6: ±15° yaw, ±5° pitch, 2.0–3.6 m/s | First attempt cleared; overview, movement/home, hint, result and saved replay passed |
 | 2. Blue Wall Bank | 2 / 2, including a sharp wall rebound | 6 / 6: ±5° yaw, ±5° pitch, 7.5–8.5 m/s | First attempt cleared; visible wall patch, overview, hint and replay passed |
 | 3. Clock In | 2 / 2, including the mounted clock rebound | 6 / 6: ±2° yaw, ±2° pitch, 11.5–12 m/s | Two first-attempt clears, identical 52,622-point solutions; overview and replay passed |
+| 4. Ticket Slalom | 2 / 2, two distinct cabinet banks and sharp turns | 6 / 6: ±0.5° yaw/pitch, ±30 ms charge; every sample rested | First gameplay attempt cleared both targets; 66,621 points, overview and replay passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved 32,120 authoritative points; its
@@ -70,9 +71,26 @@ charge/flight, 112 BPM and a 16.7 ms sampled median frame time. The browser proo
 now records audio counters before each shot so loading/capture delays can be
 distinguished from gameplay.
 
-**Next: level 4**, link two distinct banks around the existing ticket-gate
-structures or atrium frontage. Record a new route; avoid reusing a previous
-level's exact shot with one extra target. Keep architecture fixed.
+Level 4 uses opposite faces of the existing wide-lane cabinets, with 0.25 m and
+0.20 m target radii. Its 8.0 m/s, slightly downward shot travels 27.7 m and rests
+after 17.84 seconds. The neighboring shots rest within 16–21 seconds. Evidence:
+`.local/campaign/ticket-slalom-proof/` and `.local/campaign/ticket-slalom-browser/`.
+The successful Chrome run had 16.7 ms sampled median/p95 frames and no skipped
+music steps during charge/flight. No geometry or physics changed.
+
+**Next: level 5**, an atrium glass-bank route with an optional landing bonus.
+Use the existing glazing around the public basement opening, record a new shot,
+and keep the finish zone generous enough to teach the bonus. This should finish
+the introductory chapter before the campaign moves into the basement.
+
+## Outstanding final checks
+
+- The first cold Chrome view of Ticket Slalom had a 6.7-second render/main-thread
+  stall and missed a short movement input. The warmed rerun passed. Cause is
+  unprofiled; investigate cold level entry as part of the final stability check.
+  The measured report is retained in the local browser directory's
+  `cold-view-note.json`. Gameplay proof now waits for the view to finish drawing
+  and retains loading/performance reports; that does not resolve the cold stall.
 
 Before final acceptance, remove any remaining standalone retired-level probes
 under `web/tests/` rather than adapting their old course IDs or routes.

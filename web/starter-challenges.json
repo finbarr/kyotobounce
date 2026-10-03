@@ -232,5 +232,98 @@
         200
       ]
     }
+  },
+  {
+    "id": "atrium-ticket-slalom",
+    "revision": 1,
+    "name": "Ticket Slalom",
+    "creator": "station",
+    "layout": "fe661f4a2c98891d7d00f9a3be27aac31888b94d40eb518245834d22ac1c4116",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v3",
+    "start": {
+      "center": {
+        "x": 7.000006675720215,
+        "y": 0,
+        "z": -16.40000343322754
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.4,
+      "surface": "concourse"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 4.723333835601807,
+          "y": 0.6000000238418579,
+          "z": -13.835000991821289
+        },
+        "normal": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.25,
+        "surface": "central-gate-bank-module-12-shell",
+        "id": "gate-left"
+      },
+      {
+        "center": {
+          "x": 5.623333930969238,
+          "y": 0.44999998807907104,
+          "z": -13
+        },
+        "normal": {
+          "x": -0.9999999403953552,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.20000000298023224,
+        "surface": "central-gate-bank-module-13-shell",
+        "id": "gate-right"
+      }
+    ],
+    "hint": {
+      "yaw": -45,
+      "pitch": -3,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 1826,
+      "powerRange": "precision",
+      "note": "Use 8.0 m/s, aim just below level and keep spin at zero. Bank off the left cabinet, then the right, before the ball rolls into the atrium."
+    },
+    "order": 3,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "Atrium Beginnings",
+      "difficulty": "Medium",
+      "distance": 27.7,
+      "brief": "Thread the wide ticket lane with a left-right bank. Collect both cabinet patches before the ball rolls out into the atrium."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

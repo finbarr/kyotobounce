@@ -29,6 +29,8 @@ The input contains `start: {x,y,z}` and `hint: {yaw,pitch,top,kick,powerRange,ho
 The receipt contains native contacts, the recorded path and the actual server
 charge duration. Choose course targets from those contacts, then use the proof
 runner to repeat the intended hint and measure nearby inputs.
+An optional `observeSeconds` (20–120) bounds scouting time. A timeout fails and
+writes a `.failure.json` diagnostic; it never treats a moving ball as complete.
 
 ```sh
 KYOTO_WORKER_EXECUTABLE='/absolute/path/to/compatible/worker' \

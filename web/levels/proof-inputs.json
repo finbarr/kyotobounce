@@ -265,6 +265,95 @@
         "minNonFloorTargets": 1,
         "minSharpTurns": 1
       }
+    },
+    {
+      "id": "atrium-ticket-slalom",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 1826,
+        "range": "precision",
+        "input": {
+          "yaw": -45,
+          "pitch": -3,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 60
+      },
+      "neighbors": [
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -45.5,
+            "pitch": -3,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 60
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -44.5,
+            "pitch": -3,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 60
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -45,
+            "pitch": -3.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 60
+        },
+        {
+          "holdMs": 1826,
+          "range": "precision",
+          "input": {
+            "yaw": -45,
+            "pitch": -2.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 60
+        },
+        {
+          "holdMs": 1796,
+          "range": "precision",
+          "input": {
+            "yaw": -45,
+            "pitch": -3,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 60
+        },
+        {
+          "holdMs": 1856,
+          "range": "precision",
+          "input": {
+            "yaw": -45,
+            "pitch": -3,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 60
+        }
+      ],
+      "minimumNeighborClears": 4,
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 2
+      }
     }
   ]
 }

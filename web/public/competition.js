@@ -245,7 +245,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  function updateCompletionAction(){
   const button=$('next-challenge');button.hidden=!completed();
   const next=nextCampaignCourse(state.challenges,state.selected);
-  button.innerHTML=next?'Next level <kbd>SPACE / N</kbd> →':state.selected?.campaign?'All available levels clear · Choose a level <kbd>SPACE / N</kbd>':'Level complete · Choose a level <kbd>SPACE / N</kbd>';
+  button.innerHTML=next?'Next level <kbd>SPACE / N</kbd> →':'Level complete · Choose a level <kbd>SPACE / N</kbd>';
  }
  function advanceCompleted(){
   if(nextRequested)return true;

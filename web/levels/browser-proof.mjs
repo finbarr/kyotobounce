@@ -34,6 +34,10 @@ try{
  }
  await page.waitForFunction(()=>kyotoState.briefing);await page.screenshot({scale:'css',path:resolve(out,'briefing.png')});
  await page.locator('#briefing-play').click();await page.waitForFunction(()=>window.kyotoState?.pointerLocked&&!window.kyotoState?.briefingTransition);
+ // Let the first view finish drawing before sending a brief key hold.
+ // Loading/render stalls remain in the client-performance receipt below.
+ await page.waitForTimeout(1000);
+ await page.waitForFunction(()=>{const frames=kyotoState.render.frameMs.slice(-30);return frames.length===30&&frames.every(t=>t<50);});
  const start=await page.evaluate(()=>kyotoState.feet);
  await page.keyboard.down('w');await page.waitForTimeout(500);await page.keyboard.up('w');await page.waitForTimeout(200);
  const walked=await page.evaluate(()=>kyotoState.feet);assert(Math.hypot(walked.x-start.x,walked.z-start.z)>.3,'WASD moves the player');
