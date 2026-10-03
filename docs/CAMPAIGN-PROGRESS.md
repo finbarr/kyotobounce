@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**9 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**10 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -67,6 +67,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 7. Pier Pressure | 2 / 2, opposite pier banks with two sharp turns | 6 / 6: ±2° yaw/pitch, ±60 ms charge; every sample rested | First attempt cleared both targets; overview, hint, saved replay, scrub and retry passed |
 | 8. Ceiling Skip | 2 / 2, ceiling rebound followed by a B1 floor hit | 6 / 6: ±2° yaw, ±1° pitch, 11.5–12 m/s; every sample rested | First attempt cleared; ceiling patch visible while aiming, overview and saved replay controls passed |
 | 9. Upward Bound | 2 / 2, moving-step contact and a 4.91 m climb | 6 / 6: ±1° yaw/pitch, ±20 ms charge; 4 / 4 additional step phases; every sample rested upstairs | First attempt cleared; upward cutaway, hint, saved replay, scrub and retry passed |
+| 10. Glass Loop | 2 / 2, back-wall and inside-glass targets with two sharp turns | 6 / 6: ±0.5° yaw, ±1° pitch, ±30 ms charge; every sample rested | First attempt cleared; both patches visible, overview, hint and saved replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -178,9 +179,23 @@ saved replay parity, completion and recall checks pass. Typecheck, unit tests,
 the catalog check and browser build pass. Evidence: `.local/campaign/upward-bound/`.
 No station geometry or physics changed.
 
-**Next: author level 10**, a basement chapter finale using two fixed targets
-along the connected public aisles. Finish its native proof, nearby variations,
-Chrome playtest and local merge before moving to the atrium bridges.
+Level 10 closes the basement chapter with a loop through an open frontage.
+The 10.0 m/s shot at 15° elevation banks a 0.45 m back-wall patch, rebounds from
+the side wall and collects a 0.40 m patch on the inside of the glass. It returns
+to the aisle and reaches full rest in 13.42 seconds. All six nearby variations
+collect both targets and rest in 12–15 seconds. Native proof checks two sharp
+turns at the target contacts; the recorded route is 17.7 m long.
+
+Chrome clears first try at 221,276 points. Both patches are visible above the
+power controls, and the cutaway shows the open entrance and return bank.
+The overview, hint, saved replay, scrub and retry pass, with zero skipped music
+steps or page errors. Service scoring, replay parity, completion and recall,
+typecheck, unit tests and browser build pass. Evidence:
+`.local/campaign/basement-finale/`. No geometry, physics or browser code changed.
+
+**Next: author level 11**, opening the atrium bridges and balconies chapter.
+Choose a visible fixed bank or gap on an existing public bridge; finish native
+proof, nearby variations, Chrome playtesting and the local merge before level 12.
 
 ## Floor repair
 

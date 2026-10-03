@@ -854,6 +854,95 @@
         "minSharpTurns": 0,
         "minFinishRise": 4.8
       }
+    },
+    {
+      "id": "basement-glass-loop",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2313,
+        "range": "precision",
+        "input": {
+          "yaw": 55,
+          "pitch": 15,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 90
+      },
+      "neighbors": [
+        {
+          "holdMs": 2313,
+          "range": "precision",
+          "input": {
+            "yaw": 54.5,
+            "pitch": 15,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 2313,
+          "range": "precision",
+          "input": {
+            "yaw": 55.5,
+            "pitch": 15,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 2313,
+          "range": "precision",
+          "input": {
+            "yaw": 55,
+            "pitch": 14,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 2313,
+          "range": "precision",
+          "input": {
+            "yaw": 55,
+            "pitch": 16,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 2283,
+          "range": "precision",
+          "input": {
+            "yaw": 55,
+            "pitch": 15,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 2343,
+          "range": "precision",
+          "input": {
+            "yaw": 55,
+            "pitch": 15,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 2,
+        "minSharpTurns": 2
+      }
     }
   ]
 }

@@ -759,5 +759,98 @@
       ]
     },
     "requiredSurface": "hall-basement-east-escalator-1"
+  },
+  {
+    "id": "basement-glass-loop",
+    "revision": 1,
+    "name": "Glass Loop",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -10,
+        "y": -4.9135823249816895,
+        "z": 9
+      },
+      "normal": {
+        "x": 0,
+        "y": 0.9999999403953552,
+        "z": 0
+      },
+      "radius": 0.4000000059604645,
+      "surface": "hall-b1-north-aisle-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -3.639543294906616,
+          "y": -4.311863899230957,
+          "z": 13.208330154418945
+        },
+        "normal": {
+          "x": 0.01654062606394291,
+          "y": 0,
+          "z": -0.9998632073402405
+        },
+        "radius": 0.44999998807907104,
+        "surface": "hall-b1-north-bay-0-back",
+        "id": "back-wall"
+      },
+      {
+        "center": {
+          "x": -3.4551031589508057,
+          "y": -4.21148681640625,
+          "z": 11.245380401611328
+        },
+        "normal": {
+          "x": -0.016533777117729187,
+          "y": 0,
+          "z": 0.9998632669448853
+        },
+        "radius": 0.4000000059604645,
+        "surface": "hall-b1-north-bay-0-right-glass",
+        "id": "inside-glass"
+      }
+    ],
+    "hint": {
+      "yaw": 55,
+      "pitch": 15,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2313,
+      "note": "Aim through the open frontage at 15° and use 10.0 m/s with no spin. Bank the back wall, let the side wall turn the ball, then collect the inside glass patch. Both purple targets clear the level; let the ball stop completely."
+    },
+    "order": 9,
+    "campaign": {
+      "chapter": 2,
+      "chapterTitle": "Below the Glass",
+      "difficulty": "Hard",
+      "distance": 17.7,
+      "brief": "Thread the open frontage, bank the rear wall, then return onto the inside glass. Collect both purple patches in one shot."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
