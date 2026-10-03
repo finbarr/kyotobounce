@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**12 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**13 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -70,6 +70,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 10. Glass Loop | 2 / 2, back-wall and inside-glass targets with two sharp turns | 6 / 6: ±0.5° yaw, ±1° pitch, ±30 ms charge; every sample rested | First attempt cleared; both patches visible, overview, hint and saved replay controls passed |
 | 11. Bridge Pinball | 2 / 2, opposite glass-pane banks above the ticket hall | 6 / 6: ±1° yaw/pitch, ±40 ms charge; every sample rested | First attempt cleared; chapter selection, unobstructed aiming, overview and replay controls passed |
 | 12. Step Down | 2 / 2, sloping ceiling bank and 3.03 m drop to a stair tread | 6 / 6: ±1° yaw, ±0.5° pitch, 11.6–12 m/s; every sample rested | First attempt cleared; cutaway shows the start and both patches, replay and retry passed |
+| 13. Terrace Triple | 2 / 2, ledge bounce, 8.85 m descent and return-wall bank | 6 / 6: ±0.25° yaw, ±0.5° pitch, ±12 ms charge; every sample rested | First attempt cleared all three targets; overview, hint, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -230,9 +231,28 @@ Service scoring/replay/completion/recall, typecheck, unit tests, focused waypoin
 presentation checks and browser build pass. Evidence: `.local/campaign/step-down/`.
 Station geometry and native physics are unchanged.
 
-**Next: author level 13**, returning to an open atrium balcony for a longer shot
-with a view into the hall. Finish native proof, nearby variations, Chrome
-playtesting and the local merge before level 14.
+Level 13 starts on the public west balcony at 7.35 m. Its 9.0 m/s arc hits a
+0.40 m ledge patch, drops to a 0.80 m atrium-floor patch, then banks a 0.32 m
+patch on the ticket-hall return wall. The exact hint rests in 22.48 seconds;
+all six neighbors collect all three targets and rest in 22.33–22.91 seconds.
+Native proof confirms the 8.85 m descent and a sharp turn at the wall.
+
+The initial aim grazed terrace coping on one side, and ±20 ms charge missed
+the small wall patch. The final hint is centered farther left, with a larger
+wall target validated entirely on its native face. Its measured power tolerance
+is ±12 ms, so this remains a precision challenge. The earlier sensitivity is
+recorded in `.local/campaign/balcony-drop/sensitivity-note.json`.
+
+Chrome clears first try at 417,177 points. The overview exposes all three target
+patches and the drop into the hall. Movement/home, hint, saved replay, scrub and
+retry pass; sampled median/p95 frames are 16.7/16.8 ms, with zero skipped music
+steps and no page errors. Service scoring/replay/completion/recall, typecheck,
+unit tests and browser build pass. Evidence: `.local/campaign/balcony-drop/`.
+Station geometry and native physics are unchanged.
+
+**Next: author level 14**, using another connected upper public walkway for a
+distinct bank or rail-gap shot. Finish native proof, nearby variations, Chrome
+playtesting and the local merge before level 15.
 
 ## Floor repair
 

@@ -1122,6 +1122,96 @@
         "minSharpTurns": 1,
         "minHeightDrop": 2.9
       }
+    },
+    {
+      "id": "atrium-terrace-triple",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2070,
+        "range": "precision",
+        "input": {
+          "yaw": 92.25,
+          "pitch": 20,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 2070,
+          "range": "precision",
+          "input": {
+            "yaw": 92,
+            "pitch": 20,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2070,
+          "range": "precision",
+          "input": {
+            "yaw": 92.5,
+            "pitch": 20,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2070,
+          "range": "precision",
+          "input": {
+            "yaw": 92.25,
+            "pitch": 19.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2070,
+          "range": "precision",
+          "input": {
+            "yaw": 92.25,
+            "pitch": 20.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2058,
+          "range": "precision",
+          "input": {
+            "yaw": 92.25,
+            "pitch": 20,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2082,
+          "range": "precision",
+          "input": {
+            "yaw": 92.25,
+            "pitch": 20,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 1,
+        "minSharpTurns": 1,
+        "minHeightDrop": 8
+      }
     }
   ]
 }

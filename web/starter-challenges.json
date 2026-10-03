@@ -1038,5 +1038,113 @@
         200
       ]
     }
+  },
+  {
+    "id": "atrium-terrace-triple",
+    "revision": 1,
+    "name": "Terrace Triple",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -35.5,
+        "y": 7.34999942779541,
+        "z": -9.399999618530273
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "central-lift-upper-passage"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -26.01756477355957,
+          "y": 6.130000114440918,
+          "z": -10.03421688079834
+        },
+        "normal": {
+          "x": 0,
+          "y": 1.0000001192092896,
+          "z": 0
+        },
+        "radius": 0.4000000059604645,
+        "surface": "add-hall-soffit-bay--30-soffit",
+        "id": "outer-ledge"
+      },
+      {
+        "center": {
+          "x": -17.46831703186035,
+          "y": 0,
+          "z": -10.40748405456543
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.800000011920929,
+        "surface": "concourse",
+        "id": "atrium-floor"
+      },
+      {
+        "center": {
+          "x": -7.3561692237854,
+          "y": 0.7693593502044678,
+          "z": -10.723540306091309
+        },
+        "normal": {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.3199999928474426,
+        "surface": "hall-bay-gate-return-west-dark-back",
+        "id": "return-wall"
+      }
+    ],
+    "hint": {
+      "yaw": 92.25,
+      "pitch": 20,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2070,
+      "note": "Use 9.0 m/s precision power, 20° elevation and no spin. Aim just right of east. Bounce on the purple outer ledge, drop onto the floor patch, then bank the small ticket-hall return wall. All three patches count; let the ball stop completely."
+    },
+    "order": 12,
+    "campaign": {
+      "chapter": 3,
+      "chapterTitle": "Above the Atrium",
+      "difficulty": "Hard",
+      "distance": 61.2,
+      "brief": "Launch from the balcony, bounce on the outer ledge and drop into the hall. Collect the floor patch and the small return-wall target in the same shot."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
