@@ -2926,5 +2926,128 @@
         200
       ]
     }
+  },
+  {
+    "id": "atrium-finale",
+    "revision": 1,
+    "name": "Atrium Finale",
+    "creator": "station",
+    "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 54.60000228881836,
+        "y": 15.5,
+        "z": 5.699999809265137
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "east-ground-third-landing"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": 30.708398818969727,
+          "y": 5.500000476837158,
+          "z": 4.459136009216309
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.6499999761581421,
+        "surface": "east-ground-second-landing",
+        "id": "middle-landing"
+      },
+      {
+        "center": {
+          "x": 18.541593551635742,
+          "y": 0,
+          "z": 3.690514087677002
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "concourse",
+        "id": "atrium-edge"
+      },
+      {
+        "center": {
+          "x": 5.34122896194458,
+          "y": -4.913582801818848,
+          "z": 2.701982259750366
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.6000000238418579,
+        "surface": "porta-connection-b1-deck",
+        "id": "basement-drop"
+      },
+      {
+        "center": {
+          "x": 0.3894118070602417,
+          "y": -4.913582801818848,
+          "z": 2.6049513816833496
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.550000011920929,
+        "surface": "porta-connection-b1-deck",
+        "id": "basement-return"
+      }
+    ],
+    "hint": {
+      "yaw": 266.5,
+      "pitch": -8,
+      "top": -80,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2800,
+      "note": "Apply H for 8° downward aim and −80 backspin in PRECISION mode. Hold to full charge for 12.0 m/s. Skip down the stairs, cross the middle landing and atrium edge, drop to B1, then bounce off the ceiling onto the last basement patch. Wait for full rest."
+    },
+    "order": 29,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Station Finales",
+      "difficulty": "Expert",
+      "distance": 98.5,
+      "brief": "Cascade down the eastern stairs through the atrium into B1, then rebound under the concourse onto the basement floor. Four landing patches mark the complete descent."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

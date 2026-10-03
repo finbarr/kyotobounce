@@ -2670,6 +2670,96 @@
         "minSharpTurns": 1,
         "minFinishRise": -0.4
       }
+    },
+    {
+      "id": "atrium-finale",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2800,
+        "range": "precision",
+        "input": {
+          "yaw": 266.5,
+          "pitch": -8,
+          "top": -80,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 266.25,
+            "pitch": -8,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 266.75,
+            "pitch": -8,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 266.5,
+            "pitch": -8.25,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 266.5,
+            "pitch": -7.75,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2790,
+          "range": "precision",
+          "input": {
+            "yaw": 266.5,
+            "pitch": -8,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2780,
+          "range": "precision",
+          "input": {
+            "yaw": 266.5,
+            "pitch": -8,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 0,
+        "minSharpTurns": 0,
+        "minHeightDrop": 21.5
+      }
     }
   ]
 }

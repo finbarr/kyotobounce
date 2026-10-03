@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**29 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**30 / 30 delivered; final campaign audit in progress.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -87,6 +87,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 27. Skyway Circuit | 2 / 2, three glass banks and a final deck target in the high gallery | 6 / 6: ±0.25° yaw/pitch, full charge minus 10/20 ms; every sample collected all four targets and rested | First attempt cleared at 827,652 points; overview, readable glass patches, complete hint, movement/home, saved replay, scrub and retry passed |
 | 28. Tower Return | 2 / 2, tower shaft bank and two return patches across the forecourt | 6 / 6: ±0.25° yaw/pitch, ±8 ms charge; every sample collected all three targets and rested | First attempt cleared at 412,889 points; tall-route overview, POWER hint, movement/home, saved replay, scrub and retry passed |
 | 29. Passage Rebound | 2 / 2, three wall banks and a return-ramp target in the eastern public passage | 6 / 6: ±0.25° yaw/pitch, ±6 ms charge; every sample collected all targets and rested on the upper public floor | First attempt cleared at 833,575 points; overview, complete backspin/POWER hint, movement/home, saved replay, scrub and retry passed |
+| 30. Atrium Finale | 2 / 2, four landing patches across a 20.4 m descent into B1 | 6 / 6: ±0.25° yaw/pitch, full charge minus 10/20 ms; every sample collected all targets and rested | First attempt cleared at 832,448 points; overview, complete hint, movement/home, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -660,9 +661,36 @@ candidate replaces the current bundle; its temporary full assets are removed.
 The restarted preview reports the exact layout used by the native and Chrome
 proofs. No release, asset pack or production change is published.
 
-**Next: author level 30**, completing the finale chapter in the existing
-connected station spaces and retained forecourt. Finish its native proof,
-nearby variations, Chrome playtesting and local merge before the next level.
+## Atrium Finale
+
+Level 30 completes the campaign with a 98.5 m route from the eastern upper
+landing, down the stairs through the atrium and into B1. Four full-face targets
+mark the middle landing, atrium edge and two basement floor contacts, with a
+ceiling rebound between the last two. The hint uses 12 m/s in PRECISION, 8°
+downward aim and −80 backspin. No geometry change was needed.
+
+Both exact shots collect every target and reach full translation and spin rest
+in 25.08 seconds. All six nearby shots clear and rest in 25.01–34.37 seconds.
+The yaw samples span more than one mouse pixel on either side. Earlier pier-edge
+routes were rejected because nearby aim missed the final target. Native placement
+validates each complete disk. Evidence: `.local/campaign/atrium-finale/`.
+
+Chrome clears first try at 832,448 points with the four-waypoint ×80 component.
+Overview, hint, movement/home, saved replay, scrub and retry pass; independent
+server scoring reproduces the saved replay. No music steps are skipped and no
+page errors occur. Flight windows have zero long tasks and playback underruns;
+p95 frames are 17 ms except for one 33 ms window. Typecheck, all tests including
+the exact 30-course check, and the browser build pass. Local service checks also
+pass authoritative scoring, saved replay parity, completion and recall forfeiture.
+
+The cold CPU recording attributes the 1.84-second startup task to station
+reflection capture, mostly texture uploads and shader initialization. That work
+and a fresh complete-catalog verification remain for final acceptance.
+
+**Next: final campaign and stability audit.** Verify all 30 current hints,
+navigation, progression, replay/scoring, creator flow and recall. Resolve the
+profiled cold-start stall, retest Chrome entry and play, and remove standalone
+retired-level probes. Keep all work local; no deployment or asset publication.
 
 ## Floor repair
 
