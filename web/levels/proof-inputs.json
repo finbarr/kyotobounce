@@ -1682,6 +1682,96 @@
         "minSharpTurns": 2,
         "minFinishRise": -0.05
       }
+    },
+    {
+      "id": "planter-skip",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 1339,
+        "range": "precision",
+        "input": {
+          "yaw": -90,
+          "pitch": 0,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 80
+      },
+      "neighbors": [
+        {
+          "holdMs": 1339,
+          "range": "precision",
+          "input": {
+            "yaw": -91,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1339,
+          "range": "precision",
+          "input": {
+            "yaw": -89,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1339,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": -1,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1339,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 1,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1319,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        },
+        {
+          "holdMs": 1359,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 80
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 1,
+        "minSharpTurns": 1,
+        "minFinishRise": -0.05
+      }
     }
   ]
 }

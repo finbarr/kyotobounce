@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**18 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**19 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -76,6 +76,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 16. Stair Skip | 2 / 2, marked stair tread and a 3.92 m descent onto Muromachi Square | 8 / 8: ±1° yaw/pitch, ±20 ms charge, ±10 backspin; every sample rested | First attempt cleared both targets; readable aiming labels, full spin hint, overview and saved replay controls passed |
 | 17. Soft Landing | 2 / 2, uphill lob and full rest in the gold ring 2.62 m above the start | 6 / 6: ±1° yaw/pitch, ±15 ms charge; every sample earned the gold bonus | First attempt earned the bonus; overview, scout/return, complete spin hint and saved replay controls passed |
 | 18. Garden Corner | 2 / 2, end-wall and glass banks followed by a floor patch | 6 / 6: ±1° yaw/pitch, ±30 ms charge; every sample rested in the upper approach | First attempt cleared all three targets; overview, hint, saved replay, scrub and retry passed |
+| 19. Planter Skip | 2 / 2, low planter bank and return patch followed by full rest in the gold ring | 6 / 6: ±1° yaw/pitch, ±20 ms charge; every sample earned the bonus | First attempt earned the bonus; garden overview, visible patches, hint and saved replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -349,8 +350,23 @@ Service scoring, replay parity, completion and recall checks pass. Typecheck,
 unit tests and browser build pass. Evidence: `.local/campaign/garden-approach/`.
 Station geometry, native physics and browser code are unchanged.
 
-**Next: author level 19**, using the existing rooftop garden. Finish native
-proof, nearby variations, Chrome playtesting and the local merge before level 20.
+Level 19, **Planter Skip**, uses the rooftop garden's existing low planter wall.
+A level, spin-free 6.0 m/s shot skips off the floor into a 0.16 m planter patch,
+returns through a 0.55 m floor patch and rests in a 0.85 m gold ring. Its native
+path is 11 m. Both exact solutions stop in 12.58 seconds; all six neighboring
+shots collect both targets and earn the bonus in 12.17–12.98 seconds.
+
+Chrome earns the bonus first try at 411,203 points. The overview and aiming view
+show the targets among the benches and planting. Movement/home, complete hint,
+saved replay, scrub and retry pass, with 16.7 ms sampled median/p95 frames,
+zero skipped music steps and no page errors. Service scoring, replay parity,
+completion and recall checks, typecheck, unit tests and browser build pass.
+Evidence: `.local/campaign/garden-bench/`. Station geometry, native physics and
+browser code are unchanged. The superseded lamp-grazing scout was replaced;
+only a concise note remains.
+
+**Next: author level 20**, closing the rooftop-garden chapter. Finish native
+proof, nearby variations, Chrome playtesting and the local merge before level 21.
 
 ## Floor repair
 

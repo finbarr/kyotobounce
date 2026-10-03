@@ -1652,5 +1652,111 @@
         200
       ]
     }
+  },
+  {
+    "id": "planter-skip",
+    "revision": 1,
+    "name": "Planter Skip",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -192,
+        "y": 54.49824523925781,
+        "z": -11.100000381469727
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "garden-promenade-public-floor"
+    },
+    "goal": {
+      "center": {
+        "x": -189.5,
+        "y": 54.49824523925781,
+        "z": -10.880001068115234
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.8500000238418579,
+      "surface": "garden-promenade-public-floor"
+    },
+    "waypoints": [
+      {
+        "center": {
+          "x": -195.94000244140625,
+          "y": 54.709232330322266,
+          "z": -10.88001823425293
+        },
+        "normal": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.1599999964237213,
+        "surface": "garden-west-planting-planter-8",
+        "id": "planter-bank"
+      },
+      {
+        "center": {
+          "x": -193.95321655273438,
+          "y": 54.49824523925781,
+          "z": -10.880290985107422
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.550000011920929,
+        "surface": "garden-promenade-public-floor",
+        "id": "return-path"
+      }
+    ],
+    "hint": {
+      "yaw": -90,
+      "pitch": 0,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 1339,
+      "note": "Use 6.0 m/s precision power, level aim and no spin. Skip off the path into the low planter patch, bounce back through the floor patch, then let the ball stop in the gold ring."
+    },
+    "order": 18,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "Staircase & Gardens",
+      "difficulty": "Medium",
+      "distance": 11,
+      "brief": "A low skip among the rooftop benches: bank the planter, collect the return patch and roll into the gold landing ring."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
