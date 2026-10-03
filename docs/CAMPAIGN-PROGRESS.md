@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**19 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**20 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -77,6 +77,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 17. Soft Landing | 2 / 2, uphill lob and full rest in the gold ring 2.62 m above the start | 6 / 6: ±1° yaw/pitch, ±15 ms charge; every sample earned the gold bonus | First attempt earned the bonus; overview, scout/return, complete spin hint and saved replay controls passed |
 | 18. Garden Corner | 2 / 2, end-wall and glass banks followed by a floor patch | 6 / 6: ±1° yaw/pitch, ±30 ms charge; every sample rested in the upper approach | First attempt cleared all three targets; overview, hint, saved replay, scrub and retry passed |
 | 19. Planter Skip | 2 / 2, low planter bank and return patch followed by full rest in the gold ring | 6 / 6: ±1° yaw/pitch, ±20 ms charge; every sample earned the bonus | First attempt earned the bonus; garden overview, visible patches, hint and saved replay controls passed |
+| 20. Rooftop Circuit | 2 / 2, concrete and glass banks, outward/return floor patches and full rest on the garden level | 6 / 6: ±0.5° yaw/pitch, ±10 ms charge; every sample collected all four targets | First attempt cleared; four-target overview, complete hint, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -365,8 +366,30 @@ Evidence: `.local/campaign/garden-bench/`. Station geometry, native physics and
 browser code are unchanged. The superseded lamp-grazing scout was replaced;
 only a concise note remains.
 
-**Next: author level 20**, closing the rooftop-garden chapter. Finish native
-proof, nearby variations, Chrome playtesting and the local merge before level 21.
+Level 20, **Rooftop Circuit**, closes the garden chapter with four targets on the
+southern public outlook. An 8.0 m/s, 24° shot banks 0.15 m concrete and 0.27 m
+glass patches, then collects 0.80 m and 0.85 m floor patches before and after its
+return from the existing enclosure. The recorded path is 34.4 m. Both exact
+solutions stop in 18.63 seconds; all six neighbors collect every target and rest
+on the garden level in 18.65–19.21 seconds.
+
+The initial 16° route depended on a glass-sill contact: half-degree variations
+missed targets or left the station. Raising the shot clears that sill. The final
+proof retains the same aim tolerance and verifies sharp turns at both marked
+wall contacts. Superseded traces were replaced, with concise rejection notes
+kept locally. Station geometry and native physics are unchanged.
+
+Chrome clears first try at 826,684 points. The overview locates all four targets;
+movement/home, complete hint, saved replay, scrub and retry pass. Sampled
+median/p95 frames are 16.7 ms, with zero skipped music steps and no page errors.
+Service authoritative scoring, replay parity, completion and recall checks pass,
+as do typecheck, unit tests and browser build. Evidence:
+`.local/campaign/garden-finale/`. Browser code is unchanged.
+
+**Next: author level 21**, opening the platforms chapter. Inspect the outstanding
+railway-subgrade rest failure below while choosing a public platform route.
+Finish native proof, nearby variations, Chrome playtesting and the local merge
+before level 22.
 
 ## Floor repair
 

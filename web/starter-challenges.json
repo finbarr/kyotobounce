@@ -1758,5 +1758,128 @@
         200
       ]
     }
+  },
+  {
+    "id": "rooftop-circuit",
+    "revision": 1,
+    "name": "Rooftop Circuit",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -199.1999969482422,
+        "y": 54.49824523925781,
+        "z": -31.799999237060547
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "garden-south-enclosure-west-outlook-floor"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -202.10000610351562,
+          "y": 56.494789123535156,
+          "z": -33.92694854736328
+        },
+        "normal": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.15000000596046448,
+        "surface": "garden-south-enclosure-west-boundary-concrete-0-2",
+        "id": "concrete-bank"
+      },
+      {
+        "center": {
+          "x": -200.57142639160156,
+          "y": 55.42145538330078,
+          "z": -35.176998138427734
+        },
+        "normal": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "radius": 0.27000001072883606,
+        "surface": "garden-south-enclosure-west-screen-pane-1",
+        "id": "screen-bank"
+      },
+      {
+        "center": {
+          "x": -197.7237548828125,
+          "y": 54.49824523925781,
+          "z": -33.023582458496094
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.800000011920929,
+        "surface": "garden-south-enclosure-west-outlook-floor",
+        "id": "outward-floor"
+      },
+      {
+        "center": {
+          "x": -190.10000610351562,
+          "y": 54.49824523925781,
+          "z": -25.899999618530273
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.8500000238418579,
+        "surface": "garden-south-enclosure-west-outlook-floor",
+        "id": "return-floor"
+      }
+    ],
+    "hint": {
+      "yaw": -130,
+      "pitch": 24,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 1826,
+      "note": "Use 8.0 m/s precision power, 24° upward aim and no spin. Bank the concrete patch into the glass patch, then cross the two floor targets as the ball returns from the enclosure. Collect all four patches and wait for full rest."
+    },
+    "order": 19,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "Staircase & Gardens",
+      "difficulty": "Hard",
+      "distance": 34.4,
+      "brief": "Four targets around the garden outlook: concrete, glass, outward floor and return floor. Use the enclosure to bring the ball back across the terrace."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
