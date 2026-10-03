@@ -2449,5 +2449,128 @@
         200
       ]
     }
+  },
+  {
+    "id": "grand-descent",
+    "revision": 1,
+    "name": "Grand Descent",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -111.5,
+        "y": 32.77108383178711,
+        "z": -0.0799999088048935
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-07"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -101.33287048339844,
+          "y": 27.926916122436523,
+          "z": -0.29999983310699463
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.4000000059604645,
+        "surface": "daikaidan-landing-05",
+        "id": "upper-landing"
+      },
+      {
+        "center": {
+          "x": -67.01207733154297,
+          "y": 15.614657402038574,
+          "z": -0.2999996542930603
+        },
+        "normal": {
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
+        },
+        "radius": 1.5,
+        "surface": "muromachi-square",
+        "id": "square-skip"
+      },
+      {
+        "center": {
+          "x": -51.04192352294922,
+          "y": 15.61465835571289,
+          "z": -0.30052733421325684
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 1,
+        "surface": "west-v2-upper-0",
+        "id": "balcony-skip"
+      },
+      {
+        "center": {
+          "x": -52,
+          "y": 7.349999904632568,
+          "z": -8.625
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 2,
+        "surface": "central-lift-upper-passage",
+        "id": "passage-drop"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": -15,
+      "top": -80,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2800,
+      "note": "Apply H for 15° downward aim and 80 backspin, then throw at full 12.0 m/s precision power. Skip onto the marked stair landing, cross both square and balcony patches, then bank the balcony guard into the lower passage patch. Collect all four targets and wait for full rest."
+    },
+    "order": 25,
+    "campaign": {
+      "chapter": 6,
+      "chapterTitle": "Station Finales",
+      "difficulty": "Expert",
+      "distance": 112.3,
+      "brief": "Follow the grand staircase down to Muromachi Square, then rebound into the public passage below. Four targets span a 25-metre descent through the station."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

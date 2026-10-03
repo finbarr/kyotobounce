@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**25 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**26 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -83,6 +83,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 23. Canopy Crossing | 2 / 2, both faces of the platform canopy followed by the track-bed patch below | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 10/20 ms; every sample collected all targets and rested | First attempt cleared; overview, scouting above the roof, complete hint, saved replay, scrub and retry passed |
 | 24. Platform Descent | 2 / 2, upper stair bank, sloping-roof rebound and platform patch 7.35 m below the start | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 10/20 ms; every sample collected all targets and rested | First attempt cleared; stair overview, complete backspin hint, saved replay, scrub and retry passed |
 | 25. Underpass Circuit | 2 / 2, ceiling, opposing walls and floor banks plus the gold landing | 6 / 6: ±1° yaw, ±0.5° pitch, full charge minus 20/40 ms; every sample collected all targets and landed at rest | First attempt cleared at 1,641,513 points; readable aiming marker, overview, movement/home, saved replay, scrub and retry passed |
+| 26. Grand Descent | 2 / 2, stair landing, square, balcony and lower-passage targets across a 25.4 m descent | 6 / 6: ±0.5° yaw/pitch, full charge minus 10/20 ms; every sample collected all four targets and rested | First attempt cleared at 847,747 points; overview, full backspin hint, movement/home, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -512,7 +513,41 @@ for the final cold-start audit. Evidence: `.local/campaign/underpass-circuit/`.
 The eight native route proofs preceded the protocol-only rebuild; the rebuilt
 worker repeated the exact route through both service and Chrome checks.
 
-**Next: author level 26**, beginning the five finale courses in the existing
+Level 26, **Grand Descent**, begins **Station Finales** on the seventh grand
+staircase landing. A full 12 m/s throw at −15° with 80 backspin skips down the
+stairs, crosses Muromachi Square and the balcony, then rebounds from the balcony
+guard into the lower public passage. Its four floor targets span elevations
+27.93, 15.61 and 7.35 m, with a 25.4 m drop from the starting landing. The native
+route measures 112.3 m. Target radii are 0.40, 1.5, 1.0 and 2.0 m, all validated
+on their actual supporting faces.
+
+The launch is centered in the measured gap between the curved handrail posts.
+Both exact proofs collect all four targets and reach full translation and spin
+rest in 28.09 seconds. All six nearby inputs clear the same route and rest in
+28.01–29.80 seconds. Evidence: `.local/campaign/grand-descent/proof/`.
+Superseded scouts are condensed in `scout-notes.json`; only the current raw shot
+and proof remain. The station geometry and native physics are unchanged.
+
+Chrome clears first try at 847,747 points. The overview exposes all four targets
+and the elevation change; movement/home, the complete hint, saved replay, scrub
+and retry pass. Sampled final-flight median/p95 frames are 16.7 ms, with no
+skipped music steps during charge or flight and no page errors. Three music
+steps were skipped before charging, alongside a 2.18-second initial main-thread
+task. Keep this receipt in the final cold-start audit; the first flight window
+also includes two shorter tasks, peaking at 59 ms. Evidence:
+`.local/campaign/grand-descent/browser/`.
+
+A separate Chrome scout check inspects the first painted disk from above the
+handrail, then returns to the unchanged launch position and complete hint.
+The screenshot and receipt are in `landing-view/` under that evidence directory.
+
+Typecheck, unit tests and browser build pass. Service checks confirm all four
+targets, authoritative score/replay parity, full rest, completion, leaderboard
+placement and recall forfeiture. One service check was interrupted by a verified
+924-second laptop sleep; the same check passes with a scoped idle-sleep
+assertion. Its interruption evidence is retained locally.
+
+**Next: author level 27**, continuing the finale chapter in the existing
 connected station spaces and retained forecourt. Finish its native proof,
 nearby variations, Chrome playtesting and local merge before the next level.
 
