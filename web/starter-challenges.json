@@ -2313,5 +2313,141 @@
         200
       ]
     }
+  },
+  {
+    "id": "underpass-circuit",
+    "revision": 1,
+    "name": "Underpass Circuit",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": 143.5,
+        "y": -6.199999809265137,
+        "z": -74
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "east-transfer-underpass-floor"
+    },
+    "goal": {
+      "center": {
+        "x": 144.01866149902344,
+        "y": -6.199999809265137,
+        "z": -76.43870544433594
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 1.5,
+      "surface": "east-transfer-underpass-floor"
+    },
+    "waypoints": [
+      {
+        "center": {
+          "x": 145.57736206054688,
+          "y": -2.799999952316284,
+          "z": -76.38864135742188
+        },
+        "normal": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        },
+        "radius": 0.4000000059604645,
+        "surface": "east-transfer-underpass-ceiling",
+        "id": "ceiling-bank"
+      },
+      {
+        "center": {
+          "x": 146.9250030517578,
+          "y": -4.303025245666504,
+          "z": -77.70407104492188
+        },
+        "normal": {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.5,
+        "surface": "east-transfer-public-wall--120",
+        "id": "east-bank"
+      },
+      {
+        "center": {
+          "x": 146.1341552734375,
+          "y": -6.199999809265137,
+          "z": -78.44261169433594
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.6499999761581421,
+        "surface": "east-transfer-underpass-floor",
+        "id": "floor-skip"
+      },
+      {
+        "center": {
+          "x": 140.05999755859375,
+          "y": -5.415157318115234,
+          "z": -79.00387573242188
+        },
+        "normal": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        "radius": 0.6000000238418579,
+        "surface": "east-transfer-underpass-west--90.18",
+        "id": "west-bank"
+      }
+    ],
+    "hint": {
+      "yaw": 135,
+      "pitch": 40,
+      "top": 0,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 2800,
+      "note": "Apply H for 40° upward aim and no spin, then throw at full 12.0 m/s precision power. Bank off the ceiling and east wall, skip off the floor and collect the west-wall patch. Settle in the gold ring for the landing bonus; wait for translation and spin to stop."
+    },
+    "order": 24,
+    "campaign": {
+      "chapter": 5,
+      "chapterTitle": "Platforms & Tracks",
+      "difficulty": "Hard",
+      "distance": 25.2,
+      "brief": "Complete a ceiling, wall, floor and return-wall circuit beneath the platforms, then settle in the gold ring. Four targets turn this compact passage into a trick-shot course."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]

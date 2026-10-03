@@ -63,6 +63,14 @@ try{
   await page.keyboard.press('f');await page.waitForFunction(()=>kyotoState.camera.mode==='aim');
  }
  await page.locator('#game').focus();await page.keyboard.press('h');await page.waitForTimeout(500);await page.screenshot({scale:'css',path:resolve(out,'aim.png')});
+ const aimLabels=await page.evaluate(()=>{
+  const r=document.getElementById('reticle').getBoundingClientRect();
+  return [...document.querySelectorAll('#fly-targets .fly-target:not([hidden])')].map(el=>{
+   const b=el.getBoundingClientRect();return {label:el.textContent,overlapsReticle:kyotoState.reticle?.visible&&b.left<r.right&&b.right>r.left&&b.top<r.bottom&&b.bottom>r.top};
+  });
+ });
+ assert(aimLabels.every(l=>!l.overlapsReticle),'Target labels leave the aiming reticle readable');
+ await writeFile(resolve(out,'aim-labels.json'),JSON.stringify(aimLabels,null,2));
  const holds=holdArg.split(',').map(Number);assert.ok(holds.length<=2&&holds.every(n=>n>=0&&n<=2800),'At most one retry');
  for(const hold of holds){
   // Screenshot readback and initial shader loading can stall before gameplay.

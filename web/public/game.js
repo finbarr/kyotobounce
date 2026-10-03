@@ -689,14 +689,14 @@ function animate(now){
   else if(fly.active&&camera.view?.enabled)camera.clearViewOffset();
   const showAimTargets=!fly.active&&!inFlight&&!briefing.blocked&&ui.state.mode==='play';
   const labelledCourse=showAimTargets?{waypoints:ui.state.selected?.waypoints,goal:ui.state.selected?.goal}:ui.state.mode==='editor'?ui.state.draft:ui.state.selected;
-  // Surface paint can be edge-on on stairs. Reuse the scout's numbered labels
-  // while aiming, leaving the exact contact disk painted on the native face.
-  scoutTargets.update(camera,labelledCourse,(fly.active&&!replaying)||showAimTargets);
   setHidden(flyControl,briefing.blocked||replaying||['Charging','Release','Flight'].includes(phase));
   setData(flyControl,'speed',String(fly.speed));
   // Project the outgoing ray onto its first station surface. A fixed screen
   // centre only converges at one arbitrary distance in an over-shoulder view.
   const reticle=!fly.active&&p&&['play','design'].includes(ui.state.mode)&&!inFlight&&!flightPending&&phase!=='Release'?projectAimReticle(release,aim,camera,station):null;
+  // Surface paint can be edge-on on stairs. Reuse the scout's numbered labels
+  // while aiming, leaving the exact contact disk painted on the native face.
+  scoutTargets.update(camera,labelledCourse,(fly.active&&!replaying)||showAimTargets,reticle);
   $('reticle').style.display=reticle?.visible?'block':'none';
   if(reticle){setStyle($('reticle'),'left',`${reticle.x*100}%`);setStyle($('reticle'),'top',`${reticle.y*100}%`);}
   for(const a of avatars.values()){

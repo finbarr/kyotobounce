@@ -22,11 +22,25 @@ export class FlyCamera {
 
 export function flyTargets(){
  const host=document.createElement('div');host.id='fly-targets';document.body.append(host);let current='',nodes=[];
- return {update(camera,course,active){
+ return {update(camera,course,active,reticle=null){
   host.hidden=!active;if(!active)return;
   const targets=[...(course?.start?[{...course.start,label:'START'}]:[]),...(course?.waypoints||[]).map((w,i)=>({...w,label:`${String(i+1).padStart(2,'0')} · WAYPOINT`})),...(course?.goal?[{...course.goal,label:'FINISH'}]:[])];
   const key=JSON.stringify(targets);
   if(key!==current){current=key;host.replaceChildren();nodes=targets.map(t=>{const el=document.createElement('span');el.className='fly-target';host.append(el);return {el,target:t};});}
-  for(const {el,target} of nodes){const world=new THREE.Vector3(target.center.x,target.center.y,-target.center.z),p=world.clone().project(camera);el.hidden=p.z>1||p.z< -1||Math.abs(p.x)>.92||Math.abs(p.y)>.8;el.style.left=`${(p.x*.5+.5)*100}%`;el.style.top=`${(-p.y*.5+.5)*100}%`;el.textContent=`${target.label} · ${Math.round(world.distanceTo(camera.position))} m`;}
+  for(const node of nodes){
+   const {el,target}=node,world=new THREE.Vector3(target.center.x,target.center.y,-target.center.z),p=world.clone().project(camera);
+   el.hidden=p.z>1||p.z< -1||Math.abs(p.x)>.92||Math.abs(p.y)>.8;if(el.hidden)continue;
+   const label=`${target.label} · ${Math.round(world.distanceTo(camera.position))} m`;
+   // Measure only when the displayed distance changes, not on every frame.
+   if(el.textContent!==label){el.textContent=label;node.width=el.offsetWidth;node.height=el.offsetHeight;}
+   const x=(p.x*.5+.5)*innerWidth,y=(-p.y*.5+.5)*innerHeight;
+   let lift=12;
+   // Keep the launch reticle clear while retaining a leader to the exact disk.
+   if(reticle?.visible){
+    const rx=reticle.x*innerWidth,ry=reticle.y*innerHeight,bottom=y-lift;
+    if(Math.abs(x-rx)<node.width/2+16&&bottom>ry-16&&bottom-node.height<ry+16)lift+=bottom-(ry-16);
+   }
+   el.style.left=`${(p.x*.5+.5)*100}%`;el.style.top=`${(-p.y*.5+.5)*100}%`;el.style.setProperty('--target-lift',`${lift}px`);
+  }
  }};
 }

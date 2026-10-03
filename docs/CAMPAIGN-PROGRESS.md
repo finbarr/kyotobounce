@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**24 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**25 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -82,6 +82,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 22. Column Switchback | 2 / 2, narrow canopy-column and station-wall banks followed by a floor patch | 6 / 6: ±0.25° yaw/pitch, ±10 ms charge; every sample collected all targets and rested | First attempt cleared; overview, backspin hint, saved replay, scrub and retry passed |
 | 23. Canopy Crossing | 2 / 2, both faces of the platform canopy followed by the track-bed patch below | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 10/20 ms; every sample collected all targets and rested | First attempt cleared; overview, scouting above the roof, complete hint, saved replay, scrub and retry passed |
 | 24. Platform Descent | 2 / 2, upper stair bank, sloping-roof rebound and platform patch 7.35 m below the start | 6 / 6: ±0.5° yaw, ±0.25° pitch, full charge minus 10/20 ms; every sample collected all targets and rested | First attempt cleared; stair overview, complete backspin hint, saved replay, scrub and retry passed |
+| 25. Underpass Circuit | 2 / 2, ceiling, opposing walls and floor banks plus the gold landing | 6 / 6: ±1° yaw, ±0.5° pitch, full charge minus 20/40 ms; every sample collected all targets and landed at rest | First attempt cleared at 1,641,513 points; readable aiming marker, overview, movement/home, saved replay, scrub and retry passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -478,9 +479,42 @@ The station geometry and physics are unchanged. Superseded scouts were reduced
 to a small local note; the final candidate reuses the same proof directory and
 station bundle.
 
-**Next: author level 25**, completing the platforms and station-side chapter.
-Finish its native proof, nearby variations, Chrome playtesting and local merge
-before the five finale courses.
+Level 25, **Underpass Circuit**, completes the platform chapter in the public
+passage beneath the tracks. A full 12 m/s throw at 40° banks off the ceiling,
+east wall, floor and west wall, then settles in the gold ring. The native path
+is 25.2 m. The four target radii are 0.40, 0.50, 0.65 and 0.60 m; the landing
+radius is 1.5 m. Both exact proofs settle in 15.655 seconds, and all six nearby
+inputs collect every waypoint and land in 15.41–15.86 seconds.
+
+This route exposed an obsolete −5 m cutoff in service scoring: the native ball
+completed the course, but its valid −6.2 m floor caused a zero-point forfeit.
+The service now uses `StationLayout.FallLimitY()` supplied by the native worker.
+For this station it is −18.0636 m. The same value drives live scoring and is
+recorded in every new replay; the service rejects a mismatched native boundary.
+Existing saved scores are preserved. A focused native regression checks a
+separate floor at −30 m, its calculated −35.5 m boundary, full-rest completion,
+escaped-ball cancellation and fallen-player recovery. Scoring regressions cover
+basement points, replay parity, boundary crossings and client tampering.
+
+The worker was rebuilt and the local preview restarted. Full runtime checks
+pass First Bounce and Underpass Circuit scoring, replays, completion and recall,
+plus exploration and creator recording, save, exact native proof and cancellation.
+Typecheck, unit tests and browser build pass. No station geometry changed.
+
+Chrome clears first try at 1,641,513 points: ×80 for four waypoints, +2× for four
+banks, an 820,000-point landing bonus and 1,513 movement points. Overview,
+movement/home, full hint, saved replay, scrub and retry pass. The ceiling label
+now shifts above the aiming reticle while keeping its leader on the target.
+The browser check asserts that visible target labels leave the reticle clear.
+Sampled median/p95 frames are 16.7/16.8 ms, with zero skipped music steps and
+no page errors. An initial 1.90-second main-thread task remains in the receipt
+for the final cold-start audit. Evidence: `.local/campaign/underpass-circuit/`.
+The eight native route proofs preceded the protocol-only rebuild; the rebuilt
+worker repeated the exact route through both service and Chrome checks.
+
+**Next: author level 26**, beginning the five finale courses in the existing
+connected station spaces and retained forecourt. Finish its native proof,
+nearby variations, Chrome playtesting and local merge before the next level.
 
 ## Floor repair
 

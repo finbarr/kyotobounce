@@ -2222,6 +2222,96 @@
         "minSharpTurns": 1,
         "minHeightDrop": 8
       }
+    },
+    {
+      "id": "underpass-circuit",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2800,
+        "range": "precision",
+        "input": {
+          "yaw": 135,
+          "pitch": 40,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 134,
+            "pitch": 40,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 136,
+            "pitch": 40,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 135,
+            "pitch": 39.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": 135,
+            "pitch": 40.5,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2780,
+          "range": "precision",
+          "input": {
+            "yaw": 135,
+            "pitch": 40,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2760,
+          "range": "precision",
+          "input": {
+            "yaw": 135,
+            "pitch": 40,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 3,
+        "minSharpTurns": 3,
+        "minCeilingRebounds": 1
+      }
     }
   ]
 }
