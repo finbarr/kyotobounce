@@ -64,6 +64,14 @@ try{
   if(shots.length<holds.length){await page.keyboard.press('r');await page.waitForFunction(()=>window.kyotoState?.phase==='Aim');await page.keyboard.press('h');await page.waitForTimeout(300);}
  }
  const final=shots.at(-1);assert.equal(final.challenge.scoring,'waypoint-v4');assert.equal(final.result.success,true);assert.ok(final.result.score>0);
+ // H must apply the complete hint, including spin and the power range.
+ // Check the native launch receipt rather than only the displayed hint text.
+ const thrower=final.result.thrower,hint=final.challenge.hint;
+ for(const key of ['yaw','pitch','top','kick']){
+  const difference=key==='yaw'?((thrower[key]-hint[key]+540)%360)-180:thrower[key]-hint[key];
+  assert.ok(Math.abs(difference)<.0001,`Suggested ${key} reaches the native launch`);
+ }
+ assert.equal(thrower.powerRange,hint.powerRange,'Suggested power range reaches the native launch');
  assert.equal(final.result.waypointHits.length,final.challenge.waypoints.length);
  assert.equal(final.result.breakdown.waypointMultiplier,final.challenge.waypoints.length?10*2**(final.challenge.waypoints.length-1):1);
  if(final.challenge.goal)assert.equal(final.result.destinationReached,true,'The authored solution includes its destination bonus');

@@ -53,7 +53,7 @@ native shots show a better target or an unreliable interaction.
 
 ## Current increment
 
-**15 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
+**16 / 30 delivered.** Level 1, **First Bounce**, is on the west atrium floor.
 Its 1.5 m target radius introduces aim and charge without a landing requirement.
 
 | Level | Native solutions | Nearby full clears | Chrome |
@@ -73,6 +73,7 @@ Its 1.5 m target radius introduces aim and charge without a landing requirement.
 | 13. Terrace Triple | 2 / 2, ledge bounce, 8.85 m descent and return-wall bank | 6 / 6: ±0.25° yaw, ±0.5° pitch, ±12 ms charge; every sample rested | First attempt cleared all three targets; overview, hint, saved replay, scrub and retry passed |
 | 14. Timber Turn | 2 / 2, timber and column banks with a return landing bonus | 6 / 6: ±0.5° yaw/pitch, ±20 ms charge; every sample earned the bonus at full rest | First attempt earned the landing bonus; visible timber patch, overview and saved replay controls passed |
 | 15. Promenade Pinball | 2 / 2, glass and wall banks followed by a return floor patch | 6 / 6: ±0.5° yaw/pitch, ±15 ms charge in POWER; every sample rested | First attempt cleared all three targets; POWER hint, overview and saved replay controls passed |
+| 16. Stair Skip | 2 / 2, marked stair tread and a 3.92 m descent onto Muromachi Square | 8 / 8: ±1° yaw/pitch, ±20 ms charge, ±10 backspin; every sample rested | First attempt cleared both targets; readable aiming labels, full spin hint, overview and saved replay controls passed |
 
 The suggested 2.8 m/s shot has a 28.3 m total native trajectory. All variation
 runs settled naturally. The Chrome run saved an authoritative score; its
@@ -284,9 +285,33 @@ with zero skipped music steps and no page errors. Service scoring/replay/
 completion/recall, typecheck, unit tests and browser build pass. Evidence:
 `.local/campaign/promenade/`. Station geometry and native physics are unchanged.
 
-**Next: author level 16**, opening the grand-staircase and gardens chapter with
-a route that uses the existing stair geometry. Finish native proof, nearby
-variations, Chrome playtesting and the local merge before level 17.
+Level 16 opens **Staircase & Gardens** on the first grand-staircase landing.
+**Stair Skip** uses 4.5 m/s precision power, 14.5° downward aim and 80 backspin
+to strike a 0.10 m tread patch, then a broad 1.0 m patch on Muromachi Square.
+Both disks were validated on their native faces. The recorded route is 35.7 m,
+with a 3.92 m descent from release to its lowest point. Both exact solutions
+rest in 21.83 seconds; all eight variations collect both targets and rest in
+21.63–21.95 seconds on the connected upper floor. There is no destination bonus.
+
+Chrome clears first try at 217,116 points. The launch receipt confirms that H
+applies yaw, pitch, backspin, sidespin and power range; the browser proof now
+checks all five. Movement/home, overview, saved replay, scrub and retry pass.
+Sampled median/p95 frames are 16.7/16.7 ms, with zero skipped music steps and
+no page errors. Service score/replay/completion/recall, typecheck, unit tests and
+browser build pass. Evidence: `.local/campaign/grand-staircase/`.
+
+The downward aiming camera rises above the landing edge and leaves more room
+below the reticle. Numbered waypoint labels also appear while aiming, so small
+or edge-on surface patches remain identifiable. Tight camera views hide the
+robot within 2.2 m. Exact contact disks, launch physics and station geometry are
+unchanged. Chrome also confirms the open First Bounce view retains the robot,
+while the tight Bridge Pinball view hides it and keeps the target and reticle
+visible. Superseded stair candidates were removed after the final native
+proof; only concise sensitivity notes remain.
+
+**Next: author level 17**, continuing up the existing staircase toward the
+gardens with a different route. Finish native proof, nearby variations, Chrome
+playtesting and the local merge before level 18.
 
 ## Floor repair
 

@@ -314,7 +314,12 @@ canvas.addEventListener('pointercancel',cancel);
 canvas.addEventListener('mouseenter',event=>{lastPointer={x:event.clientX,y:event.clientY};});
 canvas.addEventListener('mouseleave',()=>{if(!rightDrag)lastPointer=null;});
 function takeCameraControl(){manualCamera=true;if(flightControls())flightManual=true;}
-function centerOnAim(){manualCamera=false;azimuth=-yaw*Math.PI/180;elevation=THREE.MathUtils.clamp(.10-pitch*Math.PI/180*.45,-.2,.8);}
+function centerOnAim(){
+  manualCamera=false;azimuth=-yaw*Math.PI/180;
+  // Look over the ledge when aiming down: a low shoulder view can hide the
+  // descending steps even though the ball can reach them from its release.
+  elevation=THREE.MathUtils.clamp(.10-pitch*Math.PI/180*(pitch<0?1.8:.45),-.2,.8);
+}
 document.addEventListener('mousemove',event=>{
   if(mobile?.active)return;
   if(names?.active||briefing?.blocked)return;
@@ -666,6 +671,9 @@ function animate(now){
   if(cameraClearance<1e-4)lookTarget.addScaledVector(offset,-1);
   if(p&&!inFlight&&!manualCamera&&['play','design'].includes(ui.state.mode))lookTarget.copy(release).addScaledVector(aim,30);
   camera.lookAt(lookTarget);
+  // Downward throws need space below the outgoing ray for the lower landing.
+  // The reticle is projected from the real launch ray after this framing shift.
+  if(p&&!inFlight&&!manualCamera&&['play','design'].includes(ui.state.mode))camera.rotateX(-THREE.MathUtils.degToRad(THREE.MathUtils.clamp(-pitch*.65,0,10)));
   camera.updateMatrixWorld();
   briefing.update(camera,dt);
   if(fly.active){fly.move(keys,dt,{spaceAscends:!replaying,movement:mobile.movement});camera=fly.camera;}
@@ -674,7 +682,11 @@ function animate(now){
   // Keep the followed subject in the unobstructed scene, not behind the score rail.
   if(replayViewport)camera.setViewOffset(innerWidth,innerHeight,innerWidth/2-replayViewport.x-replayViewport.width/2,innerHeight/2-replayViewport.y-replayViewport.height/2,innerWidth,innerHeight);
   else if(fly.active&&camera.view?.enabled)camera.clearViewOffset();
-  scoutTargets.update(camera,ui.state.mode==='editor'?ui.state.draft:ui.state.selected,fly.active&&!replaying);
+  const showAimTargets=!fly.active&&!inFlight&&!briefing.blocked&&ui.state.mode==='play';
+  const labelledCourse=showAimTargets?{waypoints:ui.state.selected?.waypoints,goal:ui.state.selected?.goal}:ui.state.mode==='editor'?ui.state.draft:ui.state.selected;
+  // Surface paint can be edge-on on stairs. Reuse the scout's numbered labels
+  // while aiming, leaving the exact contact disk painted on the native face.
+  scoutTargets.update(camera,labelledCourse,(fly.active&&!replaying)||showAimTargets);
   setHidden(flyControl,briefing.blocked||replaying||['Charging','Release','Flight'].includes(phase));
   setData(flyControl,'speed',String(fly.speed));
   // Project the outgoing ray onto its first station surface. A fixed screen
@@ -683,9 +695,9 @@ function animate(now){
   $('reticle').style.display=reticle?.visible?'block':'none';
   if(reticle){setStyle($('reticle'),'left',`${reticle.x*100}%`);setStyle($('reticle'),'top',`${reticle.y*100}%`);}
   for(const a of avatars.values()){
-    // A wall can push the aiming camera into the robot's silhouette.
-    // Hide it before its body fills the view and covers nearby targets.
-    const close=camera.position.distanceTo(a.group.position.clone().add(new THREE.Vector3(0,1.0,0)))<(inFlight?2.2:1.6);
+    // Walls and rising stairs can squeeze either camera into the robot.
+    // At this distance its body fills the view and covers nearby targets.
+    const close=camera.position.distanceTo(a.group.position.clone().add(new THREE.Vector3(0,1.0,0)))<2.2;
     a.group.visible=!close;
   }
   if(now>noticeUntil)$('notice').classList.add('quiet');

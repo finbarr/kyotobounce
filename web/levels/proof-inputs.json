@@ -1390,6 +1390,118 @@
         "minNonFloorTargets": 2,
         "minSharpTurns": 2
       }
+    },
+    {
+      "id": "grand-stair-skip",
+      "revision": 1,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 984,
+        "range": "precision",
+        "input": {
+          "yaw": 90,
+          "pitch": -14.5,
+          "top": -80,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 984,
+          "range": "precision",
+          "input": {
+            "yaw": 89,
+            "pitch": -14.5,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 984,
+          "range": "precision",
+          "input": {
+            "yaw": 91,
+            "pitch": -14.5,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 984,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -15.5,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 984,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -13.5,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 964,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -14.5,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 1004,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -14.5,
+            "top": -80,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 984,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -14.5,
+            "top": -70,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 984,
+          "range": "precision",
+          "input": {
+            "yaw": 90,
+            "pitch": -14.5,
+            "top": -90,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 8,
+      "features": {
+        "minNonFloorTargets": 0,
+        "minSharpTurns": 0,
+        "minHeightDrop": 3.8
+      }
     }
   ]
 }

@@ -1360,5 +1360,98 @@
         200
       ]
     }
+  },
+  {
+    "id": "grand-stair-skip",
+    "revision": 1,
+    "name": "Stair Skip",
+    "creator": "station",
+    "layout": "a0014e3b3cf2664f2db0958733907ffbb6a496d1d556a121b0bba25b794e2026",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v4",
+    "start": {
+      "center": {
+        "x": -79.69999694824219,
+        "y": 18.036741256713867,
+        "z": 3.5999999046325684
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.25,
+      "surface": "daikaidan-landing-01"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -76.29000854492188,
+          "y": 16.422019958496094,
+          "z": 3.380000114440918
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.10000000149011612,
+        "surface": "daikaidan-flight-01",
+        "id": "stair-tread"
+      },
+      {
+        "center": {
+          "x": -73.62146759033203,
+          "y": 15.61465835571289,
+          "z": 3.379913330078125
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 1,
+        "surface": "muromachi-square",
+        "id": "square-skip"
+      }
+    ],
+    "hint": {
+      "yaw": 90,
+      "pitch": -14.5,
+      "top": -80,
+      "kick": 0,
+      "powerRange": "precision",
+      "holdMs": 984,
+      "note": "Use 4.5 m/s precision power, 14.5° downward aim and 80 backspin. Hit the small purple tread, then skip down to the broad patch on Muromachi Square. Collect both patches and let the ball stop completely."
+    },
+    "order": 15,
+    "campaign": {
+      "chapter": 4,
+      "chapterTitle": "Staircase & Gardens",
+      "difficulty": "Hard",
+      "distance": 35.7,
+      "brief": "Drop from the first grand-staircase landing onto the marked tread, then bounce out onto Muromachi Square. Backspin controls the first rebound."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
   }
 ]
