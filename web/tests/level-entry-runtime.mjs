@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {Client} from './api-client.mjs';
-const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4173';
+const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4425';
 if(!['localhost','127.0.0.1'].includes(new URL(origin).hostname))throw Error('Use an isolated local server');
 const clients=[];
 async function enter(token){
@@ -10,12 +10,12 @@ async function enter(token){
 }
 try{
  const fresh=await enter(),catalog=fresh.messages.findLast(m=>m.type==='catalog').challenges;
- const campaign=catalog.filter(c=>c.campaign).sort((a,b)=>a.order-b.order),first=campaign[0],next=campaign[1];
- assert.equal(first.order,-1);assert.equal(first.id,'kyoto-tutorial');assert.equal(next.order,0);
+ const campaign=catalog.filter(c=>c.campaign).sort((a,b)=>a.order-b.order),first=campaign[0],next=campaign[1]||first;
+ assert.equal(first.order,0);assert.equal(first.id,'atrium-welcome');assert.equal(next.order,campaign.length>1?1:0);
  if(fresh.state.challenge?.id!==first.id)await fresh.next(m=>m.type==='state'&&m.challenge?.id===first.id);
  assert.equal(fresh.messages.findLast(m=>m.type==='session').challenge.id,first.id);
  const p=fresh.state.players.find(p=>p.id===fresh.id),start=first.start.center;
- assert.ok(Math.hypot(p.feet.x-start.x,p.feet.z-start.z)<=first.start.radius+.01,'The native robot starts inside Level 0');
+ assert.ok(Math.hypot(p.feet.x-start.x,p.feet.z-start.z)<=first.start.radius+.01,'The native robot starts inside Level 1');
  await fresh.request('select-challenge',{challengeId:next.id},'selected');const token=fresh.token;fresh.close();
  const returning=await enter(token);assert.equal(returning.messages.findLast(m=>m.type==='session').challenge.id,next.id,'Returning players resume their chosen level');
  await assert.rejects(returning.request('select-challenge',{challengeId:null},'selected'),/Choose a level/);

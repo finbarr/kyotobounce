@@ -245,7 +245,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
  function updateCompletionAction(){
   const button=$('next-challenge');button.hidden=!completed();
   const next=nextCampaignCourse(state.challenges,state.selected);
-  button.innerHTML=next?(isTutorial(state.selected)?'Play Level 1 <kbd>SPACE / N</kbd> →':'Next level <kbd>SPACE / N</kbd> →'):state.selected?.campaign?'Campaign complete · Choose a level <kbd>SPACE / N</kbd>':'Level complete · Choose a level <kbd>SPACE / N</kbd>';
+  button.innerHTML=next?'Next level <kbd>SPACE / N</kbd> →':state.selected?.campaign?'All available levels clear · Choose a level <kbd>SPACE / N</kbd>':'Level complete · Choose a level <kbd>SPACE / N</kbd>';
  }
  function advanceCompleted(){
   if(nextRequested)return true;
@@ -317,7 +317,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
     $('result-tip').textContent=waypoint?(m.challenge?.waypoints?.length?'Collect EVERY waypoint to clear. All in-bounds shots rank. R · TRY AGAIN':'Land in the destination to clear. All in-bounds shots rank. R · TRY AGAIN'):b?.outcome==='miss'?`Finish within ${b.proximityRange.toFixed(1)} m to earn proximity points.`:'R · TRY AGAIN     ESC · REPLAY & MENUS';
     if(isTutorial(m.challenge)){
      $('result-label').textContent=m.success?'TUTORIAL COMPLETE':'ONE MORE TRY';
-     $('result-tip').textContent=m.success?'Your score is on the Level 0 board. Play Level 1, or retry to climb the rankings.':'Touch the purple patch to clear. Retry with R, then H for suggested aim. On touch, tap Try again and Use suggested aim.';
+     $('result-tip').textContent=m.success?'Your score is on the Level 1 board. Retry to climb the rankings, or choose another level.':'Touch the purple patch to clear. Retry with R, then H for suggested aim. On touch, tap Try again and Use suggested aim.';
     }
     $('watch-result').hidden=!m.saved;$('share-result').hidden=!m.saved;ranking.show(m);updateCompletionAction();
     if(!feedback.clearing)sound.cue('result',rank);

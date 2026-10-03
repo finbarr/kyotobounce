@@ -15,7 +15,8 @@ try{
  const competition=new Competition(store,worker,()=>{}),guest=store.guest();
  // Free exploration uses the same authoritative launch inputs.
  const member=await competition.add(guest,'power-fixture');
- member.restoring=false;worker.ready=true;worker.capabilities=['waypoint-v3'];competition.layout="free-play-layout";competition.physics=PHYSICS_VERSION;
+ member.restoring=false;worker.ready=true;worker.capabilities=['waypoint-v3','design-ball-v1'];competition.layout="free-play-layout";competition.physics=PHYSICS_VERSION;
+ await competition.command(member,{type:'design-start'});
  const intent={type:'charge',challengeId:null,revision:null,layout:competition.layout,physics:competition.physics};
  await assert.rejects(competition.command(member,{...intent,powerRange:'turbo'}),/Choose precision/);
  await competition.command(member,{...intent,powerRange:'precision'});

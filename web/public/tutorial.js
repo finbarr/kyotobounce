@@ -1,4 +1,4 @@
-export const isTutorial=course=>course?.creator==='station'&&course.id==='kyoto-tutorial';
+export const isTutorial=course=>course?.creator==='station'&&course.id==='atrium-welcome';
 
 // Coaching observes ordinary gameplay. It never awards points, forces a throw,
 // blocks a control, or treats a recalled shot as a completed tutorial.
@@ -22,8 +22,8 @@ export class TutorialGuide{
 }
 
 export function tutorialUI({onAim,onContinue}){
- const guide=new TutorialGuide(),host=document.createElement('aside');host.id='tutorial';host.hidden=true;host.setAttribute('aria-label','Level 0 tutorial');
- host.innerHTML='<div class="tutorial-top"><span>LEVEL 0 · TUTORIAL <b id="tutorial-step"></b></span><button id="tutorial-hide" aria-label="Hide tutorial tips">×</button></div><div role="status" aria-live="polite" aria-atomic="true"><h2 id="tutorial-title"></h2><p id="tutorial-copy"></p></div><button id="tutorial-action"></button>';
+ const guide=new TutorialGuide(),host=document.createElement('aside');host.id='tutorial';host.hidden=true;host.setAttribute('aria-label','Level 1 tutorial');
+ host.innerHTML='<div class="tutorial-top"><span>LEVEL 1 · TUTORIAL <b id="tutorial-step"></b></span><button id="tutorial-hide" aria-label="Hide tutorial tips">×</button></div><div role="status" aria-live="polite" aria-atomic="true"><h2 id="tutorial-title"></h2><p id="tutorial-copy"></p></div><button id="tutorial-action"></button>';
  document.body.append(host);
  const $=id=>document.getElementById(id);let last='',mobile=false;
  $('tutorial-hide').onclick=()=>{guide.action('dismiss');onContinue();};

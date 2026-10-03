@@ -30,6 +30,8 @@ for(const support of layout.architecture.portaConnectionV2?.combSupports||[])
 // Only the entry position changes. No geometry export or asset duplication is needed.
 layout.spawn=config.spawn;
 const layoutBytes=JSON.stringify(layout)+'\n',layoutSha256=hash(layoutBytes);
+const campaign=await json('web/starter-challenges.json');
+assert(campaign.every(c=>c.layout===layoutSha256),'Campaign targets must match the exact served v2 collision layout');
 station.spawn=config.spawn;station.layoutSha256=layoutSha256;
 const local=resolve('.local/v2',port),overlay=resolve(local,'public');
 await mkdir(resolve(overlay,'assets/runtime'),{recursive:true});
@@ -52,7 +54,7 @@ const build=await json('web/public/browser-build.json');
 for(const name of ['assets/station.json',...Object.keys(replacements)]){
  const path=resolve(overlay,name);build.files['web/public/'+name]={bytes:(await stat(path)).size,sha256:await hashFile(path)};
 }
-build.scope='Local Kyoto Bounce v2; latest reconstructed station and free exploration';
+build.scope='Local Kyoto Bounce v2; reconstructed station and new campaign';
 await writeFile(resolve(overlay,'browser-build.json'),JSON.stringify(build,null,2)+'\n');
 const receipt={...config,layoutSha256,sourceLayoutSha256:hash(source),spawnOnly:true,port,publicOverlay:overlay,createdAt:new Date().toISOString()};
 await writeFile(resolve(local,'asset-receipt.json'),JSON.stringify(receipt,null,2)+'\n');

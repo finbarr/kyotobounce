@@ -10,7 +10,9 @@ const c=new Client(origin.replace(/^http/,'ws')),magnitude=v=>Math.hypot(v.x,v.y
 try{
  await c.join();await delay(1000);
  const player=()=>c.state.players.find(p=>p.id===c.id),feet=()=>player().feet;
- assert.equal(c.state.challenge,null);assert.deepEqual(c.messages.findLast(m=>m.type==='catalog').challenges,[]);
+ const opening=c.state.challenge;assert.equal(opening.id,'atrium-welcome');
+ await c.request('design-start',{},'design-ready');c.send('home');await delay(300);
+ assert.equal(c.state.challenge,null,'Creator uses the exploration spawn when returning home');
  assert(player().grounded,'Spawn must be on a walkable floor');assert(distance(feet(),spawn)<.1,'Start at the configured exploration spawn');
  const start={...feet()};
  for(let i=0;i<12;i++){c.input({yaw:0,z:1});await delay(80);}

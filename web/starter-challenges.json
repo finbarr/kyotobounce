@@ -1,1 +1,80 @@
-[]
+[
+  {
+    "id": "atrium-welcome",
+    "revision": 1,
+    "name": "First Bounce",
+    "creator": "station",
+    "layout": "fe661f4a2c98891d7d00f9a3be27aac31888b94d40eb518245834d22ac1c4116",
+    "physics": "kyoto-p3-3",
+    "scoring": "waypoint-v3",
+    "start": {
+      "center": {
+        "x": -20,
+        "y": 0,
+        "z": -4.000000953674316
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "radius": 0.5,
+      "surface": "concourse"
+    },
+    "goal": null,
+    "waypoints": [
+      {
+        "center": {
+          "x": -20.220001220703125,
+          "y": 0,
+          "z": -5.842808246612549
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 1.5,
+        "surface": "concourse",
+        "id": "first-bounce"
+      }
+    ],
+    "hint": {
+      "yaw": 180,
+      "pitch": -8,
+      "top": 0,
+      "kick": 0,
+      "holdMs": 560,
+      "powerRange": "precision",
+      "note": "A gentle 2.8 m/s throw into the wide purple floor patch. Touch it, then let the ball stop. There is no landing target."
+    },
+    "order": 0,
+    "campaign": {
+      "chapter": 1,
+      "chapterTitle": "Atrium Beginnings",
+      "difficulty": "Intro",
+      "distance": 28.3,
+      "brief": "Make your first bounce on the broad atrium floor. Hit the purple patch; anywhere the ball settles is fine."
+    },
+    "throwModel": "robot-v4",
+    "allowedInputs": {
+      "chargeSeconds": 2.8,
+      "power": [
+        0,
+        1
+      ],
+      "pitch": [
+        -65,
+        80
+      ],
+      "top": [
+        -200,
+        200
+      ],
+      "kick": [
+        -200,
+        200
+      ]
+    }
+  }
+]
