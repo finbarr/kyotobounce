@@ -84,6 +84,7 @@ export class PhysicsWorker extends EventEmitter {
         }
         if(message.type==='ready'){
           if(this.ready)continue;
+          if(!Number.isFinite(message.fallLimitY)){this.fail(run,'Physics worker is missing the station fall boundary. Rebuild the worker.');return;}
           clearTimeout(run.startupTimer);this.ready=true;this.capabilities=Array.isArray(message.capabilities)?message.capabilities:[];
           console.log('Native physics ready',message.profile,String(message.layout).slice(0,12));
           this.setStatus('ready','Physics is ready.');

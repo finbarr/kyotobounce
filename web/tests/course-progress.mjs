@@ -12,7 +12,7 @@ try{
  const base={revision:1,creator:'station',name:'Progress fixture',layout:'station',physics:PHYSICS_VERSION,throwModel:THROW_MODEL,scoring:SCORING_VERSION,start:disk,goal:disk};
  const courses=['unplayed','partial','completed','crowded','ties','broadcast'].map(id=>({...base,id}));
  for(const course of courses)store.saveChallenge(course);
- const shot=(challenge,attempt,guest,score,success=false,duration=10)=>({type:'result',challenge,attempt,id:guest.id,score,success,duration,surfaces:0,poses:[],contacts:[]});
+ const shot=(challenge,attempt,guest,score,success=false,duration=10)=>({type:'result',fallLimitY:-12,challenge,attempt,id:guest.id,score,success,duration,surfaces:0,poses:[],contacts:[]});
  const save=(...args)=>store.saveResult(shot(...args),'animation');
  const row=id=>store.courseProgress(a.id).find(p=>p.challengeId===id);
  assert.deepEqual(row('unplayed'),{challengeId:'unplayed',revision:1,completed:false,bestScore:0,rank:null});
@@ -28,7 +28,7 @@ try{
  for(const course of courses)assert.equal(row(course.id).rank,store.personalPlacement(course,a.id)?.rank??null,'Selector uses exactly the leaderboard tie ordering');
  assert.equal(row('ties').rank,3);
  assert.equal(store.courseProgress(b.id,courses[2])[0].completed,false,'Progress belongs to a player, not the whole level');
- const published=[],game=new Competition(store,{ready:true},(message,id)=>published.push({message,id}));game.layout=base.layout;game.physics=base.physics;
+ const published=[],game=new Competition(store,{ready:true},(message,id)=>published.push({message,id}));game.layout=base.layout;game.physics=base.physics;game.fallLimitY=-12;
  const ma={id:'session-a',guest:a,selected:courses[0],restoring:true},mb={id:'session-b',guest:b,selected:null,restoring:false};game.members.set(ma.id,ma);game.members.set(mb.id,mb);
  const all=await game.command(ma,{type:'course-progress',guest:b.id});
  assert.equal(all.full,true);assert.equal(all.entries.find(p=>p.challengeId==='crowded').rank,251,'Read-only progress uses authenticated identity even during worker restoration');

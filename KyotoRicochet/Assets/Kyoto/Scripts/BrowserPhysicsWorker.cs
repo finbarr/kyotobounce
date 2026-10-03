@@ -18,7 +18,7 @@ namespace Kyoto
         [Serializable] class Ready
         {
             public string type="ready",layout,profile,physics=BrowserSession.SimulationVersion;
-            public Vector3 spawn;public float radius;public string[] capabilities=new[]{"waypoint-v4","shot-stream-v1","shot-speed-v1","design-ball-v1"};
+            public Vector3 spawn;public float radius,fallLimitY;public string[] capabilities=new[]{"waypoint-v4","shot-stream-v1","shot-speed-v1","design-ball-v1"};
         }
         readonly ConcurrentQueue<BrowserSession.Command> commands=new ConcurrentQueue<BrowserSession.Command>();
         readonly Dictionary<string,BrowserSession> sessions=new Dictionary<string,BrowserSession>();
@@ -68,7 +68,7 @@ namespace Kyoto
                 Send(new Auth{token=Environment.GetEnvironmentVariable("KYOTO_WORKER_TOKEN")});
                 reader=new Thread(ReadCommands){IsBackground=true};reader.Start();
                 var profile=BallProfile.Phase2Default;
-                Send(new Ready{layout=hash,profile=profile.id,spawn=layout.spawn,radius=profile.radius_m});
+                Send(new Ready{layout=hash,profile=profile.id,spawn=layout.spawn,radius=profile.radius_m,fallLimitY=layout.FallLimitY()});
                 Debug.Log("KYOTO_NATIVE_WORKER_READY "+hash);
             }
             catch(Exception e){Debug.LogException(e);Application.Quit(1);enabled=false;}

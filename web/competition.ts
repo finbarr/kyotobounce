@@ -11,7 +11,7 @@ export class Competition {
  store:Store;worker:PhysicsWorker;publish:(message:unknown,sessionId?:string)=>void;
  members=new Map<string,Member>();
  pending=new Map<string,{id:string;challenge:Challenge|null}>();
- initializing=false;layout='';physics='';animation='ori-carry-v2';
+ initializing=false;layout='';physics='';fallLimitY=NaN;animation='ori-carry-v2';
  constructor(store:Store,worker:PhysicsWorker,publish:(message:unknown,sessionId?:string)=>void){this.store=store;this.worker=worker;this.publish=publish;}
  session(m:Member){return {type:'session',id:m.id,busy:!!m.attempt,attempt:m.attempt||null,recalling:!!m.recalling,designing:!!m.designing,restoring:m.restoring,challenge:m.selected};}
  sync(m:Member){this.publish(this.session(m),m.id);}
@@ -54,7 +54,7 @@ export class Competition {
   if(!this.members.has(m.id)||!this.worker.ready)return;
   m.restoring=false;this.sync(m);this.board(m);
  }
- async ready(message:any){this.initializing=true;try{this.layout=message.layout;this.physics=message.physics;this.store.discardRetired(this.layout,this.physics);}finally{this.initializing=false;}await Promise.all([...this.members.values()].map(m=>this.restore(m)));this.publish(this.catalog());}
+ async ready(message:any){this.initializing=true;try{this.layout=message.layout;this.physics=message.physics;this.fallLimitY=message.fallLimitY;this.store.discardRetired(this.layout,this.physics);}finally{this.initializing=false;}await Promise.all([...this.members.values()].map(m=>this.restore(m)));this.publish(this.catalog());}
  accepts(message:any){
   const m=this.members.get(message.id);if(!m)return false;
   if(message.type==='state'&&message.phase==='Aim')return !m.attempt;
@@ -101,6 +101,7 @@ export class Competition {
    this.publish({type:'error',message:'The attempt used an incompatible level version. No score was saved.'},member.id);this.sync(member);return;
   }
   if(c){
+   if(result.fallLimitY!==this.fallLimitY)throw new Error('Invalid native station boundary');
    if(!Number.isInteger(result.surfaces)||result.surfaces<0||result.score!==(result.success?1000+100*result.surfaces:0))throw new Error('Invalid native result');
    result.challenge=c;
    // The native worker attests to physical success and records the trajectory.
@@ -203,7 +204,7 @@ export class Competition {
    if(member.selected?.scoring===WAYPOINT_SCORING)this.requireWaypoints();
    if((m.challengeId||null)!==(member.selected?.id||null)||(m.revision||null)!==(member.selected?.revision||null)||m.layout!==this.layout||m.physics!==this.physics)throw new Error('Refresh the current level: its version changed');
    member.attemptPresentation={playerName:member.guest.name,character:m.character||'ori'};
-   member.lastResult=undefined;member.combo=member.selected?new ComboTracker(member.selected):undefined;member.scoreFrames=[];
+   member.lastResult=undefined;member.combo=member.selected?new ComboTracker(member.selected,this.fallLimitY):undefined;member.scoreFrames=[];
    member.chargeAt=performance.now();member.attempt=randomUUID();this.pending.set(member.attempt,{id,challenge:member.selected});
    this.worker.send({type:'charge',id,request:member.attempt,powerRange:m.powerRange||'full'});this.sync(member);return;
   }

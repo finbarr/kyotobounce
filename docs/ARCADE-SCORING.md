@@ -28,6 +28,15 @@ Movement time is measured from consecutive authoritative 180 Hz positions, exclu
 
 The server calculates live frames and final results from the same native records. Clients cannot submit a score. The game is pre-launch: current partial and complete records remain valid; retired station/course/scoring records are discarded. `waypoint-v4` identifies this tuning so old ×2-first scores cannot mix with current leaderboards. Courses keep their current IDs and revisions; no legacy scoring implementation or migration is retained. All 32 waypoints with a destination bonus remain below the safe-integer limit.
 
+## Station boundary
+
+The native worker calculates `fallLimitY` from the lowest collision surface in the
+loaded station, with five metres of recovery space. It sends that limit at startup
+and with each result. Live scoring and saved replays use the same value; basement
+floors below −5 m remain in bounds. Any recorded pose below the native limit
+forfeits the shot even if it later returns. Recall and native escape notices still
+cancel the attempt. Clients cannot supply or change this boundary.
+
 ## Launch position
 
 Every level permits walking and throwing anywhere in the station. The cream-and-navy checkered START pad marks the spawn and suggested launch position, not a movement or scoring boundary. The Start button returns the robot to it. All shots still belong to the selected course and use its targets and leaderboard; moving farther away can create longer, more inventive bank shots. There is no separate free-exploration mode. Walking itself awards no points.

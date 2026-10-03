@@ -22,7 +22,7 @@ namespace Kyoto
         {
             public string type="result",attempt,id,reason,layout,physics=SimulationVersion,profile;
             public BrowserChallenge challenge;
-            public bool success,destinationReached;public WaypointHit[] waypointHits;public int score,surfaces,impacts;public float duration;
+            public bool success,destinationReached;public WaypointHit[] waypointHits;public int score,surfaces,impacts;public float duration,fallLimitY;
             public double releaseTime,chargeTime;
             public PlayerState thrower;
             public Vector3 launchPosition,velocity,spin;
@@ -219,7 +219,7 @@ namespace Kyoto
             state.phase="Result";
             state.diagnostics.endReason=reason;state.diagnostics.endedAt=ball.Clock;
             pendingResult=new ThrowResult{attempt=attempt,id=owner.state.id,reason=reason,layout=state.layout,profile=state.profile,challenge=activeChallenge,
-                success=success,destinationReached=success,waypointHits=waypointHits.ToArray(),score=success?1000+100*distinct.Count:0,surfaces=distinct.Count,impacts=impactCount,duration=ball.Clock,
+                success=success,destinationReached=success,waypointHits=waypointHits.ToArray(),score=success?1000+100*distinct.Count:0,surfaces=distinct.Count,impacts=impactCount,duration=ball.Clock,fallLimitY=fallLimitY,
                 releaseTime=state.releaseTime,chargeTime=state.chargeTime,thrower=thrower,launchPosition=state.launchPosition,velocity=launchVelocity,spin=launchSpin,
                 poses=replayPoses.ToArray(),contacts=replayContacts.ToArray(),design=designArmed?CaptureDesign():null};
         }

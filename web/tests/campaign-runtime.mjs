@@ -28,6 +28,8 @@ try{
   }
   const replay=(await c.request('replay',{attempt:r.attempt},'replay')).replay;
   assert.equal(replay.score,r.score);assert.equal(replay.layout,c.state.layout);
+  assert(Number.isFinite(r.fallLimitY));assert.equal(replay.fallLimitY,r.fallLimitY);
+  assert(replay.poses.every(p=>p.p.y>=r.fallLimitY),'Every ranked pose stays inside the native station boundary');
   assert.deepEqual(scoreAttempt(replay),r.breakdown,'Server score is reproducible from native replay evidence');
   assert.deepEqual(replay.scoreFrames.at(-1).score,r.breakdown,'Saved live score ends at the authoritative final score');
   const progress=await c.request('course-progress',{},'course-progress');

@@ -30,8 +30,11 @@ export const proximityRange=(c:Challenge)=>clamp(distance(c.start.center,c.goal!
 // A tracker consumes every native physics pose, including between network frames.
 // The identical calculation drives the live HUD and the immutable final replay.
 export class ComboTracker {
- c:Challenge;leftStation=false;last:Pose|null=null;movingSeconds=0;firstVisit=Infinity;contacts:Contact[]=[];waypointHits:WaypointHit[]=[];
- constructor(challenge:Challenge){this.c=challenge;}
+ c:Challenge;fallLimitY:number;leftStation=false;last:Pose|null=null;movingSeconds=0;firstVisit=Infinity;contacts:Contact[]=[];waypointHits:WaypointHit[]=[];
+ constructor(challenge:Challenge,fallLimitY:number){
+  if(!Number.isFinite(fallLimitY))throw new Error('Missing native station boundary');
+  this.c=challenge;this.fallLimitY=fallLimitY;
+ }
  waypoint(hit:WaypointHit){
   if(this.c.scoring!==WAYPOINT_SCORING)return;
   const target=this.c.waypoints?.find(w=>w.id===hit.waypointId);
@@ -45,8 +48,9 @@ export class ComboTracker {
  poses(poses:Pose[]){
   for(const pose of poses){
    if(!Number.isFinite(pose.t)||Object.values(pose.p).some(x=>!Number.isFinite(x)))throw new Error('Invalid recorded trajectory');
-   // Same boundary used by the native worker, retained as a storage safeguard.
-   if(pose.p.y < -5)this.leftStation=true;
+   // Use the boundary calculated by the native worker for this layout.
+   // Retain it in the replay so later scoring never depends on another layout.
+   if(pose.p.y < this.fallLimitY)this.leftStation=true;
    const a=this.last;
    if(a&&pose.t<a.t)throw new Error('Trajectory time moved backwards');
    if(a&&pose.t>a.t){
@@ -107,7 +111,7 @@ export class ComboTracker {
 export function scoreAttempt(result:NativeResult):ScoreBreakdown{
  if(![ARCADE_SCORING,WAYPOINT_SCORING].includes(result.challenge?.scoring||''))throw new Error('Unsupported scoring rules');
  if(!result.poses.length)throw new Error('Invalid recorded trajectory');
- const tracker=new ComboTracker(result.challenge!);
+ const tracker=new ComboTracker(result.challenge!,result.fallLimitY);
  for(const hit of result.contacts)tracker.contact(hit);
  for(const hit of result.waypointHits||[])tracker.waypoint(hit);
  tracker.poses(result.poses);

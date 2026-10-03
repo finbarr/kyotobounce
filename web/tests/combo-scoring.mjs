@@ -5,7 +5,7 @@ const p=(x,y=.023,z=0)=>({x,y,z});
 const pose=(t,x,y=.023,z=0)=>({t,p:p(x,y,z),q:{x:0,y:0,z:0,w:1}});
 const c={id:'combo',revision:1,name:'Combo',creator:'tester',throwModel:'robot-v4',scoring:SCORING_VERSION,start:{center:p(0,0),radius:.75,surface:'floor'},goal:{center:p(20,0),radius:1,surface:'floor'},layout:'test',physics:'test'};
 const hits=Array.from({length:12},(_,i)=>({surface:`bank-${i}`,label:`Bank ${i}`,point:p(i*1.4,0),time:i*.5+.1,speed:4,qualifying:true}));
-const result=(extra={})=>({type:'result',attempt:'a',id:'tester',challenge:c,reason:'Target settled',success:true,score:0,surfaces:12,impacts:12,duration:10,releaseTime:20,chargeTime:17,thrower:{},launchPosition:p(0,1),velocity:p(4,0),spin:p(0,0),layout:'test',physics:'test',profile:'test',poses:[pose(0,0,1),pose(6,15,1),pose(10,20)],contacts:hits,...extra});
+const result=(extra={})=>({fallLimitY:-12,type:'result',attempt:'a',id:'tester',challenge:c,reason:'Target settled',success:true,score:0,surfaces:12,impacts:12,duration:10,releaseTime:20,chargeTime:17,thrower:{},launchPosition:p(0,1),velocity:p(4,0),spin:p(0,0),layout:'test',physics:'test',profile:'test',poses:[pose(0,0,1),pose(6,15,1),pose(10,20)],contacts:hits,...extra});
 const monster=scoreAttempt(result());assert.equal(monster.total,71000,'Twelve distinct banks add 6x and 1000 movement points, without exponential growth');assert.equal(monster.styleBanks,12);
 const repeated=scoreAttempt(result({contacts:hits.map(h=>({...h,surface:'wall'}))}));assert.equal(repeated.styleBanks,1);
 const treads=scoreAttempt(result({contacts:hits.map((h,i)=>({...h,surface:`west-escalator-step-${i}`}))}));assert.equal(treads.styleBanks,1,'One escalator is one bank family');
@@ -23,7 +23,7 @@ const rings=[0,.25,.5,.75,1].map(f=>scoreAttempt(result({success:false,poses:[po
 assert.deepEqual(rings.map(x=>Math.round(x*100)),[100,75,50,25,0],'Bullseye percentages match the actual landing formula');
 assert.equal(scoreAttempt(result({reason:'Recalled'})).total,0);
 assert.equal(scoreAttempt(result({challenge:{...c,requiredSurface:'missing'}})).total,monster.total,'A route requirement affects completion, not score eligibility');
-const tracker=new ComboTracker(c);const r=result();for(const h of hits)tracker.contact(h);tracker.poses(r.poses.slice(0,2));const before=tracker.value();tracker.poses(r.poses.slice(2));assert.equal(before.bankMultiplier,monster.bankMultiplier,'Movement cannot increase the multiplier');assert.equal(monster.potential-before.potential,monster.movementPoints-before.movementPoints,'Only flat movement points grow between banks');assert.deepEqual(tracker.value({success:true}),monster,'Chunked live telemetry and final replay calculate exactly the same score');
+const tracker=new ComboTracker(c,-12);const r=result();for(const h of hits)tracker.contact(h);tracker.poses(r.poses.slice(0,2));const before=tracker.value();tracker.poses(r.poses.slice(2));assert.equal(before.bankMultiplier,monster.bankMultiplier,'Movement cannot increase the multiplier');assert.equal(monster.potential-before.potential,monster.movementPoints-before.movementPoints,'Only flat movement points grow between banks');assert.deepEqual(tracker.value({success:true}),monster,'Chunked live telemetry and final replay calculate exactly the same score');
 assert.throws(()=>tracker.poses([pose(-1,0)]),/backwards/);
 console.log('PASS additive bank combos, repeated surfaces, chatter, swept tags, ring accuracy, linear movement bonus without time/spin multipliers, rest and live/final parity');
 
@@ -34,7 +34,7 @@ const motionCourse={...c,goal:{center:p(0,0),radius:2,surface:'floor'}};
 const motionPoses=[pose(0,0),pose(2,1),pose(5,1),{...pose(8,1),q:{x:0,y:1,z:0,w:0}},pose(10,0)];
 const movement=scoreAttempt(result({challenge:motionCourse,contacts:[],poses:motionPoses,success:true}));
 assert.equal(movement.movingSeconds,4);assert.equal(movement.movementPoints,400);assert.equal(movement.total,10400);
-const chunked=new ComboTracker(motionCourse);for(const item of motionPoses)chunked.poses([item]);assert.deepEqual(chunked.value({success:true}),movement);
+const chunked=new ComboTracker(motionCourse,-12);for(const item of motionPoses)chunked.poses([item]);assert.deepEqual(chunked.value({success:true}),movement);
 const fractional=scoreAttempt(result({challenge:motionCourse,contacts:[],poses:[pose(0,0),pose(.125,1)],success:true}));assert.equal(fractional.movementPoints,12,'Fractional seconds accrue individual points, not one-second awards');
 const multiplied=scoreAttempt(result({challenge:motionCourse,contacts:hits,poses:motionPoses,success:true}));assert.equal(multiplied.movementPoints,400,'Banks cannot multiply movement points');assert.equal(multiplied.total,Math.round(10000*multiplied.bankMultiplier)+400);
 const missed=scoreAttempt(result({poses:[pose(0,0),pose(10,-20)],contacts:[],success:false}));assert.equal(missed.movementPoints,1000);assert.equal(missed.total,1000,'A target miss still ranks its movement points');
