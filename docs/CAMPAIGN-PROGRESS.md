@@ -920,3 +920,9 @@ They are not yet a completed campaign revision. No push or deployment.
   all six nearby variations and the first browser shot cleared. Scouting,
   replay, retry and music checks passed. Evidence:
   `.local/level-refinement/canopy-final-proof/` and `canopy-final-browser/`.
+
+- **Skyway Circuit (revision 2):** 64.5 m westbound shot along the glass
+  walkway, through a near skip and a broad far deck target. Two exact hints,
+  all six nearby variations and the first browser shot cleared. All shots
+  finished at full translation and spin rest. Replay, retry and music passed.
+  Evidence: `.local/level-refinement/skyway-accepted-proof/` and `skyway-browser/`.

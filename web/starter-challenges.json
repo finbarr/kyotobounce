@@ -2560,7 +2560,7 @@
   },
   {
     "id": "skyway-circuit",
-    "revision": 1,
+    "revision": 2,
     "name": "Skyway Circuit",
     "creator": "station",
     "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
@@ -2568,14 +2568,14 @@
     "scoring": "waypoint-v4",
     "start": {
       "center": {
-        "x": 10.450004577636719,
-        "y": 45.08330535888672,
-        "z": 15.5
+        "x": 65,
+        "y": 45.083457946777344,
+        "z": 16.399999618530273
       },
       "normal": {
-        "x": -0.00000287841839963221,
+        "x": -0.000002862499286493403,
         "y": 1,
-        "z": -3.978215943334362e-7
+        "z": -4.727759872480419e-8
       },
       "radius": 0.25,
       "surface": "central-skyway-deck"
@@ -2584,81 +2584,51 @@
     "waypoints": [
       {
         "center": {
-          "x": 12.137612342834473,
-          "y": 46.979488372802734,
-          "z": 16.899856567382812
-        },
-        "normal": {
-          "x": 0.016513513401150703,
-          "y": 0.0000026559030175121734,
-          "z": -0.9998636245727539
-        },
-        "radius": 0.30000001192092896,
-        "surface": "central-skyway-glass-99",
-        "id": "first-glass"
-      },
-      {
-        "center": {
-          "x": 14.649999618530273,
-          "y": 46.55000305175781,
-          "z": 14.40500259399414
-        },
-        "normal": {
-          "x": -0.016513213515281677,
-          "y": -0.000003107810243818676,
-          "z": 0.9998636841773987
-        },
-        "radius": 0.30000001192092896,
-        "surface": "central-skyway-glass-228",
-        "id": "opposite-glass"
-      },
-      {
-        "center": {
-          "x": 16.8700008392334,
-          "y": 45.9900016784668,
-          "z": 16.978010177612305
-        },
-        "normal": {
-          "x": 0.016511959955096245,
-          "y": 0.0000035270957141619874,
-          "z": -0.9998636841773987
-        },
-        "radius": 0.10000000149011612,
-        "surface": "central-skyway-glass-103",
-        "id": "return-glass"
-      },
-      {
-        "center": {
-          "x": 18.167572021484375,
-          "y": 45.08332824707031,
-          "z": 15.646050453186035
+          "x": 48.8550910949707,
+          "y": 45.08341598510742,
+          "z": 16.338214874267578
         },
         "normal": {
           "x": -0.00000287841839963221,
           "y": 1,
           "z": -3.978215943334362e-7
         },
-        "radius": 0.699999988079071,
+        "radius": 0.800000011920929,
         "surface": "central-skyway-deck",
-        "id": "floor-finish"
+        "id": "entry-skip"
+      },
+      {
+        "center": {
+          "x": 0.0000019073486328125,
+          "y": 45.083274841308594,
+          "z": 15.5
+        },
+        "normal": {
+          "x": -0.00000287841839963221,
+          "y": 1,
+          "z": -3.978215943334362e-7
+        },
+        "radius": 1.0499999523162842,
+        "surface": "central-skyway-deck",
+        "id": "long-gallery-skip"
       }
     ],
     "hint": {
-      "yaw": 45,
-      "pitch": 15.5,
+      "yaw": -91,
+      "pitch": 0,
       "top": 0,
       "kick": 0,
-      "powerRange": "precision",
-      "holdMs": 2800,
-      "note": "Apply H for 15.5° upward aim and no spin, then throw at full 12.0 m/s precision power. Bank between the two glass walls, skip off the deck and hit the small return-glass patch below the handrail. Collect the floor patch and wait for full rest."
+      "powerRange": "full",
+      "holdMs": 830,
+      "note": "Send a low shot west along the glass walkway, through the near skip and the distant deck patch. Use POWER and hold about 0.83 seconds."
     },
     "order": 26,
     "campaign": {
       "chapter": 6,
       "chapterTitle": "Station Finales",
-      "difficulty": "Expert",
-      "distance": 11.7,
-      "brief": "Thread three glass banks along the Skyway, 45 metres above the station floor. A low return patch tests your control before the final deck target."
+      "difficulty": "Hard",
+      "distance": 64.5,
+      "brief": "Take the long view down the Skyway. Skip through the near deck target and carry the shot along the glass gallery to the far patch."
     },
     "throwModel": "robot-v4",
     "allowedInputs": {

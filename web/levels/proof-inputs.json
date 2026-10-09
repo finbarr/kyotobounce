@@ -2405,91 +2405,95 @@
     },
     {
       "id": "skyway-circuit",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
-        "holdMs": 2800,
-        "range": "precision",
+        "holdMs": 830,
+        "range": "full",
         "input": {
-          "yaw": 45,
-          "pitch": 15.5,
+          "yaw": -91,
+          "pitch": 0,
           "top": 0,
           "kick": 0
         },
-        "observeSeconds": 100
+        "observeSeconds": 110
       },
       "neighbors": [
         {
-          "holdMs": 2800,
-          "range": "precision",
+          "holdMs": 830,
+          "range": "full",
           "input": {
-            "yaw": 44.75,
-            "pitch": 15.5,
+            "yaw": -91.25,
+            "pitch": 0,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 2800,
-          "range": "precision",
+          "holdMs": 830,
+          "range": "full",
           "input": {
-            "yaw": 45.25,
-            "pitch": 15.5,
+            "yaw": -90.75,
+            "pitch": 0,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 2800,
-          "range": "precision",
+          "holdMs": 830,
+          "range": "full",
           "input": {
-            "yaw": 45,
-            "pitch": 15.25,
+            "yaw": -91,
+            "pitch": -0.25,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 2800,
-          "range": "precision",
+          "holdMs": 830,
+          "range": "full",
           "input": {
-            "yaw": 45,
-            "pitch": 15.75,
+            "yaw": -91,
+            "pitch": 0.25,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 2790,
-          "range": "precision",
+          "holdMs": 822,
+          "range": "full",
           "input": {
-            "yaw": 45,
-            "pitch": 15.5,
+            "yaw": -91,
+            "pitch": 0,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 2780,
-          "range": "precision",
+          "holdMs": 838,
+          "range": "full",
           "input": {
-            "yaw": 45,
-            "pitch": 15.5,
+            "yaw": -91,
+            "pitch": 0,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         }
       ],
       "minimumNeighborClears": 6,
       "features": {
-        "minNonFloorTargets": 3,
-        "minSharpTurns": 3
+        "minNonFloorTargets": 0,
+        "minSharpTurns": 0,
+        "objectiveDistance": [
+          60,
+          90
+        ]
       }
     },
     {
