@@ -6,6 +6,7 @@ import {createHash,randomUUID} from 'node:crypto';
 import {resolve} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 import {PhysicsWorker} from '../worker.ts';
+import {objectiveDistance} from './objective-distance.mjs';
 const out=resolve(process.argv[2]||`.local/campaign/proof-${Date.now()}`);
 assert(out.startsWith(resolve('.local')+'/'),'Proof output must be under this worktree .local/');
 assert(process.env.KYOTO_WORKER_EXECUTABLE,'Select a compatible KYOTO_WORKER_EXECUTABLE explicitly');
@@ -57,6 +58,8 @@ async function run(slot){
    receipt.duration=result.duration;receipt.hits=[...hitIds];receipt.destinationReached=result.destinationReached;receipt.final=result.poses.at(-1).p;
    receipt.allWaypoints=challenge.waypoints?.every(w=>hitIds.has(w.id))??true;
    receipt.fullClear=receipt.allWaypoints&&(!challenge.goal||result.destinationReached===true);
+   const objective=objectiveDistance(result);
+   receipt.objectiveDistance=objective?.distance;receipt.objectiveSeconds=objective?.seconds;
    await writeFile(resolve(out,`${index}-${challenge.id}.json`),JSON.stringify(result));
    if(challenge.requiredSurface){
     receipt.requiredSurfaceHit=result.contacts.some(c=>c.qualifying&&c.surface===challenge.requiredSurface);
@@ -73,6 +76,10 @@ async function run(slot){
     assert.ok(receipt.finishRise>=features.minFinishRise,'The ball must finish at the required height relative to its start');
    }
    if(features&&kind==='hint'){
+    if(features.objectiveDistance){
+     const [min,max]=features.objectiveDistance;
+     assert.ok(objective&&objective.distance>=min&&objective.distance<=max,'Suggested route must have the authored distance through the final waypoint');
+    }
     const nonFloor=result.waypointHits.filter(h=>h.normal.y<.5);
     receipt.nonFloorTargets=nonFloor.length;receipt.sharpTurns=0;receipt.ceilingRebounds=0;
     const delta=(a,b)=>[b.x-a.x,b.y-a.y,b.z-a.z];

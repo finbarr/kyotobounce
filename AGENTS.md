@@ -28,4 +28,6 @@ Use one Git worktree and branch per independent task. Never have multiple sessio
 
 Run `npm run typecheck` and `npm test` for service changes; `npm run build:web` verifies the browser asset set. Test visible changes in a real browser. For physics/protocol/scoring integration, run `npm run test:runtime` against an isolated local server after rebuilding when needed.
 
+Keep the user's desktop usable during verification. Local browser checks must be headless and install `web/tests/background-input.mjs` before navigation so they cannot capture or move the desktop pointer. Use keyboard controls; do not bring test windows forward or use desktop mouse automation. macOS physics workers must pass the background-only launch check. See `docs/PARALLEL_DEVELOPMENT.md`.
+
 Never run record-creating tests on production by default. Never commit `.local/`, `artifacts/`, `web/data/`, secrets, research images, backups or Unity package/runtime binaries. Large original assets belong in a versioned release pack; do not force-add them or silently overwrite local edits. See `docs/ASSETS.md`.

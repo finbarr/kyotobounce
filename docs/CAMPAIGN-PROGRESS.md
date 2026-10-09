@@ -882,3 +882,12 @@ They are not yet a completed campaign revision. No push or deployment.
   The real-browser shot, saved replay, retry and camera passed with zero skipped
   music steps during the shot. Evidence: `.local/level-refinement/blue-proof/`
   and `.local/level-refinement/blue-browser/`.
+
+- **Basement Drop (revision 2):** 40.7 m high lob through the atrium into the
+  existing glass well, ending at the B1 floor target. Two exact hints and all
+  six nearby variations passed. The browser cleared on its first shot and
+  verified scouting, replay, retry and zero skipped music steps during flight.
+  Evidence: `.local/level-refinement/basement-proof/` and `basement-browser/`.
+- **Route labels:** all 30 distances now stop at the final required waypoint
+  of the suggested native shot. Later rolling is excluded. The proof runner
+  records this distance and time for future course edits.

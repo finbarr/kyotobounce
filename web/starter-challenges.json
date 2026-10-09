@@ -53,7 +53,7 @@
       "chapter": 1,
       "chapterTitle": "Atrium Beginnings",
       "difficulty": "Intro",
-      "distance": 28.3,
+      "distance": 2.1,
       "brief": "Make your first bounce on the broad atrium floor. Hit the purple patch; anywhere the ball settles is fine."
     },
     "throwModel": "robot-v4",
@@ -224,7 +224,7 @@
       "chapter": 1,
       "chapterTitle": "Atrium Beginnings",
       "difficulty": "Easy",
-      "distance": 68.3,
+      "distance": 7.2,
       "brief": "Look up: the clock above the ticket gates is your target. Bank its purple face and let the rebound drop back through the atrium."
     },
     "throwModel": "robot-v4",
@@ -317,7 +317,7 @@
       "chapter": 1,
       "chapterTitle": "Atrium Beginnings",
       "difficulty": "Medium",
-      "distance": 27.7,
+      "distance": 4.7,
       "brief": "Thread the wide ticket lane with a left-right bank. Collect both cabinet patches before the ball rolls out into the atrium."
     },
     "throwModel": "robot-v4",
@@ -408,7 +408,7 @@
       "chapter": 1,
       "chapterTitle": "Atrium Beginnings",
       "difficulty": "Easy",
-      "distance": 32,
+      "distance": 2.2,
       "brief": "Bank the glass around the basement opening. Hit its purple patch to clear the level; bring the ball back beside your start for the gold landing bonus."
     },
     "throwModel": "robot-v4",
@@ -434,7 +434,7 @@
   },
   {
     "id": "basement-drop",
-    "revision": 1,
+    "revision": 2,
     "name": "Basement Drop",
     "creator": "station",
     "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
@@ -442,52 +442,52 @@
     "scoring": "waypoint-v4",
     "start": {
       "center": {
-        "x": 1.2000000476837158,
+        "x": 1.199997901916504,
         "y": 0,
-        "z": -0.5
+        "z": 14
       },
       "normal": {
         "x": 0,
-        "y": 0.9999999403953552,
+        "y": 1,
         "z": 0
       },
-      "radius": 0.4000000059604645,
-      "surface": "hall-bay-floor-surface"
+      "radius": 0.25,
+      "surface": "concourse"
     },
     "goal": null,
     "waypoints": [
       {
         "center": {
-          "x": 1.4199997186660767,
+          "x": 0.9800000190734863,
           "y": -4.913582801818848,
-          "z": 6.640918254852295
+          "z": 2.4773876667022705
         },
         "normal": {
           "x": 0,
           "y": 1,
           "z": 0
         },
-        "radius": 0.6499999761581421,
+        "radius": 0.65,
         "surface": "porta-connection-b1-deck",
         "id": "b1-floor"
       }
     ],
     "hint": {
-      "yaw": 0,
-      "pitch": 30,
+      "yaw": 180,
+      "pitch": 80,
       "top": 0,
       "kick": 0,
-      "powerRange": "precision",
-      "holdMs": 1217,
-      "note": "Use 5.5 m/s, aim 30° upward and keep spin at zero. Clear the central glass rim and bounce on the purple B1 floor patch, then let the ball settle."
+      "powerRange": "full",
+      "holdMs": 535,
+      "note": "Apply H for an 80° high lob, then use 19.5 m/s POWER with no spin. Watch the ball rise through the atrium, fall over the glass rim and hit the purple B1 floor patch. Use F to scout the landing, then return before throwing. Let the ball stop completely."
     },
     "order": 5,
     "campaign": {
       "chapter": 2,
       "chapterTitle": "Below the Glass",
-      "difficulty": "Easy",
-      "distance": 38.6,
-      "brief": "Lob over the central glass rim into the basement. Touch the purple floor patch almost five metres below the atrium to clear the level."
+      "difficulty": "Medium",
+      "distance": 40.7,
+      "brief": "Lift a high lob through the atrium and drop it into the glass well. Collect the basement floor patch almost five metres below the start."
     },
     "throwModel": "robot-v4",
     "allowedInputs": {
@@ -579,7 +579,7 @@
       "chapter": 2,
       "chapterTitle": "Below the Glass",
       "difficulty": "Medium",
-      "distance": 10.7,
+      "distance": 5.2,
       "brief": "Bank the pier in front of you, then the wall behind your launch pad. Collect both purple patches across the B1 aisle and let the ball settle."
     },
     "throwModel": "robot-v4",
@@ -672,7 +672,7 @@
       "chapter": 2,
       "chapterTitle": "Below the Glass",
       "difficulty": "Medium",
-      "distance": 30,
+      "distance": 9.9,
       "brief": "Bank the low B1 ceiling, then the floor beneath the central glass opening. Collect both purple patches as the rebound crosses the public basement."
     },
     "throwModel": "robot-v4",
@@ -750,7 +750,7 @@
       "chapter": 2,
       "chapterTitle": "Below the Glass",
       "difficulty": "Medium",
-      "distance": 14.7,
+      "distance": 15.2,
       "brief": "Catch the upward escalator from B1 to the atrium. Touch its moving steps and the purple fixed exit plate at the top, then let the ball settle."
     },
     "throwModel": "robot-v4",
@@ -844,7 +844,7 @@
       "chapter": 2,
       "chapterTitle": "Below the Glass",
       "difficulty": "Hard",
-      "distance": 17.7,
+      "distance": 10.3,
       "brief": "Thread the open frontage, bank the rear wall, then return onto the inside glass. Collect both purple patches in one shot."
     },
     "throwModel": "robot-v4",
@@ -937,7 +937,7 @@
       "chapter": 3,
       "chapterTitle": "Above the Atrium",
       "difficulty": "Medium",
-      "distance": 49.6,
+      "distance": 6.4,
       "brief": "Play the glass bridge above the ticket hall. Bank the purple patch on each side of the walkway in one shot."
     },
     "throwModel": "robot-v4",
@@ -1030,7 +1030,7 @@
       "chapter": 3,
       "chapterTitle": "Above the Atrium",
       "difficulty": "Hard",
-      "distance": 11.7,
+      "distance": 6,
       "brief": "Bank the sloping ceiling and drop onto the tiny purple stair tread. Collect both patches before the ball settles on the steps."
     },
     "throwModel": "robot-v4",
@@ -1138,7 +1138,7 @@
       "chapter": 3,
       "chapterTitle": "Above the Atrium",
       "difficulty": "Hard",
-      "distance": 61.2,
+      "distance": 38.6,
       "brief": "Launch from the balcony, bounce on the outer ledge and drop into the hall. Collect the floor patch and the small return-wall target in the same shot."
     },
     "throwModel": "robot-v4",
@@ -1244,7 +1244,7 @@
       "chapter": 3,
       "chapterTitle": "Above the Atrium",
       "difficulty": "Medium",
-      "distance": 16.3,
+      "distance": 10.2,
       "brief": "Play two banks across Wood Square: the timber triangle, then the column base. Bring the ball back onto the turf for the gold landing bonus."
     },
     "throwModel": "robot-v4",
@@ -1352,7 +1352,7 @@
       "chapter": 3,
       "chapterTitle": "Above the Atrium",
       "difficulty": "Hard",
-      "distance": 45.5,
+      "distance": 18.8,
       "brief": "Use the POWER range for a fast zigzag along the promenade: glass, opposite wall, then the floor patch on the return. Collect all three targets."
     },
     "throwModel": "robot-v4",
@@ -1445,7 +1445,7 @@
       "chapter": 4,
       "chapterTitle": "Staircase & Gardens",
       "difficulty": "Hard",
-      "distance": 35.7,
+      "distance": 9.3,
       "brief": "Drop from the first grand-staircase landing onto the marked tread, then bounce out onto Muromachi Square. Backspin controls the first rebound."
     },
     "throwModel": "robot-v4",
@@ -1536,7 +1536,7 @@
       "chapter": 4,
       "chapterTitle": "Staircase & Gardens",
       "difficulty": "Hard",
-      "distance": 14.1,
+      "distance": 9.2,
       "brief": "Lob from the seventh to the eighth stair landing and brake with backspin. Touch the purple patch, then settle in the gold ring beyond it."
     },
     "throwModel": "robot-v4",
@@ -1644,7 +1644,7 @@
       "chapter": 4,
       "chapterTitle": "Staircase & Gardens",
       "difficulty": "Medium",
-      "distance": 33,
+      "distance": 7.9,
       "brief": "Turn the corner at the top of the grand staircase: end wall, glass guard, then arrival floor. Three targets lead into the garden approach."
     },
     "throwModel": "robot-v4",
@@ -1750,7 +1750,7 @@
       "chapter": 4,
       "chapterTitle": "Staircase & Gardens",
       "difficulty": "Medium",
-      "distance": 11,
+      "distance": 6.6,
       "brief": "A low skip among the rooftop benches: bank the planter, collect the return patch and roll into the gold landing ring."
     },
     "throwModel": "robot-v4",
@@ -1873,7 +1873,7 @@
       "chapter": 4,
       "chapterTitle": "Staircase & Gardens",
       "difficulty": "Hard",
-      "distance": 34.4,
+      "distance": 21.4,
       "brief": "Four targets around the garden outlook: concrete, glass, outward floor and return floor. Use the enclosure to bring the ball back across the terrace."
     },
     "throwModel": "robot-v4",
@@ -1981,7 +1981,7 @@
       "chapter": 5,
       "chapterTitle": "Platforms & Tracks",
       "difficulty": "Hard",
-      "distance": 66.7,
+      "distance": 23.7,
       "brief": "Go up into the canopy, bank the hanging platform sign and collect the floor patch as the ball returns along Platform 0."
     },
     "throwModel": "robot-v4",
@@ -2089,7 +2089,7 @@
       "chapter": 5,
       "chapterTitle": "Platforms & Tracks",
       "difficulty": "Hard",
-      "distance": 43.7,
+      "distance": 30.4,
       "brief": "Clip the narrow canopy column, cross back toward the station wall and collect the final floor patch on the return."
     },
     "throwModel": "robot-v4",
@@ -2197,7 +2197,7 @@
       "chapter": 5,
       "chapterTitle": "Platforms & Tracks",
       "difficulty": "Hard",
-      "distance": 49,
+      "distance": 28.8,
       "brief": "Clear the tracks, skip over both faces of the next platform canopy and collect the patch below as the ball drops from the roof. Use F to scout the roof targets."
     },
     "throwModel": "robot-v4",
@@ -2305,7 +2305,7 @@
       "chapter": 5,
       "chapterTitle": "Platforms & Tracks",
       "difficulty": "Hard",
-      "distance": 67,
+      "distance": 31,
       "brief": "Drive a downward shot into the upper stair, rebound from its sloping roof and collect the platform patch below. Backspin shapes the descent from the cross-station passage."
     },
     "throwModel": "robot-v4",
@@ -2441,7 +2441,7 @@
       "chapter": 5,
       "chapterTitle": "Platforms & Tracks",
       "difficulty": "Hard",
-      "distance": 25.2,
+      "distance": 15.5,
       "brief": "Complete a ceiling, wall, floor and return-wall circuit beneath the platforms, then settle in the gold ring. Four targets turn this compact passage into a trick-shot course."
     },
     "throwModel": "robot-v4",
@@ -2564,7 +2564,7 @@
       "chapter": 6,
       "chapterTitle": "Station Finales",
       "difficulty": "Expert",
-      "distance": 112.3,
+      "distance": 97.7,
       "brief": "Follow the grand staircase down to Muromachi Square, then rebound into the public passage below. Four targets span a 25-metre descent through the station."
     },
     "throwModel": "robot-v4",
@@ -2687,7 +2687,7 @@
       "chapter": 6,
       "chapterTitle": "Station Finales",
       "difficulty": "Expert",
-      "distance": 37.8,
+      "distance": 11.7,
       "brief": "Thread three glass banks along the Skyway, 45 metres above the station floor. A low return patch tests your control before the final deck target."
     },
     "throwModel": "robot-v4",
@@ -2795,7 +2795,7 @@
       "chapter": 6,
       "chapterTitle": "Station Finales",
       "difficulty": "Expert",
-      "distance": 226,
+      "distance": 215.1,
       "brief": "Send a high arc onto Kyoto Tower, then bring it back across two forecourt targets. The shaft patch sits nearly 59 metres above the launch pad."
     },
     "throwModel": "robot-v4",
@@ -2918,7 +2918,7 @@
       "chapter": 6,
       "chapterTitle": "Station Finales",
       "difficulty": "Expert",
-      "distance": 89.6,
+      "distance": 35.3,
       "brief": "Three wall banks at the eastern end of the public passage. Clear the ramp rail, turn off the end wall and bounce back onto the sloping floor."
     },
     "throwModel": "robot-v4",
@@ -3041,7 +3041,7 @@
       "chapter": 6,
       "chapterTitle": "Station Finales",
       "difficulty": "Expert",
-      "distance": 98.5,
+      "distance": 80.8,
       "brief": "Cascade down the eastern stairs through the atrium into B1, then rebound under the concourse onto the basement floor. Four landing patches mark the complete descent."
     },
     "throwModel": "robot-v4",

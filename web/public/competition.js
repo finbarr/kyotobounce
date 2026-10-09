@@ -161,7 +161,7 @@ export function competitionUI({onModeChange=()=>{},focusTarget=()=>{},resume=()=
    button.disabled=selectingLevel||!!state.session?.restoring||['Release','Flight'].includes(getPhase());
    button.setAttribute('aria-pressed',String(state.selected?.id===c.id));
    const copy=document.createElement('span'),name=document.createElement('strong');copy.className='course-copy';name.textContent=c.name;copy.append(name);
-   if(c.campaign){const meta=document.createElement('small');meta.textContent=`${c.campaign.difficulty} · ${c.campaign.distance} m route`;copy.append(meta);}
+   if(c.campaign){const meta=document.createElement('small');meta.textContent=`${c.campaign.difficulty} · ${c.campaign.distance} m through waypoints`;copy.append(meta);}
    const saved=state.progress.get(c.id),progress=saved?.revision===c.revision?saved:null;
    const status=document.createElement('span'),completion=document.createElement('span'),rank=document.createElement('span');
    status.className='course-status';completion.className='course-completion';rank.className='course-rank';
