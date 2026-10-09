@@ -1393,7 +1393,7 @@
   },
   {
     "id": "grand-stair-skip",
-    "revision": 1,
+    "revision": 2,
     "name": "Stair Skip",
     "creator": "station",
     "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
@@ -1401,8 +1401,8 @@
     "scoring": "waypoint-v4",
     "start": {
       "center": {
-        "x": -79.69999694824219,
-        "y": 18.036741256713867,
+        "x": -91.0199966430664,
+        "y": 23.08275032043457,
         "z": 3.5999999046325684
       },
       "normal": {
@@ -1411,37 +1411,37 @@
         "z": 0
       },
       "radius": 0.25,
-      "surface": "daikaidan-landing-01"
+      "surface": "daikaidan-landing-03"
     },
     "goal": null,
     "waypoints": [
       {
         "center": {
-          "x": -76.29000854492188,
-          "y": 16.422019958496094,
-          "z": 3.380000114440918
+          "x": -85.16424560546875,
+          "y": 20.660663604736328,
+          "z": 3.379999876022339
         },
         "normal": {
           "x": 0,
           "y": 1,
           "z": 0
         },
-        "radius": 0.10000000149011612,
-        "surface": "daikaidan-flight-01",
-        "id": "stair-tread"
+        "radius": 0.800000011920929,
+        "surface": "daikaidan-landing-02",
+        "id": "middle-landing"
       },
       {
         "center": {
-          "x": -73.62146759033203,
-          "y": 15.61465835571289,
-          "z": 3.379913330078125
+          "x": -71.81119537353516,
+          "y": 15.614657402038574,
+          "z": 3.380000591278076
         },
         "normal": {
           "x": 0,
-          "y": 1,
+          "y": 0.9999999403953552,
           "z": 0
         },
-        "radius": 1,
+        "radius": 1.5,
         "surface": "muromachi-square",
         "id": "square-skip"
       }
@@ -1452,16 +1452,16 @@
       "top": -80,
       "kick": 0,
       "powerRange": "precision",
-      "holdMs": 984,
-      "note": "Use 4.5 m/s precision power, 14.5° downward aim and 80 backspin. Hit the small purple tread, then skip down to the broad patch on Muromachi Square. Collect both patches and let the ball stop completely."
+      "holdMs": 1826,
+      "note": "Use 8.0 m/s precision power, 14.5° downward aim and 80 backspin. Bank the broad middle landing, skip down the remaining stairs and collect the Muromachi Square patch. Let the ball stop completely."
     },
     "order": 15,
     "campaign": {
       "chapter": 4,
       "chapterTitle": "Staircase & Gardens",
-      "difficulty": "Hard",
-      "distance": 9.3,
-      "brief": "Drop from the first grand-staircase landing onto the marked tread, then bounce out onto Muromachi Square. Backspin controls the first rebound."
+      "difficulty": "Medium",
+      "distance": 26.3,
+      "brief": "Start higher on the grand staircase. Link the middle landing and Muromachi Square in a longer descent, using backspin to carry the stair skips."
     },
     "throwModel": "robot-v4",
     "allowedInputs": {

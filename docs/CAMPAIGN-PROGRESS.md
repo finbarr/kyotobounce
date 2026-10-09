@@ -902,3 +902,9 @@ They are not yet a completed campaign revision. No push or deployment.
   nearby variations and the first browser shot cleared. Target placement also
   covers the two earlier browser miss trajectories. Replay and music passed.
   Evidence: `.local/level-refinement/bridge-final-proof/` and `bridge-browser/`.
+
+- **Stair Skip (revision 2):** 26.3 m descent from the third grand-staircase
+  landing through a broad middle landing and Muromachi Square. Both repeated
+  hints, all six nearby variations and the first browser shot cleared. Replay,
+  retry and music checks passed. Evidence: `.local/level-refinement/stair-proof/`
+  and `stair-browser/`.
