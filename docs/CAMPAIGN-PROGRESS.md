@@ -891,3 +891,8 @@ They are not yet a completed campaign revision. No push or deployment.
 - **Route labels:** all 30 distances now stop at the final required waypoint
   of the suggested native shot. Later rolling is excluded. The proof runner
   records this distance and time for future course edits.
+
+- **Glass Loop (revision 2):** 21.5 m through three targets: back wall,
+  inside glass and an aisle return. Two exact hints, six nearby variations and
+  the first browser shot cleared. Saved replay, retry and music checks passed.
+  Evidence: `.local/level-refinement/glass-proof/` and `glass-browser/`.
