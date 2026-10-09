@@ -124,6 +124,13 @@ export class Competition {
   const id=member.id;
   if(m.type==='course-progress')return this.progress(member);
   if(member.restoring)throw new Error('Your attempt is being restored. Try again in a moment.');
+  if(m.type==='skip-shot'){
+   if(Object.keys(m).some(key=>!['type','attempt'].includes(key))||typeof m.attempt!=='string')throw new Error('Send the current shot only');
+   if(!member.attempt||member.attempt!==m.attempt||member.chargeAt!==undefined)return;
+   if(!this.worker.capabilities.includes('shot-skip-v1'))throw new Error('The physics worker needs an update to skip shots');
+   this.worker.send({type:'skip-shot',id,request:member.attempt});
+   return {type:'shot-skipping',attempt:member.attempt};
+  }
   if(m.type==='playback-rate'){
    if(Object.keys(m).some(key=>!['type','attempt','rate'].includes(key))||![1,2].includes(m.rate)||typeof m.attempt!=='string')throw new Error('Choose normal or 2x shot playback');
    if(!member.attempt||member.attempt!==m.attempt||member.chargeAt!==undefined)return;

@@ -76,7 +76,7 @@ namespace Kyoto
         Player owner;
         // Compute a minute of runway in small batches while presentation and
         // other players keep their own clocks. A perpetual roll stays bounded.
-        bool ahead;
+        bool ahead,skipToEnd;
         double shotWallTime,shotStationTime,playbackElapsed;
         float playbackRate=1;
         double PlaybackElapsed => playbackElapsed+Math.Max(0,Time.realtimeSinceStartupAsDouble-shotWallTime)*playbackRate;
@@ -84,13 +84,13 @@ namespace Kyoto
         ThrowResult pendingResult;
         Notice pendingNotice;
         readonly List<ReplayPose> walkerPoses=new List<ReplayPose>();
-        public bool CanAdvanceAhead => ahead&&pendingNotice==null&&state.phase=="Flight"&&stationTime-shotStationTime<PlaybackElapsed+60;
+        public bool CanAdvanceAhead => ahead&&pendingNotice==null&&state.phase=="Flight"&&(skipToEnd||stationTime-shotStationTime<PlaybackElapsed+60);
         public void StepLive()
         {
             if(!ahead){Step();return;}
-            if(pendingNotice!=null&&PlaybackElapsed>=ball.Clock+.2)
+            if(pendingNotice!=null&&(skipToEnd||PlaybackElapsed>=ball.Clock+.2))
             {Send(pendingNotice);Reset();return;}
-            if(pendingResult!=null&&PlaybackElapsed>=pendingResult.duration+.2)
+            if(pendingResult!=null&&(skipToEnd||PlaybackElapsed>=pendingResult.duration+.2))
             {var result=pendingResult;pendingResult=null;ahead=false;Send(result);}
         }
         public void AdvanceAhead()
@@ -137,6 +137,11 @@ namespace Kyoto
             {if(owner==p){Reset();}UnityEngine.Object.Destroy(p.walker.gameObject);players.Remove(c.id);return;}
             switch(c.type)
             {
+                case "skip-shot":
+                    // Skip presentation, never simulation. AdvanceAhead still uses
+                    // bounded batches and Finish still requires full physical rest.
+                    if(owner==p&&c.request==attempt&&(ahead||state.phase=="Release"))skipToEnd=true;
+                    break;
                 case "playback-rate":
                     // Change presentation only. Fixed-step physics and scoring time stay intact.
                     if(owner==p&&ahead&&c.request==attempt&&(c.rate==1||c.rate==2))
@@ -227,7 +232,7 @@ namespace Kyoto
                 stationTime=Math.Min(stationTime,shotStationTime+elapsed);ActivateClock();
                 for(int i=walkerPoses.Count-1;i>=0;i--)if(walkerPoses[i].t<=elapsed){owner?.walker.Place(walkerPoses[i].p);break;}
             }
-            ahead=false;playbackRate=1;playbackElapsed=0;pendingResult=null;pendingNotice=null;walkerPoses.Clear();
+            ahead=false;skipToEnd=false;playbackRate=1;playbackElapsed=0;pendingResult=null;pendingNotice=null;walkerPoses.Clear();
             attempt=null;state.phase="Aim";state.owner="";owner=null;state.power=0;distinct.Clear();impactTimes.Clear();impactCount=0;goalDwell=0;state.diagnostics.endReason="";state.diagnostics.endedAt=0;
         }
         float ThrowSpeed(float power)

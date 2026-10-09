@@ -18,7 +18,7 @@ namespace Kyoto
         [Serializable] class Ready
         {
             public string type="ready",layout,profile,physics=BrowserSession.SimulationVersion;
-            public Vector3 spawn;public float radius,fallLimitY;public string[] capabilities=new[]{"waypoint-v4","shot-stream-v1","shot-speed-v1","design-ball-v1"};
+            public Vector3 spawn;public float radius,fallLimitY;public string[] capabilities=new[]{"waypoint-v4","shot-stream-v1","shot-speed-v1","shot-skip-v1","design-ball-v1"};
         }
         readonly ConcurrentQueue<BrowserSession.Command> commands=new ConcurrentQueue<BrowserSession.Command>();
         readonly Dictionary<string,BrowserSession> sessions=new Dictionary<string,BrowserSession>();

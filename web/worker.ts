@@ -36,7 +36,7 @@ export class PhysicsWorker extends EventEmitter {
   private log = resolve(process.env.KYOTO_WORKER_LOG || 'artifacts/phase3/worker/player.log');
   private sha = '';
 
-  lifecycle() { return {type:'worker-status',status:this.status,message:this.statusMessage}; }
+  lifecycle() { return {type:'worker-status',status:this.status,message:this.statusMessage,capabilities:this.ready?this.capabilities:[]}; }
   private setStatus(status:string,message:string) {
     this.status=status;this.statusMessage=message;this.emit('status',this.lifecycle());
   }

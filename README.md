@@ -34,6 +34,8 @@ Open **http://127.0.0.1:4173/**. The first Unity import/build can take several m
 | Mouse | Aim and rotate the camera; click the play area to capture the pointer |
 | Arrow keys | Orbit the camera |
 | Hold click or Space, release | Wind up and throw |
+| Hold Space during flight | Play the shot at 2× speed |
+| Enter / Skip to result | Skip the remaining flight and show the settled result |
 | Q / E, Z / C | Adjust top/backspin and sidespin |
 | X | Clear spin |
 | H | Apply the challenge hint when available |
@@ -42,6 +44,8 @@ Open **http://127.0.0.1:4173/**. The first Unity import/build can take several m
 | Escape | Release the mouse / cancel the windup |
 
 Precision throws use a compact arm motion. Robot power uses a wider staggered stance, a deeper wind-up and a forceful follow-through. Both release from the same authoritative launch point.
+
+Skip to result is also available on touch screens and while recording a design ball. It waits for the physics worker to finish calculating real rest, including spin. The score and full replay are preserved. While it says “Finishing shot…”, you can still recall to forfeit.
 
 Replays open in free camera: WASD flies, Q/E moves down/up, and Shift boosts speed. Click to capture the mouse or right-drag to look. Hold Space for 2× playback, including faster music and effects; release it to return to normal speed. Pause/Play and the timeline remain in the replay panel, and Recenter returns the camera to the shot. The camera also moves while playback is paused. Escape releases the mouse for the controls.
 

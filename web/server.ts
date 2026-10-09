@@ -197,6 +197,11 @@ wss.on('connection',socket=>{
         const member=competition.members.get(id);if(!member)throw new Error('Rejoin the session');
         const result=await competition.command(member,m);
         if(m.type==='playback-rate'&&result&&shots.get(id)?.attempt===m.attempt)shots.get(id)!.setRate(m.rate);
+        if(m.type==='skip-shot'&&result){
+          let shot=shots.get(id);
+          if(!shot||shot.attempt!==m.attempt){shot=new ShotStream(m.attempt);shots.set(id,shot);}
+          shot.skipToEnd();
+        }
         if(result)send(socket,result);
       }
     }catch(error){send(socket,{type:'error',message:error instanceof Error?error.message:'Invalid message'});}

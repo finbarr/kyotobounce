@@ -25,3 +25,14 @@ assert.ok(game.accepts({type:'state',phase:'Aim',id:member.id,attempt:null}),'Th
 reset({ok:true});assert.deepEqual(await recalling,{type:'recalled'});assert.equal(member.recalling,false);
 member.attempt='new';assert.ok(game.accepts({type:'state',phase:'Charging',id:member.id,attempt:'new'}));assert.equal(game.accepts({type:'state',phase:'Charging',id:member.id,attempt:'old'}),false);assert.equal(game.accepts({type:'state',phase:'Aim',id:member.id,attempt:null}),false,'An old idle pose cannot interrupt a newly accepted charge');
 console.log('PASS recall fences before/after first chunk, authoritative attempt invalidation, late messages, success rank independence, campaign navigation and shared entry aim');
+
+const skipCommands=[],skipGame=new Competition({}, {capabilities:['shot-skip-v1'],send:m=>skipCommands.push(m)},()=>{});
+const skippingMember={id:'owner',attempt:'current',restoring:false};
+for(const extra of [{score:100000},{duration:1},{power:1}])await assert.rejects(skipGame.command(skippingMember,{type:'skip-shot',attempt:'current',...extra}),/current shot only/);
+assert.equal(await skipGame.command(skippingMember,{type:'skip-shot',attempt:'someone-else'}),undefined);
+skippingMember.chargeAt=performance.now();assert.equal(await skipGame.command(skippingMember,{type:'skip-shot',attempt:'current'}),undefined);delete skippingMember.chargeAt;
+assert.deepEqual(await skipGame.command(skippingMember,{type:'skip-shot',attempt:'current'}),{type:'shot-skipping',attempt:'current'});
+assert.deepEqual(skipCommands,[{type:'skip-shot',id:'owner',request:'current'}],'Only the authenticated session and current released attempt reach physics');
+assert.equal(skippingMember.attempt,'current','Skipping cannot finish or clear the attempt before the native result');
+skipGame.worker.capabilities=[];await assert.rejects(skipGame.command(skippingMember,{type:'skip-shot',attempt:'current'}),/worker needs an update/);
+console.log('PASS skip intent ownership, charge guard, native capability and rejection of client results');

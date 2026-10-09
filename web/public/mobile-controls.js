@@ -1,6 +1,6 @@
 import {TouchInput} from './touch-input.js';
 const $=id=>document.getElementById(id);
-export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,speed,recall}){
+export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,speed,recall,skip}){
  const host=document.createElement('div');host.id='mobile-ui';host.innerHTML=`<div id="mobile-stage"></div><nav id="mobile-tools" aria-label="Game panels"><button id="mobile-levels" aria-expanded="false" aria-controls="competition">Levels</button><button id="mobile-settings" aria-expanded="false" aria-controls="throw-panel">Shot setup</button><button id="mobile-scout" aria-pressed="false">Scout</button></nav><button id="mobile-close" hidden>Back to game ×</button><div id="mobile-controls" hidden><p id="mobile-hint">Drag to aim · Hold THROW, release to shoot</p><div id="mobile-move" role="group" aria-label="Drag to move"><span>MOVE</span><i id="mobile-stick"></i><b aria-hidden="true">＋</b></div><div id="mobile-actions"><button id="mobile-throw">HOLD<br><strong>THROW</strong></button><button id="mobile-cancel" hidden>Cancel shot</button><button id="mobile-speed" aria-pressed="false" hidden>2× speed</button><button id="mobile-recall" hidden>Recall ball</button><div id="mobile-height" hidden><button id="mobile-up" aria-label="Fly up">↑ Up</button><button id="mobile-down" aria-label="Fly down">↓ Down</button></div><button id="mobile-boost" aria-pressed="false" hidden>Fly faster</button></div></div>`;document.body.append(host);
  const coarse=matchMedia('(pointer:coarse)'),narrow=matchMedia('(max-width:900px)');let active=false,menu='',state={},lastMode='',boost=false,viewport=null,resultTop=Infinity;
  const movement={x:0,z:0,y:0,fast:false};
@@ -19,6 +19,7 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
  }
  bind(canvas,'look');bind($('mobile-move'),'move');bind($('mobile-throw'),'throw');bind($('mobile-up'),'up');bind($('mobile-down'),'down');
  $('mobile-levels').onclick=()=>panel(menu==='levels'?'':'levels');$('mobile-settings').onclick=()=>panel(menu==='settings'?'':'settings');$('mobile-close').onclick=()=>panel('');
+ const skipButton=document.createElement('button');skipButton.id='mobile-skip';skipButton.hidden=true;skipButton.textContent='Skip to result';$('mobile-speed').after(skipButton);skipButton.onclick=skip;
  $('mobile-scout').onclick=()=>{panel('');fly();};$('mobile-cancel').onclick=()=>{input.reset();cancel();};$('mobile-speed').onclick=speed;$('mobile-recall').onclick=recall;
  $('mobile-boost').onclick=()=>{boost=!boost;movement.fast=boost;$('mobile-boost').setAttribute('aria-pressed',String(boost));};
  for(const id of ['fly-start','fly-finish','launch-design-ball','design-back','close-editor','show-overview','use-hint'])$(id)?.addEventListener('click',()=>{if(active)panel('');});
@@ -45,6 +46,9 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
    const chargeLabel=state.charging?'RELEASE<br><strong>THROW</strong>':'HOLD<br><strong>THROW</strong>';if($('mobile-throw').innerHTML!==chargeLabel)$('mobile-throw').innerHTML=chargeLabel;
    $('mobile-throw').setAttribute('aria-label',state.charging?'Release to throw':'Hold to charge, release to throw');$('mobile-throw').dataset.charging=String(state.charging);$('mobile-cancel').hidden=!state.charging;
    $('mobile-recall').hidden=flying||!['Release','Flight'].includes(state.phase)||!playing;$('mobile-speed').hidden=flying||state.phase!=='Flight'||!playing;$('mobile-speed').setAttribute('aria-pressed',String(state.fastForward));
+   skipButton.hidden=!state.skipSupported||flying||state.phase!=='Flight'||!playing;skipButton.disabled=state.skipping||!state.connected;
+   $('mobile-speed').disabled=state.skipping;
+   const skipLabel=state.skipping?'Finishing shot…':'Skip to result';if(skipButton.textContent!==skipLabel)skipButton.textContent=skipLabel;
    $('mobile-height').hidden=!flying;$('mobile-boost').hidden=!flying;
    const hint=flying?'Drag to look · Stick to fly · Up / Down for height':state.phase==='Flight'?(state.mode==='design'?'Recording design ball · Drag to orbit · 2× for faster playback':'Drag to orbit · Pinch to zoom'):state.mode==='editor'?'Review the recorded route, name it and save':'Drag to aim · Hold THROW, release to shoot';if($('mobile-hint').textContent!==hint)$('mobile-hint').textContent=hint;
   }

@@ -100,7 +100,10 @@ body:not(.mobile-ui):not(.is-replay){--game-edge:24px;--game-rail:260px;--game-g
 body:not(.mobile-ui):not(.is-replay)>#competition{top:var(--game-top);right:var(--game-edge);width:300px;max-height:calc(100dvh - var(--game-top) - var(--game-bottom));padding:18px;z-index:10}
 body:not(.mobile-ui):not(.is-replay):has(>#result-leaderboard:not([hidden]))>#competition{right:calc(var(--game-edge) + var(--game-rail) + var(--game-gap));width:300px}
 body:not(.mobile-ui):not(.is-replay):not(.is-briefing)>#result-leaderboard{top:var(--game-top);right:var(--game-edge);width:var(--game-rail);max-height:calc(100dvh - var(--game-top) - var(--game-bottom) - 80px)}
-body:not(.mobile-ui):not(.is-replay)>#shot-speed{right:var(--game-edge);bottom:var(--game-bottom);width:var(--game-rail);height:64px;min-height:0;padding:10px;box-shadow:none}
+body:not(.mobile-ui):not(.is-replay)>#shot-speed{right:var(--game-edge);bottom:calc(var(--game-bottom) + 52px);width:var(--game-rail);height:64px;min-height:0;padding:10px;box-shadow:none}
+#shot-skip{position:fixed;z-index:18;right:var(--game-edge);bottom:var(--game-bottom);width:var(--game-rail);min-height:44px;padding:10px;color:#f9db79;background:#13192bf5;border:1px solid #f9db7977;font:11px ui-monospace,monospace;cursor:pointer}
+#shot-skip[hidden]{display:none}#shot-skip:focus-visible{outline:3px solid #fff;outline-offset:3px}#shot-skip:disabled{cursor:wait;opacity:.7}
+body:not(.mobile-ui):not(.is-replay):has(>#shot-skip:not([hidden]))>#result-leaderboard{max-height:calc(100dvh - var(--game-top) - var(--game-bottom) - 132px)}
 body:not(.mobile-ui):not(.is-replay)>#shot-speed strong{font-size:13px}
 body:not(.mobile-ui):not(.is-replay)>#shot-speed small{font-size:8px;letter-spacing:0}
 body:not(.mobile-ui):not(.is-replay)>#combo-hud{left:var(--game-edge);bottom:var(--game-bottom);width:340px}

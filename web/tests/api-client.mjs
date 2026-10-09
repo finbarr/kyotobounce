@@ -9,6 +9,7 @@ export class Client{
   this.socket.on('message',data=>{const m=JSON.parse(data.toString());
    this.playback.cancelForNotice(m,this.id);
    if(m.type==='shot-resume'){this.playback.resume(m);return;}
+   if(m.type==='shot-skipping'&&this.playback.shot?.attempt===m.attempt)this.playback.skipToEnd();
    if(m.type==='shot-chunk'){this.chunks.push({...m,received:performance.now()});this.playback.accept(m,performance.now());return;}
    if(m.type==='result'&&this.playback.result(m))return;
    if(m.type==='state'){if(['Aim','Charging'].includes(m.phase))this.playback.clear(true);else if(this.playback.active)return;}
@@ -19,7 +20,7 @@ export class Client{
  next(predicate,timeout=15000){return new Promise((resolve,reject)=>{const w={predicate,resolve,timer:setTimeout(()=>{this.waiters=this.waiters.filter(x=>x!==w);reject(new Error('Timed out waiting for '+predicate.toString()+'; phase='+this.state?.phase+'; recent='+this.messages.slice(-8).map(m=>m.type+':'+(m.phase||m.message||'')).join(',')));},timeout)};this.waiters.push(w);});}
  send(type,extra={}){this.socket.send(JSON.stringify({type,...(type==='hello'?{protocol:'shot-stream-v4'}:{}),...extra}));}
  async request(type,extra={},expected){const next=this.next(m=>m.type===expected||m.type==='error');this.send(type,extra);const m=await next;if(m.type==='error')throw new Error(m.message);return m;}
- async join(token){if(this.socket.readyState!==WebSocket.OPEN)await new Promise((resolve,reject)=>{if(this.socket.readyState!==WebSocket.CONNECTING){reject(new Error('Connection closed before joining'));return;}this.socket.once('open',resolve);this.socket.once('error',reject);this.socket.once('close',()=>reject(new Error('Connection closed before joining')));});const m=await this.request('hello',{token},'welcome');if(!this.state?.players.some(p=>p.id===this.id))await this.next(s=>s.type==='state'&&s.players.some(p=>p.id===this.id));return m;}
+ async join(token,sessionId){if(this.socket.readyState!==WebSocket.OPEN)await new Promise((resolve,reject)=>{if(this.socket.readyState!==WebSocket.CONNECTING){reject(new Error('Connection closed before joining'));return;}this.socket.once('open',resolve);this.socket.once('error',reject);this.socket.once('close',()=>reject(new Error('Connection closed before joining')));});const m=await this.request('hello',{token,sessionId},'welcome');if(!this.state?.players.some(p=>p.id===this.id))await this.next(s=>s.type==='state'&&s.players.some(p=>p.id===this.id));return m;}
  input(extra={}){this.send('input',{x:0,z:0,yaw:90,pitch:15,top:0,kick:0,fast:false,...extra});}
  async throw(holdMs,settings={},timeout=40000){
   this.input(settings);await delay(120);const result=this.next(m=>m.type==='result'||m.type==='error'||m.type==='notice',timeout);

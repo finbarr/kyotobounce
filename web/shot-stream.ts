@@ -4,7 +4,7 @@ const shared=['type','id','attempt','layout','profile','physics','challenge','ow
 export class ShotStream {
  attempt:string;frames:any[]=[];events:any[]=[];chunks:any[]=[];sequence=0;
   releaseTime=0;started=performance.now();lastFlush=0;computeStarted=performance.now();bytes=0;
-  rate=1;elapsedAtChange=0;
+  rate=1;elapsedAtChange=0;skipping=false;
  constructor(attempt:string){this.attempt=attempt;}
  frame(frame:any){
   if(!this.sequence&&!this.frames.length){this.releaseTime=frame.releaseTime;this.started=performance.now()-frame.flightTime*1000;}
@@ -20,13 +20,22 @@ export class ShotStream {
   this.bytes+=Buffer.byteLength(JSON.stringify(chunk));
   if(chunk.complete)console.info(JSON.stringify({event:'shot-computed',duration:frames.at(-1).flightTime,computeMs:Math.round(performance.now()-this.computeStarted),chunks:this.sequence,bytes:this.bytes}));
   this.chunks.push(chunk);this.lastFlush=performance.now();
+  if(this.skipping)this.skipToEnd();
   const cutoff=this.releaseTime+this.elapsed()-2;
   while(this.chunks.length>1&&this.chunks[0].frames.at(-1).stationTime<cutoff)this.chunks.shift();
   return chunk;
  }
  elapsed(now=performance.now()){return this.elapsedAtChange+Math.max(0,(now-this.started)/1000)*this.rate;}
  setRate(rate:number,now=performance.now()){if(rate!==1&&rate!==2)throw new Error('Invalid playback rate');this.elapsedAtChange=this.elapsed(now);this.started=now;this.rate=rate;}
- resume(){return {type:'shot-resume',attempt:this.attempt,time:this.releaseTime+Math.max(0,this.elapsed()-.2)};}
+  skipToEnd(now=performance.now()){
+    this.skipping=true;
+    const last=this.chunks.at(-1)?.frames.at(-1);
+    if(last?.phase==='Result'){
+      this.elapsedAtChange=Math.max(this.elapsed(now),last.stationTime-this.releaseTime);
+      this.started=now;this.rate=1;
+    }
+  }
+  resume(){return {type:'shot-resume',attempt:this.attempt,time:this.releaseTime+Math.max(0,this.elapsed()-.2),skipToEnd:this.skipping};}
 }
 
 // A stalled TCP connection may release a full reconnect window of ordinary

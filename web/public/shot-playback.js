@@ -12,14 +12,17 @@ export class ShotPlayback {
  accepts(attempt){return this.expected===undefined||attempt===this.expected;}
  clear(discard=false){if(discard&&this.shot){this.discarded.add(this.shot.attempt);if(this.discarded.size>8)this.discarded.delete(this.discarded.values().next().value);}this.shot=null;this.resumeAt=null;this.rate=1;}
  setRate(rate,now){if(rate!==1&&rate!==2)throw new Error('Invalid playback rate');this.advance(now);this.rate=rate;}
- resume(message){if(this.shot?.attempt!==message.attempt)this.resumeAt=message;}
+ resume(message){if(this.shot?.attempt!==message.attempt)this.resumeAt=message;else if(message.skipToEnd)this.skipToEnd();}
+ skipToEnd(){const s=this.shot;if(!s||s.resultSent)return false;s.skipRequested=true;return true;}
+ cancelSkip(){if(this.shot)this.shot.skipRequested=false;}
+ get skipping(){return !!this.shot?.skipRequested;}
  accept(chunk,now){
   if(!this.accepts(chunk.attempt)||this.discarded.has(chunk.attempt))return false;
   if(this.shot?.attempt!==chunk.attempt){
    const first={...chunk.base,...chunk.frames[0]},resume=this.resumeAt?.attempt===chunk.attempt?this.resumeAt.time:null;
    const start=resume??first.releaseTime-.12;
    const launch={...first,phase:'Release',stationTime:first.releaseTime,flightTime:0,ball:first.launchPosition,rotationSamples:[],liveScore:null};
-   this.shot={attempt:chunk.attempt,sequence:-1,frames:[launch],events:[],clock:start,now,emitted:-Infinity,eventFloor:resume??-Infinity,complete:false,result:null,resultSent:false,underrunMs:0};this.resumeAt=null;
+   this.shot={attempt:chunk.attempt,sequence:-1,frames:[launch],events:[],clock:start,now,emitted:-Infinity,eventFloor:resume??-Infinity,complete:false,result:null,resultSent:false,underrunMs:0,skipRequested:this.resumeAt?.attempt===chunk.attempt&&!!this.resumeAt.skipToEnd};this.resumeAt=null;
   }
   const s=this.shot;if(chunk.sequence<=s.sequence)return;
   s.sequence=chunk.sequence;
@@ -48,6 +51,10 @@ export class ShotPlayback {
   const s=this.advance(now);if(!s)return null;
   const last=s.frames.at(-1);
   const messages=[];
+  // Wait for both the resting pose and the server's result. Dropped playback
+  // events must not turn into a burst of impacts and sounds on the result screen.
+  const jumped=!!(s.skipRequested&&s.complete&&last.phase==='Result'&&s.result);
+  if(jumped){s.clock=Math.max(s.clock,last.stationTime);s.frames=[last];s.events=[];s.skipRequested=false;this.rate=1;}
   while(s.frames.length>2&&s.frames[1].stationTime<=s.clock)s.frames.shift();
   const before=s.frames[0],after=s.frames[1]||before;
   const current=after.stationTime<=s.clock?after:before;
@@ -55,7 +62,7 @@ export class ShotPlayback {
   const events=s.events.filter(e=>e.at<=s.clock);s.events=s.events.filter(e=>e.at>s.clock);messages.push(...events);
   const phase=s.clock<after.releaseTime?'Release':s.complete&&s.clock>=last.stationTime&&last.phase==='Result'?'Result':'Flight';
   if(phase==='Result'&&s.result&&!s.resultSent){s.resultSent=true;messages.push(s.result);}
-  return {before,after,alpha:Math.max(0,Math.min(1,(s.clock-before.stationTime)/(after.stationTime-before.stationTime||1))),time:s.clock,phase,messages};
+  return {before,after,alpha:Math.max(0,Math.min(1,(s.clock-before.stationTime)/(after.stationTime-before.stationTime||1))),time:s.clock,phase,messages,jumped};
  }
  stats(){const s=this.shot;return {shotBufferedSeconds:s?Math.max(0,s.frames.at(-1).stationTime-s.clock):0,shotComplete:!!s?.complete,shotPlaybackTime:s?.clock??0,shotUnderrunMs:s?.underrunMs??0};}
 }

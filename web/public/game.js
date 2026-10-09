@@ -81,7 +81,7 @@ const avatars=new Map(),keys=new Set(),caster=new THREE.Raycaster();caster.first
 const cameraTarget=new THREE.Vector3(0,1.3,-20),followTarget=cameraTarget.clone(),desired=new THREE.Vector3(),lookTarget=new THREE.Vector3();
 camera.position.set(-3.8,2.3,-20);camera.lookAt(cameraTarget);
 let noticeUntil=0,lastImpact=null,startupMs=0;
-let workerStatus='starting',connectionStatus='connecting',lastResultAttempt='',loadedLayout='',layoutReloading=false;
+let workerStatus='starting',connectionStatus='connecting',lastResultAttempt='',loadedLayout='',layoutReloading=false,skipSupported=false;
 let stationLook,robotShadow,ballShadow;
 let cameraClearance=3.8,cameraObstacles;
 const robotCutaway=new RobotCutaway();
@@ -119,12 +119,22 @@ const speedIndicator=document.createElement('button');speedIndicator.id='shot-sp
 function setFastForward(held){
  fastForwardHeld=held;
  if(ui?.state.mode==='replay'){sound.setPlaybackRate(ui.playbackRate(held));return;}
- const rate=held&&connectionStatus==='connected'&&['play','design'].includes(ui?.state.mode)&&shotTimeline?.phase==='Flight'&&shotPlayback.active?2:1;
+ const rate=held&&!shotPlayback.skipping&&connectionStatus==='connected'&&['play','design'].includes(ui?.state.mode)&&shotTimeline?.phase==='Flight'&&shotPlayback.active?2:1;
  if(rate===livePlaybackRate)return;
  livePlaybackRate=rate;shotPlayback.setRate(rate,performance.now());sound.setPlaybackRate(rate);
  const attempt=shotPlayback.shot?.attempt;if(attempt)send('playback-rate',{attempt,rate});
 }
 speedIndicator.onclick=()=>{sound.unlock();setFastForward(!fastForwardHeld);canvas.focus();};
+const skipButton=document.createElement('button');skipButton.id='shot-skip';skipButton.hidden=true;skipButton.type='button';skipButton.textContent='Skip to result · Enter';document.body.append(skipButton);
+function skipShot(){
+ if(!skipSupported||connectionStatus!=='connected'||!['play','design'].includes(ui?.state.mode)||shotTimeline?.phase!=='Flight'||!shotPlayback.active||shotPlayback.skipping||recallPending)return;
+ const attempt=shotPlayback.shot.attempt;
+ if(!liveThrow.owns(attempt))return;
+ sound.unlock();setFastForward(false);
+ if(send('skip-shot',{attempt}))shotPlayback.skipToEnd();
+ canvas.focus();
+}
+skipButton.onclick=skipShot;
 const performanceReport=clientPerformance();
 const updateShotDetails=shotDetails(()=>cancel());
 const connection=sharedReplayId?null:gameConnection({
@@ -147,6 +157,11 @@ function clearLiveMotion(){
   ballRotations.samples=[];ballRotations.releaseTime=null;
   trailCount=0;trailGeometry.setDrawRange(0,0);ball.visible=false;guide.visible=false;
   $('power-fill').style.width='0%';$('power-number').textContent='0%';$('power-label').textContent='HOLD TO WIND UP';
+}
+function clearSkippedMotion(){
+ history.length=0;previous=null;renderClock=null;lastImpact=null;
+ ballRotations.samples=[];ballRotations.releaseTime=null;
+ trailCount=0;trailGeometry.setDrawRange(0,0);heat.reset();
 }
 function checkStationVersion(layout){
   if(!loadedLayout||!layout||layout===loadedLayout||layoutReloading)return false;
@@ -176,8 +191,10 @@ function handleMessage(m,playback=false){
   if(recallPending&&(['shot-chunk','shot-resume','result','impact','waypoint-hit'].includes(m.type)||(m.type==='state'&&m.phase!=='Aim')))return;
   if(m.type==='shot-resume'){
     if(!liveThrow.resume(m.attempt))return;
-    shotPlayback.expect(m.attempt);shotPlayback.resume(m);return;
+    shotPlayback.expect(m.attempt);shotPlayback.resume(m);
+    if(shotPlayback.skipping)send('skip-shot',{attempt:m.attempt});return;
   }
+  if(m.type==='shot-skipping'){if(liveThrow.owns(m.attempt)&&shotPlayback.shot?.attempt===m.attempt)shotPlayback.skipToEnd();return;}
   // A completed session may reconnect with its final pose but no shot buffer.
   if(m.type==='state'&&m.phase==='Result'&&liveThrow.canRestore&&liveThrow.resume(m.attempt))shotPlayback.expect(m.attempt);
   if(!liveThrow.accepts(m))return;
@@ -209,6 +226,7 @@ function handleMessage(m,playback=false){
     }
   }
   if(m.type==='worker-status'){
+    skipSupported=m.status==='ready'&&m.capabilities?.includes('shot-skip-v1');
     const recovering=workerStatus==='recovering';workerStatus=m.status;
     if(m.status==='ready'){if(recovering)notice('Session restored. Your unfinished shot was cancelled; you can throw again.',6500);}
     else{
@@ -220,7 +238,7 @@ function handleMessage(m,playback=false){
   if(m.type==='ready')checkStationVersion(m.layout);
   if(m.type==='state'){if(snapshot&&(m.stationTime<snapshot.stationTime||m.attempt!==snapshot.attempt)){history.length=0;previous=null;renderClock=null;ballRotations.samples=[];ballRotations.releaseTime=null;}ballRotations.add(m);if(m.phase==='Flight')flightPending=false;previous=history.length?snapshot:null;snapshot=m;received=performance.now();history.push(m);if(history.length>30)history.shift();if(!playback||connectionStatus==='connected')workerReady=true;startup?.network(workerReady);}
   if(m.type==='state')resumeQueuedCharge();
-  if(m.type==='error'){recallPending=false;recallChargeQueued=false;}
+  if(m.type==='error'){recallPending=false;recallChargeQueued=false;shotPlayback.cancelSkip();}
   if(m.type==='error'||m.type==='notice'){if(!m.id||m.id===guestId){if(m.type==='error')flightPending=false;notice(m.message);stopChargeSound();chargeMeter.reset();}}
   if(m.type==='impact'){lastImpact=m;$('last-impact').textContent=m.label;if(m.qualifying)sound.cue('impact',m);}
 }
@@ -342,8 +360,8 @@ document.addEventListener('mousemove',event=>{
   }
 });
 canvas.addEventListener('wheel',e=>{e.preventDefault();if(fly.active)return;distance=THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.001),.65,12);},{passive:false});
-document.addEventListener('pointerdown',e=>{if(e.target!==canvas&&!speedIndicator.contains(e.target)&&!mobile?.owns(e.target)&&(chargeMeter.charging||pointerLocked()||lockRequested))cancel();},true);
-document.addEventListener('focusin',e=>{if(e.target!==canvas&&!speedIndicator.contains(e.target)&&!mobile?.owns(e.target)&&(chargeMeter.charging||pointerLocked()||lockRequested))cancel();});
+document.addEventListener('pointerdown',e=>{if(e.target!==canvas&&!speedIndicator.contains(e.target)&&!skipButton.contains(e.target)&&!mobile?.owns(e.target)&&(chargeMeter.charging||pointerLocked()||lockRequested))cancel();},true);
+document.addEventListener('focusin',e=>{if(e.target!==canvas&&!speedIndicator.contains(e.target)&&!skipButton.contains(e.target)&&!mobile?.owns(e.target)&&(chargeMeter.charging||pointerLocked()||lockRequested))cancel();});
 window.addEventListener('blur',cancel);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancel();});
 window.addEventListener('keydown',e=>{
   if(e.defaultPrevented||names?.active||startup?.active||e.isComposing)return;
@@ -353,6 +371,7 @@ window.addEventListener('keydown',e=>{
   if(briefing?.blocked)return;
   if(levelMenuOpen()){if(e.code==='Escape'){e.preventDefault();closeLevelMenu();}else ui.navigateLevels(e);return;}
   if(editing)return;
+  if(!modified&&e.code==='Enter'&&!e.target.closest('button')&&['play','design'].includes(ui.state.mode)&&shotTimeline?.phase==='Flight'){e.preventDefault();if(!e.repeat)skipShot();return;}
   if(!modified&&['design','editor'].includes(ui.state.mode)&&e.code==='Escape'){e.preventDefault();cancel();ui.exitDesign();return;}
   if(!modified&&ui.state.mode==='editor'&&e.code==='KeyR'){e.preventDefault();if(!e.repeat)ui.retryDesign();return;}
   if(!modified&&e.code==='KeyR'&&['play','design'].includes(ui.state.mode)){e.preventDefault();if(!e.repeat){recall();canvas.focus();}return;}
@@ -492,7 +511,7 @@ names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-
 if(sharedReplayId){document.body.classList.add('is-replay');$('connection').textContent='REPLAY VIEWER';$('edit-player-name').hidden=true;}
 const characterPicker=createCharacterPicker({onChange:id=>{characterChoice=id;for(const [owner,a]of avatars)if(owner===guestId||ui.state.mode==='replay')setAvatarCharacter(a,id);}});
 if(sharedReplayId)$('course-list').after(characterPicker.element);else $('loading-character').append(characterPicker.element);
-mobile=mobileControls({canvas,cancel,charge:startCharge,release,recall,
+mobile=mobileControls({canvas,cancel,charge:startCharge,release,recall,skip:skipShot,
  look:(dx,dy)=>{
   if(fly.active){fly.look(dx,dy);return;}
   if(flightControls()){azimuth-=dx*.005;elevation=THREE.MathUtils.clamp(elevation+dy*.004,-.95,1.25);takeCameraControl();}
@@ -521,6 +540,7 @@ function animate(now){
   const frameStart=performance.now();requestAnimationFrame(animate);const rawDt=(now-lastFrame)/1000,dt=Math.min(.1,rawDt);lastFrame=now;
   if(!loaded||startup.active)return;
   shotTimeline=shotPlayback.sample(now);
+  if(shotTimeline?.jumped)clearSkippedMotion();
   if(shotTimeline){for(const message of shotTimeline.messages)handleMessage(message,true);ballRotations.add(shotTimeline.after);}
   if(!rightDrag&&!fly.active){
     const turn=Number(keys.has('ArrowRight'))-Number(keys.has('ArrowLeft')),tilt=Number(keys.has('ArrowUp'))-Number(keys.has('ArrowDown'));
@@ -536,8 +556,11 @@ function animate(now){
   if(heatKey!==heatPresentationKey||(heatPresentationTime!==null&&scorePresentation.time<heatPresentationTime-.0001)){trailCount=0;trailGeometry.setDrawRange(0,0);heatPresentationKey=heatKey;}heatPresentationTime=scorePresentation.time;
   const timeline=ui.timeline()||renderTimeline(now),snapshot=timeline.after,previous=timeline.before;
   const p=replaying?snapshot?.players[0]:snapshot?.players.find(p=>p.id===(snapshot?.owner||guestId)),phase=replaying?timeline.phase:liveThrow.phase(snapshot,timeline.phase),alpha=timeline.alpha;
-  mobile.update({mode:ui.state.mode,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked,charging:chargeMeter.charging,fastForward:fastForwardHeld,resultVisible:!$('result-card').hidden});
-  setHidden(speedIndicator,(!replaying&&phase!=='Flight')||briefing.blocked);speedIndicator.disabled=replaying&&!ui.state.replayPlaying;
+  mobile.update({mode:ui.state.mode,phase,fly:fly.active,ready:loaded&&(workerReady||replaying),blocked:names.active||briefing.blocked,charging:chargeMeter.charging,fastForward:fastForwardHeld,skipSupported,skipping:shotPlayback.skipping,connected:connectionStatus==='connected',resultVisible:!$('result-card').hidden});
+  setHidden(skipButton,!skipSupported||replaying||phase!=='Flight'||briefing.blocked||mobile.active);
+  skipButton.disabled=shotPlayback.skipping||connectionStatus!=='connected';
+  setText(skipButton,shotPlayback.skipping?'Finishing shot…':'Skip to result · Enter');
+  setHidden(speedIndicator,(!replaying&&phase!=='Flight')||briefing.blocked);speedIndicator.disabled=replaying?!ui.state.replayPlaying:shotPlayback.skipping;
   setData(speedIndicator,'rate',String(presentationRate));setData(speedIndicator,'audioRate',String(sound.state.playbackRate));setData(speedIndicator,'musicBpm',String(sound.state.bpm));
   if(speedIndicator.dataset.active!==String(presentationRate===2)||speedIndicator.dataset.touch!==String(mobile.active)){setData(speedIndicator,'active',String(presentationRate===2));setData(speedIndicator,'touch',String(mobile.active));setText($('shot-speed-label'),presentationRate===2?'⏩ 2× FAST FORWARD':mobile.active?'TAP · 2× SPEED':'HOLD SPACE · 2×');setText($('shot-speed-help'),presentationRate===2?'RELEASE SPACE / CLICK FOR NORMAL':'OR CLICK TO FAST FORWARD');speedIndicator.setAttribute('aria-pressed',String(presentationRate===2));}
   characterPicker.setDisabled(['Charging','Release','Flight'].includes(phase)||isAvatarCelebrating(avatars.get(guestId)));
