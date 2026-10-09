@@ -3,6 +3,7 @@ import {chromium} from 'playwright';
 import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import assert from 'node:assert/strict';
+import {backgroundInput} from '../tests/background-input.mjs';
 const [name,outArg,holdArg]=process.argv.slice(2);
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4425';
 assert(['127.0.0.1','localhost'].includes(new URL(origin).hostname),'Use an isolated local server');
@@ -12,6 +13,7 @@ assert(course,`Unknown course ${name}`);
 const out=resolve(outArg);assert.ok(out.startsWith(resolve('.local')+'/'));await mkdir(out,{recursive:true});
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist']});
 const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
+await backgroundInput(context);
 const page=await context.newPage();page.setDefaultTimeout(30000);const shots=[],commands=[],errors=[],replays=[];
 page.on('pageerror',e=>errors.push(String(e)));page.on('websocket',ws=>{ws.on('framereceived',f=>{try{const m=JSON.parse(String(f.payload));if(m.type==='replay')replays.push(m.replay);}catch{}});ws.on('framesent',f=>{try{const m=JSON.parse(String(f.payload));if(m.type!=='input')commands.push({at:Date.now(),...m});}catch{}});});
 let status='fail',launchState=null;
@@ -41,7 +43,8 @@ try{
  assert.equal(overviewMarkers.length,course.waypoints.length);assert(overviewMarkers.every(m=>m.clear),'Overview waypoint badges stay clear of headings, controls and the leaderboard');
  await writeFile(resolve(out,'overview-markers.json'),JSON.stringify(overviewMarkers,null,2));
  await page.screenshot({scale:'css',path:resolve(out,'briefing.png')});
- await page.locator('#briefing-play').click();await page.waitForFunction(()=>window.kyotoState?.pointerLocked&&!window.kyotoState?.briefingTransition);
+ await page.locator('#briefing-play').click();await page.waitForFunction(()=>!kyotoState.briefing&&!kyotoState.briefingTransition);
+ assert.equal(await page.evaluate(()=>document.pointerLockElement),null,'The audit must never capture the desktop pointer');
  // Let the first view finish drawing before sending a brief key hold.
  // Loading/render stalls remain in the client-performance receipt below.
  await page.waitForTimeout(1000);

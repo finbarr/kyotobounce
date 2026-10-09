@@ -25,6 +25,12 @@ Codex's worktree mode supplies independent working files for parallel tasks. Its
 
 For UI-only work, copying a compatible existing worker into the worktree can avoid a Unity import. An explicit `KYOTO_WORKER_EXECUTABLE` also works, but do not rebuild that shared path while sessions are using it. Any C# change requires rebuilding the task's own worker.
 
+### Keep the desktop usable during local checks
+
+- Browser automation must remain headless and must install `web/tests/background-input.mjs` before opening the game. Headless Chrome can still capture and warp the real macOS cursor through Pointer Lock. Use keyboard controls for these checks; pointer-lock handler behavior is tested in `camera-focus.mjs` without OS input. Older browser scripts need this adaptation before use on the laptop.
+- The macOS physics bundle must have `LSBackgroundOnly=true`. `npm run build:worker` prepares and re-signs it, and the service refuses an unprepared bundle. For an existing stopped local build, run `node web/prepare-macos-worker.mjs` (optionally passing its bundle path). This changes packaging only; it does not rebuild physics.
+- Stop temporary browser and native verification processes when the check finishes. Do not use desktop mouse automation or bring test windows to the foreground while the user is working.
+
 GitHub Actions runs the portable checks on pushes and PRs. It does not provide Unity behavioral proof or deploy. Native checks and browser playtesting remain part of PR acceptance.
 
 ## Task prompt template

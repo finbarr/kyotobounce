@@ -6,6 +6,7 @@ import { EventEmitter } from 'node:events';
 import { randomUUID, createHash } from 'node:crypto';
 import { readFile, mkdir, access, copyFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
+import {assertBackgroundWorker} from './macos-worker.ts';
 
 type Run = {
   token: string;
@@ -44,6 +45,7 @@ export class PhysicsWorker extends EventEmitter {
     this.started=true;
     try {
       await access(this.executable).catch(()=>{throw new Error('Physics worker missing. Run npm run build:worker first.');});
+      await assertBackgroundWorker(this.executable);
       this.sha=createHash('sha256').update(await readFile(this.layout)).digest('hex');
       await mkdir(dirname(this.log),{recursive:true});
       if(this.stopping)return;

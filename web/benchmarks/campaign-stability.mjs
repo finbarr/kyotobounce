@@ -4,6 +4,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
 import assert from 'node:assert/strict';
+import {backgroundInput} from '../tests/background-input.mjs';
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4425';
 assert(['127.0.0.1','localhost'].includes(new URL(origin).hostname),'Use an isolated local service');
 const out=resolve(process.argv[2]||'.local/campaign/final-audit/browser');
@@ -15,6 +16,7 @@ for(const file of ['web/starter-challenges.json','web/v2/assets.json','web/publi
  hashes[file]=createHash('sha256').update(await readFile(file)).digest('hex');
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist']});
 const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
+await backgroundInput(context);
 const page=await context.newPage(),cdp=await context.newCDPSession(page),errors=[],reports=[],receipts=[];
 page.setDefaultTimeout(30000);
 page.on('pageerror',e=>errors.push(String(e)));
@@ -63,7 +65,8 @@ try{
    if(!receipt.pass||[0,5,11,19,20,26,27,29].includes(course.order))await page.screenshot({path:resolve(out,`${course.id}-${viewport.width}.png`)});
    assert(receipt.pass,`${course.id} ${viewport.width}: overview markers are blocked`);
    await page.locator('#briefing-play').click();
-   await page.waitForFunction(()=>!kyotoState.briefingTransition&&kyotoState.pointerLocked);
+   await page.waitForFunction(()=>!kyotoState.briefing&&!kyotoState.briefingTransition);
+   assert.equal(await page.evaluate(()=>document.pointerLockElement),null,'The audit must never capture the desktop pointer');
    await page.locator('#game').focus();await page.keyboard.press('h');
    const hint=await page.evaluate(()=>({yaw:kyotoState.yaw,pitch:kyotoState.pitch,top:kyotoState.top,kick:kyotoState.kick}));
    for(const key of ['yaw','pitch','top','kick'])assert(Math.abs(key==='yaw'?((hint[key]-course.hint[key]+540)%360)-180:hint[key]-course.hint[key])<.001,`${course.id}: ${key} hint`);

@@ -859,3 +859,19 @@ triangulation. `install-atrium-grout-browser.mjs` replaces visible fragments whi
 all other encoded geometry and textures. Selected exports still consider nearby
 station objects when removing hidden overlaps. Use Blender's `--python-exit-code 1`
 so a failed source/export assertion stops the workflow.
+
+## Camera and route refinements — 8 October 2026
+
+The robot camera now keeps its normal shoulder distance at walls. Station
+surfaces between the camera and robot receive a small feathered cutaway;
+forward targets, collision and ball-follow camera obstruction remain intact.
+All 30 starting views and five walking/back-to-wall sequences passed in the
+complete local game. Evidence: `.local/camera-cutaway/browser.json`.
+
+Local browser checks now block Pointer Lock before loading the game and use
+keyboard controls. The macOS physics worker is packaged as a background-only
+app; a native startup check confirmed activation policy `prohibited` and no
+foreground activation. See `docs/PARALLEL_DEVELOPMENT.md` for this workflow.
+
+The eight planned course-length changes are being verified individually.
+They are not yet a completed campaign revision. No push or deployment.

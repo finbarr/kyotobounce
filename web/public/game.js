@@ -6,6 +6,7 @@ import {freezeStaticTransforms} from './static-transforms.js';
 import {FlyCamera,flyTargets} from './fly-camera.js';
 import {StationBoundary} from './station-boundary.js';
 import {CameraObstacles,easeCameraClearance} from './camera-obstacles.js';
+import {RobotCutaway} from './robot-cutaway.js';
 import {replayIdFromPath} from './replay-links.js';
 import {playerName} from './player-name.js';
 import {gameConnection} from './connection.js';
@@ -83,6 +84,7 @@ let noticeUntil=0,lastImpact=null,startupMs=0;
 let workerStatus='starting',connectionStatus='connecting',lastResultAttempt='',loadedLayout='',layoutReloading=false;
 let stationLook,robotShadow,ballShadow;
 let cameraClearance=3.8,cameraObstacles;
+const robotCutaway=new RobotCutaway();
 function notice(text,duration=4500){$('notice').textContent=text;$('notice').classList.remove('quiet');noticeUntil=performance.now()+duration;}
 function send(type,extra={}){return connection?.send(type,extra);}
 const sharedReplayId=replayIdFromPath(location.pathname);let requestedLevel=levelIdFromPath(location.pathname)||new URLSearchParams(location.search).get('level');
@@ -414,6 +416,7 @@ async function load(){
     boundary.applyFog(scene);
     await yieldLoadingUI();stationLook.updateLights(camera.position,0);
     await stationLook.captureEnvironment();
+    for(const root of [station,hardwareScene,details.group,...scene.children.filter(o=>data.escalators.some(e=>e.id===o.name))])robotCutaway.apply(root);
     if(data.stationInstallations){
       const lights=document.createElement('button');lights.id='station-light-mode';lights.textContent='Station lights: Day';lights.setAttribute('aria-pressed','false');
       let night=false;lights.onclick=()=>{night=!night;stationLook.setNight(night);lights.textContent=night?'Station lights: Evening':'Station lights: Day';lights.setAttribute('aria-pressed',String(night));};
@@ -669,13 +672,17 @@ function animate(now){
   desired.set(Math.sin(azimuth)*Math.cos(elevation),Math.sin(elevation),Math.cos(azimuth)*Math.cos(elevation)).multiplyScalar(distance).add(cameraTarget);
   if(!inFlight&&!manualCamera)desired.add(new THREE.Vector3(Math.cos(azimuth),0,-Math.sin(azimuth)).multiplyScalar(.55));
   const offset=desired.clone().sub(cameraTarget);
+  const requestedCameraDistance=offset.length();
   // The robot camera needs room for its near plane around obstacle edges. The
   // small ball can rest against a floor: preserve its point anchor and padding.
   const ballView=inFlight&&!showRobotResult;
   const clearance=cameraObstacles.clearance(cameraTarget,desired,ballView?0:.16,ballView?.16:.01);
+  const robotView=!ballView&&!fly.active&&!briefing.blocked;
   // Pull in immediately to avoid crossing a wall; ease only the return distance.
   // Orbit angles and the ball target still respond in the current frame.
-  cameraClearance=easeCameraClearance(cameraClearance,clearance,dt);
+  // A robot view keeps its comfortable boom. Only foreground fragments fade;
+  // the ball camera still stops before real geometry during a shot or replay.
+  cameraClearance=robotView?requestedCameraDistance:easeCameraClearance(cameraClearance,clearance,dt);
   desired.copy(cameraTarget).addScaledVector(offset.normalize(),cameraClearance);
   // Orbit is direct input: smoothing the world-space position makes the view
   // chase its requested angle and drift after the mouse has stopped.
@@ -698,6 +705,8 @@ function animate(now){
   if(fly.active){fly.move(keys,dt,{spaceAscends:!replaying,movement:mobile.movement});camera=fly.camera;}
   // All camera paths share the same world limit, including briefing and replay.
   boundary.constrain(camera.position);camera.updateMatrixWorld();
+  if(robotView)robotCutaway.update(camera.position,cameraTarget,clearance<requestedCameraDistance-.03,dt);
+  else robotCutaway.clear();
   // Keep the followed subject in the unobstructed scene, not behind the score rail.
   if(replayViewport)camera.setViewOffset(innerWidth,innerHeight,innerWidth/2-replayViewport.x-replayViewport.width/2,innerHeight/2-replayViewport.y-replayViewport.height/2,innerWidth,innerHeight);
   else if(fly.active&&camera.view?.enabled)camera.clearViewOffset();
@@ -717,7 +726,7 @@ function animate(now){
     // Walls and rising stairs can squeeze either camera into the robot.
     // At this distance its body fills the view and covers nearby targets.
     const close=camera.position.distanceTo(a.group.position.clone().add(new THREE.Vector3(0,1.0,0)))<2.2;
-    a.group.visible=!close;
+    a.group.visible=!close||(robotView&&a===resultAvatar);
   }
   if(now>noticeUntil)$('notice').classList.add('quiet');
   if(!['play','design'].includes(ui.state.mode)){setHidden($('throw-panel'),true);setHidden($('flight-panel'),true);$('reticle').style.display='none';}

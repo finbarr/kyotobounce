@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import {prepareBackgroundWorker} from './macos-worker.ts';
 const unity = process.env.UNITY_EDITOR || '/Applications/Unity/Hub/Editor/6000.3.23f1/Unity.app/Contents/MacOS/Unity';
 const linux=process.argv.includes('--linux');
 await mkdir('artifacts/phase3/builds', { recursive: true });
@@ -8,4 +9,10 @@ const log = resolve(`artifacts/phase3/builds/worker-${new Date().toISOString().r
 console.log(`Building ${linux?'Linux':'macOS'} native physics worker. Log:`, log);
 const child = spawn(unity, ['-batchmode', '-nographics', '-quit', '-buildTarget', linux?'StandaloneLinux64':'StandaloneOSX', '-standaloneBuildSubtarget', linux?'Server':'Player', '-projectPath', resolve('KyotoRicochet'), '-executeMethod', `Kyoto.Editor.BrowserWorkerBuilder.${linux?'BuildLinux':'Build'}`, '-logFile', log], { stdio: 'inherit' });
 child.on('error', error => { console.error(error); process.exitCode=1; });
-child.on('exit', code => { console.log('Worker build exit:', code); process.exitCode=code ?? 1; });
+child.on('exit', async code => {
+  console.log('Worker build exit:', code);process.exitCode=code??1;
+  if(code===0&&!linux){
+    try{await prepareBackgroundWorker();console.log('macOS physics worker stays in the background.');}
+    catch(error){console.error(error);process.exitCode=1;}
+  }
+});
