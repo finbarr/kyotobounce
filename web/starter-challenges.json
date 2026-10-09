@@ -170,7 +170,7 @@
   },
   {
     "id": "atrium-clock-in",
-    "revision": 1,
+    "revision": 2,
     "name": "Clock In",
     "creator": "station",
     "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
@@ -206,6 +206,21 @@
         "radius": 0.30000001192092896,
         "surface": "atrium-gate-clock-body",
         "id": "gate-clock"
+      },
+      {
+        "center": {
+          "x": 1.25,
+          "y": -4.913582801818848,
+          "z": 5
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 0.75,
+        "surface": "porta-connection-b1-deck",
+        "id": "basement-drop"
       }
     ],
     "hint": {
@@ -215,15 +230,15 @@
       "kick": 0,
       "holdMs": 2800,
       "powerRange": "precision",
-      "note": "Use full precision charge (12 m/s), a 50° upward aim and no spin. Hit the clock above the central ticket gates, then let the ball settle."
+      "note": "Use full precision charge (12 m/s), a 50° upward aim and no spin. Bank the clock above the ticket gates, then follow the skips into the purple basement patch down the hole."
     },
     "order": 2,
     "campaign": {
       "chapter": 1,
       "chapterTitle": "Atrium Beginnings",
-      "difficulty": "Easy",
-      "distance": 7.2,
-      "brief": "Look up: the clock above the ticket gates is your target. Bank its purple face and let the rebound drop back through the atrium."
+      "difficulty": "Medium",
+      "distance": 43.8,
+      "brief": "Ring the clock, then drop below: bank its purple face and follow the rebound down the atrium opening into the second purple waypoint."
     },
     "throwModel": "robot-v4",
     "allowedInputs": {

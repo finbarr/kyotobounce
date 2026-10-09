@@ -29,9 +29,10 @@ rank. Movement adds points outside the target multiplier. Recall forfeits.
 
 The first level, **First Bounce**, has one broad floor patch about seven metres
 ahead and no destination. It carries the movement, aim and charge coaching. The
-opening chapter progresses from single floor, glass and elevated targets to a
-longer bank-and-return and a precise two-target combination. Keep early targets
-visible from the opening robot camera, including while coaching is on screen.
+opening chapter progresses from single floor and glass targets to a clock bank
+with a basement drop, a wall-bank return and a precise two-target combination.
+Keep early targets visible from the opening robot camera, including while
+coaching is on screen.
 
 ## Scouting and creating
 

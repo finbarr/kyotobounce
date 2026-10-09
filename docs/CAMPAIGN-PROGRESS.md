@@ -6,8 +6,8 @@ Updated 9 October 2026. **30 current levels**, developed and merged into local
 ## Current scope
 
 The station architecture and native physics are unchanged by this refinement.
-Eight courses now use longer approaches, returns or descents. The campaign has
-**10 short routes** (under 15 m), **12 medium routes** (15–40 m) and **8 long
+Nine courses now use longer approaches, returns or descents. The campaign has
+**9 short routes** (under 15 m), **12 medium routes** (15–40 m) and **9 long
 routes** (over 40 m).
 
 Distances measure the suggested shot's travelled path through its final required
@@ -30,14 +30,16 @@ The opening chapter introduces one requirement at a time:
 
 1. **First Bounce:** one broad floor target; aim and charge.
 2. **Glass Return:** one glass target, with an optional landing bonus.
-3. **Clock In:** one smaller, elevated target.
-4. **Blue Wall Bank:** a longer bank and floor return; labelled Medium.
+3. **Clock In:** bank the elevated clock, then collect a 1.5 m-wide basement
+   waypoint after dropping through the atrium opening; labelled Medium.
+4. **Blue Wall Bank:** a wall bank and floor return; labelled Medium.
 5. **Ticket Slalom:** a precise pair of cabinet targets.
 
 ## Revised courses
 
 | Course | Suggested route | Features |
 | --- | ---: | --- |
+| Clock In | 43.8 m | Clock bank, atrium skips and a second waypoint at the bottom of the opening |
 | Blue Wall Bank | 26.1 m | Blue-wall bank and longer concourse return |
 | Basement Drop | 40.7 m | High atrium lob into the glass well and B1 floor |
 | Glass Loop | 21.5 m | Back wall, inside glass and aisle return |
@@ -48,13 +50,18 @@ The opening chapter introduces one requirement at a time:
 | Skyway Circuit | 64.5 m | Westbound skips along the glass walkway |
 
 Every revised course passed **two exact native shots and six nearby variations**
-(64 completed shots in total). All reached full translation and spin rest.
+(72 completed shots in total). All reached full translation and spin rest.
 Each accepted course cleared on the first shot of its final Chrome acceptance
 run, including saved replay, scrub and retry. No music steps were skipped during
-those eight browser shots. Earlier rejected candidates are not part of this catalog.
+those nine browser shots. Earlier rejected candidates are not part of this catalog.
 
-Apart from First Bounce, the other 21 courses retain their previously verified geometry and launch inputs.
+Apart from First Bounce, the other 20 courses retain their previously verified geometry and launch inputs.
 Their native evidence remains in `.local/campaign/final-audit/native/`.
+
+Clock In retains its original start, clock target and suggested throw. The second
+waypoint is on the B1 deck, 4.9 m below the atrium floor. The authored shot hits the
+clock at 0.78 s and the basement waypoint at 7.29 s. The route length includes its
+intervening floor skips; it is not a 43.8 m straight throw.
 
 ## Camera and desktop behavior
 
@@ -76,7 +83,7 @@ reject a worker bundle without that setting. See
 | ---: | --- | --- | ---: |
 | 1 | First Bounce | Short | 6.6 m |
 | 2 | Glass Return | Short | 2.2 m |
-| 3 | Clock In | Short | 7.2 m |
+| 3 | Clock In | Long | 43.8 m |
 | 4 | Blue Wall Bank | Medium | 26.1 m |
 | 5 | Ticket Slalom | Short | 4.7 m |
 | 6 | Basement Drop | Long | 40.7 m |
@@ -107,7 +114,7 @@ reject a worker bundle without that setting. See
 
 ## Verification and evidence
 
-The latest opening revision passes typecheck, the complete unit/service suite and
+The current opening revisions pass typecheck, the complete unit/service suite and
 the browser asset build. First Bounce passed two exact native throws plus all six
 variations (yaw ±8°, pitch ±5°, charge ±122 ms), all at full translation and spin
 rest. Chrome cleared it on the first keyboard throw and verified saved replay,
@@ -141,9 +148,16 @@ Accepted evidence is under `.local/level-refinement/` (outside Git):
 | Canopy Crossing | `canopy-final-proof/` | `canopy-final-browser/` |
 | Skyway Circuit | `skyway-accepted-proof/` | `skyway-browser/` |
 
-`accepted-summary.json` checks these receipts against each current course's
+Clock In evidence is in `.local/clock-in/accepted-native/` and
+`.local/clock-in/accepted-browser/`. The native samples test yaw ±1°, pitch ±2°
+and charge reductions of 61 and 122 ms. The browser replay confirms the clock
+hit followed by the basement hit and the ×20 waypoint multiplier. Earlier, smaller
+target trials are excluded.
+
+`accepted-summary.json` checks the eight earlier receipts against each current course's
 revision, start, target geometry, hint, layout, physics and scoring. It also
-checks the displayed distance and the final 10/12/8 route mix.
+checks their displayed distances and records the prior 10/12/8 route mix.
+The current 9/12/9 mix includes Clock In’s basement extension.
 
 There is one checkout and one current station bundle. The unrelated Unity
 package-lock edit is untouched. Each verified course increment was committed
