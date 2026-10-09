@@ -5,14 +5,14 @@
   "courses": [
     {
       "id": "atrium-welcome",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
-        "holdMs": 560,
+        "holdMs": 2313,
         "range": "precision",
         "input": {
           "yaw": 180,
-          "pitch": -8,
+          "pitch": 5,
           "top": 0,
           "kick": 0
         },
@@ -20,155 +20,163 @@
       },
       "neighbors": [
         {
-          "holdMs": 365,
+          "holdMs": 2191,
           "range": "precision",
           "input": {
             "yaw": 180,
-            "pitch": -8,
+            "pitch": 5,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 90
         },
         {
-          "holdMs": 755,
+          "holdMs": 2435,
           "range": "precision",
           "input": {
             "yaw": 180,
-            "pitch": -8,
+            "pitch": 5,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 90
         },
         {
-          "holdMs": 560,
+          "holdMs": 2313,
           "range": "precision",
           "input": {
-            "yaw": 165,
-            "pitch": -8,
+            "yaw": 172,
+            "pitch": 5,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 90
         },
         {
-          "holdMs": 560,
+          "holdMs": 2313,
           "range": "precision",
           "input": {
-            "yaw": 195,
-            "pitch": -8,
+            "yaw": 188,
+            "pitch": 5,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 90
         },
         {
-          "holdMs": 560,
-          "range": "precision",
-          "input": {
-            "yaw": 180,
-            "pitch": -3,
-            "top": 0,
-            "kick": 0
-          },
-          "observeSeconds": 90
-        },
-        {
-          "holdMs": 560,
+          "holdMs": 2313,
           "range": "precision",
           "input": {
             "yaw": 180,
-            "pitch": -13,
+            "pitch": 0,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 90
+        },
+        {
+          "holdMs": 2313,
+          "range": "precision",
+          "input": {
+            "yaw": 180,
+            "pitch": 10,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 90
         }
       ],
-      "minimumNeighborClears": 6
+      "minimumNeighborClears": 6,
+      "features": {
+        "objectiveDistance": [
+          6,
+          9
+        ],
+        "minNonFloorTargets": 0,
+        "minSharpTurns": 0
+      }
     },
     {
-      "id": "atrium-blue-bank",
-      "revision": 2,
+      "id": "atrium-glass-return",
+      "revision": 1,
       "repeat": 2,
       "shot": {
-        "holdMs": 2800,
+        "holdMs": 1135,
         "range": "precision",
         "input": {
-          "yaw": -90,
-          "pitch": 25,
+          "yaw": 0,
+          "pitch": 0,
           "top": 0,
           "kick": 0
         },
-        "observeSeconds": 100
+        "observeSeconds": 70
       },
       "neighbors": [
         {
-          "holdMs": 2800,
+          "holdMs": 1135,
           "range": "precision",
           "input": {
-            "yaw": -91,
-            "pitch": 25,
+            "yaw": -2,
+            "pitch": 0,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 70
         },
         {
-          "holdMs": 2800,
+          "holdMs": 1135,
           "range": "precision",
           "input": {
-            "yaw": -89,
-            "pitch": 25,
+            "yaw": 2,
+            "pitch": 0,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 70
         },
         {
-          "holdMs": 2800,
+          "holdMs": 1135,
           "range": "precision",
           "input": {
-            "yaw": -90,
-            "pitch": 24,
+            "yaw": 0,
+            "pitch": -2,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 70
         },
         {
-          "holdMs": 2800,
+          "holdMs": 1135,
           "range": "precision",
           "input": {
-            "yaw": -90,
-            "pitch": 26,
+            "yaw": 0,
+            "pitch": 2,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 70
         },
         {
-          "holdMs": 2780,
+          "holdMs": 1115,
           "range": "precision",
           "input": {
-            "yaw": -90,
-            "pitch": 25,
+            "yaw": 0,
+            "pitch": 0,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 70
         },
         {
-          "holdMs": 2760,
+          "holdMs": 1155,
           "range": "precision",
           "input": {
-            "yaw": -90,
-            "pitch": 25,
+            "yaw": 0,
+            "pitch": 0,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 70
         }
       ],
       "minimumNeighborClears": 6,
@@ -254,6 +262,95 @@
           "input": {
             "yaw": 180,
             "pitch": 50,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        }
+      ],
+      "minimumNeighborClears": 6,
+      "features": {
+        "minNonFloorTargets": 1,
+        "minSharpTurns": 1
+      }
+    },
+    {
+      "id": "atrium-blue-bank",
+      "revision": 2,
+      "repeat": 2,
+      "shot": {
+        "holdMs": 2800,
+        "range": "precision",
+        "input": {
+          "yaw": -90,
+          "pitch": 25,
+          "top": 0,
+          "kick": 0
+        },
+        "observeSeconds": 100
+      },
+      "neighbors": [
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": -91,
+            "pitch": 25,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": -89,
+            "pitch": 25,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 24,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2800,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 26,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2780,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 25,
+            "top": 0,
+            "kick": 0
+          },
+          "observeSeconds": 100
+        },
+        {
+          "holdMs": 2760,
+          "range": "precision",
+          "input": {
+            "yaw": -90,
+            "pitch": 25,
             "top": 0,
             "kick": 0
           },
@@ -353,95 +450,6 @@
       "features": {
         "minNonFloorTargets": 2,
         "minSharpTurns": 2
-      }
-    },
-    {
-      "id": "atrium-glass-return",
-      "revision": 1,
-      "repeat": 2,
-      "shot": {
-        "holdMs": 1135,
-        "range": "precision",
-        "input": {
-          "yaw": 0,
-          "pitch": 0,
-          "top": 0,
-          "kick": 0
-        },
-        "observeSeconds": 70
-      },
-      "neighbors": [
-        {
-          "holdMs": 1135,
-          "range": "precision",
-          "input": {
-            "yaw": -2,
-            "pitch": 0,
-            "top": 0,
-            "kick": 0
-          },
-          "observeSeconds": 70
-        },
-        {
-          "holdMs": 1135,
-          "range": "precision",
-          "input": {
-            "yaw": 2,
-            "pitch": 0,
-            "top": 0,
-            "kick": 0
-          },
-          "observeSeconds": 70
-        },
-        {
-          "holdMs": 1135,
-          "range": "precision",
-          "input": {
-            "yaw": 0,
-            "pitch": -2,
-            "top": 0,
-            "kick": 0
-          },
-          "observeSeconds": 70
-        },
-        {
-          "holdMs": 1135,
-          "range": "precision",
-          "input": {
-            "yaw": 0,
-            "pitch": 2,
-            "top": 0,
-            "kick": 0
-          },
-          "observeSeconds": 70
-        },
-        {
-          "holdMs": 1115,
-          "range": "precision",
-          "input": {
-            "yaw": 0,
-            "pitch": 0,
-            "top": 0,
-            "kick": 0
-          },
-          "observeSeconds": 70
-        },
-        {
-          "holdMs": 1155,
-          "range": "precision",
-          "input": {
-            "yaw": 0,
-            "pitch": 0,
-            "top": 0,
-            "kick": 0
-          },
-          "observeSeconds": 70
-        }
-      ],
-      "minimumNeighborClears": 6,
-      "features": {
-        "minNonFloorTargets": 1,
-        "minSharpTurns": 1
       }
     },
     {

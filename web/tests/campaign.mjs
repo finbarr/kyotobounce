@@ -24,5 +24,9 @@ for(const [i,c] of courses.entries()){
  for(const key of ['yaw','pitch','top','kick'])assert.equal(c.hint[key],p.shot.input[key]);
 }
 assert.equal(courses[0].id,'atrium-welcome','The new opening lesson is part of the 30-level campaign');
+assert.deepEqual(courses.slice(0,5).map(c=>c.waypoints.length),[1,1,1,2,2],'Introduce single targets before combinations');
+const intro=courses[0],target=intro.waypoints[0];
+assert.equal(intro.goal,null,'The first lesson only asks for one waypoint');
+assert(target.radius>=1.5&&Math.hypot(target.center.x-intro.start.center.x,target.center.z-intro.start.center.z)>=6,'The first target is broad and clearly ahead of the robot');
 if(process.env.KYOTO_CAMPAIGN_COMPLETE)assert.equal(courses.length,30,'Final acceptance requires all 30 levels');
 console.log(`PASS current campaign catalog, ${courses.length}/30 levels with native proof inputs`);

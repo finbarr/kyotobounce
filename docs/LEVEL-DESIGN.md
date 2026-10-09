@@ -27,8 +27,11 @@ The gold destination, when present, is an optional landing bonus. A proof of the
 suggested solution must reach it as well. Other settled in-bounds shots still
 rank. Movement adds points outside the target multiplier. Recall forfeits.
 
-The first level, **First Bounce**, has one broad floor patch and no destination.
-It is part of the 30-level count and carries the movement, aim and charge coaching.
+The first level, **First Bounce**, has one broad floor patch about seven metres
+ahead and no destination. It carries the movement, aim and charge coaching. The
+opening chapter progresses from single floor, glass and elevated targets to a
+longer bank-and-return and a precise two-target combination. Keep early targets
+visible from the opening robot camera, including while coaching is on screen.
 
 ## Scouting and creating
 

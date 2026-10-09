@@ -1,3 +1,5 @@
+import {throwSpeed} from './throw-power.js';
+
 export const isTutorial=course=>course?.creator==='station'&&course.id==='atrium-welcome';
 
 // Coaching observes ordinary gameplay. It never awards points, forces a throw,
@@ -37,11 +39,12 @@ export function tutorialUI({onAim,onContinue}){
    replay.hidden=!isTutorial(course);
    const visible=!!guide.course&&!guide.dismissed&&!blocked&&phase!=='Result';host.hidden=!visible;document.body.classList.toggle('tutorial-active',visible);
    if(!visible)return;
-   const step=guide.step,key=`${step}:${mobile}:${charging}`;if(key===last)return;last=key;host.dataset.step=step;host.scrollTop=0;
+   const speed=throwSpeed((course.hint?.holdMs??0)/2800,course.hint?.powerRange).toFixed(1);
+   const step=guide.step,key=`${step}:${mobile}:${charging}:${speed}`;if(key===last)return;last=key;host.dataset.step=step;host.scrollTop=0;
    const copy={
     move:['1 / 4','Find your line.',mobile?'Drag MOVE to walk. The checkered pad marks your start; you can throw anywhere.':'W A S D to walk. The checkered pad is a starting suggestion — you can throw from anywhere.','Next: aim →'],
     aim:['2 / 4','Aim for purple.',mobile?'Hit the purple patch. Drag the scene to aim, or use the hint below.':'Click the scene, then move the mouse to aim. Your ball must touch the purple waypoint. H sets the suggested aim.','Use suggested aim'],
-    charge:['3 / 4',charging?'Release at white!':'A gentle throw.',mobile?'Hold THROW, then release at the white 2.8 m/s mark. More charge = more speed.':'Hold Space or the mouse button. Release near the white 2.8 m/s mark. More charge means more speed.','Reset suggested aim'],
+    charge:['3 / 4',charging?'Release at white!':'A steady throw.',mobile?`Hold THROW, then release at the white ${speed} m/s mark. More charge = more speed.`:`Hold Space or the mouse button. Release near the white ${speed} m/s mark. More charge means more speed.`,'Reset suggested aim'],
     flight:['4 / 4','Watch your score grow.',mobile?'The first purple target gives ×10; later targets double it. Let the ball settle to score. Tap 2× to speed up; Recall forfeits.':'The first purple waypoint gives ×10; each later waypoint doubles it. Let the ball settle to bank your score. Hold Space for 2×; R recalls and forfeits this shot.',''],
    }[step];
    if(!copy)return;

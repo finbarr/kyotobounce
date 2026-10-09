@@ -19,6 +19,21 @@ Retired course revisions are discarded. Current scoring remains server-authorita
 the multiplier; each distinct bank adds +0.5×. See [ARCADE-SCORING.md](ARCADE-SCORING.md).
 A result still requires full translation and spin rest. Recall forfeits.
 
+## Opening progression
+
+First Bounce has one broad floor waypoint about 6.7 m ahead of the robot, with no
+landing destination. Its flat 10 m/s precision throw travels 6.6 m before the
+waypoint. The opening camera is pulled back to 5.2 m, including fresh entry,
+return to start and recenter; the coaching uses the current suggested speed.
+
+The opening chapter introduces one requirement at a time:
+
+1. **First Bounce:** one broad floor target; aim and charge.
+2. **Glass Return:** one glass target, with an optional landing bonus.
+3. **Clock In:** one smaller, elevated target.
+4. **Blue Wall Bank:** a longer bank and floor return; labelled Medium.
+5. **Ticket Slalom:** a precise pair of cabinet targets.
+
 ## Revised courses
 
 | Course | Suggested route | Features |
@@ -38,7 +53,7 @@ Each accepted course cleared on the first shot of its final Chrome acceptance
 run, including saved replay, scrub and retry. No music steps were skipped during
 those eight browser shots. Earlier rejected candidates are not part of this catalog.
 
-The other 22 courses retain their previously verified geometry and launch inputs.
+Apart from First Bounce, the other 21 courses retain their previously verified geometry and launch inputs.
 Their native evidence remains in `.local/campaign/final-audit/native/`.
 
 ## Camera and desktop behavior
@@ -59,11 +74,11 @@ reject a worker bundle without that setting. See
 
 | Level | Course | Route | Length |
 | ---: | --- | --- | ---: |
-| 1 | First Bounce | Short | 2.1 m |
-| 2 | Blue Wall Bank | Medium | 26.1 m |
+| 1 | First Bounce | Short | 6.6 m |
+| 2 | Glass Return | Short | 2.2 m |
 | 3 | Clock In | Short | 7.2 m |
-| 4 | Ticket Slalom | Short | 4.7 m |
-| 5 | Glass Return | Short | 2.2 m |
+| 4 | Blue Wall Bank | Medium | 26.1 m |
+| 5 | Ticket Slalom | Short | 4.7 m |
 | 6 | Basement Drop | Long | 40.7 m |
 | 7 | Pier Pressure | Short | 5.2 m |
 | 8 | Ceiling Skip | Short | 9.9 m |
@@ -92,10 +107,20 @@ reject a worker bundle without that setting. See
 
 ## Verification and evidence
 
-Typecheck, the complete unit/service test suite, browser asset build and full
-runtime integration suite pass. The final browser camera check passed all 30
-starting views and five walking/back-to-wall sequences, with no robot-hiding
-frames and normal shoulder clearance throughout. Camera evidence is in
+The latest opening revision passes typecheck, the complete unit/service suite and
+the browser asset build. First Bounce passed two exact native throws plus all six
+variations (yaw ±8°, pitch ±5°, charge ±122 ms), all at full translation and spin
+rest. Chrome cleared it on the first keyboard throw and verified saved replay,
+scrub, retry and advancement to Glass Return. No music steps were skipped.
+
+`web/tests/browser-first-bounce.mjs` checks fresh 1280×800 onboarding, the current
+charge instruction, recenter, return to start and opening course order. Its
+screenshots show the whole robot and floor target with the tutorial visible.
+Accepted evidence is in `.local/first-bounce/{accepted-native,accepted-browser,framing}/`.
+
+The preceding station-wide verification passed the full runtime integration suite,
+all 30 starting views and five walking/back-to-wall sequences, with no robot-hiding
+frames and normal shoulder clearance. Those camera receipts remain in
 `.local/level-refinement/final-camera/browser.json`.
 
 Runtime coverage includes authoritative scoring and replay parity, recall

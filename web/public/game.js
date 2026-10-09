@@ -1,6 +1,6 @@
 import {setText,setHidden,setAttribute,setData,setStyle} from './dom-updates.js';
 import {isTutorial,tutorialUI} from './tutorial.js';
-import {levelEntryAim} from './level-entry.js';
+import {levelEntryAim,levelEntryDistance} from './level-entry.js';
 import {levelIdFromPath} from './level-links.js';
 import {freezeStaticTransforms} from './static-transforms.js';
 import {FlyCamera,flyTargets} from './fly-camera.js';
@@ -293,7 +293,7 @@ for(const id of ['top','kick'])$(id).addEventListener('input',syncSpin);
 $('clear-spin').onclick=()=>{$('top').value=0;$('kick').value=0;syncSpin();canvas.focus();};
 $('home').onclick=()=>{send('home');lastThrowAim=null;returnRequested=true;applyLevelAim(ui.state.selected);canvas.focus();};
 for(const id of ['retry','flight-retry'])$(id).onclick=()=>{recall();canvas.focus();};
-$('recenter').onclick=()=>{if(flightControls()){azimuth=-(lastThrowAim?.yaw??yaw)*Math.PI/180;elevation=-(lastThrowAim?.pitch??pitch)*Math.PI/180;distance=2.8;takeCameraControl();}else{centerOnAim();distance=3.8;}canvas.focus();};
+$('recenter').onclick=()=>{if(flightControls()){azimuth=-(lastThrowAim?.yaw??yaw)*Math.PI/180;elevation=-(lastThrowAim?.pitch??pitch)*Math.PI/180;distance=2.8;takeCameraControl();}else{centerOnAim();distance=levelEntryDistance(ui?.state.selected);}canvas.focus();};
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('mousedown',event=>{
   if(mobile?.active)return;
@@ -485,7 +485,7 @@ briefing=challengeBriefing({renderer,boundary,isReady:()=>loaded&&workerReady&&!
   applyLevelAim(ui.state.selected);
   if(capture)captureMouse();else{briefing.dismiss();openLevelMenu();}
 }});
-ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:(c,{automatic=false}={})=>{if(!startup?.active&&(!automatic||!isTutorial(c)))briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=3.8;cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:(c,{automatic=false}={})=>{if(!startup?.active&&(!automatic||!isTutorial(c)))briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=levelEntryDistance(ui?.state.selected);cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 $('replay-free').onclick=()=>setFly(true);
 for(const id of ['replay-play','replay-restart','replay-recenter','replay-free'])$(id).addEventListener('click',()=>canvas.focus());
 names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});
@@ -511,7 +511,7 @@ startup.network(workerReady);
 
 window.addEventListener('kyoto:retry',()=>{recall();captureMouse();canvas.focus();});
 function applyAim(h){setPowerRange(h.powerRange||'precision',true);yaw=h.yaw;pitch=h.pitch;top=h.top;kick=h.kick;$('top').value=top;$('kick').value=kick;syncSpin();centerOnAim();}
-function applyLevelAim(challenge){applyAim(levelEntryAim(challenge));distance=3.8;cameraClearance=distance;}
+function applyLevelAim(challenge){applyAim(levelEntryAim(challenge));distance=levelEntryDistance(challenge);cameraClearance=distance;}
 window.addEventListener('kyoto:hint',event=>{const h=event.detail;applyAim(h);tutorial.aim();notice(`Suggested aim set. Release at the white ${throwSpeed(h.holdMs/((ui.state.selected?.allowedInputs?.chargeSeconds||2.8)*1000),h.powerRange||'precision').toFixed(1)} m/s mark.`,7000);canvas.focus();});
 
 let lastFrame=performance.now(),frames=0,frameSum=0,frameSample=performance.now(),lastTelemetry=0;
@@ -661,7 +661,7 @@ function animate(now){
   document.body.classList.toggle('is-robot-result',showRobotResult);
   const replayViewport=replaying?ui.replayViewport():mobile.active&&!briefing.blocked?mobile.viewport():null;
   const narrowResult=showRobotResult&&!replaying&&!mobile.active&&innerWidth<=900;
-  if(replayViewport&&!manualCamera&&(!inFlight||showRobotResult))distance=Math.max(3.8,innerHeight/replayViewport.height*2.4);
+  if(replayViewport&&!manualCamera&&(!inFlight||showRobotResult))distance=Math.max(levelEntryDistance(ui.state.selected),innerHeight/replayViewport.height*2.4);
   else if(narrowResult&&!manualCamera)distance=4.3;
   if(narrowResult)camera.setViewOffset(innerWidth,innerHeight,0,innerHeight*.18,innerWidth,innerHeight);
   else if(camera.view?.enabled)camera.clearViewOffset();
