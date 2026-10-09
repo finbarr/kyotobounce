@@ -914,3 +914,9 @@ They are not yet a completed campaign revision. No push or deployment.
   all six nearby variations and the first browser shot cleared. Replay, retry
   and music checks passed. Evidence: `.local/level-refinement/garden-proof/`
   and `garden-browser/`.
+
+- **Canopy Crossing (revision 2):** 55.5 m diagonal lob over the near canopy,
+  dropping past the next canopy edge onto its platform. Two exact hints,
+  all six nearby variations and the first browser shot cleared. Scouting,
+  replay, retry and music checks passed. Evidence:
+  `.local/level-refinement/canopy-final-proof/` and `canopy-final-browser/`.

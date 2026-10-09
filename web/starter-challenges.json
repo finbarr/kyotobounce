@@ -2115,7 +2115,7 @@
   },
   {
     "id": "canopy-crossing",
-    "revision": 1,
+    "revision": 2,
     "name": "Canopy Crossing",
     "creator": "station",
     "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
@@ -2139,66 +2139,36 @@
     "waypoints": [
       {
         "center": {
-          "x": 69.77974700927734,
-          "y": 5.378332138061523,
-          "z": -46.56173324584961
-        },
-        "normal": {
-          "x": -0.0007865250227041543,
-          "y": 0.9990445375442505,
-          "z": 0.0436958484351635
-        },
-        "radius": 0.44999998807907104,
-        "surface": "railway-2-3-east-roof-1",
-        "id": "near-roof"
-      },
-      {
-        "center": {
-          "x": 69.72750854492188,
-          "y": 5.539981842041016,
-          "z": -51.63123321533203
-        },
-        "normal": {
-          "x": 0.0007865250227041543,
-          "y": 0.9990445375442505,
-          "z": -0.0436958484351635
-        },
-        "radius": 0.6499999761581421,
-        "surface": "railway-2-3-east-roof--1",
-        "id": "far-roof"
-      },
-      {
-        "center": {
-          "x": 69.76641082763672,
-          "y": -1.399999976158142,
-          "z": -60.464820861816406
+          "x": 99.54931640625,
+          "y": 0,
+          "z": -72.95770263671875
         },
         "normal": {
           "x": 0,
           "y": 1,
           "z": 0
         },
-        "radius": 1,
-        "surface": "hachijo-crossing-rebuilt-hachijo-lift-east-transfer-rebuilt-railway-railway-subgrade-0",
-        "id": "track-drop"
+        "radius": 0.800000011920929,
+        "surface": "east-transfer-rebuilt-railway-4-5-platform-0",
+        "id": "far-platform"
       }
     ],
     "hint": {
-      "yaw": 180,
-      "pitch": 55,
+      "yaw": 140,
+      "pitch": 45,
       "top": 0,
       "kick": 0,
-      "powerRange": "precision",
-      "holdMs": 2800,
-      "note": "Use F to scout the roof targets, then return and apply H. Throw at full 12.0 m/s precision power, 55° upward aim and no spin. Skip across both canopy patches, then collect the track-bed patch below. Wait for full translation and spin rest."
+      "powerRange": "full",
+      "holdMs": 704,
+      "note": "Use F to scout the far platform target, then return and apply H. Lob diagonally over the near canopy and drop past the next canopy edge onto the platform. Use POWER and hold about 0.70 seconds."
     },
     "order": 22,
     "campaign": {
       "chapter": 5,
       "chapterTitle": "Platforms & Tracks",
       "difficulty": "Hard",
-      "distance": 28.8,
-      "brief": "Clear the tracks, skip over both faces of the next platform canopy and collect the patch below as the ball drops from the roof. Use F to scout the roof targets."
+      "distance": 55.5,
+      "brief": "Cross the tracks and near canopy, then drop onto the marked platform beneath the next canopy."
     },
     "throwModel": "robot-v4",
     "allowedInputs": {
