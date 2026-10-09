@@ -908,3 +908,9 @@ They are not yet a completed campaign revision. No push or deployment.
   hints, all six nearby variations and the first browser shot cleared. Replay,
   retry and music checks passed. Evidence: `.local/level-refinement/stair-proof/`
   and `stair-browser/`.
+
+- **Garden Corner (revision 2):** 50.1 m across the rooftop garden into a
+  viewing-glass target and back along the public promenade. Two exact hints,
+  all six nearby variations and the first browser shot cleared. Replay, retry
+  and music checks passed. Evidence: `.local/level-refinement/garden-proof/`
+  and `garden-browser/`.
