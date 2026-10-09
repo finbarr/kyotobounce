@@ -79,7 +79,7 @@
   },
   {
     "id": "atrium-blue-bank",
-    "revision": 1,
+    "revision": 2,
     "name": "Blue Wall Bank",
     "creator": "station",
     "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
@@ -87,16 +87,16 @@
     "scoring": "waypoint-v4",
     "start": {
       "center": {
-        "x": -29,
+        "x": -21,
         "y": 0,
-        "z": -5.200000762939453
+        "z": -5.200001239776611
       },
       "normal": {
         "x": 0,
         "y": 1,
         "z": 0
       },
-      "radius": 0.45,
+      "radius": 0.25,
       "surface": "concourse"
     },
     "goal": null,
@@ -104,35 +104,50 @@
       {
         "center": {
           "x": -33.099998474121094,
-          "y": 1.380285382270813,
-          "z": -4.980000972747803
+          "y": 0.8367966413497925,
+          "z": -4.980001449584961
         },
         "normal": {
           "x": 1,
           "y": 0,
           "z": 0
         },
-        "radius": 0.6499999761581421,
+        "radius": 0.4000000059604645,
         "surface": "central-lift-ground-front-south-joined",
         "id": "blue-wall"
+      },
+      {
+        "center": {
+          "x": -20.641801834106445,
+          "y": 0,
+          "z": -4.979408264160156
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        "radius": 1.5,
+        "surface": "concourse",
+        "id": "hall-return"
       }
     ],
     "hint": {
       "yaw": -90,
-      "pitch": 15,
+      "pitch": 25,
       "top": 0,
       "kick": 0,
-      "holdMs": 1826,
       "powerRange": "precision",
-      "note": "Bank the purple patch on the blue west frontage. Use 8.0 m/s and a slight upward aim, then let the rebound settle anywhere."
+      "holdMs": 2800,
+      "note": "Use full 12.0 m/s precision power and 25° upward aim. Bank the distant blue wall, then catch the broad return patch across the atrium. Let the ball reach full rest."
     },
     "order": 1,
     "campaign": {
       "chapter": 1,
       "chapterTitle": "Atrium Beginnings",
       "difficulty": "Easy",
-      "distance": 59,
-      "brief": "Turn the atrium wall into your first bank. Hit the purple wall patch and watch the ball rebound across the hall."
+      "distance": 26.1,
+      "brief": "Bank the blue wall from across the hall, then return onto the broad atrium patch. Collect both targets in one shot."
     },
     "throwModel": "robot-v4",
     "allowedInputs": {

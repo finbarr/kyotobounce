@@ -90,14 +90,14 @@
     },
     {
       "id": "atrium-blue-bank",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
-        "holdMs": 1826,
+        "holdMs": 2800,
         "range": "precision",
         "input": {
           "yaw": -90,
-          "pitch": 15,
+          "pitch": 25,
           "top": 0,
           "kick": 0
         },
@@ -105,66 +105,66 @@
       },
       "neighbors": [
         {
-          "holdMs": 1826,
+          "holdMs": 2800,
           "range": "precision",
           "input": {
-            "yaw": -95,
-            "pitch": 15,
+            "yaw": -91,
+            "pitch": 25,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 100
         },
         {
-          "holdMs": 1826,
+          "holdMs": 2800,
           "range": "precision",
           "input": {
-            "yaw": -85,
-            "pitch": 15,
+            "yaw": -89,
+            "pitch": 25,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 100
         },
         {
-          "holdMs": 1826,
+          "holdMs": 2800,
           "range": "precision",
           "input": {
             "yaw": -90,
-            "pitch": 10,
+            "pitch": 24,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 100
         },
         {
-          "holdMs": 1826,
+          "holdMs": 2800,
           "range": "precision",
           "input": {
             "yaw": -90,
-            "pitch": 20,
+            "pitch": 26,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 100
         },
         {
-          "holdMs": 1704,
+          "holdMs": 2780,
           "range": "precision",
           "input": {
             "yaw": -90,
-            "pitch": 15,
+            "pitch": 25,
             "top": 0,
             "kick": 0
           },
           "observeSeconds": 100
         },
         {
-          "holdMs": 1948,
+          "holdMs": 2760,
           "range": "precision",
           "input": {
             "yaw": -90,
-            "pitch": 15,
+            "pitch": 25,
             "top": 0,
             "kick": 0
           },

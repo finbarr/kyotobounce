@@ -875,3 +875,10 @@ foreground activation. See `docs/PARALLEL_DEVELOPMENT.md` for this workflow.
 
 The eight planned course-length changes are being verified individually.
 They are not yet a completed campaign revision. No push or deployment.
+
+- **Blue Wall Bank (revision 2):** 26.1 m through the final waypoint, using
+  a longer approach to the blue wall and a return across the concourse. Both
+  repeated hints and all six nearby variations cleared and reached full rest.
+  The real-browser shot, saved replay, retry and camera passed with zero skipped
+  music steps during the shot. Evidence: `.local/level-refinement/blue-proof/`
+  and `.local/level-refinement/blue-browser/`.
