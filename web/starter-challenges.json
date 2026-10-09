@@ -885,7 +885,7 @@
   },
   {
     "id": "bridge-pinball",
-    "revision": 1,
+    "revision": 2,
     "name": "Bridge Pinball",
     "creator": "station",
     "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
@@ -893,7 +893,7 @@
     "scoring": "waypoint-v4",
     "start": {
       "center": {
-        "x": 6.000001430511475,
+        "x": 6.500001907348633,
         "y": 9.589427947998047,
         "z": -13.350000381469727
       },
@@ -902,58 +902,58 @@
         "y": 1,
         "z": 0
       },
-      "radius": 0.4000000059604645,
+      "radius": 0.25,
       "surface": "gate-passage-bridge-walking-floor"
     },
     "goal": null,
     "waypoints": [
       {
         "center": {
-          "x": 4.423755168914795,
-          "y": 11.187495231628418,
-          "z": -11.955001831054688
+          "x": -3.2353882789611816,
+          "y": 11.343158721923828,
+          "z": -12.082601547241211
         },
         "normal": {
-          "x": 0.016668498516082764,
+          "x": 0.016657337546348572,
           "y": 0,
-          "z": -0.9998611211776733
+          "z": -0.9998612999916077
         },
-        "radius": 0.4000000059604645,
-        "surface": "gate-passage-glass-front-7",
-        "id": "front-glass"
+        "radius": 0.6,
+        "surface": "gate-passage-glass-front-2",
+        "id": "bridge-glass"
       },
       {
         "center": {
-          "x": 1.203369140625,
-          "y": 10.535379409790039,
-          "z": -14.276653289794922
+          "x": -36,
+          "y": 9.589427947998047,
+          "z": -14
         },
         "normal": {
-          "x": -0.016658134758472443,
-          "y": 0,
-          "z": 0.9998612403869629
+          "x": 0,
+          "y": 0.9999999403953552,
+          "z": 0
         },
-        "radius": 0.4000000059604645,
-        "surface": "gate-passage-glass-rear-5",
-        "id": "rear-glass"
+        "radius": 0.8500000238418579,
+        "surface": "gate-west-access-corridor-floor",
+        "id": "gallery-floor"
       }
     ],
     "hint": {
-      "yaw": -55,
-      "pitch": 10,
+      "yaw": -84,
+      "pitch": 5,
       "top": 0,
       "kick": 0,
-      "powerRange": "precision",
-      "holdMs": 1826,
-      "note": "Use 8.0 m/s at 10° elevation with no spin. Bank the front window, then the rear window across the walkway. Collect both purple patches and let the ball roll to a complete stop."
+      "powerRange": "full",
+      "holdMs": 774,
+      "note": "Use 28.0 m/s POWER, 5° upward aim and no spin. Glance off the front glass, then send the ball along the west gallery onto the distant floor patch. Collect both targets and let the ball stop completely."
     },
     "order": 10,
     "campaign": {
       "chapter": 3,
       "chapterTitle": "Above the Atrium",
-      "difficulty": "Medium",
-      "distance": 6.4,
-      "brief": "Play the glass bridge above the ticket hall. Bank the purple patch on each side of the walkway in one shot."
+      "difficulty": "Hard",
+      "distance": 62.5,
+      "brief": "Turn a glass bank into a long run along the upper west gallery. Collect the large floor patch near the far end of the public corridor."
     },
     "throwModel": "robot-v4",
     "allowedInputs": {

@@ -896,3 +896,9 @@ They are not yet a completed campaign revision. No push or deployment.
   inside glass and an aisle return. Two exact hints, six nearby variations and
   the first browser shot cleared. Saved replay, retry and music checks passed.
   Evidence: `.local/level-refinement/glass-proof/` and `glass-browser/`.
+
+- **Bridge Pinball (revision 2):** 62.5 m suggested route through the bridge
+  glass and a floor patch along the west gallery. Two exact hints, all six
+  nearby variations and the first browser shot cleared. Target placement also
+  covers the two earlier browser miss trajectories. Replay and music passed.
+  Evidence: `.local/level-refinement/bridge-final-proof/` and `bridge-browser/`.

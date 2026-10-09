@@ -954,91 +954,95 @@
     },
     {
       "id": "bridge-pinball",
-      "revision": 1,
+      "revision": 2,
       "repeat": 2,
       "shot": {
-        "holdMs": 1826,
-        "range": "precision",
+        "holdMs": 774,
+        "range": "full",
         "input": {
-          "yaw": -55,
-          "pitch": 10,
+          "yaw": -84,
+          "pitch": 5,
           "top": 0,
           "kick": 0
         },
-        "observeSeconds": 100
+        "observeSeconds": 110
       },
       "neighbors": [
         {
-          "holdMs": 1826,
-          "range": "precision",
+          "holdMs": 774,
+          "range": "full",
           "input": {
-            "yaw": -56,
-            "pitch": 10,
+            "yaw": -84.2,
+            "pitch": 5,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 1826,
-          "range": "precision",
+          "holdMs": 774,
+          "range": "full",
           "input": {
-            "yaw": -54,
-            "pitch": 10,
+            "yaw": -83.8,
+            "pitch": 5,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 1826,
-          "range": "precision",
+          "holdMs": 774,
+          "range": "full",
           "input": {
-            "yaw": -55,
-            "pitch": 9,
+            "yaw": -84,
+            "pitch": 4.75,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 1826,
-          "range": "precision",
+          "holdMs": 774,
+          "range": "full",
           "input": {
-            "yaw": -55,
-            "pitch": 11,
+            "yaw": -84,
+            "pitch": 5.25,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 1786,
-          "range": "precision",
+          "holdMs": 766,
+          "range": "full",
           "input": {
-            "yaw": -55,
-            "pitch": 10,
+            "yaw": -84,
+            "pitch": 5,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         },
         {
-          "holdMs": 1866,
-          "range": "precision",
+          "holdMs": 782,
+          "range": "full",
           "input": {
-            "yaw": -55,
-            "pitch": 10,
+            "yaw": -84,
+            "pitch": 5,
             "top": 0,
             "kick": 0
           },
-          "observeSeconds": 100
+          "observeSeconds": 110
         }
       ],
       "minimumNeighborClears": 6,
       "features": {
-        "minNonFloorTargets": 2,
-        "minSharpTurns": 2
+        "minNonFloorTargets": 1,
+        "minSharpTurns": 0,
+        "objectiveDistance": [
+          45,
+          65
+        ]
       }
     },
     {
