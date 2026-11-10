@@ -33,6 +33,7 @@ web/tests/.auth/
 node_modules/
 docs/*
 !docs/LOCAL_PLAY.md
+!docs/BROWSER-PHYSICS.md
 !docs/ASSETS.md
 !docs/ARCADE-SCORING.md
 !docs/PARALLEL_DEVELOPMENT.md
@@ -49,6 +50,7 @@ docs/*
 !docs/STATION-AUDIT-VIEWS.json
 tools/*
 !tools/assets.mjs
+!tools/browser-collision.mjs
 !tools/asset-paths.mjs
 !tools/pack-assets.mjs
 !tools/dev.mjs
