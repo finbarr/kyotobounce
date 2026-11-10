@@ -2,6 +2,15 @@
 import concurrent.futures, datetime, hashlib, json, mimetypes, pathlib, re, urllib.request, urllib.parse
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 CATALOG=ROOT/'sources.json'
+def reference_url(base, link):
+    url=urllib.parse.urljoin(base,link.replace('&amp;','&'))
+    parts=urllib.parse.urlsplit(url)
+    if parts.scheme not in ('http','https') or parts.username or parts.password: return None
+    # Public viewer HTML can include third-party API keys. Those script URLs
+    # are not architectural references and must never enter the source register.
+    credentials={'key','apikey','api_key','token','access_token','auth','authorization','signature','sig','secret','password'}
+    if any(name.lower().replace('-','_') in credentials for name,_ in urllib.parse.parse_qsl(parts.query,keep_blank_values=True)): return None
+    return url
 def collect(item):
     if item.get('access')=='link-only': return item
     req=urllib.request.Request(item['url'],headers={'User-Agent':'KyotoStationReferenceResearch/1.0 (personal architectural study)'})
@@ -20,8 +29,8 @@ def collect(item):
             text=data.decode('utf-8','replace')
             links=[]
             for link in re.findall(r'''(?:href|src|data-src)\s*=\s*["']([^"']+)''',text,re.I):
-                url=urllib.parse.urljoin(final,link.replace('&amp;','&'))
-                if url.startswith(('http://','https://')) and url not in links: links.append(url)
+                url=reference_url(final,link)
+                if url and url not in links: links.append(url)
             item['discovered_links']=links
         print(item['id'],len(data),content_type,flush=True)
     except Exception as error:
