@@ -16,7 +16,7 @@ export class Shot{
   this.world=world;this.challenge={...challenge,physics:BROWSER_PHYSICS};this.attempt=attempt;this.releaseTime=releaseTime;this.chargeTime=chargeTime;this.thrower=thrower;
   this.launch=structuredClone(launch);this.ball=new Ball(world);this.ball.stationTime=releaseTime;this.ball.launch(launch.position,launch.velocity,launch.spin);
   this.tracker=new ComboTracker(this.challenge,world.fallLimitY);this.poses=[];this.contacts=[];this.waypointHits=[];this.events=[];this.impactTimes=new Map();this.surfaces=new Set();this.collected=new Set();
-  this.steps=0;this.sleepDwell=0;this.goalDwell=0;this.done=false;this.reason='';this.destinationReached=false;this.recordPose();
+  this.steps=0;this.impacts=0;this.sleepDwell=0;this.goalDwell=0;this.done=false;this.reason='';this.destinationReached=false;this.recordPose();
  }
  recordPose(){const pose={t:this.ball.clock,p:{...this.ball.position},q:{...this.ball.rotation}};this.poses.push(pose);this.tracker.poses([pose]);return pose;}
  step(){
@@ -32,7 +32,7 @@ export class Shot{
    }
    if(contact.speed<=.28)continue;
    const qualifying=contact.speed>=.35&&b.clock-(this.impactTimes.get(contact.surface)??-Infinity)>=.08;
-   if(qualifying){this.impactTimes.set(contact.surface,b.clock);this.surfaces.add(contact.surface);}
+   if(qualifying){this.impacts++;this.impactTimes.set(contact.surface,b.clock);this.surfaces.add(contact.surface);}
    const hit={type:'impact',attempt:this.attempt,surface:contact.surface,label:contact.surface.replaceAll('-',' '),point:contact.point,speed:contact.speed,time:b.clock,stationTime:this.releaseTime+contact.time,qualifying};
    this.contacts.push(hit);this.tracker.contact(hit);this.events.push(hit);
   }
@@ -51,10 +51,11 @@ export class Shot{
   else if(this.sleepDwell>.6){this.done=true;this.reason='Ball stopped';}
  }
  cancel(reason='Recalled'){this.done=true;this.reason=reason;this.destinationReached=false;}
+ drain(){const recording={poses:this.poses,contacts:this.contacts};this.poses=[];this.contacts=[];this.tracker.compactContacts();return recording;}
  get breakdown(){return this.tracker.value({destinationReached:this.destinationReached,reason:this.reason,final:this.done});}
  result(){
   if(!this.done)throw Error('The shot is still moving');
   const breakdown=this.breakdown,success=breakdown.total>0&&waypointRouteComplete(this.challenge,this.waypointHits,this.destinationReached)&&(!this.challenge.requiredSurface||this.surfaces.has(this.challenge.requiredSurface));
-  return {type:'result',attempt:this.attempt,challenge:this.challenge,layout:this.world.layoutSha256,physics:BROWSER_PHYSICS,profile:this.ball.profile.id,fallLimitY:this.world.fallLimitY,reason:this.reason,success,destinationReached:this.destinationReached,score:breakdown.total,breakdown,duration:this.ball.clock,releaseTime:this.releaseTime,chargeTime:this.chargeTime,thrower:this.thrower,launchPosition:this.launch.position,velocity:this.launch.velocity,spin:this.launch.spin,poses:this.poses,contacts:this.contacts,waypointHits:this.waypointHits,surfaces:this.surfaces.size,impacts:this.contacts.filter(c=>c.qualifying).length};
+  return {type:'result',attempt:this.attempt,challenge:this.challenge,layout:this.world.layoutSha256,physics:BROWSER_PHYSICS,profile:this.ball.profile.id,fallLimitY:this.world.fallLimitY,reason:this.reason,success,destinationReached:this.destinationReached,score:breakdown.total,breakdown,duration:this.ball.clock,releaseTime:this.releaseTime,chargeTime:this.chargeTime,thrower:this.thrower,launchPosition:this.launch.position,velocity:this.launch.velocity,spin:this.launch.spin,poses:this.poses,contacts:this.contacts,waypointHits:this.waypointHits,surfaces:this.surfaces.size,impacts:this.impacts};
  }
 }

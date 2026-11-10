@@ -542,6 +542,7 @@ function animate(now){
   const frameStart=performance.now();requestAnimationFrame(animate);const rawDt=(now-lastFrame)/1000,dt=Math.min(.1,rawDt);lastFrame=now;
   if(!loaded||startup.active)return;
   shotTimeline=shotPlayback.sample(now);
+  if(shotTimeline?.phase==='Flight')connection?.playback?.(shotPlayback.shot.attempt,shotTimeline.time);
   if(shotTimeline?.jumped)clearSkippedMotion();
   if(shotTimeline){for(const message of shotTimeline.messages)handleMessage(message,true);ballRotations.add(shotTimeline.after);}
   if(!rightDrag&&!fly.active){

@@ -68,9 +68,10 @@ applies another impulse. Runtime BVH construction belongs in the worker.
   zero skipped music steps. Audio's scheduler advanced 100 steps over the shot.
   This is a headless Chrome laptop result, not a physical-phone or whole-campaign
   benchmark. Receipt and current UI captures: `.local/browser-physics/game/`.
-- The existing interface now uses worker states and trajectory chunks. Scores and
-  full replays are saved atomically in IndexedDB only when playback presents the
-  result. Recall discards a computed-but-unpresented result. The local board is
+- The existing interface uses worker states and trajectory chunks. Replay chunks
+  are written to IndexedDB during simulation; scores and completed replay headers
+  commit atomically only when playback presents the result. Recall removes the
+  unfinished recording and discards a computed-but-unpresented result. The local board is
   labelled "On this device"; these records have not been independently verified.
   Existing native guest credentials and scores are not overwritten.
 - Walking uses continuous full-capsule queries, wall sliding and ramp support.
@@ -100,6 +101,28 @@ applies another impulse. Runtime BVH construction belongs in the worker.
   on-demand authority, cross-browser determinism and broader device/performance
   benchmarks. The browser preview
   does not provide course creation yet.
+- Browser gameplay now computes 30 seconds ahead of acknowledged playback, with
+  one physics-step tolerance at the boundary.
+  Each recording message contains at most 180 new physics poses (181 including
+  the initial pose), 30 presentation frames and one bounded batch of events.
+  The worker waits for the IndexedDB write acknowledgment before continuing.
+  Skip bypasses the time lead, retains storage backpressure and suppresses future
+  presentation frames until full rest. Recall remains available in every wait.
+  Live bank history retains credited surfaces rather than repeated impacts;
+  complete replay poses, rotations, contacts and score frames stay on disk.
+- `node web/tests/browser-shot-flow.mjs` proves the lookahead/ack bounds, exact
+  streamed-versus-raw replay equality, bank-history compaction and recall of an
+  indefinitely moving shot. `npm run test:browser:recording` runs the real worker
+  offline through more than 240 simulated seconds without an early result,
+  delayed storage, stale acknowledgments and recording failure. It also checks
+  preservation of existing saved data, active-tab recording locks, and cleanup
+  of abandoned recordings after a tab closes. Full replay viewing still loads
+  that replay into memory; saved disk usage grows with actual shot duration.
+- The three-course interface run with streamed recording passes desktop/mobile
+  controls, offline play, Skip, recall, reload and exact Node verification of
+  reconstructed replays. Its unskipped escalator flight measured 1,914 frames,
+  60.0 FPS average, 16.8 ms p95 and maximum, zero main-thread long tasks and zero
+  skipped music steps. These are headless Chrome laptop measurements.
 - Keep one generated collision pack under `.local/browser-physics/`; do not commit
   generated assets or make duplicate station bundles. Preserve unrelated local
   Unity package edits. Test the browser headlessly with `background-input.mjs`.
@@ -112,8 +135,7 @@ playback/Skip/rotation-sample interface and fences results by attempt ID.
 
 ## Next bounded task
 
-Bound compute-ahead for shots that keep moving, without timing them out or
-banking them early. Then prove all 30 authored routes and station traversal,
+Prove all 30 authored routes and station traversal,
 including small steps and convex solids; enable the complete campaign, finish
 creation/editing and add independent on-demand score verification. Keep
 integrating each finished task; the overall migration remains incomplete until

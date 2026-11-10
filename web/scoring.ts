@@ -17,6 +17,17 @@ function entersGoal(a:Vector,b:Vector,g:Vector,r:number,ballRadius:number){
 type Pose=NativeResult['poses'][number];
 type Contact=NativeResult['contacts'][number];
 type Challenge=NonNullable<NativeResult['challenge']>;
+// Keep the credited contacts, not every repeated bounce, when streaming a long
+// browser replay. This is the same ordered filter used for live/final scoring.
+function bankContacts(contacts:Contact[],until:number){
+ const seen=new Set<string>(),banks:Contact[]=[];let lastTime=-Infinity,lastPoint:Vector|null=null;
+ for(const hit of contacts){
+  const family=hit.surface.replace(/-(?:step|tread)-?\d+$/,'');
+  if(!hit.qualifying||hit.speed<1||hit.time>until||seen.has(family)||hit.time-lastTime<.18||(lastPoint&&distance(hit.point,lastPoint)<.6))continue;
+  seen.add(family);banks.push(hit);lastTime=hit.time;lastPoint=hit.point;
+ }
+ return banks;
+}
 // Course completion is separate from score eligibility. Use actual target IDs,
 // never a client count; destination-only courses still need a landing to clear.
 export function waypointRouteComplete(c:Challenge,hits:WaypointHit[],destinationReached:boolean){
@@ -45,6 +56,11 @@ export class ComboTracker {
   if(!this.waypointHits.some(h=>h.waypointId===hit.waypointId))this.waypointHits.push({waypointId:hit.waypointId,time:hit.time,point:hit.point,normal:hit.normal,surface:hit.surface});
  }
  contact(hit:Contact){this.contacts.push(hit);}
+ compactContacts(){
+  // Call after poses have caught up; retain future contacts if any were queued.
+  const time=this.last?.t??0,until=this.c.scoring===WAYPOINT_SCORING?time:Math.min(time,this.firstVisit);
+  this.contacts=[...bankContacts(this.contacts,until),...this.contacts.filter(h=>h.time>time)];
+ }
  poses(poses:Pose[]){
   for(const pose of poses){
    if(!Number.isFinite(pose.t)||Object.values(pose.p).some(x=>!Number.isFinite(x)))throw new Error('Invalid recorded trajectory');
@@ -66,12 +82,7 @@ export class ComboTracker {
   const g=this.c.goal!.center,endPosition=this.last?.p||this.c.start.center;
   const gap=Math.hypot(Math.max(0,Math.hypot(endPosition.x-g.x,endPosition.z-g.z)-(this.c.goal!.radius-.023)),Math.max(0,Math.abs(endPosition.y-(g.y+.023))-.015));
   const range=proximityRange(this.c),goalVisited=!!options.success||Number.isFinite(this.firstVisit);
-  const seen=new Set<string>();let banks=0,lastTime=-Infinity,lastPoint:Vector|null=null,lastBank='';
-  for(const hit of this.contacts){
-   const family=hit.surface.replace(/-(?:step|tread)-?\d+$/,'');
-   if(!hit.qualifying||hit.speed<1||hit.time>this.firstVisit||hit.time>(this.last?.t??0)||seen.has(family)||hit.time-lastTime<.18||(lastPoint&&distance(hit.point,lastPoint)<.6))continue;
-   seen.add(family);banks++;lastTime=hit.time;lastPoint=hit.point;lastBank=hit.label;
-  }
+  const credited=bankContacts(this.contacts,Math.min(this.firstVisit,this.last?.t??0)),banks=credited.length,lastBank=credited.at(-1)?.label||'';
   const bankBonus=BANK_BONUS*banks,bankMultiplier=1+bankBonus,comboMultiplier=bankMultiplier;
   // No gameplay ceiling: only guard the integer storage/transport precision.
   const bankPoints=Math.min(Number.MAX_SAFE_INTEGER,Math.round(BASE_POINTS*bankMultiplier));
@@ -85,12 +96,7 @@ export class ComboTracker {
  forfeited(reason?:string){return this.leftStation||['Recalled','Player left','Ball left the station'].includes(reason||'');}
  waypointValue(options:{destinationReached?:boolean;reason?:string;final?:boolean}):ScoreBreakdown{
   const hits=this.waypointHits.filter(h=>h.time<=(this.last?.t??0));
-  const seen=new Set<string>();let banks=0,lastTime=-Infinity,lastPoint:Vector|null=null,lastBank='';
-  for(const hit of this.contacts){
-   const family=hit.surface.replace(/-(?:step|tread)-?\d+$/,'');
-   if(!hit.qualifying||hit.speed<1||hit.time>(this.last?.t??0)||seen.has(family)||hit.time-lastTime<.18||(lastPoint&&distance(hit.point,lastPoint)<.6))continue;
-   seen.add(family);banks++;lastTime=hit.time;lastPoint=hit.point;lastBank=hit.label;
-  }
+  const credited=bankContacts(this.contacts,this.last?.t??0),banks=credited.length,lastBank=credited.at(-1)?.label||'';
   const safe=(n:number)=>Math.min(Number.MAX_SAFE_INTEGER,Math.max(0,Math.round(n)));
   const waypointCount=hits.length,waypointMultiplier=waypointCount?FIRST_WAYPOINT_MULTIPLIER*WAYPOINT_FACTOR**(waypointCount-1):1;
   // Bank credit never doubles when a waypoint is collected. Order does not matter.

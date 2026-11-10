@@ -3,17 +3,18 @@ import {Walker} from './walker.js';
 import {STEP} from './ball.js';
 import {ballProfile} from './materials.js';
 import {v,add,clamp,identity} from './math.js';
+import {ShotRunner} from './shot-runner.js';
 export class GameSession{
  constructor(world,catalog,id,emit){
   this.world=world;this.catalog=catalog.map(c=>({...c,physics:BROWSER_PHYSICS}));this.id=id;this.emit=emit;this.stationTime=0;this.generation=0;this.lastTick=performance.now();this.accumulator=0;this.input={x:0,z:0,fast:false};
   this.select(this.catalog[0].id,false);this.timer=setInterval(()=>this.tick(),1000/30);
  }
- close(){clearInterval(this.timer);this.generation++;}
+ close(){clearInterval(this.timer);this.runner?.close();this.generation++;}
  player(){return {id:this.id,feet:this.walker.feet,release:this.walker.release(this.aim.yaw,this.aim.pitch,this.stationTime)||add(this.walker.feet,v(0,1.5,0)),movement:this.walker.movement,walked:this.walker.walked,grounded:this.walker.grounded,...this.aim,power:this.power||0,powerRange:this.powerRange||'precision'};}
  session(){this.emit({type:'session',id:this.id,busy:['Charging','Release','Flight'].includes(this.phase),attempt:this.attempt,challenge:this.challenge,local:true});}
  select(id,announce=true){
   const challenge=this.catalog.find(c=>c.id===id);if(!challenge)throw Error('This course is not in the current browser preview');
-  this.generation++;this.challenge=challenge;this.phase='Aim';this.attempt=null;this.shot=null;this.power=0;this.chargeTime=this.releaseTime=0;
+  this.runner?.close();this.generation++;this.challenge=challenge;this.phase='Aim';this.attempt=null;this.shot=null;this.power=0;this.chargeTime=this.releaseTime=0;
   this.walker=new Walker(this.world,add(challenge.start.center,v(0,.03,0)));this.input={x:0,z:0,fast:false};this.aim={yaw:180,pitch:15,top:0,kick:0,...challenge.hint};this.powerRange=challenge.hint?.powerRange||'precision';
   for(let i=0;i<12;i++)this.walker.move(this.input,this.aim.yaw,false,STEP);
   this.session();if(announce)this.emit({type:'selected',challenge});this.publish();
@@ -23,7 +24,7 @@ export class GameSession{
  tick(){
   const now=performance.now();this.accumulator+=Math.min(.1,(now-this.lastTick)/1000);this.lastTick=now;
   while(this.accumulator>=STEP){
-   this.accumulator-=STEP;this.stationTime+=STEP;
+   this.accumulator-=STEP;if(this.phase!=='Flight')this.stationTime+=STEP;
    if(['Aim','Charging','Release'].includes(this.phase))this.walker.move(this.phase==='Aim'&&now-this.inputAt<300?this.input:{x:0,z:0},this.aim.yaw,this.input.fast,STEP);
   }
   if(this.phase==='Charging')this.power=clamp((now-this.chargeAt)/2800,0,1);
@@ -48,32 +49,19 @@ export class GameSession{
   }
   if(m.type==='cancel'){this.input={x:0,z:0};if(['Charging','Release'].includes(this.phase))this.reset();return;}
   if(m.type==='recall'){this.shot?.cancel();this.reset();this.emit({type:'recalled'});return;}
+  if(m.type==='playback-progress'&&m.attempt===this.attempt&&this.phase==='Flight'){
+   this.runner?.progress(m.time);this.stationTime=this.releaseTime+(this.runner?.played||0);return;
+  }
+  if(m.type==='recording-ack'&&m.attempt===this.attempt){this.runner?.acknowledge(m.sequence);return;}
   if(m.type==='bank-result'&&m.attempt===this.attempt&&this.shot?.done){this.phase='Result';this.stationTime=Math.max(this.stationTime,this.releaseTime+this.shot.ball.clock);this.session();return;}
-  if(m.type==='skip-shot'&&m.attempt===this.attempt)this.emit({type:'shot-skipping',attempt:this.attempt});
+  if(m.type==='skip-shot'&&m.attempt===this.attempt){this.runner?.skip();this.emit({type:'shot-skipping',attempt:this.attempt});}
  }
- reset(){this.generation++;this.phase='Aim';this.attempt=null;this.shot=null;this.input={x:0,z:0};this.power=0;this.session();this.publish();}
+ reset(){this.runner?.close();this.generation++;this.phase='Aim';this.attempt=null;this.shot=null;this.input={x:0,z:0};this.power=0;this.session();this.publish();}
  launch(){
   const release=this.walker.release(this.aim.yaw,this.aim.pitch,this.stationTime);if(!release){this.reset();this.emit({type:'error',message:'Throw cancelled: the hand is blocked'});return;}
   this.releaseTime=this.stationTime;this.phase='Flight';const thrower=structuredClone(this.player()),launch=launchInput(this.walker.feet,{...this.aim,power:this.power,powerRange:this.powerRange});launch.position=release;
   const shot=this.shot=new Shot(this.world,this.challenge,launch,{attempt:this.attempt,releaseTime:this.releaseTime,chargeTime:this.chargeTime,thrower});
-  const base={...this.state(),launchPosition:launch.position,players:[thrower]},generation=this.generation,began=performance.now();let sequence=0,rotationCursor=0,maxBatchMs=0;const scoreFrames=[];
-  const compute=()=>{
-   if(generation!==this.generation)return;
-   try{
-    const start=performance.now(),frames=[],events=[];
-    do{
-     shot.step();events.push(...shot.events.splice(0).map(e=>({...e,id:this.id})));
-     if(shot.steps%6===0||shot.done){
-      const b=shot.ball,score=shot.breakdown;scoreFrames.push({t:b.clock,score});
-      const rotationSamples=shot.poses.slice(rotationCursor).map(p=>({t:p.t,q:p.q}));rotationCursor=shot.poses.length;
-      frames.push({stationTime:this.releaseTime+b.clock,flightTime:b.clock,phase:shot.done?'Result':'Flight',ball:b.position,rotation:b.rotation,velocity:b.velocity,spin:b.spin,rotationSamples,liveScore:score,impacts:shot.contacts.filter(c=>c.qualifying).length,surfaces:shot.surfaces.size,diagnostics:{simulating:!shot.done,sleeping:b.sleeping,supported:b.supported,contactBudgetExhaustions:b.budgetExhaustions}});
-     }
-    }while(!shot.done&&performance.now()-start<8);
-    maxBatchMs=Math.max(maxBatchMs,performance.now()-start);
-    this.emit({type:'shot-chunk',attempt:this.attempt,sequence:sequence++,base,frames,events,complete:shot.done});
-    if(shot.done)this.emit({type:'local-result',result:{...shot.result(),id:this.id,scoreFrames},computeMs:performance.now()-began,maxBatchMs});
-    else setTimeout(compute,0);
-   }catch(error){this.reset();this.emit({type:'error',message:String(error)});}
-  };setTimeout(compute,0);
+  const base={...this.state(),launchPosition:launch.position,players:[thrower]},generation=this.generation;
+  this.runner=new ShotRunner(shot,base,message=>{if(generation===this.generation)this.emit(message);});
  }
 }
