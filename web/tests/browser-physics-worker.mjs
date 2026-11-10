@@ -38,13 +38,14 @@ try{
  });
  await page.waitForFunction(()=>messages.some(m=>m.type==='ready'||m.type==='error'),null,{timeout:60000});
  const ready=await page.evaluate(()=>messages.find(m=>m.type==='ready'||m.type==='error'));assert.equal(ready.type,'ready',ready.message);
+ assert.equal(ready.stats.solids,457,'Worker indexes the current solid casings');
  // Both repeat runs execute after network access is disabled. Neither collision
  // queries nor scoring may fall back to the Unity service or an HTTP endpoint.
  await context.setOffline(true);
  const courses=JSON.parse(await readFile('web/starter-challenges.json','utf8')),nodeProof=JSON.parse(await readFile(`.local/browser-physics/${campaign?'campaign':'station'}-proof.json`,'utf8'));
  if(campaign){assert.equal(nodeProof.physics,BROWSER_PHYSICS);assert.equal(nodeProof.receipts.filter(r=>r.kind==='hint'&&r.pass).length,30);assert.equal(nodeProof.catalogSha256,createHash('sha256').update(await readFile('web/starter-challenges.json')).digest('hex'),'Node proof must describe the current catalog');}
  const cases=(campaign?courses.map(c=>c.id):['atrium-welcome','atrium-clock-in','basement-upward-bound']).map(id=>campaign?nodeProof.receipts.find(r=>r.id===id&&r.kind==='hint'):nodeProof.results.find(r=>r.id===id));
- if(campaign){assert.ok(nodeProof.regressions.some(r=>r.label==='moving-contact-timestamp'));cases.push(...nodeProof.regressions);}
+ if(campaign){for(const label of ['moving-contact-timestamp','solid-casing-recovery'])assert.ok(nodeProof.regressions.some(r=>r.label===label));cases.push(...nodeProof.regressions);}
  for(const expected of cases){
   const id=expected.id,label=expected.label||id,challenge=courses.find(c=>c.id===id),hint=challenge.hint,launch=campaign?expected.launch:launchInput(add(challenge.start.center,v(0,.025,0)),{...hint,power:hint.holdMs/2800}),releaseTime=expected.releaseTime||0;
   let hash;
@@ -52,7 +53,7 @@ try{
    await page.evaluate(({challenge,launch,releaseTime})=>{window.result=null;window.messages=[];window.worker.postMessage({type:'throw',challenge,launch,options:{releaseTime}});},{challenge,launch,releaseTime});
    await page.waitForFunction(()=>result||messages.some(m=>m.type==='error'),null,{timeout:60000});
    const response=await page.evaluate(()=>result||messages.find(m=>m.type==='error'));assert.equal(response.type,'result',response.message);
-   const {result,computeMs,maxBatchMs}=response;assert.ok(result.success);assert.equal(result.waypointHits.length,challenge.waypoints.length);
+   const {result,computeMs,maxBatchMs}=response;assert.equal(result.success,expected.expectSuccess??true);assert.equal(result.waypointHits.length,expected.expectedWaypoints??challenge.waypoints.length);
    const digest=createHash('sha256').update(JSON.stringify(result)).digest('hex');
    assert.equal(digest,expected.sha256,`${label}: Chrome must reproduce the Node verifier byte for byte`);
    if(hash)assert.equal(digest,hash);hash=digest;

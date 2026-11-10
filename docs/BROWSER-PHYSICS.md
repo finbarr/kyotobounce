@@ -52,6 +52,12 @@ does not open an automatic overview screen.
   produced matching poses and scores but a 7e-15-second Chrome/Node timestamp
   difference. That exact launch and station phase are retained in the campaign
   replay regression; no comparison tolerance is used.
+- Version `kyoto-browser-4` gives the 457 convex escalator casings solid
+  interiors. Centered convex hulls use the same authored corners as native
+  collision, indexed in a separate spatial tree. Interior overlap correction
+  moves a penetrated ball outward and prevents release from inside a casing.
+  Exterior casts still use the original triangles; ordinary open meshes stay
+  open. No collision pack or visual asset changes are needed.
 - Quaternion integration uses fixed-order trigonometric polynomials, avoiding
   engine-specific `Math.sin`/`Math.cos` differences amplified by cancellation.
   A manually timed throw exposed the difference; the Chrome regression includes
@@ -81,6 +87,7 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
 | `npm run test:traversal` | 166 station walks: 33 public stair flights, all 48 escalators, connected east atrium stairs and the complete Grand Stair-to-garden route, each in both directions; six offline keyboard walks in rendered Chrome through the real UI/worker |
 | `npm run test:physics:station` | Opening-course geometry checks, including Clock In's first three native contact positions within 0.1 mm, plus Node/Chrome replay equality |
+| `npm run test:physics:solids` | All 457 authored convex casings: 5,941 interior samples, 5,484 exterior casts, outward recovery and contacts on the original visible surfaces; combined-world interior lookup |
 | `node web/tests/browser-escalators.mjs --station` | All 48 actual lanes carry a grounded walker; 1,380 rendered-tread/collision comparisons at five phases, maximum measured difference 0.00000213 m |
 | `npm run test:runtime` | Isolated native service campaign, full rest, walking, creator validation, replay, Skip/reconnect and recall regressions while the native path remains in use |
 
@@ -94,10 +101,10 @@ revision is incremented. Native proofs can use `KYOTO_PROOF_SKIP=1` to bypass
 presentation through the existing Skip protocol while still requiring full rest.
 
 Offline Chrome 157 on this laptop reproduces all 30 complete replay hashes and
-the timed-contact regression twice. Collision loading/indexing took 1.225 seconds.
-Shots took 15.4–531.2 ms
+both the timed-contact and solid-recovery regressions twice. Collision
+loading/indexing took 1.059 seconds. These cases took 3.9–438.4 ms
 of worker computation in yielding batches, with the largest observed batch
-8.3 ms. The main-thread heartbeat p95 was 17.2 ms, maximum 145.0 ms including
+8.8 ms. The main-thread heartbeat p95 was 18.0 ms, maximum 123.6 ms including
 loading and test result transfers. This isolated worker check is not a rendered
 frame-rate or physical-phone benchmark. Receipts:
 `.local/browser-physics/{campaign,campaign-worker}-proof.json`.
@@ -118,9 +125,9 @@ These are headless Chrome laptop measurements,
 not physical-phone results or a guarantee of 60 FPS. Current receipts and captures
 are under `.local/browser-physics/game/`.
 
-The final integrated UI run passed all desktop/mobile course selections, exact
+The solid-casing UI run passed all desktop/mobile course selections, exact
 re-simulation of its three stored shots, offline controls and reload persistence.
-Its 1,880-frame flight averaged 59.28 FPS, with 16.8 ms p95, 33.4 ms maximum,
+Its 1,832-frame flight averaged 60.00 FPS, with 16.7 ms p95, 16.8 ms maximum,
 no main-thread long tasks and no skipped music beats. Maximum audio scheduler
 gap was 53.3 ms. The test now waits for responsive controls to finish switching
 after a viewport resize before sending menu input.
@@ -138,18 +145,24 @@ Receipts are `.local/browser-physics/walking-proof.json` and
 fixture course starts in its fetched catalog; movement uses the real keyboard
 controls, current collision pack and built worker while offline.
 
+The solid-casing proof measures a maximum contact-to-authored-surface distance
+of 0.00000726 m for interior recovery and 0.00000525 m for exterior casts.
+Portable checks also compare 600 exterior face/edge/corner casts with analytic
+rotated boxes, reject a hand inside a solid and retain open-mesh behavior.
+The campaign regression includes an initially penetrated ball in an actual
+east concourse casing: its first physics step escapes, it reaches full rest,
+and it does not claim the distant waypoint. The receipt is
+`.local/browser-physics/solid-proof.json`.
+
 ## Remaining bounded tasks
 
-1. Complete solid convex overlap handling for the escalator casings and verify
-   collision against the visual station. The current pack marks 457 panels as
-   convex, but browser overlap queries still treat them as triangle shells.
-2. Implement browser course creation/editing, validation and durable saved
+1. Implement browser course creation/editing, validation and durable saved
    courses using the existing interface.
-3. Add independent on-demand online verification and score storage. Reconstruct
+2. Add independent on-demand online verification and score storage. Reconstruct
    accepted shots from validated inputs; never accept a client's claimed score.
    Package static hosting and verification without an always-on physics process
    or a fixed monthly compute subscription.
-4. Verify the complete integrated game, cross-browser replay behavior and broader
+3. Verify the complete integrated game, cross-browser replay behavior and broader
    desktop/mobile controls and performance. Remove remaining runtime dependence
    on the native worker when the replacement is proven. Investigate the observed
    audio scheduler gap of about 1.1 seconds during automated course/viewport

@@ -61,12 +61,18 @@ for(const [index,challenge] of courses.entries()){
 // A real UI throw exposed a one-bit Chrome/Node difference in a moving-tread
 // contact timestamp. Keep the exact launch and nonzero station phase: authored
 // hints alone did not exercise this case.
-const regressions=[{id:'basement-upward-bound',label:'moving-contact-timestamp',releaseTime:40.87834413442761,launch:{position:v(2.2200000286102295,-3.3885726928710938,5.64272928237915),velocity:v(1.0162678956985474,0,6.222846661011925e-17),spin:v()}}];
+const regressions=[
+ {id:'basement-upward-bound',label:'moving-contact-timestamp',releaseTime:40.87834413442761,launch:{position:v(2.2200000286102295,-3.3885726928710938,5.64272928237915),velocity:v(1.0162678956985474,0,6.222846661011925e-17),spin:v()}},
+ // Inject an invalid penetrated state to exercise recovery in the real worker.
+ // It must escape the casing and settle, without claiming the distant target.
+ {id:'atrium-welcome',label:'solid-casing-recovery',recoverFrom:'east-concourse-lower-escalator-1-skirt--1 36796',expectSuccess:false,expectedWaypoints:0,releaseTime:0,launch:{position:v(28.900002479553223,5.379999876022339,5.914999723434448),velocity:v(),spin:v()}}
+];
 for(const fixture of regressions){
  const shot=new Shot(world,courses.find(c=>c.id===fixture.id),fixture.launch,{releaseTime:fixture.releaseTime});
+ if(fixture.recoverFrom){assert.equal(world.overlap(shot.ball.position,shot.ball.profile.radius)?.surface.id,fixture.recoverFrom);shot.step();assert.equal(world.overlap(shot.ball.position,shot.ball.profile.radius),null,'First physics step escapes the solid');}
  while(!shot.done&&shot.steps<180*150)shot.step();
  assert.ok(shot.done&&shot.ball.sleeping);assert.equal(shot.ball.budgetExhaustions,0);
- const result=shot.result();assert.ok(result.success);assert.deepEqual(scoreAttempt(result),result.breakdown);
+ const result=shot.result();assert.equal(result.success,fixture.expectSuccess??true);assert.deepEqual(scoreAttempt(result),result.breakdown);
  fixture.sha256=createHash('sha256').update(JSON.stringify(result)).digest('hex');
 }
 world.free();await writeFile('.local/browser-physics/campaign-proof.json',JSON.stringify({layout:proof.layout,physics:BROWSER_PHYSICS,catalogSha256:createHash('sha256').update(catalogBytes).digest('hex'),inputsSha256:createHash('sha256').update(proofBytes).digest('hex'),receipts,regressions},null,2)+'\n');
