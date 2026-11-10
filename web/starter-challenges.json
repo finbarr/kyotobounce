@@ -900,7 +900,7 @@
   },
   {
     "id": "bridge-pinball",
-    "revision": 2,
+    "revision": 3,
     "name": "Bridge Pinball",
     "creator": "station",
     "layout": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
@@ -955,12 +955,12 @@
     ],
     "hint": {
       "yaw": -84,
-      "pitch": 5,
+      "pitch": 4.25,
       "top": 0,
       "kick": 0,
       "powerRange": "full",
       "holdMs": 774,
-      "note": "Use 28.0 m/s POWER, 5° upward aim and no spin. Glance off the front glass, then send the ball along the west gallery onto the distant floor patch. Collect both targets and let the ball stop completely."
+      "note": "Use 28.0 m/s POWER, 4.25° upward aim and no spin. Glance off the front glass, then send the ball along the west gallery onto the distant floor patch. Collect both targets and let the ball stop completely."
     },
     "order": 10,
     "campaign": {

@@ -7,8 +7,9 @@ import {backgroundInput} from './background-input.mjs';
 import {buildBrowserPhysics} from '../build-physics.mjs';
 import {encodeCollisionPack} from '../public/physics/collision-pack.js';
 import {v,identity} from '../public/physics/math.js';
+import {BROWSER_PHYSICS} from '../public/physics/shot.js';
 await buildBrowserPhysics();
-const course={id:'recording-test',name:'Recording test',layout:'recording-test',physics:'kyoto-browser-1',scoring:'waypoint-v4',revision:1,start:{center:v(0,10000,0),radius:.25,normal:v(0,1,0),surface:'platform'},waypoints:[],hint:{yaw:0,pitch:0,top:0,kick:0,powerRange:'full'}};
+const course={id:'recording-test',name:'Recording test',layout:'recording-test',physics:BROWSER_PHYSICS,scoring:'waypoint-v4',revision:1,start:{center:v(0,10000,0),radius:.25,normal:v(0,1,0),surface:'platform'},waypoints:[],hint:{yaw:0,pitch:0,top:0,kick:0,powerRange:'full'}};
 const collision=encodeCollisionPack({layoutSha256:course.layout,fallLimitY:-1e9,shapes:[{kind:'box',id:'platform',material:'granite',position:v(0,9999.5,0),half:v(2,.5,2),rotation:identity(),mask:3}],escalators:[]},[]);
 const server=http.createServer(async(req,res)=>{
  try{

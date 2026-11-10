@@ -33,6 +33,7 @@
     "dev:browser": "node web/browser-dev.mjs",
     "assets:collision": "node tools/browser-collision.mjs",
     "test:browser:local": "node web/tests/browser-local-game.mjs",
+    "test:browser:campaign": "node web/tests/browser-campaign.mjs && node web/tests/browser-physics-worker.mjs --campaign",
     "test:physics:motion": "node web/tests/browser-escalators.mjs",
     "test:browser:recording": "node web/tests/browser-recording.mjs"
   },

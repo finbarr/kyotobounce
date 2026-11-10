@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import {setTimeout as delay} from 'node:timers/promises';
 import {StaticWorld} from '../public/physics/static-world.js';
-import {Shot} from '../public/physics/shot.js';
+import {Shot,BROWSER_PHYSICS} from '../public/physics/shot.js';
 import {ShotRunner,SHOT_LOOKAHEAD,SHOT_BATCH_STEPS} from '../public/physics/shot-runner.js';
 import {ComboTracker} from '../scoring.ts';
 import {v,identity} from '../public/physics/math.js';
 const until=async check=>{const end=performance.now()+10000;while(!check()){if(performance.now()>end)throw Error('Shot flow timed out');await delay(5);}};
-const course={id:'flow',layout:'flow',physics:'kyoto-browser-1',scoring:'waypoint-v4',revision:1,start:{center:v()},waypoints:[]};
+const course={id:'flow',layout:'flow',physics:BROWSER_PHYSICS,scoring:'waypoint-v4',revision:1,start:{center:v()},waypoints:[]};
 const world=new StaticWorld({layoutSha256:'flow',fallLimitY:-1e9,shapes:[],escalators:[]});
 const endless=new Shot(world,course,{position:v(0,1e6,0),velocity:v(1,0,0),spin:v(0,5,0)});
 let chunks=0,result=null,last,hold=true,maxPoses=0;

@@ -5,7 +5,7 @@ import {ComboTracker,waypointRouteComplete} from '../../scoring.ts';
 
 // This version must never share a leaderboard with the native solver. Verification
 // will reproduce inputs with this module, not accept the result sent by a browser.
-export const BROWSER_PHYSICS='kyoto-browser-1';
+export const BROWSER_PHYSICS='kyoto-browser-2';
 export function launchInput(feet,input){
  const angle=input.pitch*Math.PI/180,speed=throwSpeed(input.power,input.powerRange);
  return {position:add(feet,yaw(v(.22,1.5,.42),input.yaw)),velocity:yaw(v(0,speed*Math.sin(angle),speed*Math.cos(angle)),input.yaw),spin:yaw(v(input.top,0,-input.kick),input.yaw)};

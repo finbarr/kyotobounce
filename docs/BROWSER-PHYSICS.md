@@ -6,137 +6,112 @@ on demand using the same versioned simulation and collision assets; a browser's
 claimed score is never authoritative. Gameplay must continue after disconnection.
 Deployment is outside the current goal.
 
-## Delivered: opening courses and moving escalators
-
-Acceptance checks: First Bounce, Clock In and Upward Bound playable without Unity
-or a WebSocket; exact surface waypoint collection, full translation/spin settling,
-recall forfeiture, Skip and replay; persistent local progress; headless Chrome
-checks with desktop pointer capture disabled; real moving tread contacts and
-walking carry. Follow with the rest of the campaign, complete traversal, creator,
-independent score verification and broader performance checks.
+## Current browser preview
 
 Run `npm run assets:collision` once for the current asset pack, then
-`npm run dev:browser -- 4430`. This preview serves the existing game at
-`http://127.0.0.1:4430`, with the opening proof courses and no Unity service,
-WebSocket or gameplay HTTP API. It references the existing station files directly.
-Upward Bound is also enabled to exercise the moving-escalator route. All 48
-station escalators now have analytical moving tread collision, surface velocity,
-support, incoming-tread wake-up and grounded walking carry. Sweeps split at rail
-turns, include reverse travel and the hidden return chain, and retain the custom
-ball contact/spin response. Each shot has its own station clock initialized from
-its recorded release time. Throw clearance checks include the moving treads.
-`npm run test:browser:local` exercises the real interface against that preview.
-The regular native launcher remains available until the rest of the migration
-has passed; the static preview selects the browser transport with an HTML marker.
+`npm run dev:browser -- 4430`. The preview at `http://127.0.0.1:4430` serves all
+30 campaign courses without Unity, a WebSocket or a gameplay HTTP API. It uses
+existing station files directly. The regular native launcher remains available
+until the full migration passes; an HTML marker selects the browser transport.
 
-The initial collision export and custom ball solver are in `web/public/physics/`.
-Generate the single local collision asset with `node tools/browser-collision.mjs`.
-The input must match the current campaign layout hash. The served v2 layout comes
-from `web/v2/assets.json` with its configured spawn, not the retired root layout.
-Exporting positions, triangles and physical properties removes render-only data:
-the initial pack is 58,843,636 bytes versus a 512,444,053-byte layout.
+The browser owns walking, throwing, target collection, scoring, full settling,
+recall, Skip, local progress and replays. Local leaderboards are labelled
+"On this device" and are unverified. Native credentials and scores remain
+separate. Course creation and independent online verification are still required.
+Selecting a level closes the mobile panel, including First Bounce, whose tutorial
+does not open an automatic overview screen.
 
-The ball retains the native 180 Hz custom impulse/drag/spin model. Three Mesh BVH
-indexes triangles; analytic swept sphere/triangle, box and capsule tests provide
-contacts. A generic library's sphere casts failed sub-millimetre floor-clearance
-checks for this 23 mm ball, so it was removed. No third-party rigid-body solver
-applies another impulse. Runtime BVH construction belongs in the worker.
+## Simulation and assets
 
-## Evidence and remaining work
+- `web/public/physics/` retains the native 180 Hz custom gravity, drag, bounce,
+  friction and spin response. Three Mesh BVH indexes station triangles;
+  analytical sphere/triangle, box and capsule queries supply contacts. No second
+  rigid-body solver applies impulses. BVH construction happens in the worker.
+- The served layout comes from `web/v2/assets.json` and its configured spawn,
+  matching the campaign hash, rather than the retired root layout. One generated
+  collision pack lives under `.local/browser-physics/`. It contains 2,410,996
+  triangles and 4,620 primitives in 58,843,636 bytes, versus the 512,444,053-byte
+  source layout. Regenerate only when the canonical station changes.
+- All 48 escalators have moving tread sweeps, contact velocity, load support,
+  incoming-tread wake-up and grounded walking carry. Sweeps split at rail turns
+  and cover reverse travel and the return chain. Each shot records its release
+  time and owns an independent station clock. Hand clearance includes treads.
+- Browser physics version `kyoto-browser-2` retains valid load-bearing support
+  when a wall also contacts the ball. Each step rechecks proximity and separating
+  velocity. This fixes indefinite floor/wall corner jitter without relaxing the
+  quiet linear/angular thresholds or adding a shot timeout. The existing course
+  key separates physics versions and discards retired local records.
+- Quaternion integration uses fixed-order trigonometric polynomials, avoiding
+  engine-specific `Math.sin`/`Math.cos` differences amplified by cancellation.
+  A manually timed throw exposed the difference; the Chrome regression includes
+  that exact case and 1,024 varied rotation inputs. Rotation retains the angular
+  model, with approximation error checked against sin/cos over 40,001 angles.
+- Physics computes at most 30 seconds ahead of acknowledged playback, with one
+  step of numerical tolerance. Each recording chunk contains at most 180 new
+  poses, 30 presentation frames and a bounded event batch. The worker waits for
+  IndexedDB acknowledgment before continuing. Skip removes the playback lead
+  limit, keeps storage backpressure and waits for physical rest. Recall forfeits
+  even a computed result whose playback has not finished.
+- Scores and complete replay headers commit atomically when the result is
+  presented. Full pose/rotation/contact data stays in IndexedDB chunks; live
+  scoring retains only necessary bank history. Full replay viewing still loads
+  that replay into memory, and saved storage grows with actual shot duration.
 
-- `node web/tests/browser-physics.mjs`: geometry, contact response, spin and rest,
-  fixed-step repeatability, stair masks, compact format validation.
-- `npm run test:physics:station`: full-station Node and headless Chrome worker
-  proofs. Both run each opening shot twice, compare every recorded pose, contact
-  and score byte for byte, require all waypoints and zero linear/angular velocity,
-  and compare final scoring with the existing authoritative scoring module.
-  Chrome runs disconnected after loading the worker/asset and checks recall
-  forfeiture while the main thread continues receiving events. These are physics
-  runtime checks, not yet proof of playable browser levels. Clock In's first
-  three contact positions agree with the native recording within 0.1 mm.
-- November 10 Chrome 157 check on this laptop: worker loading/indexing 1.071 s;
-  First Bounce 34.084 simulated seconds in 306 ms, Clock In 26.823 seconds in
-  106 ms. Main-thread heartbeat p95 17.0 ms, maximum 113.7 ms during the test.
-  This isolated worker test does not establish full-game 60 FPS or audio quality.
-  Small local receipts: `.local/browser-physics/{station,worker}-proof.json`.
-- The full interface passes both courses while offline, including walking,
-  Start, keyboard/desktop Skip, recall of an already computed shot, replay
-  seeking, saved records after reload, touch hold/release and mobile Skip.
-  Stored UI replays reproduce every pose, contact, target and score in Node.
-  A complete unskipped Clock In flight at 1280×800 measured 1,610 frames:
-  60.0 FPS average, 16.7 ms p95, 16.8 ms maximum, zero main-thread long tasks and
-  zero skipped music steps. Audio's scheduler advanced 100 steps over the shot.
-  This is a headless Chrome laptop result, not a physical-phone or whole-campaign
-  benchmark. Receipt and current UI captures: `.local/browser-physics/game/`.
-- The existing interface uses worker states and trajectory chunks. Replay chunks
-  are written to IndexedDB during simulation; scores and completed replay headers
-  commit atomically only when playback presents the result. Recall removes the
-  unfinished recording and discards a computed-but-unpresented result. The local board is
-  labelled "On this device"; these records have not been independently verified.
-  Existing native guest credentials and scores are not overwritten.
-- Walking uses continuous full-capsule queries, wall sliding and ramp support.
-  Portable tests cover a waist-height obstruction, sideways sliding, climbing a
-  stair ramp and standing still on a slope. Full station traversal and small
-  step-up behavior remain to be verified or completed.
-- `npm run test:physics:motion` covers analytical tread contacts, support, wake-up,
-  stationary-floor sleep, both rail directions, wrap and boundary crossings,
-  exhaustive-versus-indexed sweep equivalence and walking carry. It is also part
-  of `npm test`. Run `node web/tests/browser-escalators.mjs --station` for the real
-  asset: all 48 lanes pass grounded idle carry, and 1,380 rendered-tread top
-  comparisons at five phases differ from collision by at most 0.00000213 m.
-  Receipt: `.local/browser-physics/motion-proof.json`.
-- The full-station and offline Chrome worker proofs now include Upward Bound.
-  Its authored input reaches the upper exit after real tread contact and settles
-  in 30.990 simulated seconds, scoring 113,037. Node and Chrome match every pose,
-  contact, target and score exactly. Chrome computed it in 348 ms in batches of
-  at most 8.1 ms; the two opening-course proof hashes remain unchanged.
-- The full interface also completes Upward Bound offline at its live release
-  phase; its stored replay reproduces exactly in Node. Unskipped playback at
-  1280×800 measured 1,768 frames, 59.93 FPS average, 16.8 ms p95 and 33.2 ms maximum,
-  with zero main-thread long tasks and zero skipped music steps. The music
-  scheduler's largest observed gap was 309 ms; this is measured headless Chrome
-  behavior, not proof of physical-device audio quality. Desktop/mobile controls,
-  recall, Skip and durable records pass in the same three-course interface run.
-- Still required: convex solid overlap handling, all-course proof, creator,
-  on-demand authority, cross-browser determinism and broader device/performance
-  benchmarks. The browser preview
-  does not provide course creation yet.
-- Browser gameplay now computes 30 seconds ahead of acknowledged playback, with
-  one physics-step tolerance at the boundary.
-  Each recording message contains at most 180 new physics poses (181 including
-  the initial pose), 30 presentation frames and one bounded batch of events.
-  The worker waits for the IndexedDB write acknowledgment before continuing.
-  Skip bypasses the time lead, retains storage backpressure and suppresses future
-  presentation frames until full rest. Recall remains available in every wait.
-  Live bank history retains credited surfaces rather than repeated impacts;
-  complete replay poses, rotations, contacts and score frames stay on disk.
-- `node web/tests/browser-shot-flow.mjs` proves the lookahead/ack bounds, exact
-  streamed-versus-raw replay equality, bank-history compaction and recall of an
-  indefinitely moving shot. `npm run test:browser:recording` runs the real worker
-  offline through more than 240 simulated seconds without an early result,
-  delayed storage, stale acknowledgments and recording failure. It also checks
-  preservation of existing saved data, active-tab recording locks, and cleanup
-  of abandoned recordings after a tab closes. Full replay viewing still loads
-  that replay into memory; saved disk usage grows with actual shot duration.
-- The three-course interface run with streamed recording passes desktop/mobile
-  controls, offline play, Skip, recall, reload and exact Node verification of
-  reconstructed replays. Its unskipped escalator flight measured 1,914 frames,
-  60.0 FPS average, 16.8 ms p95 and maximum, zero main-thread long tasks and zero
-  skipped music steps. These are headless Chrome laptop measurements.
-- Keep one generated collision pack under `.local/browser-physics/`; do not commit
-  generated assets or make duplicate station bundles. Preserve unrelated local
-  Unity package edits. Test the browser headlessly with `background-input.mjs`.
+## Verification
 
-The browser worker is bundled with [esbuild](https://esbuild.github.io/api/#bundle),
-including the existing scoring module. It uses the distinct `kyoto-browser-1`
-physics version so its results cannot mix with native leaderboards. The worker
-computes a shot in yielding batches. Its UI adapter preserves the existing
-playback/Skip/rotation-sample interface and fences results by attempt ID.
+Use headless Chrome with `web/tests/background-input.mjs`; never capture the
+user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 
-## Next bounded task
+| Check | What it establishes |
+| --- | --- |
+| `npm test` | Portable geometry, impulse/spin model, floor/wall settling, separation from former support, stair masks, moving treads, recording bounds, scoring and existing UI/service regressions |
+| `npm run test:browser:campaign` | All 30 actual Walker release positions; every suggested shot repeated; 184 nearby throws; targets, destinations, authored route features, zero velocity/spin at rest, no collision-budget exhaustion, independent scoring; all 30 hints repeated offline in Chrome with exact Node replay hashes |
+| `npm run test:browser:local` | Rendered game, walking/home, three representative complete shots, desktop and touch controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
+| `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
+| `npm run test:physics:station` | Opening-course geometry checks, including Clock In's first three native contact positions within 0.1 mm, plus Node/Chrome replay equality |
+| `node web/tests/browser-escalators.mjs --station` | All 48 actual lanes carry a grounded walker; 1,380 rendered-tread/collision comparisons at five phases, maximum measured difference 0.00000213 m |
+| `npm run test:runtime` | Isolated native service campaign, full rest, walking, creator validation, replay, Skip/reconnect and recall regressions while the native path remains in use |
 
-Prove all 30 authored routes and station traversal,
-including small steps and convex solids; enable the complete campaign, finish
-creation/editing and add independent on-demand score verification. Keep
-integrating each finished task; the overall migration remains incomplete until
-those requirements and the final performance checks pass.
+November 10 campaign proof: 30/30 suggested routes and 184/184 nearby throws
+collected every required target/destination and reached true rest. Passage
+Rebound's previously stuck nearby throw settles in 23.700 simulated seconds.
+Bridge Pinball keeps its targets, charge and route; its suggested pitch changes
+from 5 to 4.25 degrees. Both native and browser solvers pass all six nearby inputs
+at that aim, and the suggested route remains approximately 63 metres. Its course
+revision is incremented. Native proofs can use `KYOTO_PROOF_SKIP=1` to bypass
+presentation through the existing Skip protocol while still requiring full rest.
+
+Offline Chrome 157 on this laptop reproduces all 30 complete replay hashes twice.
+Collision loading/indexing took 1.205 seconds. Authored shots took 15.9–547.0 ms
+of worker computation in yielding batches, with the largest observed batch
+14.8 ms. The main-thread heartbeat p95 was 17.4 ms, maximum 143.5 ms including
+loading and test result transfers. This isolated worker check is not a rendered
+frame-rate or physical-phone benchmark. Receipts:
+`.local/browser-physics/{campaign,campaign-worker}-proof.json`.
+
+The rendered interface pass completes three representative shots offline and
+reproduces their persisted replays exactly in Node. All 30 courses are selectable
+with their current starts, targets and hints at 1280×800 and 390×664. Keyboard
+hold timing is measured from keydown, avoiding a telemetry wait that overcharged
+short throws. During a full unskipped escalator flight, 1,728 frames averaged
+59.97 FPS, with 16.7 ms p95, 33.3 ms maximum, no main-thread long tasks and no
+skipped music steps. Maximum observed audio scheduler gap was 69.3 ms. These are
+headless Chrome laptop measurements, not physical-phone results. The current
+receipt and captures are under `.local/browser-physics/game/`.
+
+## Remaining bounded tasks
+
+1. Complete station traversal, small step-up behavior and solid convex overlap
+   handling, and verify their collision against the visual station.
+2. Implement browser course creation/editing, validation and durable saved
+   courses using the existing interface.
+3. Add independent on-demand online verification and score storage. Reconstruct
+   accepted shots from validated inputs; never accept a client's claimed score.
+   Package static hosting and verification without an always-on physics process
+   or a fixed monthly compute subscription.
+4. Verify the complete integrated game, cross-browser replay behavior and broader
+   desktop/mobile controls and performance. Remove remaining runtime dependence
+   on the native worker when the replacement is proven.
+
+Keep one checkout and generated asset set, finish and integrate each bounded
+change, and preserve unrelated Unity edits. No migration deployment is authorized.

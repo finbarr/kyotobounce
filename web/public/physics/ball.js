@@ -15,7 +15,7 @@ export function resolveContact(velocity,spin,normal,profile,restitution,friction
 }
 export class Ball{
  constructor(world,profile=ballProfile){this.world=world;this.profile=profile;this.stationTime=0;this.launch(v(),v(),v());}
- launch(position,velocity,spin){this.position=v(position.x,position.y,position.z);this.rotation=identity();this.velocity=velocity;this.spin=limit(spin,this.profile.maxSpin);this.sleeping=false;this.supported=false;this.clock=0;this.restingTime=0;this.lastContact=-10;this.normal=v();this.surfaceVelocity=v();this.rolling=0;this.torsional=0;this.contacts=[];this.budgetExhaustions=0;}
+ launch(position,velocity,spin){this.position=v(position.x,position.y,position.z);this.rotation=identity();this.velocity=velocity;this.spin=limit(spin,this.profile.maxSpin);this.sleeping=false;this.supported=false;this.supportContact=null;this.clock=0;this.restingTime=0;this.lastContact=-10;this.normal=v();this.surfaceVelocity=v();this.rolling=0;this.torsional=0;this.contacts=[];this.budgetExhaustions=0;}
  endVelocity(velocity,dt){const drag=.00055*(this.profile.radius/.025)**2/this.profile.mass;const accel=add(gravity,mul(velocity,-drag*length(velocity))),mid=add(velocity,mul(accel,dt*.5));return add(velocity,mul(add(gravity,mul(mid,-drag*length(mid))),dt));}
  sweep(position,displacement,dt){
   const first=this.world.sweep(position,displacement,this.profile.radius);if(!first)return null;
@@ -36,6 +36,7 @@ export class Ball{
   if(this.sleeping&&!this.world.motion.sweep(this.position,v(),this.profile.radius+SKIN,worldTime,dt))return;
   this.sleeping=false;
   let position=this.position,rotation=this.rotation,remaining=dt;
+  const supports=this.supportContact?[this.supportContact]:[];
   for(let contact=0;contact<12&&remaining>1e-7;contact++){
    const end=this.endVelocity(this.velocity,remaining),delta=mul(add(this.velocity,end),.5*remaining);
    let hit=this.world.overlap(position,this.profile.radius);if(hit)hit.time=0;else hit=this.sweep(position,delta,remaining);
@@ -51,18 +52,27 @@ export class Ball{
     this.velocity=add(response.velocity,surface.velocity);this.spin=response.spin;
     this.contacts.push({time:this.clock-remaining+time,point:{...point},normal:{...normal},surface:surface.id,speed:-vn,incoming,outgoing:this.velocity,incomingSpin,outgoingSpin:this.spin});
     this.lastContact=this.clock;this.normal=normal;this.surfaceVelocity=surface.velocity;this.rolling=surface.rolling;this.torsional=surface.torsional;
+    if(dot(gravity,normal)<0)supports.push({normal,surface,time:this.clock});
    }
    remaining=f(remaining-Math.max(time,Math.min(remaining,dt*.002)));
   }
   if(remaining>1e-7)this.budgetExhaustions++;
-  const load=Math.max(0,-dot(gravity,this.normal)),near=load>0&&this.clock-this.lastContact<dt*2.1&&dot(sub(this.velocity,this.surfaceVelocity),this.normal)<=.01;
-  const support=near?this.world.sweep(position,mul(this.normal,-2*SKIN),this.profile.radius):null;
-  const movingSupport=near?this.world.motion.probe(position,mul(this.normal,-2*SKIN),this.profile.radius,this.stationTime):null;
-  this.supported=!!(support&&dot(support.normal,this.normal)>.99||movingSupport&&dot(movingSupport.normal,this.normal)>.99);
+  // A wall impulse must not erase the floor carrying the ball's weight. Keep
+  // recent load-bearing contacts, but recheck proximity and separation every
+  // step so a former floor cannot brake a rebound or a ball leaving an edge.
+  this.supportContact=null;let load=0;
+  for(let i=supports.length-1;i>=0;i--){
+   const candidate=supports[i],{normal,surface,time}=candidate,weight=-dot(gravity,normal);
+   if(weight<=load||this.clock-time>=dt*2.1||dot(sub(this.velocity,surface.velocity),normal)>.01)continue;
+   const delta=mul(normal,-2*SKIN),support=this.world.sweep(position,delta,this.profile.radius),movingSupport=this.world.motion.probe(position,delta,this.profile.radius,this.stationTime);
+   if(support&&dot(support.normal,normal)>.99||movingSupport&&dot(movingSupport.normal,normal)>.99){this.supportContact=candidate;load=weight;}
+  }
+  this.supported=!!this.supportContact;
   if(this.supported){
-   const normalSpin=project(this.spin,this.normal),rollingSpin=sub(this.spin,normalSpin),inertia=this.profile.inertiaFactor*this.profile.mass*this.profile.radius**2,scale=this.profile.mass*load*this.profile.radius/inertia*dt;
-   this.spin=add(towardZero(rollingSpin,this.rolling*scale),towardZero(normalSpin,this.torsional*scale));
-   const relative=sub(this.velocity,this.surfaceVelocity),quiet=dot(this.surfaceVelocity,this.surfaceVelocity)<1e-8&&length(plane(relative,this.normal))<.025&&Math.abs(dot(relative,this.normal))<.10&&length(this.spin)<.75;
+   const {normal,surface}=this.supportContact;
+   const normalSpin=project(this.spin,normal),rollingSpin=sub(this.spin,normalSpin),inertia=this.profile.inertiaFactor*this.profile.mass*this.profile.radius**2,scale=this.profile.mass*load*this.profile.radius/inertia*dt;
+   this.spin=add(towardZero(rollingSpin,surface.rolling*scale),towardZero(normalSpin,surface.torsional*scale));
+   const relative=sub(this.velocity,surface.velocity),quiet=dot(surface.velocity,surface.velocity)<1e-8&&length(plane(relative,normal))<.025&&Math.abs(dot(relative,normal))<.10&&length(this.spin)<.75;
    this.restingTime=quiet?f(this.restingTime+dt):0;if(this.restingTime>.4){this.sleeping=true;this.velocity=this.spin=v();}
   }else this.restingTime=0;
   this.position=position;this.rotation=rotation;

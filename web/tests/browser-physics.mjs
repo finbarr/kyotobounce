@@ -4,13 +4,18 @@ import {StaticWorld} from '../public/physics/static-world.js';
 import {Ball,resolveContact,STEP} from '../public/physics/ball.js';
 import {Walker} from '../public/physics/walker.js';
 import {ballProfile} from '../public/physics/materials.js';
-import {v,length,identity} from '../public/physics/math.js';
+import {v,length,identity,rotationTrig} from '../public/physics/math.js';
 import {boxSweep,triangleSweep,segmentSweep} from '../public/physics/sweeps.js';
 import {encodeCollisionPack,decodeCollisionPack} from '../public/physics/collision-pack.js';
 import {compileCollision,fallLimitY} from '../../tools/browser-collision.mjs';
 const near=(a,b,t=1e-6)=>assert.ok(Math.abs(a-b)<=t,`${a} != ${b} within ${t}`),V=(x=0,y=0,z=0)=>new Vector3(x,y,z);
 const floor={kind:'box',id:'floor',material:'granite',position:v(0,-.5,0),half:v(1000,.5,1000),rotation:identity(),mask:3};
 const world=shapes=>new StaticWorld({shapes,fallLimitY:-10,escalators:[]});
+
+// Rotation keeps the angular model while avoiding engine-specific libm bits.
+for(let i=-20000;i<=20000;i++){
+ const angle=i*.05,{sin,cos}=rotationTrig(angle);near(sin,Math.sin(angle),1e-12);near(cos,Math.cos(angle),1e-12);
+}
 
 // Analytic face, round edge and round corner distances, including tiny clearances.
 const triangle=new Triangle(V(-100,0,-100),V(0,0,100),V(100,0,-100));
@@ -62,6 +67,25 @@ const empty=world([]),falling=new Ball(empty);falling.launch(v(0,100,0),v(),v())
 for(let i=0;i<6000;i++)falling.step();assert.equal(falling.sleeping,false,'No timer stops moving flight');
 function shot(){const ball=new Ball(flat);ball.launch(v(0,1.525,0),v(0,1,10),v(25,0,0));const positions=[];for(let i=0;i<9000&&!ball.sleeping;i++){ball.step();positions.push({...ball.position,q:{...ball.rotation}});}assert.ok(ball.sleeping);assert.equal(ball.budgetExhaustions,0);return positions;}
 assert.deepEqual(shot(),shot(),'Every fixed-step replay pose is repeatable');
+
+// A slight floor slope pushes a quiet ball into a wall. Wall impulses used to
+// erase the floor support and keep this corner jittering indefinitely. Exercise
+// both local coordinates and Float32 precision at the far end of the station.
+for(const x of [0,162.5]){
+ const slope=-Math.atan(.05),corner=world([
+  {...floor,id:'slope',position:v(x,30,0),half:v(4,.1,2),rotation:{x:0,y:0,z:Math.sin(slope/2),w:Math.cos(slope/2)}},
+  {...floor,id:'end-wall',position:v(x+1,30,0),half:v(.1,2,2)}
+ ]),b=new Ball(corner);
+ b.launch(v(x,30.2,0),v(.2,0,0),v(0,0,-10));
+ for(let i=0;i<180*20&&!b.sleeping;i++)b.step();
+ assert.ok(b.sleeping,'A supported floor/wall corner must settle');
+ assert.deepEqual(b.velocity,v());assert.deepEqual(b.spin,v());assert.equal(b.budgetExhaustions,0);
+ assert.ok(b.position.x>x+.85&&b.position.x<x+.9,'The ball must reach the wall before resting');
+ // Leaving the supporting surface must remove its braking and sleep eligibility.
+ b.sleeping=false;b.velocity=v(0,2,0);b.spin=v(0,100,0);b.step();
+ assert.equal(b.supported,false);assert.equal(b.restingTime,0);near(length(b.spin),100);
+ corner.free();
+}
 
 // Exported stair treads and walking ramps use different collision masks, while
 // retaining real surfaces and exact bounds through the compact format.

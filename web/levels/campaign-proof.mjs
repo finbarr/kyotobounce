@@ -26,7 +26,7 @@ if(selectedIds)for(const id of selectedIds)assert.ok(courses.some(c=>c.id===id),
 await writeFile(resolve(out,'catalog.json'),campaignBytes);
 const worker=new PhysicsWorker(),states=new Map(),events=new Map();let ready;
 const accelerated=new Set();
-worker.on('message',m=>{if(m.type==='ready')ready=m;if(['state','shot-frame'].includes(m.type))states.set(m.id,m);if(m.type==='shot-frame'&&!accelerated.has(m.attempt)){accelerated.add(m.attempt);worker.send({type:'playback-rate',id:m.id,request:m.attempt,rate:2});}if(['result','notice'].includes(m.type))events.set(m.id,m);});
+worker.on('message',m=>{if(m.type==='ready')ready=m;if(['state','shot-frame'].includes(m.type))states.set(m.id,m);if(m.type==='shot-frame'&&!accelerated.has(m.attempt)){accelerated.add(m.attempt);worker.send(process.env.KYOTO_PROOF_SKIP?{type:'skip-shot',id:m.id,request:m.attempt}:{type:'playback-rate',id:m.id,request:m.attempt,rate:2});}if(['result','notice'].includes(m.type))events.set(m.id,m);});
 const until=async(f,ms=15000)=>{const end=performance.now()+ms;while(!f()){if(performance.now()>end)throw Error('Observation timed out before rest');await delay(10);}};
 const jobs=fixture.courses.filter(p=>!selectedIds||selectedIds.includes(p.id)).flatMap(proof=>{
  const challenge=courses.find(c=>c.id===proof.id&&c.revision===proof.revision);assert.ok(challenge,`Current course ${proof.id}`);
