@@ -72,15 +72,17 @@ try{
  await page.waitForFunction(()=>kyotoState.phase==='Flight');await page.locator('#mobile-skip').click();await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result);
  state=await page.evaluate(()=>kyotoState);assert.ok(state.result.success);assert.equal(state.result.waypointHits.length,2);assert.equal(state.pointerLocked,false);
  await page.waitForTimeout(900);await page.screenshot({path:out+'/mobile-clock-in.png'});
- // Let one full flight play normally: compute-ahead must not bank early, stall
+ // Let the moving-escalator course play normally: compute-ahead must not bank early, stall
  // the renderer, or drop the music clock. Measure the real station at 1280x800.
- await page.setViewportSize({width:1280,height:800});await page.locator('#game').focus();await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim');
+ await page.setViewportSize({width:1280,height:800});await page.locator('#next-challenge').click();await page.waitForFunction(()=>kyotoState.challenge?.id==='basement-upward-bound');
+ if(await page.evaluate(()=>kyotoState.briefing))await page.locator('#briefing-play').click();await page.waitForFunction(()=>!kyotoState.briefing&&!kyotoState.briefingTransition);
  await page.evaluate(()=>{
   window.bench={frames:[],longTasks:[],running:true,audioStart:null};let last=performance.now();
   new PerformanceObserver(list=>{if(kyotoState.phase==='Flight')bench.longTasks.push(...list.getEntries().map(e=>e.duration));}).observe({type:'longtask'});
   function sample(now){if(kyotoState.phase==='Flight'){bench.frames.push(now-last);bench.audioStart??={...kyotoState.audio};}last=now;if(bench.running)requestAnimationFrame(sample);}requestAnimationFrame(sample);
  });
- await begin(2900);await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result,null,{timeout:60000});
+ await begin(122);await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result,null,{timeout:60000});
+ state=await page.evaluate(()=>kyotoState);assert.ok(state.result.success);assert.equal(state.result.waypointHits.length,1);assert.ok(state.diagnostics.sleeping);assert.equal(Math.hypot(...Object.values(state.velocity)),0);assert.equal(Math.hypot(...Object.values(state.spin)),0);results.push(state.result);
  benchmark=await page.evaluate(()=>{bench.running=false;return {...bench,audioEnd:kyotoState.audio};});
  const frames=benchmark.frames.slice().sort((a,b)=>a-b);benchmark={...benchmark,frames:frames.length,meanFps:1000/(frames.reduce((a,b)=>a+b,0)/frames.length),p95FrameMs:frames[Math.floor(frames.length*.95)],maxFrameMs:frames.at(-1)};
  assert.ok(benchmark.frames>300,'Measured normal playback rather than an early result');assert.equal(benchmark.audioEnd.status,'running');assert.equal(benchmark.audioEnd.skippedMusicSteps,benchmark.audioStart.skippedMusicSteps,'Music clock must not drop beats during flight');
@@ -96,7 +98,7 @@ try{
   while(!shot.done&&shot.steps<180*120)shot.step();assert.ok(shot.done);
   const verified=shot.result();for(const key of ['poses','contacts','waypointHits','breakdown','score','success','duration'])assert.deepEqual(verified[key],replay[key],`Stored ${key} must reproduce from launch inputs`);
  }world.free();
- assert.deepEqual(errors,[]);console.log('PASS browser-only game: walking, home, both levels, offline Skip, recall forfeiture, replay seeking, durable local score, touch hold/release and mobile Skip');
+ assert.deepEqual(errors,[]);console.log('PASS browser-only game: walking, home, three levels including moving escalator, offline Skip, recall forfeiture, replay seeking, durable local score, touch hold/release and mobile Skip');
 }catch(error){
  await page.screenshot({path:out+'/failure.png'});await writeFile(out+'/failure.json',JSON.stringify({error:String(error),errors,state:await page.evaluate(()=>window.kyotoState)},null,2));throw error;
 }finally{await writeFile(out+'/receipt.json',JSON.stringify({results,errors,benchmark},null,2));await browser.close();if(benchmark)console.log(JSON.stringify(benchmark));}

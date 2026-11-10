@@ -34,7 +34,7 @@ try{
  // queries nor scoring may fall back to the Unity service or an HTTP endpoint.
  await context.setOffline(true);
  const courses=JSON.parse(await readFile('web/starter-challenges.json','utf8')),nodeProof=JSON.parse(await readFile('.local/browser-physics/station-proof.json','utf8'));
- for(const id of ['atrium-welcome','atrium-clock-in']){
+ for(const id of ['atrium-welcome','atrium-clock-in','basement-upward-bound']){
   const challenge=courses.find(c=>c.id===id),hint=challenge.hint,launch=launchInput(add(challenge.start.center,v(0,.025,0)),{...hint,power:hint.holdMs/2800});
   let hash;
   for(let run=0;run<2;run++){

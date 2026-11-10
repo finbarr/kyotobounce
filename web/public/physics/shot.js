@@ -14,7 +14,7 @@ export class Shot{
  constructor(world,challenge,launch,{attempt='local',releaseTime=0,chargeTime=0,thrower=null}={}){
   if(challenge.layout!==world.layoutSha256)throw Error('Course and collision layout differ');
   this.world=world;this.challenge={...challenge,physics:BROWSER_PHYSICS};this.attempt=attempt;this.releaseTime=releaseTime;this.chargeTime=chargeTime;this.thrower=thrower;
-  this.launch=structuredClone(launch);this.ball=new Ball(world);this.ball.launch(launch.position,launch.velocity,launch.spin);
+  this.launch=structuredClone(launch);this.ball=new Ball(world);this.ball.stationTime=releaseTime;this.ball.launch(launch.position,launch.velocity,launch.spin);
   this.tracker=new ComboTracker(this.challenge,world.fallLimitY);this.poses=[];this.contacts=[];this.waypointHits=[];this.events=[];this.impactTimes=new Map();this.surfaces=new Set();this.collected=new Set();
   this.steps=0;this.sleepDwell=0;this.goalDwell=0;this.done=false;this.reason='';this.destinationReached=false;this.recordPose();
  }

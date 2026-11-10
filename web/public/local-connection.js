@@ -45,7 +45,7 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
    profile={...profile,name,named:true};store.setting('profile',profile).then(()=>emit({type:'named',name})).catch(error);return true;
   }
   if(type==='course-progress'){progress().catch(error);return true;}
-  if(['design-start','design-cancel','save-challenge','place'].includes(type)){error(Error('Course creation is not available in this two-level preview yet'));return true;}
+  if(['design-start','design-cancel','save-challenge','place'].includes(type)){error(Error('Course creation is not available in this preview yet'));return true;}
   if(type==='charge'){presentation={name:profile.name,character:extra.character||'ori'};provisional=null;}
   if(type==='recall'||type==='home'||type==='select-challenge'){provisional=null;currentAttempt=null;}
   if(type==='client-performance'||type==='playback-rate')return true;

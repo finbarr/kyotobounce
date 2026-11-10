@@ -11,7 +11,7 @@ await buildBrowserPhysics();const release=await stationRelease();
 delete release.layoutBytes;
 const receipt=JSON.parse(await readFile('.local/browser-physics/station.collision.bin.json','utf8'));
 if(receipt.layoutSha256!==release.layoutSha256)throw Error('Regenerate the browser collision pack for this station');
-const catalog=JSON.parse(await readFile('web/starter-challenges.json','utf8')).filter(c=>['atrium-welcome','atrium-clock-in'].includes(c.id)).map(c=>({...c,physics:'kyoto-browser-1'}));
+const catalog=JSON.parse(await readFile('web/starter-challenges.json','utf8')).filter(c=>['atrium-welcome','atrium-clock-in','basement-upward-bound'].includes(c.id)).map(c=>({...c,physics:'kyoto-browser-1'}));
 const html=(await readFile('web/public/index.html','utf8')).replace('</head>','<meta name="kyoto-runtime" content="browser"></head>');
 const memory={'/':html,'/assets/station.json':release.stationBytes,'/campaign.json':JSON.stringify(catalog)};
 const files={'/physics-worker.js':'.local/browser-physics/worker.js','/station.collision.bin':'.local/browser-physics/station.collision.bin',...Object.fromEntries(Object.entries(release.files).map(([name,file])=>['/'+name,file]))};

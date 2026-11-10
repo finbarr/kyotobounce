@@ -18,6 +18,13 @@ export function boxSweep(p,d,half,radius){
  let enter=0,leave=1;
  for(const axis of ['x','y','z']){const h=half[axis]+radius;if(Math.abs(d[axis])<1e-14){if(Math.abs(p[axis])>h)return null;continue;}const a=(-h-p[axis])/d[axis],b=(h-p[axis])/d[axis];enter=Math.max(enter,Math.min(a,b));leave=Math.min(leave,Math.max(a,b));if(enter>leave)return null;}
  const closest=q=>new Vector3(Math.max(-half.x,Math.min(half.x,q.x)),Math.max(-half.y,Math.min(half.y,q.y)),Math.max(-half.z,Math.min(half.z,q.z)));let best=Infinity;
+ // A moving tread can begin this interval touching or penetrating the ball.
+ // Only approaching relative motion produces a contact (also for a solid box).
+ const initial=closest(p),offset=p.clone().sub(initial);
+ if(offset.lengthSq()<=radius*radius){
+  if(offset.lengthSq()<1e-16){const axis=['x','y','z'].sort((a,b)=>(half[a]-Math.abs(p[a]))-(half[b]-Math.abs(p[b])))[0];offset.set(0,0,0);offset[axis]=p[axis]<0?-1:1;initial[axis]=offset[axis]*half[axis];}
+  offset.normalize();return d.dot(offset)<0?{fraction:0,normal:offset,point:initial}:null;
+ }
  for(const axis of ['x','y','z']){if(Math.abs(d[axis])<1e-14)continue;const others=['x','y','z'].filter(a=>a!==axis);for(const sign of [-1,1]){const t=(sign*(half[axis]+radius)-p[axis])/d[axis];if(t<0||t>1||d[axis]*sign>=0)continue;const q=p.clone().addScaledVector(d,t);if(others.every(a=>Math.abs(q[a])<=half[a]))best=Math.min(best,t);}}
  for(const axis of ['x','y','z']){const [j,k]=['x','y','z'].filter(a=>a!==axis);for(const sj of [-1,1])for(const sk of [-1,1]){const a=new Vector3(),b=new Vector3();a[axis]=-half[axis];b[axis]=half[axis];a[j]=b[j]=sj*half[j];a[k]=b[k]=sk*half[k];best=Math.min(best,segmentSweep(p,d,a,b,radius));}}
  if(best>1)return null;const center=p.clone().addScaledVector(d,best),point=closest(center),normal=center.clone().sub(point).normalize();return d.dot(normal)<-1e-14?{fraction:best,normal,point}:null;

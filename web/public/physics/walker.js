@@ -5,8 +5,9 @@ export class Walker{
  place(feet){this.feet={...feet};this.lastSafe={...feet};this.grounded=false;this.falling=0;this.walked=0;this.movement=v();}
  move(input,heading,fast,dt){
   const previous=this.feet,speed=fast?4.2:1.4,direction=yaw(limit(v(input.x,0,input.z),1),heading);
+  const carry=this.grounded?this.world.motion.walkingVelocity(this.feet):v();
   this.falling=this.grounded?-2:Math.max(-30,this.falling-9.81*dt);this.grounded=false;
-  let delta=mul(add(mul(direction,speed),v(0,this.falling,0)),dt),position=this.feet;
+  let delta=mul(add(add(mul(direction,speed),carry),v(0,this.falling,0)),dt),position=this.feet;
   for(let i=0;i<6&&length(delta)>1e-7;i++){
    const hit=this.world.capsuleSweep(position,delta,.24,1.8,.025);
    if(!hit){position=add(position,delta);break;}
@@ -32,12 +33,15 @@ export class Walker{
   const movement=sub(this.feet,previous);movement.y=0;this.movement=length(direction)>.001?mul(movement,1/dt):v();
   if(this.grounded&&length(direction)>.001)this.walked+=length(movement);
  }
- release(heading,pitch){
+ release(heading,pitch,time=0){
   const eye=add(this.feet,v(0,1.65,0)),delta=yaw(v(.22,-.15,.42),heading),radius=ballProfile.radius;
-  const hit=this.world.sweep(eye,delta,radius+.006);
+  let hit=this.world.sweep(eye,delta,radius+.006);
+  const moving=this.world.motion.probe(eye,delta,radius+.006,time);
+  if(moving&&(!hit||moving.time*length(delta)<hit.distance))hit={distance:moving.time*length(delta)};
   const position=hit?add(eye,mul(unit(delta),Math.max(0,hit.distance-.012))):add(eye,delta);
-  if(this.world.overlap(position,radius+.004))return null;
+  if(this.world.overlap(position,radius+.004)||this.world.motion.overlaps(position,radius+.004,time))return null;
   const angle=pitch*Math.PI/180,direction=yaw(v(0,Math.sin(angle),Math.cos(angle)),heading);
-  return this.world.sweep(position,mul(direction,.012),radius)?null:position;
+  const outgoing=mul(direction,.012);
+  return this.world.sweep(position,outgoing,radius)||this.world.motion.probe(position,outgoing,radius,time)?null:position;
  }
 }

@@ -14,7 +14,7 @@ export function resolveContact(velocity,spin,normal,profile,restitution,friction
  return {velocity,spin,normalImpulse,tangentImpulse};
 }
 export class Ball{
- constructor(world,profile=ballProfile){this.world=world;this.profile=profile;this.launch(v(),v(),v());}
+ constructor(world,profile=ballProfile){this.world=world;this.profile=profile;this.stationTime=0;this.launch(v(),v(),v());}
  launch(position,velocity,spin){this.position=v(position.x,position.y,position.z);this.rotation=identity();this.velocity=velocity;this.spin=limit(spin,this.profile.maxSpin);this.sleeping=false;this.supported=false;this.clock=0;this.restingTime=0;this.lastContact=-10;this.normal=v();this.surfaceVelocity=v();this.rolling=0;this.torsional=0;this.contacts=[];this.budgetExhaustions=0;}
  endVelocity(velocity,dt){const drag=.00055*(this.profile.radius/.025)**2/this.profile.mass;const accel=add(gravity,mul(velocity,-drag*length(velocity))),mid=add(velocity,mul(accel,dt*.5));return add(velocity,mul(add(gravity,mul(mid,-drag*length(mid))),dt));}
  sweep(position,displacement,dt){
@@ -31,11 +31,16 @@ export class Ball{
   return null;
  }
  step(dt=STEP){
-  this.clock=f(this.clock+dt);if(this.sleeping)return;
+  const worldTime=this.stationTime;this.stationTime+=dt;
+  this.clock=f(this.clock+dt);
+  if(this.sleeping&&!this.world.motion.sweep(this.position,v(),this.profile.radius+SKIN,worldTime,dt))return;
+  this.sleeping=false;
   let position=this.position,rotation=this.rotation,remaining=dt;
   for(let contact=0;contact<12&&remaining>1e-7;contact++){
    const end=this.endVelocity(this.velocity,remaining),delta=mul(add(this.velocity,end),.5*remaining);
    let hit=this.world.overlap(position,this.profile.radius);if(hit)hit.time=0;else hit=this.sweep(position,delta,remaining);
+   const moving=this.world.motion.sweep(position,delta,this.profile.radius,worldTime+dt-remaining,remaining);
+   if(moving&&(!hit||moving.time<hit.time))hit=moving;
    if(!hit){position=add(position,delta);rotation=spinRotation(rotation,this.spin,remaining);this.velocity=end;remaining=0;break;}
    const {normal,point,surface,time}=hit;
    this.velocity=this.endVelocity(this.velocity,time);rotation=spinRotation(rotation,this.spin,time);position=add(point,mul(normal,this.profile.radius+SKIN));
@@ -52,7 +57,8 @@ export class Ball{
   if(remaining>1e-7)this.budgetExhaustions++;
   const load=Math.max(0,-dot(gravity,this.normal)),near=load>0&&this.clock-this.lastContact<dt*2.1&&dot(sub(this.velocity,this.surfaceVelocity),this.normal)<=.01;
   const support=near?this.world.sweep(position,mul(this.normal,-2*SKIN),this.profile.radius):null;
-  this.supported=!!(support&&dot(support.normal,this.normal)>.99);
+  const movingSupport=near?this.world.motion.probe(position,mul(this.normal,-2*SKIN),this.profile.radius,this.stationTime):null;
+  this.supported=!!(support&&dot(support.normal,this.normal)>.99||movingSupport&&dot(movingSupport.normal,this.normal)>.99);
   if(this.supported){
    const normalSpin=project(this.spin,this.normal),rollingSpin=sub(this.spin,normalSpin),inertia=this.profile.inertiaFactor*this.profile.mass*this.profile.radius**2,scale=this.profile.mass*load*this.profile.radius/inertia*dt;
    this.spin=add(towardZero(rollingSpin,this.rolling*scale),towardZero(normalSpin,this.torsional*scale));

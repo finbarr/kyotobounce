@@ -10,7 +10,7 @@ import {v,add} from '../public/physics/math.js';
 import {scoreAttempt} from '../scoring.ts';
 const started=performance.now(),world=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin'))),buildMs=performance.now()-started;
 const courses=JSON.parse(await readFile('web/starter-challenges.json','utf8')),results=[];
-for(const id of ['atrium-welcome','atrium-clock-in']){
+for(const id of ['atrium-welcome','atrium-clock-in','basement-upward-bound']){
  const challenge=courses.find(c=>c.id===id),hint=challenge.hint;
  const launch=launchInput(add(challenge.start.center,v(0,.025,0)),{...hint,power:hint.holdMs/2800});
  let reference;
@@ -21,6 +21,7 @@ for(const id of ['atrium-welcome','atrium-clock-in']){
   assert.ok(shot.done,`${id} did not settle`);assert.ok(shot.ball.sleeping);assert.equal(shot.ball.budgetExhaustions,0);
   const result=shot.result();assert.ok(result.success,`${id}: missing waypoint`);assert.deepEqual(scoreAttempt(result),result.breakdown);
   assert.equal(result.waypointHits.length,challenge.waypoints.length);assert.deepEqual(shot.ball.velocity,v());assert.deepEqual(shot.ball.spin,v());
+  if(id==='basement-upward-bound')assert.ok(result.contacts.some(c=>c.surface==='hall-basement-east-escalator-1'),'Authored route must physically contact a moving tread');
   if(id==='atrium-clock-in'){
    // Current native Clock In proof: first three impacts. Float32 query noise
    // need not be byte-identical to PhysX; geometry must remain within 0.1 mm.

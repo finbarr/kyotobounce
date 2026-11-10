@@ -4,13 +4,14 @@ import {v} from './math.js';
 import {surfaceFor} from './materials.js';
 import {boxSweep,triangleSweep,segmentSweep} from './sweeps.js';
 import {capsuleSweep} from './capsule.js';
+import {StationMotion} from './motion.js';
 const vector=p=>new Vector3(p.x,p.y,p.z);
 function shapeBounds(s){const h=vector(s.half);if(s.kind==='capsule')h.set(s.radius,s.half.y+s.radius,s.radius);const q=new Quaternion(s.rotation.x,s.rotation.y,s.rotation.z,s.rotation.w),p=vector(s.position),box=new Box3();for(const x of [-1,1])for(const y of [-1,1])for(const z of [-1,1])box.expandByPoint(new Vector3(h.x*x,h.y*y,h.z*z).applyQuaternion(q).add(p));return box;}
 function tree(items){if(!items.length)return null;const bounds=new Box3();for(const s of items)bounds.union(s.bounds);if(items.length<=8)return {bounds,items};const size=bounds.getSize(new Vector3()),axis=size.x>=size.y&&size.x>=size.z?'x':size.y>=size.z?'y':'z';items.sort((a,b)=>(a.bounds.min[axis]+a.bounds.max[axis])-(b.bounds.min[axis]+b.bounds.max[axis]));const half=items.length>>1;return {bounds,left:tree(items.slice(0,half)),right:tree(items.slice(half))};}
 export class StaticWorld{
  static async create(pack){return new StaticWorld(pack);}
  constructor(pack){
-  this.layoutSha256=pack.layoutSha256;this.fallLimitY=pack.fallLimitY;this.escalators=pack.escalators||[];
+  this.layoutSha256=pack.layoutSha256;this.fallLimitY=pack.fallLimitY;this.escalators=pack.escalators||[];this.motion=new StationMotion(this.escalators);
   this.info=pack.shapes.map(s=>({surface:surfaceFor(s),mask:s.mask,complex:s.kind!=='box'}));
   const meshes=pack.shapes.filter(s=>s.kind==='mesh'),vertices=new Float32Array(meshes.reduce((n,s)=>n+s.vertices.length,0)),indices=new Uint32Array(meshes.reduce((n,s)=>n+s.indices.length,0));
   this.triangleShape=new Uint32Array(indices.length/3);let vi=0,ii=0;const primitives=[];

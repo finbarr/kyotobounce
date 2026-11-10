@@ -6,18 +6,25 @@ on demand using the same versioned simulation and collision assets; a browser's
 claimed score is never authoritative. Gameplay must continue after disconnection.
 Deployment is outside the current goal.
 
-## Delivered slice: First Bounce and Clock In
+## Delivered: opening courses and moving escalators
 
-Acceptance checks: both courses playable through the existing interface without Unity
+Acceptance checks: First Bounce, Clock In and Upward Bound playable without Unity
 or a WebSocket; exact surface waypoint collection, full translation/spin settling,
 recall forfeiture, Skip and replay; persistent local progress; headless Chrome
-checks with desktop pointer capture disabled. Follow with walking/escalators and
-the rest of the campaign, creator, independent score verification and performance.
+checks with desktop pointer capture disabled; real moving tread contacts and
+walking carry. Follow with the rest of the campaign, complete traversal, creator,
+independent score verification and broader performance checks.
 
 Run `npm run assets:collision` once for the current asset pack, then
 `npm run dev:browser -- 4430`. This preview serves the existing game at
-`http://127.0.0.1:4430`, with the two opening proof courses and no Unity service,
+`http://127.0.0.1:4430`, with the opening proof courses and no Unity service,
 WebSocket or gameplay HTTP API. It references the existing station files directly.
+Upward Bound is also enabled to exercise the moving-escalator route. All 48
+station escalators now have analytical moving tread collision, surface velocity,
+support, incoming-tread wake-up and grounded walking carry. Sweeps split at rail
+turns, include reverse travel and the hidden return chain, and retain the custom
+ball contact/spin response. Each shot has its own station clock initialized from
+its recorded release time. Throw clearance checks include the moving treads.
 `npm run test:browser:local` exercises the real interface against that preview.
 The regular native launcher remains available until the rest of the migration
 has passed; the static preview selects the browser transport with an HTML marker.
@@ -68,11 +75,30 @@ applies another impulse. Runtime BVH construction belongs in the worker.
   Existing native guest credentials and scores are not overwritten.
 - Walking uses continuous full-capsule queries, wall sliding and ramp support.
   Portable tests cover a waist-height obstruction, sideways sliding, climbing a
-  stair ramp and standing still on a slope. Full station traversal, small step-up
-  behavior and moving-escalator carry remain to be verified or completed.
-- Still required: moving tread collision and wake-up, convex solid overlap
-  handling, all-course proof, creator, on-demand authority, cross-browser
-  determinism and broader device/performance benchmarks. The two-course preview
+  stair ramp and standing still on a slope. Full station traversal and small
+  step-up behavior remain to be verified or completed.
+- `npm run test:physics:motion` covers analytical tread contacts, support, wake-up,
+  stationary-floor sleep, both rail directions, wrap and boundary crossings,
+  exhaustive-versus-indexed sweep equivalence and walking carry. It is also part
+  of `npm test`. Run `node web/tests/browser-escalators.mjs --station` for the real
+  asset: all 48 lanes pass grounded idle carry, and 1,380 rendered-tread top
+  comparisons at five phases differ from collision by at most 0.00000213 m.
+  Receipt: `.local/browser-physics/motion-proof.json`.
+- The full-station and offline Chrome worker proofs now include Upward Bound.
+  Its authored input reaches the upper exit after real tread contact and settles
+  in 30.990 simulated seconds, scoring 113,037. Node and Chrome match every pose,
+  contact, target and score exactly. Chrome computed it in 348 ms in batches of
+  at most 8.1 ms; the two opening-course proof hashes remain unchanged.
+- The full interface also completes Upward Bound offline at its live release
+  phase; its stored replay reproduces exactly in Node. Unskipped playback at
+  1280×800 measured 1,768 frames, 59.93 FPS average, 16.8 ms p95 and 33.2 ms maximum,
+  with zero main-thread long tasks and zero skipped music steps. The music
+  scheduler's largest observed gap was 309 ms; this is measured headless Chrome
+  behavior, not proof of physical-device audio quality. Desktop/mobile controls,
+  recall, Skip and durable records pass in the same three-course interface run.
+- Still required: convex solid overlap handling, all-course proof, creator,
+  on-demand authority, cross-browser determinism and broader device/performance
+  benchmarks. The browser preview
   does not provide course creation yet.
 - Keep one generated collision pack under `.local/browser-physics/`; do not commit
   generated assets or make duplicate station bundles. Preserve unrelated local
@@ -86,9 +112,9 @@ playback/Skip/rotation-sample interface and fences results by attempt ID.
 
 ## Next bounded task
 
-Port the native moving-escalator path, swept sphere/box contacts, support/wake-up
-and walking carry. Verify collisions and replay determinism at path boundaries
-before enabling the rest of the campaign. Then prove all 30 authored routes and
-station traversal, complete creation/editing and add independent on-demand score
-verification. Keep integrating each finished task; the overall migration remains
-incomplete until those requirements and the final performance checks pass.
+Bound compute-ahead for shots that keep moving, without timing them out or
+banking them early. Then prove all 30 authored routes and station traversal,
+including small steps and convex solids; enable the complete campaign, finish
+creation/editing and add independent on-demand score verification. Keep
+integrating each finished task; the overall migration remains incomplete until
+those requirements and the final performance checks pass.
