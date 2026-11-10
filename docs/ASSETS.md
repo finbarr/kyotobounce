@@ -67,7 +67,7 @@ For a new release, run `npm run assets:pack -- assets-v8` (increment the current
 
 ## Provenance and boundaries
 
-The atrium is an independently modeled interpretation informed by public photographs and architectural research, not an official survey, CAD export or dimensionally exact replica. Referenced research photos, embedded camera-photo references, and third-party municipal exterior datasets are excluded from the public pack. The distributed textures are original procedural/baked material maps, not crops of research photographs.
+The atrium is an independently developed interpretation informed by public photographs and architectural research, not an official survey, CAD export or dimensionally exact replica. The v2 station includes adapted Kyoto City municipal geometry under CC BY 4.0; its source, license and modifications are acknowledged on the shipped [credits page](../web/public/credits.html). Referenced research photos and embedded camera-photo references are excluded from runtime releases. The distributed textures are original procedural/baked material maps, not crops of research photographs.
 
 The robot and station hardware are project-created Blender geometry. In-game sound effects and music are synthesized by `web/public/arcade-audio.js`; no Tony Hawk game recordings or other commercial audio are included.
 

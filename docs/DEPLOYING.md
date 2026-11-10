@@ -7,7 +7,22 @@ The supplied scripts target an Ubuntu 24.04 x86_64 server with systemd and Caddy
 1. Install Unity 6000.3.23f1 with Linux dedicated-server build support on the build machine. Fetch assets, run the source checks, then `npm run build:worker -- --linux` and `npm run build:web`.
 2. Provision a server with SSH key access. Review `deploy/bootstrap.sh` before running it as root on a **new server**; it installs packages, configures SSH and creates the `kyoto` service user.
 3. Point your domain and `www` DNS records at the server, and allow ports 80/443 plus your SSH access through the firewall.
-4. Set `KYOTO_SSH_TARGET`, `KYOTO_SSH_KEY` and `KYOTO_HOST` explicitly, then run `node deploy/package.mjs` and `node deploy/upload.mjs`.
+4. Set `KYOTO_SSH_TARGET`, `KYOTO_SSH_KEY` and `KYOTO_HOST` explicitly, then run `node deploy/package.mjs` and `node deploy/upload.mjs --stage-only`.
+
+The packager uses the current station bundle pinned by `web/v2/assets.json`.
+It verifies the source, geometry, hardware, moving-step metadata and all 30
+course layout hashes before writing the release's canonical
+`runtime/station-layout.json`. The tested exploration spawn is applied exactly
+as in the local v2 preview. Only current delivery models ship; the older public
+authoring pack is not a substitute for this station bundle. Original sources
+remain in the private versioned authoring bundle, outside the runtime release.
+
+`--stage-only` uploads without switching the live release. Install production
+dependencies in the candidate, make it readable by the `kyoto` user, and run a
+temporary service on a separate loopback port with a separate database and log.
+After native and headless browser checks pass, preserve rollback configuration
+and a consistent database backup, stop the temporary service, then invoke
+`bash RELEASE_DIRECTORY/deploy/activate.sh RELEASE_DIRECTORY HOSTNAME` over SSH.
 
 Example configuration (substitute your own values):
 
@@ -16,7 +31,7 @@ export KYOTO_SSH_TARGET=root@your-server
 export KYOTO_SSH_KEY="$HOME/.ssh/your-key"
 export KYOTO_HOST=game.example.com
 node deploy/package.mjs
-node deploy/upload.mjs
+node deploy/upload.mjs --stage-only
 ```
 
 A maintainer may keep those values in an ignored `.deploy.local.json` with `target`, `key`, and `hostname` fields. Never commit private keys or service data.

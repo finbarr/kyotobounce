@@ -80,4 +80,4 @@ The runtime test creates test guests/challenges and takes real native shots; use
 
 ## License
 
-Project source and project-created art/audio are **MIT licensed**. Dependencies retain their own licenses; Unity is an external proprietary tool/runtime and is not included in the source release. The station is an independently authored approximation, with no affiliation with Kyoto Station, its operators, or its architect. Research photos and third-party municipal models are not distributed. See [asset provenance](docs/ASSETS.md).
+Project source and project-created art/audio are **MIT licensed**. Parts of the v2 station adapt Kyoto City's municipal model under **CC BY 4.0**; see [credits](web/public/credits.html). Dependencies retain their own licenses; Unity is an external proprietary tool/runtime and is not included in the source release. The station is an independently developed approximation, with no affiliation with Kyoto Station, its operators, or its architect. Research photographs are not distributed. See [asset provenance](docs/ASSETS.md).
