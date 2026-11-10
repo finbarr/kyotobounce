@@ -12,6 +12,12 @@ const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use
 const context=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:1});await backgroundInput(context);
 const page=await context.newPage(),errors=[],requests=[],results=[],catalog=JSON.parse(await readFile('web/starter-challenges.json'));let benchmark;page.setDefaultTimeout(30000);
 page.on('pageerror',e=>errors.push(String(e)));page.on('websocket',()=>errors.push('Game opened a WebSocket'));page.on('request',r=>requests.push(r.url()));
+async function viewport(width,height){
+ await page.setViewportSize({width,height});
+ // matchMedia change handlers run after setViewportSize resolves. Sending L
+ // first can open the old mobile panel just as resize closes it.
+ await page.waitForFunction(mobile=>document.body.classList.contains('mobile-ui')===mobile,width<=900);
+}
 async function enter(){
  const submit=page.locator('#loading-name button[type=submit]');
  await submit.waitFor({state:'visible',timeout:120000});
@@ -40,6 +46,10 @@ async function select(id){
  if(await page.evaluate(()=>kyotoState.briefing))await page.locator('#briefing-play').click();
  await page.waitForFunction(()=>!kyotoState.briefing&&!kyotoState.briefingTransition);
  await page.locator('#campaign-chapter').waitFor({state:'hidden'});
+ // First Bounce has no automatic overview to wait through. Its selected UI
+ // arrives before the replacement physics state, so await actual readiness and
+ // placement instead of sampling the transient reset frame.
+ await page.waitForFunction(c=>kyotoState.ready&&kyotoState.phase==='Aim'&&kyotoState.challenge?.id===c.id&&Math.hypot(kyotoState.feet.x-c.start.center.x,kyotoState.feet.z-c.start.center.z)<.01,course);
 }
 try{
  await page.goto(origin+'/level/atrium-welcome');await enter();console.log('Loaded browser-only station');
@@ -71,7 +81,7 @@ try{
  assert.equal((await page.evaluate(()=>kyotoState.board[0].attempt)),results[1].attempt,'Reload retains the score');
  await context.setOffline(true);
  await page.locator('#result-leaderboard ol button').first().click();await page.waitForFunction(()=>kyotoState.mode==='replay');
- await page.locator('#close-replay').click();await page.setViewportSize({width:390,height:664});
+ await page.locator('#close-replay').click();await viewport(390,664);
  await page.locator('#game').focus();await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim');
  await page.keyboard.press('h');await page.locator('#mobile-throw').waitFor({state:'visible'});
  // Touch emulation belongs to this headless tab and does not use the desktop
@@ -86,7 +96,7 @@ try{
  await page.waitForTimeout(900);await page.screenshot({path:out+'/mobile-clock-in.png'});
  // Let the moving-escalator course play normally: compute-ahead must not bank early, stall
  // the renderer, or drop the music clock. Measure the real station at 1280x800.
- await touch.send('Emulation.setTouchEmulationEnabled',{enabled:false});await page.setViewportSize({width:1280,height:800});await select('basement-upward-bound');
+ await touch.send('Emulation.setTouchEmulationEnabled',{enabled:false});await viewport(1280,800);await select('basement-upward-bound');
  await page.evaluate(()=>{
   window.bench={frames:[],longTasks:[],running:true,audioStart:null};let last=performance.now();
   new PerformanceObserver(list=>{if(kyotoState.phase==='Flight')bench.longTasks.push(...list.getEntries().map(e=>e.duration));}).observe({type:'longtask'});
@@ -113,7 +123,7 @@ try{
  // its actual target geometry and suggested controls. Full shot feasibility is
  // separately proved for all stages and neighbors by test:browser:campaign.
  for(const width of [1280,390]){
-  await page.setViewportSize({width,height:width===390?664:800});
+  await viewport(width,width===390?664:800);
   for(const course of catalog){
    await select(course.id);await page.locator('#game').focus();await page.keyboard.press('h');
    await page.waitForFunction(c=>kyotoState.challenge?.id===c.id&&kyotoState.phase==='Aim'&&['yaw','pitch','top','kick'].every(k=>Math.abs(kyotoState[k]-c.hint[k])<.0001),course);

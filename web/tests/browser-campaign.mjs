@@ -58,7 +58,18 @@ for(const [index,challenge] of courses.entries()){
  const runs=receipts.filter(r=>r.id===challenge.id),neighbors=runs.slice(1),clears=neighbors.filter(r=>r.fullClear).length;
  console.log(JSON.stringify({id:challenge.id,hint:runs[0].pass,neighbors:`${clears}/${neighbors.length}`,minimum:source.minimumNeighborClears,errors:runs.filter(r=>!r.pass).map(r=>({sample:r.sample,error:r.error})),tolerance:clears>=source.minimumNeighborClears}));
 }
-world.free();await writeFile('.local/browser-physics/campaign-proof.json',JSON.stringify({layout:proof.layout,physics:BROWSER_PHYSICS,catalogSha256:createHash('sha256').update(catalogBytes).digest('hex'),inputsSha256:createHash('sha256').update(proofBytes).digest('hex'),receipts},null,2)+'\n');
+// A real UI throw exposed a one-bit Chrome/Node difference in a moving-tread
+// contact timestamp. Keep the exact launch and nonzero station phase: authored
+// hints alone did not exercise this case.
+const regressions=[{id:'basement-upward-bound',label:'moving-contact-timestamp',releaseTime:40.87834413442761,launch:{position:v(2.2200000286102295,-3.3885726928710938,5.64272928237915),velocity:v(1.0162678956985474,0,6.222846661011925e-17),spin:v()}}];
+for(const fixture of regressions){
+ const shot=new Shot(world,courses.find(c=>c.id===fixture.id),fixture.launch,{releaseTime:fixture.releaseTime});
+ while(!shot.done&&shot.steps<180*150)shot.step();
+ assert.ok(shot.done&&shot.ball.sleeping);assert.equal(shot.ball.budgetExhaustions,0);
+ const result=shot.result();assert.ok(result.success);assert.deepEqual(scoreAttempt(result),result.breakdown);
+ fixture.sha256=createHash('sha256').update(JSON.stringify(result)).digest('hex');
+}
+world.free();await writeFile('.local/browser-physics/campaign-proof.json',JSON.stringify({layout:proof.layout,physics:BROWSER_PHYSICS,catalogSha256:createHash('sha256').update(catalogBytes).digest('hex'),inputsSha256:createHash('sha256').update(proofBytes).digest('hex'),receipts,regressions},null,2)+'\n');
 assert.ok(receipts.every(r=>r.pass),'Campaign physics, geometry or authored-route assertion failed');
 for(const p of proof.courses)assert.ok(receipts.filter(r=>r.id===p.id&&r.kind==='neighbor'&&r.fullClear).length>=p.minimumNeighborClears,`${p.id}: nearby input tolerance failed`);
 console.log(`PASS all 30 browser courses: repeated exact hints, ${receipts.filter(r=>r.kind==='neighbor').length} nearby inputs, authored route features, full rest and independent scoring`);

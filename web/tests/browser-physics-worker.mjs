@@ -43,8 +43,10 @@ try{
  await context.setOffline(true);
  const courses=JSON.parse(await readFile('web/starter-challenges.json','utf8')),nodeProof=JSON.parse(await readFile(`.local/browser-physics/${campaign?'campaign':'station'}-proof.json`,'utf8'));
  if(campaign){assert.equal(nodeProof.physics,BROWSER_PHYSICS);assert.equal(nodeProof.receipts.filter(r=>r.kind==='hint'&&r.pass).length,30);assert.equal(nodeProof.catalogSha256,createHash('sha256').update(await readFile('web/starter-challenges.json')).digest('hex'),'Node proof must describe the current catalog');}
- for(const id of campaign?courses.map(c=>c.id):['atrium-welcome','atrium-clock-in','basement-upward-bound']){
-  const challenge=courses.find(c=>c.id===id),hint=challenge.hint,expected=campaign?nodeProof.receipts.find(r=>r.id===id&&r.kind==='hint'):nodeProof.results.find(r=>r.id===id),launch=campaign?expected.launch:launchInput(add(challenge.start.center,v(0,.025,0)),{...hint,power:hint.holdMs/2800}),releaseTime=expected.releaseTime||0;
+ const cases=(campaign?courses.map(c=>c.id):['atrium-welcome','atrium-clock-in','basement-upward-bound']).map(id=>campaign?nodeProof.receipts.find(r=>r.id===id&&r.kind==='hint'):nodeProof.results.find(r=>r.id===id));
+ if(campaign){assert.ok(nodeProof.regressions.some(r=>r.label==='moving-contact-timestamp'));cases.push(...nodeProof.regressions);}
+ for(const expected of cases){
+  const id=expected.id,label=expected.label||id,challenge=courses.find(c=>c.id===id),hint=challenge.hint,launch=campaign?expected.launch:launchInput(add(challenge.start.center,v(0,.025,0)),{...hint,power:hint.holdMs/2800}),releaseTime=expected.releaseTime||0;
   let hash;
   for(let run=0;run<2;run++){
    await page.evaluate(({challenge,launch,releaseTime})=>{window.result=null;window.messages=[];window.worker.postMessage({type:'throw',challenge,launch,options:{releaseTime}});},{challenge,launch,releaseTime});
@@ -52,11 +54,11 @@ try{
    const response=await page.evaluate(()=>result||messages.find(m=>m.type==='error'));assert.equal(response.type,'result',response.message);
    const {result,computeMs,maxBatchMs}=response;assert.ok(result.success);assert.equal(result.waypointHits.length,challenge.waypoints.length);
    const digest=createHash('sha256').update(JSON.stringify(result)).digest('hex');
-   assert.equal(digest,expected.sha256,`${id}: Chrome must reproduce the Node verifier byte for byte`);
+   assert.equal(digest,expected.sha256,`${label}: Chrome must reproduce the Node verifier byte for byte`);
    if(hash)assert.equal(digest,hash);hash=digest;
-   if(!run)results.push({id,computeMs,maxBatchMs,duration:result.duration,score:result.score,sha256:digest});
+   if(!run)results.push({id,label,computeMs,maxBatchMs,duration:result.duration,score:result.score,sha256:digest});
   }
-  console.log(`PASS offline Chrome: ${id}, two identical full replays`);
+  console.log(`PASS offline Chrome: ${label}, two identical full replays`);
  }
  // A buffered shot is still recallable after computation has finished, before
  // the user reaches the end of playback. It must not become a banked score.

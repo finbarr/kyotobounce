@@ -50,7 +50,10 @@ export class Ball{
     const input=clamp((-vn-.12)/(.30-.12),0,1),weight=input*input*(3-2*input),incoming=this.velocity,incomingSpin=this.spin;
     const response=resolveContact(sub(incoming,surface.velocity),incomingSpin,normal,this.profile,weight*surface.bounce,surface.friction,weight*surface.grip,weight*surface.offset);
     this.velocity=add(response.velocity,surface.velocity);this.spin=response.spin;
-    this.contacts.push({time:this.clock-remaining+time,point:{...point},normal:{...normal},surface:surface.id,speed:-vn,incoming,outgoing:this.velocity,incomingSpin,outgoingSpin:this.spin});
+    // Moving-surface queries use doubles internally. Serialize contact time at
+    // the same Float32 boundary as the simulation clock and poses, so a last-bit
+    // query difference cannot make an otherwise identical replay unverifiable.
+    this.contacts.push({time:f(this.clock-remaining+time),point:{...point},normal:{...normal},surface:surface.id,speed:-vn,incoming,outgoing:this.velocity,incomingSpin,outgoingSpin:this.spin});
     this.lastContact=this.clock;this.normal=normal;this.surfaceVelocity=surface.velocity;this.rolling=surface.rolling;this.torsional=surface.torsional;
     if(dot(gravity,normal)<0)supports.push({normal,surface,time:this.clock});
    }
