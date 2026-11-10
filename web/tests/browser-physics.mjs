@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {Vector3,Triangle} from 'three';
 import {StaticWorld} from '../public/physics/static-world.js';
 import {Ball,resolveContact,STEP} from '../public/physics/ball.js';
+import {Walker} from '../public/physics/walker.js';
 import {ballProfile} from '../public/physics/materials.js';
 import {v,length,identity} from '../public/physics/math.js';
 import {boxSweep,triangleSweep,segmentSweep} from '../public/physics/sweeps.js';
@@ -31,6 +32,14 @@ const impact=walls.sweep(v(0,1,0),v(0,0,-100),ballProfile.radius);
 assert.equal(impact.surface.id,'wall');near(impact.point.z,-1.999);near(impact.normal.z,1);
 assert.equal(walls.sweep(v(0,1,0),v(0,0,-100),ballProfile.radius,2),null);
 const overlap=walls.overlap(v(0,.02,0),.023);near(overlap.depth,.003);near(overlap.point.y,0);
+// A waist-height obstruction must hit the capsule between its end hemispheres.
+// Sliding follows the wall instead of stopping all horizontal movement.
+const walking=world([floor,{...floor,id:'waist-wall',position:v(0,.9,-2),half:v(4,.04,.01)}]);
+const bodyHit=walking.capsuleSweep(v(0,.02501,0),v(0,0,-4),.24,1.8,.025);
+assert.ok(bodyHit&&bodyHit.fraction<.5);near(bodyHit.normal.z,1);
+const walker=new Walker(walking,v(0,.03,0));
+for(let i=0;i<360;i++)walker.move({x:.3,z:1},180,false,STEP);
+assert.ok(walker.grounded);assert.ok(walker.feet.z>-1.73,'Full body cannot pass through the wall');assert.ok(walker.feet.x<-.6,'Player can slide sideways along the wall');near(walker.feet.y,.025,2e-5);
 const angle=Math.PI/4,rotated=world([{...floor,id:'rotated',position:v(12,3,-7),half:v(1,1,1),rotation:{x:0,y:Math.sin(angle/2),z:0,w:Math.cos(angle/2)}}]);
 const rotatedHit=rotated.sweep(v(12,3,0),v(0,0,-10),.023);assert.equal(rotatedHit.surface.id,'rotated');near(rotatedHit.point.z,-7+Math.SQRT2,1e-5);
 const capsule=world([{...floor,kind:'capsule',radius:.1,half:v(.1,1,.1),position:v()}]);
@@ -61,9 +70,13 @@ const compiled=compileCollision(layout,'fixture'),encoded=encodeCollisionPack(co
 assert.equal(decoded.layoutSha256,'fixture');assert.equal(decoded.shapes.length,2);
 near(stairs.sweep(v(0,2,.5),v(0,-3,0),.023,1).point.y,.2);
 near(stairs.sweep(v(0,2,.5),v(0,-3,0),.023,2).normal.y,1/Math.sqrt(1+.2**2));
+const climber=new Walker(stairs,v(0,.15,.25));for(let i=0;i<130;i++)climber.move({x:0,z:1},0,false,STEP);
+assert.ok(climber.feet.z>1.1);assert.ok(climber.feet.y>.24,'Capsule follows the walking ramp above the real stair treads');
+const parked={...climber.feet};for(let i=0;i<180;i++)climber.move({x:0,z:0},0,false,STEP);
+near(climber.feet.z,parked.z,1e-5);
 near(fallLimitY({...layout,escalators:[{lowerCenter:v(0,-3,0),path:[v(0,-2,0)]}]}),-11);
 assert.throws(()=>decodeCollisionPack(encoded.slice(0,17)),/Truncated/);
 const corrupt=encoded.slice();new DataView(corrupt.buffer).setUint32(12,0xfffffff0,true);assert.throws(()=>decodeCollisionPack(corrupt),/Truncated/);
 const bad=structuredClone(compiled.metadata);bad.shapes[0].vertices.offset=-4;assert.throws(()=>decodeCollisionPack(encodeCollisionPack(bad,compiled.arrays)),/Invalid/);
-for(const w of [walls,rotated,capsule,flat,empty,stairs])w.free();
+for(const w of [walls,walking,rotated,capsule,flat,empty,stairs])w.free();
 console.log('PASS browser physics: analytic contacts, masks, stairs, impulse model, spin settling, no timeout finish, deterministic poses and collision pack validation');

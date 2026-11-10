@@ -1,8 +1,9 @@
 // One persistent board during aiming, flight, menus and results. Rows are shots,
 // and ownership uses the stable guest ID, never a possibly duplicated name.
-export function resultBoard({host,watch,sound,getGuestId=()=>null,share=()=>{}}){
+export function resultBoard({local=false,host,watch,sound,getGuestId=()=>null,share=()=>{}}){
  const panel=document.createElement('section');panel.id='result-leaderboard';panel.hidden=true;panel.setAttribute('aria-label','Level scoreboard');
  panel.innerHTML='<div class="board-heading"><span class="eyebrow">LEVEL TOP 10 / ランキング</span><b class="board-course"></b><button class="share-level">Copy level link ↗</button><b id="ranking-announcement" role="status"></b></div><ol aria-label="Level high scores"></ol><p class="board-empty">NO SCORES YET. Put your name on the board.</p><div class="own-placement" hidden><p>YOUR SHOT</p><ol aria-label="Your placement"></ol></div><p class="board-footnote">Every in-bounds shot can rank · select a score to watch</p>';
+ if(local){panel.querySelector('.eyebrow').textContent='ON THIS DEVICE · TOP 10';panel.querySelector('.share-level').hidden=true;}
  host.append(panel);
  const list=panel.querySelector('ol'),announcement=panel.querySelector('[role=status]'),placement=panel.querySelector('.own-placement'),ownList=placement.querySelector('ol'),empty=panel.querySelector('.board-empty'),title=panel.querySelector('.board-course'),shareButton=panel.querySelector('.share-level');
  let timers=[],animations=[],generation=0,current=null,pending=null,revealing=false,lastShot=null;

@@ -29,7 +29,10 @@
     "test:v2": "node web/tests/v2-runtime.mjs",
     "test:v2:browser": "node web/tests/v2-browser.mjs",
     "build:physics": "node web/build-physics.mjs",
-    "test:physics:station": "node web/tests/browser-physics-station.mjs && node web/tests/browser-physics-worker.mjs"
+    "test:physics:station": "node web/tests/browser-physics-station.mjs && node web/tests/browser-physics-worker.mjs",
+    "dev:browser": "node web/browser-dev.mjs",
+    "assets:collision": "node tools/browser-collision.mjs",
+    "test:browser:local": "node web/tests/browser-local-game.mjs"
   },
   "dependencies": {
     "three": "0.185.1",

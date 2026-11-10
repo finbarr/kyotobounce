@@ -10,6 +10,8 @@ import {RobotCutaway} from './robot-cutaway.js';
 import {replayIdFromPath} from './replay-links.js';
 import {playerName} from './player-name.js';
 import {gameConnection} from './connection.js';
+import {browserConnection} from './local-connection.js';
+const browserRuntime=document.querySelector('meta[name=kyoto-runtime]')?.content==='browser';
 import {clientPerformance} from './performance.js';
 import {ShotPlayback} from './shot-playback.js';
 import {LiveThrow} from './live-throw.js';
@@ -137,7 +139,7 @@ function skipShot(){
 skipButton.onclick=skipShot;
 const performanceReport=clientPerformance();
 const updateShotDetails=shotDetails(()=>cancel());
-const connection=sharedReplayId?null:gameConnection({
+const connection=sharedReplayId&&!browserRuntime?null:(browserRuntime?browserConnection:gameConnection)({
   url:`${location.protocol==='https:'?'wss':'ws'}://${location.host}`,
   hello:()=>({protocol:'shot-stream-v4',token:localStorage.getItem('kyoto-guest'),sessionId:guestId,lastResultAttempt}),
   onStatus(status,extra){
@@ -209,12 +211,12 @@ function handleMessage(m,playback=false){
   // A native cancellation ends the buffered shot too (including out-of-bounds design balls).
   if(shotPlayback.cancelForNotice(m,guestId)){liveThrow.reset();discardThrowMotion();flightPending=false;returnRequested=true;setFastForward(false);}
   ui?.message(m);names?.message(m);
-  if(m.type==='result'){setFastForward(false);lastResultAttempt=m.attempt;keys.clear();if(pointerLocked()){resultMouseRelease=true;document.exitPointerLock();}}
+  if(m.type==='result'){connection?.presented?.(m.attempt).catch(error=>notice('Could not save this shot: '+error.message));setFastForward(false);lastResultAttempt=m.attempt;keys.clear();if(pointerLocked()){resultMouseRelease=true;document.exitPointerLock();}}
   if(m.type==='result'&&ui?.state.mode==='play'&&m.saved&&m.score>0)pendingRobotResult=m;
   if(m.type==='selected'||m.type==='replay')pendingRobotResult=null;
   if(m.type==='session'){if(requestedLevel&&!m.restoring){const level=requestedLevel;requestedLevel=null;send('select-challenge',{challengeId:level});}const level=`${m.challenge?.id||''}:${m.challenge?.revision||''}`;if(level!==powerLevel){powerLevel=level;if(!m.designing&&ui?.state.mode==='play')applyLevelAim(m.challenge);}}
   if(m.type==='welcome'){
-    const returning=!!guestId;guestId=m.sessionId;identityId=m.id;localStorage.setItem('kyoto-guest-id',m.id);localStorage.setItem('kyoto-guest',m.token);$('nickname').value=m.name;
+    const returning=!!guestId;guestId=m.sessionId;identityId=m.id;if(!m.local){localStorage.setItem('kyoto-guest-id',m.id);localStorage.setItem('kyoto-guest',m.token);}$('nickname').value=m.name;
     // Input stays disabled until a fresh authoritative state arrives.
     workerReady=false;
     if(returning){
@@ -504,10 +506,10 @@ briefing=challengeBriefing({renderer,boundary,isReady:()=>loaded&&workerReady&&!
   applyLevelAim(ui.state.selected);
   if(capture)captureMouse();else{briefing.dismiss();openLevelMenu();}
 }});
-ui=competitionUI({resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:(c,{automatic=false}={})=>{if(!startup?.active&&(!automatic||!isTutorial(c)))briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=levelEntryDistance(ui?.state.selected);cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
+ui=competitionUI({local:browserRuntime,getReplay:browserRuntime?id=>connection.replay(id):undefined,getLevel:browserRuntime?id=>connection.level(id):undefined,resume:closeLevelMenu,onModeChange:designerView,focusTarget:focusDesignTarget,getLayout:()=>loadedLayout,sharedReplay:!!sharedReplayId,overview:(c,{automatic=false}={})=>{if(!startup?.active&&(!automatic||!isTutorial(c)))briefing.open(c);},sound,scene,send,cancel,notice,getGuestId:()=>identityId,getPhase:()=>shotTimeline?.phase||snapshot?.phase,getLiveTime:()=>shotTimeline?.time??(snapshot?snapshot.stationTime+(performance.now()-received)/1000:0),resetView:reason=>{if(reason==='level'&&ui?.state.mode!=='editor')setFly(false);setFastForward(false);heat.reset();if(reason==='level'){recallChargeQueued=false;recallPending=false;robotChargeQueued=false;clearTimeout(robotChargeTimer);clearTimeout(robotRetryTimer);chargeMeter.reset();stopChargeSound();clearLiveMotion();applyLevelAim(ui.state.selected);shotPlayback.waitForAttempt();shotTimeline=null;lastThrowAim=null;aimOrbit=null;flightPending=false;returnRequested=true;ballCameraActive=false;robotResultCamera=false;flightManual=false;}centerOnAim();if(ui?.state.mode==='replay'){if(reason!=='seek')setFly(false);returnRequested=false;ballCameraActive=false;robotResultCamera=false;flightManual=false;aimOrbit=null;azimuth=-ui.state.replay.thrower.yaw*Math.PI/180;elevation=.10-ui.state.replay.thrower.pitch*Math.PI/180*.45;}distance=levelEntryDistance(ui?.state.selected);cameraClearance=distance;trailCount=0;trailGeometry.setDrawRange(0,0);}});
 $('replay-free').onclick=()=>setFly(true);
 for(const id of ['replay-play','replay-restart','replay-recenter','replay-free'])$(id).addEventListener('click',()=>canvas.focus());
-names=playerName({send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});
+names=playerName({local:browserRuntime,send,cancel,notice,initialHost:sharedReplayId?null:$('loading-name'),onReady:ready=>startup?.player(ready)});
 if(sharedReplayId){document.body.classList.add('is-replay');$('connection').textContent='REPLAY VIEWER';$('edit-player-name').hidden=true;}
 const characterPicker=createCharacterPicker({onChange:id=>{characterChoice=id;for(const [owner,a]of avatars)if(owner===guestId||ui.state.mode==='replay')setAvatarCharacter(a,id);}});
 if(sharedReplayId)$('course-list').after(characterPicker.element);else $('loading-character').append(characterPicker.element);
@@ -567,7 +569,7 @@ function animate(now){
   if(['Aim','Charging'].includes(phase))returnRequested=false;
   const inFlight=(replaying?['Flight','Result'].includes(phase):liveThrow.follows(snapshot,phase))&&!returnRequested;
   document.body.classList.toggle('is-ball-camera',inFlight&&!fly.active);
-  setText($('connection'),replaying||sharedReplayId?'REPLAY VIEWER':workerReady?ui.state.selected?'Online · shared scores':'Online · exploring':workerStatus==='recovering'?'Restoring physics':workerStatus==='failed'?'Physics stopped':connectionStatus==='reconnecting'?'Reconnecting…':connectionStatus==='replaced'?'Session moved':'Physics starting');$('connection-dot').classList.toggle('ready',workerReady);
+  setText($('connection'),replaying||sharedReplayId?'REPLAY VIEWER':workerReady?browserRuntime?'On this device · saved locally':ui.state.selected?'Online · shared scores':'Online · exploring':workerStatus==='recovering'?'Restoring physics':workerStatus==='failed'?'Physics stopped':connectionStatus==='reconnecting'?'Reconnecting…':connectionStatus==='replaced'?'Session moved':'Physics starting');$('connection-dot').classList.toggle('ready',workerReady);
   ball.visible=!!snapshot;
   if(!snapshot){setHidden($('throw-panel'),true);setHidden($('flight-panel'),true);$('reticle').style.display='none';}
   if(snapshot){

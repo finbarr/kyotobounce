@@ -3,6 +3,7 @@ import {MeshBVH,CENTER} from 'three-mesh-bvh';
 import {v} from './math.js';
 import {surfaceFor} from './materials.js';
 import {boxSweep,triangleSweep,segmentSweep} from './sweeps.js';
+import {capsuleSweep} from './capsule.js';
 const vector=p=>new Vector3(p.x,p.y,p.z);
 function shapeBounds(s){const h=vector(s.half);if(s.kind==='capsule')h.set(s.radius,s.half.y+s.radius,s.radius);const q=new Quaternion(s.rotation.x,s.rotation.y,s.rotation.z,s.rotation.w),p=vector(s.position),box=new Box3();for(const x of [-1,1])for(const y of [-1,1])for(const z of [-1,1])box.expandByPoint(new Vector3(h.x*x,h.y*y,h.z*z).applyQuaternion(q).add(p));return box;}
 function tree(items){if(!items.length)return null;const bounds=new Box3();for(const s of items)bounds.union(s.bounds);if(items.length<=8)return {bounds,items};const size=bounds.getSize(new Vector3()),axis=size.x>=size.y&&size.x>=size.z?'x':size.y>=size.z?'y':'z';items.sort((a,b)=>(a.bounds.min[axis]+a.bounds.max[axis])-(b.bounds.min[axis]+b.bounds.max[axis]));const half=items.length>>1;return {bounds,left:tree(items.slice(0,half)),right:tree(items.slice(half))};}
@@ -22,6 +23,7 @@ export class StaticWorld{
   this.stats={triangles:indices.length/3,primitives:primitives.length,queries:0,triangleTests:0};
  }
  candidates(bounds,fn){const visit=node=>{if(!node||!bounds.intersectsBox(node.bounds))return;if(node.items){for(const s of node.items)if(bounds.intersectsBox(s.bounds))fn(s);}else{visit(node.left);visit(node.right);}};visit(this.tree);}
+ capsuleSweep(feet,delta,radius,height,skin){return capsuleSweep(this,feet,delta,radius,height,skin);}
  sweep(position,displacement,radius,mask=1){
   this.stats.queries++;const p=vector(position),d=vector(displacement),distance=d.length();if(distance<1e-9)return null;
   const scale=Math.max(Math.abs(p.x)+Math.abs(d.x),Math.abs(p.y)+Math.abs(d.y),Math.abs(p.z)+Math.abs(d.z)),guard=Math.max(.000001,scale*2.3841858e-7);
