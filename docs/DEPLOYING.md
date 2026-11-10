@@ -4,6 +4,14 @@ The game needs a long-running Node service plus a native Linux Unity dedicated-s
 
 The supplied scripts target an Ubuntu 24.04 x86_64 server with systemd and Caddy. The initial deployment used 2 vCPUs and 4 GB RAM; capacity depends on concurrent physics sessions and needs load testing for your traffic.
 
+The v2 layout has a much larger transient allocation while Unity parses the
+station JSON. The November 2026 release was staged on the existing 4 GB host
+with 4 GB of swap; a 2300 MB staging limit without swap killed the worker during
+startup. Provision startup memory headroom before activation, and inspect both
+resident memory and swap activity during real shots. Swap is startup headroom,
+not a substitute for measuring sustained gameplay load. Preserve its boot
+configuration when maintaining that host.
+
 1. Install Unity 6000.3.23f1 with Linux dedicated-server build support on the build machine. Fetch assets, run the source checks, then `npm run build:worker -- --linux` and `npm run build:web`.
 2. Provision a server with SSH key access. Review `deploy/bootstrap.sh` before running it as root on a **new server**; it installs packages, configures SSH and creates the `kyoto` service user.
 3. Point your domain and `www` DNS records at the server, and allow ports 80/443 plus your SSH access through the firewall.
