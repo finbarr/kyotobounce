@@ -15,7 +15,8 @@ used directly; each preview shares one generated collision pack. Missing or
 corrupt generated collision data is rebuilt, while mismatched source art stops
 the build. `npm run build:static` uses the same preparation.
 
-Setup now installs the current six-file `assets-v8` game pack. The canonical
+Setup can install the verified current six-file `assets-v8` game pack using
+`KYOTO_ASSET_ARCHIVE`; public release is pending. The canonical
 layout and matching models are sufficient to rebuild the browser game without
 Unity or private authoring files; see [asset distribution](ASSETS.md). The native
 runtime source remains for reference and the existing live service until an
@@ -368,6 +369,10 @@ observed maximum gap was 64 ms. The temporary install was removed. Evidence is
 under `.local/asset-setup-test/`.
 
 ## Remaining bounded tasks
+
+Public release of the verified `assets-v8` archive awaits explicit authorization.
+The local archive and fresh-install proof are complete; the normal download URL
+will not work until publication. This does not authorize deployment of the game.
 
 The static package and pinned Linux verifier image now have local runtime
 acceptance. `docs/DEPLOYING.md` documents their builds and a request-billed,

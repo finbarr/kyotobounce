@@ -1,11 +1,12 @@
 # Local development
 
 Use Node 22.23.2 and the current station assets described in [ASSETS.md](ASSETS.md).
-Unity is not required. Setup installs the pinned current station asset pack.
-Modified local assets stop installation before anything is replaced.
+Unity is not required. The current asset pack is verified locally and awaits
+publication, so a fresh checkout needs its archive path. Modified local assets
+stop installation before anything is replaced.
 
 ```sh
-npm run setup
+KYOTO_ASSET_ARCHIVE=/absolute/path/kyoto-assets-v8.tar.gz npm run setup
 npm run dev -- 4173
 ```
 

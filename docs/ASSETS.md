@@ -5,8 +5,10 @@ Project-created game code, models, textures and synthesized audio are MIT licens
 ## Current game asset pack
 
 `assets-manifest.json` pins the versioned `assets-v8` game pack by archive and
-per-file SHA-256. `npm run setup` installs dependencies, fetches/validates the
-pack and builds browser physics. `npm run assets:verify` checks the installed
+per-file SHA-256. **The archive is verified locally and awaits publication.**
+Until then, supply `KYOTO_ASSET_ARCHIVE` as shown below when installing into a
+fresh checkout. `npm run setup` installs dependencies, validates the supplied
+pack and builds browser physics; after publication it can download the pack. `npm run assets:verify` checks the installed
 files without downloading anything. Changed local assets are never overwritten.
 
 The pack has exactly six inputs, totaling 159,537,468 compressed bytes:
