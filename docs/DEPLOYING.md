@@ -57,6 +57,78 @@ chunk must show a visible Retry action instead of hanging at startup. The deskto
 pointer is protected before navigation; receipts are in
 `.local/browser-release-test`.
 
+## On-demand verifier image
+
+`npm run build:verifier` validates the current campaign/collision receipt and
+bundles the server into `.local/verification/build`. `npm run build:verifier:image`
+also builds `localhost/kyoto-verifier:local` with Podman; set
+`KYOTO_CONTAINER_RUNTIME=docker` to use Docker for the image build. The build
+streams an explicit set of files to the builder, including the existing collision
+pack, with no second asset tree or repository-wide build context. It includes
+attribution, uses a digest-pinned Linux amd64 Node base, installs only production
+dependencies, and runs as the non-root `node` user. No credential file is copied.
+
+`npm run test:verifier:container` requires a running local Podman machine and
+Java 21+. It builds the image and uses an isolated, demo-only Firestore emulator.
+On this laptop, keep the VM lifecycle in the same shell as the test so the tool
+can clean it up reliably; reuse the existing machine rather than creating one:
+
+```sh
+podman machine start podman-machine-default &&
+  (trap 'podman machine stop podman-machine-default' EXIT
+   npm run test:verifier:container)
+```
+
+The test runs the real station and 30-course catalog in a read-only, one-CPU,
+1 GiB Linux container. It checks authentication, forged-result rejection,
+mid-flight checkpoint recovery after container replacement, independent host
+agreement, four simultaneous verification requests, and retained scores/progress
+after shutdown. Logs and receipts are in `.local/verification/container/`.
+These are local emulation/container checks, not managed-cloud acceptance.
+
+The image requires `GOOGLE_CLOUD_PROJECT` and exact `KYOTO_ALLOWED_ORIGINS`.
+Application Default Credentials come from the assigned workload service account
+in Cloud Run; do not export or embed a service-account key. A managed instance
+rejects Firestore emulator configuration. It validates its release/campaign
+receipt at startup and the collision checksum before simulation. The optional
+`KYOTO_VERIFY_SLICE_MS` setting accepts 1–1000 ms (default 1000); reaching that
+work limit saves a continuation and never finishes a moving ball. SIGTERM asks
+active simulations to checkpoint and drains requests within the provider's
+[ten-second shutdown window](https://docs.cloud.google.com/run/docs/container-contract).
+
+`npm run configure:verifier` writes `.local/verification/cloud-run.json` from
+`GOOGLE_CLOUD_PROJECT`, `KYOTO_VERIFY_IMAGE` (an Artifact Registry digest URL),
+and `KYOTO_ALLOWED_ORIGINS`. Optional `KYOTO_VERIFY_SERVICE` and
+`KYOTO_VERIFY_ACCOUNT` default to `kyoto-verifier`. This generates configuration
+only. It specifies request-based billing, zero minimum instances, a service-wide
+maximum of two, one CPU/1 GiB per instance, concurrency four, a 30-second request
+timeout, a startup probe and no warm-up/background job. The service is publicly
+reachable; its own authenticated API still validates player credentials and
+independently calculates every accepted score.
+[Billing](https://docs.cloud.google.com/run/docs/configuring/billing-settings),
+[scaling](https://docs.cloud.google.com/run/docs/configuring/max-instances),
+[public API access](https://docs.cloud.google.com/run/docs/authenticating/public).
+
+For an explicitly authorized deployment, create a dedicated workload service
+account, a colocated Firestore Native database and an Artifact Registry image
+repository. Grant the account `roles/datastore.user` for the intended database,
+not project editor/owner. Install the indexes and deny-browser rules in
+`deploy/verification/`; server access uses IAM and bypasses client rules.
+Push the tested amd64 image, generate configuration with its registry digest,
+then apply it with `gcloud run services replace` for the chosen project/region.
+No build/configuration command here provisions or deploys those resources.
+[Firestore IAM](https://docs.cloud.google.com/firestore/native/docs/security/iam).
+
+Before cutover, inspect the deployed scaling/billing settings, workload IAM,
+index readiness and CORS; run an authorized real shot/restart/load check; then
+build the static game with that verifier's HTTPS URL. Measure managed-database
+contention and cold-start behavior in the chosen region. Instance limits are
+capacity controls, not a hard bill cap; request, storage and egress usage can
+cost money, though this setup requires no always-on compute subscription. Keep
+only the current registry release and any explicitly required rollback image.
+The existing live service must not be stopped until the replacement is accepted
+and deployment/cutover is authorized.
+
 ## Existing native deployment
 
 The currently deployed architecture uses a long-running Node service plus a

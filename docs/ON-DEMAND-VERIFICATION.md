@@ -313,10 +313,25 @@ retired publications, fence late workers, and reject oversized evidence without
 creating a result. Browser replay checks delay an input request and require its
 exact reconstruction after retry; portable tests also cancel a long retry wait.
 
-The static browser package and local hosting checks are documented in
-`docs/DEPLOYING.md`. Before full migration acceptance, finish scale-to-zero
-verifier deployment packaging, then run the complete integrated acceptance checks.
+The static browser package, pinned verifier image and scale-to-zero configuration
+generator are documented in `docs/DEPLOYING.md`. Complete integrated migration
+acceptance and any explicitly authorized cloud smoke/load checks remain pending.
 No compatibility archive or native score migration is planned.
+
+The Linux amd64 container acceptance passed all 30 full clears with exact final
+result agreement against independent host reconstruction, recovery from a
+persisted mid-flight checkpoint after container replacement, four concurrent
+verifications, and progress retention after shutdown. The image ran as a non-root
+user on a read-only filesystem with one CPU and 1 GiB RAM. Its peak process RSS
+was about 824 MiB, ending at 672 MiB after the concurrency check; the image size
+was 360,169,672 bytes. Local container start-to-health took 4.49 seconds and the
+measured graceful stops took 0.44–0.57 seconds. These include local runtime
+overhead and amd64 emulation on this laptop, not Cloud Run latency or memory
+measurements. Per-course comparison timings include both HTTP verification and
+host reference simulation. Receipts are in `.local/verification/container/`.
+The service suite also gates a live request during shutdown, proves its private
+checkpoint was persisted, and resumes it to a real result in a replacement
+process. No moving shot is finalized by shutdown or the request work budget.
 
 ## Hosting evidence, checked November 10, 2026
 

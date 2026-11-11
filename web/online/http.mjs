@@ -12,10 +12,10 @@ function body(req){
  });
 }
 export function verificationHttp(service,{origins=[],gate=requestGate()}={}){
- const allowed=new Set(origins);
+ const allowed=new Set(origins),active=new Set();
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
-  const controller=new AbortController();res.on('close',()=>{if(!res.writableEnded)controller.abort();});
+  const controller=new AbortController();active.add(controller);res.on('close',()=>{active.delete(controller);if(!res.writableEnded)controller.abort();});
   const respond=(value,status=200)=>{if(!res.destroyed){res.writeHead(status);res.end(JSON.stringify(value));}};
   try{
    const release=gate();res.once('finish',release);res.once('close',release);
@@ -48,5 +48,7 @@ export function verificationHttp(service,{origins=[],gate=requestGate()}={}){
    respond({error:error instanceof HttpError?error.message:'Verification is temporarily unavailable',...(error.retryAfter?{retryAfter:error.retryAfter}:{})},error instanceof HttpError?error.status:503);
   }
  });
- server.headersTimeout=10000;server.requestTimeout=30000;server.keepAliveTimeout=5000;return server;
+ server.headersTimeout=10000;server.requestTimeout=30000;server.keepAliveTimeout=5000;
+ server.drain=()=>{for(const controller of active)controller.abort();return new Promise(resolve=>{server.close(resolve);server.closeIdleConnections();});};
+ return server;
 }

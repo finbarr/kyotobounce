@@ -166,6 +166,16 @@ try{
  await coursePublicationTests({start,stop,service,request,register,submit,finish,world,deferred,advanceClock:()=>{clock+=31000;}});
  await resourceTests(db,world);
 
+ // A terminating instance stops at a simulation boundary and stores a private
+ // continuation before closing the HTTP connection. The next process resumes.
+ const drainGate=deferred(),drainEntered=deferred(),draining=await start(service({world:async()=>{drainEntered.resolve();await drainGate.promise;return world;}}));
+ const drainId=await submit(draining,alice,h,runs),drainReply=request(draining,path(drainId)+'/advance',{player:alice,method:'POST',body:{},status:202});
+ await drainEntered.promise;const drained=draining.server.drain();drainGate.resolve();
+ const drainState=await drainReply;await drained;servers.delete(draining);
+ assert.equal(drainState.state,'pending');assert.ok(!drainState.result);assert.ok((await draining.service.attempts.doc(drainId).get()).data().checkpoint.length>0);
+ const successor=await start();await finish(successor,alice,drainId);await stop(successor);
+ console.log('PASS graceful HTTP drain checkpoints in-flight controls and a replacement verifier resumes to a real result');
+
  if(process.argv.includes('--station')){
   const began=performance.now();stationWorld=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin')));
   const catalog=JSON.parse(await readFile('web/starter-challenges.json')).map(c=>({...c,physics:BROWSER_PHYSICS}));assert.equal(catalog.length,30);

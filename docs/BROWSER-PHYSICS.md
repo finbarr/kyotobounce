@@ -238,11 +238,11 @@ headless Chrome check, not a Cloudflare deployment or a physical-phone test.
 
 ## Remaining bounded tasks
 
-1. Finish scale-to-zero verification packaging without an always-on physics
-   process or a fixed monthly compute subscription. The browser static package
-   is built with `npm run build:static`; see `docs/DEPLOYING.md` for delivery
-   chunking, local verification and hosting configuration.
-2. Verify the complete integrated game, cross-browser replay behavior and broader
+The static package and pinned Linux verifier image now have local runtime
+acceptance. `docs/DEPLOYING.md` documents their builds and a request-billed,
+zero-minimum-instance service configuration; no cloud deployment was performed.
+
+1. Verify the complete integrated game, cross-browser replay behavior and broader
    desktop/mobile controls and performance. Remove remaining runtime dependence
    on the native worker when the replacement is proven. Investigate the observed
    audio scheduler gap of about 1.1 seconds during automated course/viewport

@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {verifierConfig} from '../online/config.mjs';
+import {cloudRunService} from '../../deploy/verification/cloud-run.mjs';
+const local={GOOGLE_CLOUD_PROJECT:'demo-kyoto-verification',FIRESTORE_EMULATOR_HOST:'127.0.0.1:1234'};
+assert.deepEqual(verifierConfig(local).origins,['http://127.0.0.1:4430','http://localhost:4430']);assert.equal(verifierConfig(local).host,'127.0.0.1');
+const production={GOOGLE_CLOUD_PROJECT:'kyoto-example',NODE_ENV:'production',PORT:'8080',KYOTO_ALLOWED_ORIGINS:'https://kyotobounce.com,https://www.kyotobounce.com',KYOTO_VERIFIER_RELEASE:'/app/release.json'};
+assert.equal(verifierConfig(production).host,'0.0.0.0');assert.equal(verifierConfig(production).sliceMs,1000);
+for(const change of [{PORT:'0'},{PORT:'Infinity'},{KYOTO_ALLOWED_ORIGINS:''},{KYOTO_ALLOWED_ORIGINS:'*'},{KYOTO_ALLOWED_ORIGINS:'https://name:secret@example.com'},{KYOTO_ALLOWED_ORIGINS:'https://game.example/path'},{KYOTO_ALLOWED_ORIGINS:'http://game.example'},{KYOTO_VERIFIER_RELEASE:''},{KYOTO_VERIFY_SLICE_MS:'1001'},{KYOTO_VERIFY_SLICE_MS:'.5'},{FIRESTORE_EMULATOR_HOST:'localhost:8080'}])assert.throws(()=>verifierConfig({...production,...change}));
+assert.throws(()=>verifierConfig({...local,K_SERVICE:'cloud-managed'}));
+const input={project:'kyoto-example',image:'us-west1-docker.pkg.dev/kyoto-example/game/verifier@sha256:'+'1'.repeat(64),origins:'https://kyotobounce.com'},spec=cloudRunService(input);
+assert.equal(spec.metadata.annotations['run.googleapis.com/invoker-iam-disabled'],'true','The public API authenticates player credentials itself; it must not require Google user tokens');
+assert.equal(spec.metadata.annotations['run.googleapis.com/minScale'],'0');assert.equal(spec.metadata.annotations['run.googleapis.com/maxScale'],'2');assert.equal(spec.spec.template.metadata.annotations['run.googleapis.com/cpu-throttling'],'true');
+assert.equal(spec.spec.template.spec.containerConcurrency,4);assert.equal(spec.spec.template.spec.containers[0].resources.limits.memory,'1Gi');assert.equal(spec.spec.template.spec.serviceAccountName,'kyoto-verifier@kyoto-example.iam.gserviceaccount.com');
+for(const change of [{image:input.image.replace(/@.*/,':latest')},{image:input.image.replace('kyoto-example/game','other-project/game')},{account:'123-compute'},{origins:'*'}])assert.throws(()=>cloudRunService({...input,...change}));
+console.log('PASS exact verifier origins, demo-only emulation, bounded slices, pinned image, workload identity and scale-to-zero request billing configuration');
