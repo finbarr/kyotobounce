@@ -9,7 +9,7 @@ Ship the requested bounded change. Do not resume historical Phase 2/3 checklists
 - Browser: `web/public/`; dedicated physics worker: `web/public/physics/`; independent on-demand score verification: `web/verification.mjs` and `web/online-*.mjs`. Normal setup/start/build require no Unity runtime.
 - This game is pre-launch. Keep only the current station, courses and scoring rules; discard retired development data instead of maintaining archives or compatibility migrations. Current scores remain authoritative; never trust a client-supplied final score.
 - A shot finishes only when the ball stops translating AND spinning; no timer finish while it is moving. Recall forfeits.
-- Station collision and visual exports must match the current `web/v2/assets.json` manifest and campaign hash. Its configured layout is canonical; the root layout and published assets-v7 pack are retired. See `docs/ASSETS.md` for current asset availability.
+- Station collision and visual exports must match the current `web/v2/assets.json` manifest and campaign hash. Its configured layout is canonical; `npm run assets:fetch` installs the pinned current game pack. The root layout and assets-v7 pack are retired. See `docs/ASSETS.md`.
 - Current scoring behavior is documented in `docs/ARCADE-SCORING.md`.
 - A native C# change is not running until the worker is rebuilt and the service restarted. Linux deployments require the dedicated-server build, not a normal graphical player.
 

@@ -12,7 +12,7 @@ export async function stationRelease(){
  for(const file of new Set([config.layout,config.geometry,config.hardware,config.station,config.detail,config.motionLayout])){
   try{await access(file);}catch(error){if(error.code!=='ENOENT')throw error;missing.push(file);}
  }
- if(missing.length)throw Error('Current station assets are missing:\n'+missing.join('\n')+'\nSee docs/ASSETS.md. The published assets-v7 pack contains a retired station and cannot supply these files.');
+ if(missing.length)throw Error('Current station assets are missing:\n'+missing.join('\n')+'\nRun npm run assets:fetch to install the pinned current station. See docs/ASSETS.md.');
  const source=await readFile(config.layout);
  const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
  assert.equal(hash(source),config.layoutSha256,'The station source must match its asset receipt');

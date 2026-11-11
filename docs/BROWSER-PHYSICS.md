@@ -15,10 +15,11 @@ used directly; each preview shares one generated collision pack. Missing or
 corrupt generated collision data is rebuilt, while mismatched source art stops
 the build. `npm run build:static` uses the same preparation.
 
-The current station is still absent from the old public `assets-v7` archive;
-[asset distribution](ASSETS.md) remains a migration requirement. Normal setup no
-longer fetches that retired station. The native runtime source remains for
-reference and the existing live service until an authorized cutover.
+Setup now installs the current six-file `assets-v8` game pack. The canonical
+layout and matching models are sufficient to rebuild the browser game without
+Unity or private authoring files; see [asset distribution](ASSETS.md). The native
+runtime source remains for reference and the existing live service until an
+authorized cutover.
 
 The browser owns walking, throwing, target collection, scoring, full settling,
 recall, Skip, course creation/revision, local progress and replays. Local leaderboards are labelled
@@ -344,23 +345,44 @@ explicit paths. The rebuilt static package passed its full checksum inventory,
 file limits and local routing checks. No native process or preview remained
 after verification.
 
+## Fresh asset install acceptance
+
+The `assets-v8` game pack contains exactly six current inputs in a 159,537,468-byte
+archive. Its SHA-256 is
+`66a376d592d89be61fb8be79eaf2360ccfca79a897aa69b12ccec1f712362aad`.
+The canonical layout is stored once; editable Blender sources, research media,
+native binaries and player data are excluded. The manifest pins archive/file
+checksums and the station configuration. Installer tests cover corruption,
+cache reuse, incomplete installs, local edits, stale metadata, unexpected or
+duplicate entries, archive links and symlinked destinations.
+
+`npm run test:assets:setup` installed dependencies and that pack into a disposable
+source-only directory, then ran the real `setup`, `assets:verify` and rendered
+browser startup checks. There were no Unity files, source art, preinstalled
+node_modules, generated collision assets or links back to the original station.
+The regenerated collision checksum exactly matched the prior station proof.
+Offline play, replay reconstruction, touch controls and both 30-level menus
+passed. Chrome 157 measured 59.97 FPS, 16.8 ms p95, 33.3 ms maximum, no long tasks
+and no skipped music steps during the 1,834-frame flight; the audio scheduler's
+observed maximum gap was 64 ms. The temporary install was removed. Evidence is
+under `.local/asset-setup-test/`.
+
 ## Remaining bounded tasks
 
 The static package and pinned Linux verifier image now have local runtime
 acceptance. `docs/DEPLOYING.md` documents their builds and a request-billed,
 zero-minimum-instance service configuration; no cloud deployment was performed.
 
-1. Prepare a distributable current station asset pack and verify a fresh setup.
-   The public assets-v7 pack and its authoring allowlist still contain the retired
-   station; the current bundle must not depend on files unique to this laptop.
-   Remove remaining obsolete runtime entry points during the final audit.
+1. Update the build-only sharp dependency: the clean install audit reports
+   GHSA-wq5f-xc86-pv6w for 0.35.4 and a patched 0.35.5. Verify lossless asset
+   output after the update; the browser and online verifier do not load sharp.
 2. Investigate transition audio stalls. An earlier Chrome run observed a roughly
    1.1-second scheduler gap during automated course/viewport changes; the rendered Firefox run also
    observed one skipped music step before its flight benchmark. Their causes
    remain unproven. Keep the worker/storage diagnostics for the earlier Chrome
    Skip timeout while checking these transitions.
 3. Audit the full migration against current runtime evidence, commands and
-   documentation before declaring it done.
+   documentation, removing obsolete runtime entry points before declaring it done.
 
 Keep one checkout and generated asset set, finish and integrate each bounded
 change, and preserve unrelated Unity edits. No migration deployment is authorized.

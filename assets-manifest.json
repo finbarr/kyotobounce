@@ -1,127 +1,38 @@
 {
-  "version": "assets-v7",
-  "license": "MIT",
+  "kind": "kyoto-game-assets-v1",
+  "version": "assets-v8",
+  "license": "MIT; Kyoto City municipal geometry CC-BY-4.0 (see web/public/credits.html)",
+  "stationManifestSha256": "3ac2139995769ba3a392b77eefe904d2e9919fe21a06cce9854bd9b29390ab4a",
+  "layoutSha256": "7ff45a1d80a05733f86c46145022ed4f802cd0b1e276e1b6c1b42e559b9b3cd2",
   "archive": {
-    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v7/kyoto-assets-v7.tar.gz",
-    "bytes": 174488123,
-    "sha256": "6c10ab6988dccf1472b78754509cbd02cb2666592758c79df1bc3ee022088f19"
+    "url": "https://github.com/finbarr/kyotobounce/releases/download/assets-v8/kyoto-assets-v8.tar.gz",
+    "bytes": 159537468,
+    "sha256": "66a376d592d89be61fb8be79eaf2360ccfca79a897aa69b12ccec1f712362aad"
   },
   "files": {
-    "web/public/assets/atrium.glb": {
-      "bytes": 216183488,
-      "sha256": "f8ba666997825cbb19924a3a64ecfa6e66d2e7fbc6d13b48cf26db36c7b37835"
+    ".local/v2/current/motion/atrium-detail.json": {
+      "bytes": 33680,
+      "sha256": "56848a4d3a8dc82f05aed7dd376bbf4766cf60bd87fb373d3ceeff8a812b03b5"
     },
-    "web/public/assets/station.json": {
-      "bytes": 1700477,
-      "sha256": "9056d18a2dec7169c714fb381814aecf1298b4bbee12bea3484180312771385a"
+    ".local/v2/current/motion/atrium-detail.runtime.glb": {
+      "bytes": 2520144,
+      "sha256": "ef0116ea90c801d28b81e0aa2d73c21ebd5bb8d0e21792ffecf957252224fe26"
     },
-    "web/public/assets/atrium-detail.glb": {
-      "bytes": 5568348,
-      "sha256": "a4825e5adcadaeffd50c04642c7673b74780a6ac3115a455b5e7f0dc42c2a1a6"
+    ".local/v2/current/source/station-layout.json": {
+      "bytes": 512444028,
+      "sha256": "c5725f8214e3c02d3c86fff9ad12badb18fecb24c6df991ce8fa88d5f126d777"
     },
-    "web/public/assets/atrium-detail.json": {
-      "bytes": 27455,
-      "sha256": "986ae3e59b8b3e8e008a58760a28e5702cca2a406f397d45bd60919d022d1355"
+    ".local/v2/current/station/atrium.runtime.glb": {
+      "bytes": 155803096,
+      "sha256": "e7ea396b040eca55b12a6d112d29426498a7dc87c0fd447bd6966618effc66a9"
+    },
+    ".local/v2/current/station/station.json": {
+      "bytes": 2844082,
+      "sha256": "bee7710040840fe6d96a3196a02840a3557133632aa59ec2d474e4de17af8085"
     },
     "web/public/assets/ori.glb": {
       "bytes": 885204,
       "sha256": "e34271911b509e41bbad7594319279697b93e3249bd93d45d6726c16b47360d4"
-    },
-    "runtime/station-layout.json": {
-      "bytes": 172494638,
-      "sha256": "232b331fe5f7543bf8b228774e15c6228fffb5ee389c2a538029665827e19cc8"
-    },
-    "runtime/textures/174d2dd1ba175c20fde33781.png": {
-      "bytes": 234110,
-      "sha256": "174d2dd1ba175c20fde3378195b2b59c7858bf65056695d31a13eaaea2faa02f"
-    },
-    "runtime/textures/1fd95771b6b554b4ac50fbe9.png": {
-      "bytes": 1349666,
-      "sha256": "1fd95771b6b554b4ac50fbe9a9869ecf51e610e72e3f911ab770db6cc3fe902d"
-    },
-    "runtime/textures/32764c949989e03d690d63b3.png": {
-      "bytes": 1483372,
-      "sha256": "32764c949989e03d690d63b3776aae28bc71b630ce0fac2323f38f7f5ded6678"
-    },
-    "runtime/textures/bd55eee417aefa59dfadb4ef.png": {
-      "bytes": 1064528,
-      "sha256": "bd55eee417aefa59dfadb4ef641ada9bf26a23ed7debdf5078cd4699fb7ef5a5"
-    },
-    "runtime/textures/c36557ce27295231bf916cae.png": {
-      "bytes": 1482775,
-      "sha256": "c36557ce27295231bf916cae0db02d4b87b744c1f0ae0f394145c98ba334552c"
-    },
-    "runtime/textures/d625591f1625d333747e06dc.png": {
-      "bytes": 1349158,
-      "sha256": "d625591f1625d333747e06dcc8bb33559e9a21f86d7289906880e93fc9854a94"
-    },
-    "runtime/textures/ee1cab81b42f7d59648a39fc.png": {
-      "bytes": 223359,
-      "sha256": "ee1cab81b42f7d59648a39fc6e34f684fef9636a9310ca46b7d8a65e82dfb174"
-    },
-    "runtime/textures/f90c6a709644fb0809f0cee3.png": {
-      "bytes": 20066785,
-      "sha256": "f90c6a709644fb0809f0cee303783fd469ced136f1cf33cc61a919fcdca39358"
-    },
-    "runtime/textures/fbfd11801789ea10c6928957.png": {
-      "bytes": 223370,
-      "sha256": "fbfd11801789ea10c69289576dc3339b92e79ac23b1471d7cb0ef04ea81a12a5"
-    },
-    "runtime/textures/k028-seasons.png": {
-      "bytes": 25842,
-      "sha256": "36c7d9b2809527c97e0334dc67691182edf8629cf8b35431b0fbb3297f585501"
-    },
-    "art-source/atrium/KyotoAtrium.blend": {
-      "bytes": 54954208,
-      "sha256": "71f51e44731a810e051aefbc1b731f0cced7f3ed51e4acc758391104e9b04c1f"
-    },
-    "art-source/phase3/robot/ORI.blend": {
-      "bytes": 418574,
-      "sha256": "cd2de40ebd5b86fbdb0c4053bcc73be32129fec8b16d7fc9719f32854b9b0c62"
-    },
-    "art-source/phase3/atrium-detail/AtriumHardware.blend": {
-      "bytes": 984345,
-      "sha256": "d9a28134e71a7641bef35ebb26bc3887e41c7b16b5c5ee5a89a8a5bceb0d9989"
-    },
-    "art-source/materials/stairs/EscalatorTreadColor.png": {
-      "bytes": 386640,
-      "sha256": "f769e025d4d66b35e3a29c31198080c195baa887a0ad207ad332339daa66baf9"
-    },
-    "art-source/materials/stairs/EscalatorTreadMask.png": {
-      "bytes": 264209,
-      "sha256": "b9e90cf97720f94c7ae1500f08974a23dc87bdef4406bc100819ec1e8ada425d"
-    },
-    "art-source/materials/stairs/EscalatorTreadNormal.png": {
-      "bytes": 5573,
-      "sha256": "050f3e9a7701fef4c6aeac55b274ccd22fa5e944b4a1b4f5d448d1544d4af76b"
-    },
-    "art-source/materials/stairs/StairStoneColor.png": {
-      "bytes": 1349158,
-      "sha256": "d625591f1625d333747e06dcc8bb33559e9a21f86d7289906880e93fc9854a94"
-    },
-    "art-source/materials/stairs/StairStoneMask.png": {
-      "bytes": 223359,
-      "sha256": "ee1cab81b42f7d59648a39fc6e34f684fef9636a9310ca46b7d8a65e82dfb174"
-    },
-    "art-source/materials/stairs/StairStoneNormal.png": {
-      "bytes": 1064528,
-      "sha256": "bd55eee417aefa59dfadb4ef641ada9bf26a23ed7debdf5078cd4699fb7ef5a5"
-    },
-    "art-source/materials/stairs/StairTreadColor.png": {
-      "bytes": 1349666,
-      "sha256": "1fd95771b6b554b4ac50fbe9a9869ecf51e610e72e3f911ab770db6cc3fe902d"
-    },
-    "art-source/materials/stairs/StairTreadMask.png": {
-      "bytes": 223370,
-      "sha256": "fbfd11801789ea10c69289576dc3339b92e79ac23b1471d7cb0ef04ea81a12a5"
-    },
-    "art-source/materials/stairs/StairTreadNormal.png": {
-      "bytes": 1064528,
-      "sha256": "bd55eee417aefa59dfadb4ef641ada9bf26a23ed7debdf5078cd4699fb7ef5a5"
-    },
-    "art-source/materials/stairs/material-spec.json": {
-      "bytes": 2615,
-      "sha256": "1dc0acce96d1b56d5f7604d7a16a107495496d2bef571f3b60109e342aa7cf55"
     }
   }
 }

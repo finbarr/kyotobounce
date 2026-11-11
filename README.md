@@ -16,12 +16,9 @@ The Three.js game runs its physics in a dedicated browser worker. Walking, all
 online scores are independently reconstructed by the on-demand verifier.
 Unity is not needed for browser development or play.
 
-Use **Node.js 22.23.2**. This checkout currently requires the station bundle
-identified by `web/v2/assets.json` and the robot source GLB. The published
-`assets-v7` archive contains a retired station; a fresh clone cannot obtain the
-current station through `assets:fetch` yet. See [asset availability](docs/ASSETS.md).
-
-With those assets installed:
+Use **Node.js 22.23.2**. Setup installs dependencies and the checksum-pinned
+current station asset pack; no Unity editor or Blender installation is required.
+See [asset availability and authoring](docs/ASSETS.md).
 
 ```sh
 npm run setup

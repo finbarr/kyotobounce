@@ -2,28 +2,51 @@
 
 Project-created game code, models, textures and synthesized audio are MIT licensed. Third-party dependencies retain their original licenses. Unity itself is proprietary and must be installed separately.
 
-## Current station availability
+## Current game asset pack
 
-The current playable station is pinned by `web/v2/assets.json`. Its canonical
-layout is `.local/v2/current/source/station-layout.json`, with the station's
-layout path symlinked to that file. The manifest also pins the delivered station
-and hardware GLBs, metadata and exploration spawn. `deploy/station.mjs` validates
-these against the 30-course campaign before any browser build or local launch.
-`KYOTO_V2_ASSETS` selects a different manifest for a deliberately isolated art
-candidate; its layout must still match the current campaign.
+`assets-manifest.json` pins the versioned `assets-v8` game pack by archive and
+per-file SHA-256. `npm run setup` installs dependencies, fetches/validates the
+pack and builds browser physics. `npm run assets:verify` checks the installed
+files without downloading anything. Changed local assets are never overwritten.
 
-**The current bundle is not yet available in the public asset archive.**
-`assets-manifest.json` and `npm run assets:fetch` still describe `assets-v7`, which
-contains a retired station. They are retained as authoring tools during migration
-and are not part of normal `npm run setup`. Do not use that archive as proof that
-a fresh clone has the current game. Current assets must already be installed at
-the manifest paths; setup reports missing files and stops if they are absent.
-Preparing a checksum-pinned, distributable current asset pack remains required.
+The pack has exactly six inputs, totaling 159,537,468 compressed bytes:
 
-The robot's original export is `web/public/assets/ori.glb`; its editable source is
-`art-source/phase3/robot/ORI.blend`. The original public pack contains that robot.
-Do not overwrite modified art to install a pack. Keep one current station bundle
-and at most one temporary candidate, with original editable sources preserved.
+- `.local/v2/current/source/station-layout.json`: the canonical station layout.
+- `.local/v2/current/station/atrium.runtime.glb` and `station.json`: matching
+  delivered station geometry and metadata.
+- `.local/v2/current/motion/atrium-detail.runtime.glb` and `atrium-detail.json`:
+  matching hardware and moving-escalator metadata.
+- `web/public/assets/ori.glb`: original robot export for the lossless browser build.
+
+`web/v2/assets.json` pins their relationship and exploration spawn. Station and
+motion now use the same canonical layout path; installation needs no layout
+symlink or duplicate file. The asset manifest also pins this configuration's
+checksum. The build validates it against all 30 campaign courses.
+
+Downloads are cached under `~/.cache/kyotobounce` (override with
+`KYOTO_ASSET_CACHE`). For an unpublished pack or an offline transfer, use the
+existing archive directly, without making another cached copy:
+
+```sh
+KYOTO_ASSET_ARCHIVE=/absolute/path/kyoto-assets-v8.tar.gz npm run setup
+```
+
+The installer validates the archive hash, exact file allowlist and regular-file
+entry types before extraction. It verifies every extracted file before installing
+missing ones, rejects destination symlinks, and removes its temporary staging
+files. An interrupted install can resume without replacing existing assets.
+
+The pack contains game inputs only. Editable Blender originals and authoring
+textures remain in the maintained source bundle, outside this runtime archive;
+they are needed only for art changes. `sourceScene` in the station manifest is
+an authoring reference, not a game setup dependency. The robot's editable source
+is `art-source/phase3/robot/ORI.blend`. Preserve those originals and keep at most
+one temporary art candidate. Research images, credentials, player data, native
+binaries and retired station exports must never enter the game pack.
+
+`KYOTO_V2_ASSETS` can select a deliberately isolated art candidate, whose layout
+must still match the campaign. Promote a candidate into `web/v2/assets.json`
+before packaging a new game asset version.
 
 ## Browser delivery build
 
@@ -53,24 +76,15 @@ credentials never belong in that package. See [deployment](DEPLOYING.md).
 
 Use Blender 5.2.1 LTS. Replace `blender` with your executable path if necessary.
 
-```sh
-blender --background --python tools/export_browser_art.py
-blender --background --python tools/build_atrium_detail.py
-blender --background --python art-source/phase3/robot/export_browser.py
-npm run build:web
-```
-
-To export collision geometry after editing the atrium, use a fresh output directory:
+Art work requires the original Blender scenes and textures; installing the game
+pack alone is not an authoring setup. From the maintained source bundle, export
+a matching candidate pair without replacing current game assets:
 
 ```sh
-blender --background art-source/atrium/KyotoAtrium.blend --python tools/export_atrium_layout.py -- --output artifacts/layout-candidate
-```
-
-Export a matching browser candidate without replacing current assets:
-
-```sh
+blender --background .local/v2/current/source/KyotoAtrium.blend \
+  --python tools/export_atrium_layout.py -- --output artifacts/layout-candidate
 blender --background --python tools/export_browser_art.py -- \
-  --source path/to/candidate/KyotoAtrium.blend \
+  --source .local/v2/current/source/KyotoAtrium.blend \
   --layout artifacts/layout-candidate/station-layout.json \
   --output artifacts/browser-candidate
 ```
@@ -78,7 +92,8 @@ blender --background --python tools/export_browser_art.py -- \
 Build matching hardware with `tools/build_atrium_detail.py -- --layout
 artifacts/layout-candidate/station-layout.json --output artifacts/browser-candidate
 --source-output artifacts/hardware-source` on one command line after Blender's
-`--background --python` options.
+`--background --python` options. Robot changes use the preserved ORI source and
+`art-source/phase3/robot/export_browser.py`.
 
 The browser exporter clips covered, coplanar architectural faces throughout the station using `tools/coplanar_surfaces.py`. It resolves wall returns, overlapping floor finishes, tactile bases, frame intersections and slab caps within 0.25 mm. Authored trim wins over backing, and floors win over slab-edge caps; exposed rims, curved/sloped geometry and the canonical collision layout stay unchanged. The export receipt records removed area per source object. Run `node web/tests/station-overlaps.mjs` to check wall, floor, tactile, landing and skyway seam coverage in the actual GLB. These surfaces no longer rely on material-wide depth offsets.
 
@@ -91,10 +106,25 @@ starter routes and update their definitions before publishing a changed station.
 
 `art-source/phase3/robot/build_robot.py` generates the original rig; `tools/build_atrium_detail.py` generates hardware. `tools/build_stair_materials.py` generates textures using Python, NumPy and Pillow. The Blender source remains the editable authority for manually authored station geometry.
 
-The existing `assets:pack` allowlist also targets the retired root station. It
-must be updated and verified against the current bundle before publishing a new
-asset version. Publish immutable versioned archives rather than replacing a
-published archive, and never add large binaries to Git history.
+## Pack and verify a new version
+
+Run `npm run assets:pack -- assets-vN` with a new version. The packager validates
+the current station/campaign, archives the six explicit regular files, checks
+that none changed during compression, and updates `assets-manifest.json`.
+It writes `.local/asset-pack/kyoto-assets-vN.tar.gz` and refuses to overwrite an
+existing archive. Review the manifest, then run `npm run test:assets:setup`.
+
+That check creates one disposable source-only install, runs the real setup
+command against the prepared archive, regenerates collision data and exercises
+offline browser play. It includes no Unity project, source art, preinstalled
+node_modules or generated collision files. It removes the temporary install
+and keeps only small receipts under `.local/asset-setup-test/`.
+
+Publish the verified archive on the matching versioned GitHub asset release;
+this supplies source-checkout setup and does not deploy the live game. Verify
+the published download against the manifest. Never replace a published archive
+or add the binary to Git history. Keep one current local archive; obsolete
+generated packs can be removed after their replacement is verified.
 
 ## Provenance and boundaries
 

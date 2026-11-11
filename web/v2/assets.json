@@ -1,5 +1,5 @@
 {
-  "layout": ".local/v2/current/station/station-layout.json",
+  "layout": ".local/v2/current/source/station-layout.json",
   "layoutSha256": "c5725f8214e3c02d3c86fff9ad12badb18fecb24c6df991ce8fa88d5f126d777",
   "geometry": ".local/v2/current/station/atrium.runtime.glb",
   "geometrySha256": "e7ea396b040eca55b12a6d112d29426498a7dc87c0fd447bd6966618effc66a9",

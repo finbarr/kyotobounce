@@ -1,8 +1,8 @@
 # Local development
 
 Use Node 22.23.2 and the current station assets described in [ASSETS.md](ASSETS.md).
-Unity is not required. The old public art pack cannot supply the current station;
-missing assets stop setup with their paths instead of starting an older level set.
+Unity is not required. Setup installs the pinned current station asset pack.
+Modified local assets stop installation before anything is replaced.
 
 ```sh
 npm run setup
