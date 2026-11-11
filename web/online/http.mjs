@@ -19,15 +19,18 @@ export function verificationHttp(service,{origins=[]}={}){
   try{
    const origin=req.headers.origin;if(origin){insist(allowed.has(origin),403,'Origin is not allowed');res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Vary','Origin');}
    if(req.method==='OPTIONS'){res.setHeader('Access-Control-Allow-Methods','GET, POST, PUT, OPTIONS');res.setHeader('Access-Control-Allow-Headers','Authorization, Content-Type');res.setHeader('Access-Control-Max-Age','600');respond({},204);return;}
-   const {pathname,search}=new URL(req.url,'http://localhost');insist(!search,400,'Query parameters are not supported');
+   const {pathname,searchParams}=new URL(req.url,'http://localhost');
+   insist(!searchParams.size||req.method==='GET'&&pathname==='/v1/courses'&&searchParams.size===1&&searchParams.has('after'),400,'Unsupported query parameters');
    if(req.method==='GET'&&pathname==='/health'){respond({status:'ready',layout:service.layout,physics:[...service.catalog.values()][0].physics});return;}
-   if(req.method==='GET'&&pathname==='/v1/courses'){respond({courses:[...service.catalog.values()]});return;}
+   if(req.method==='GET'&&pathname==='/v1/courses'){respond(await service.listCourses(searchParams.get('after')??undefined));return;}
    if(req.method==='POST'&&pathname==='/v1/identity'){const c=credential(req.headers.authorization),m=fields(await body(req),['name']);respond(await service.identity(c,playerName(m.name)));return;}
    const publicReplay=/^\/v1\/replays\/([^/]+)(?:\/inputs\/(\d+))?$/.exec(pathname);
    if(req.method==='GET'&&publicReplay){insist(uuid(publicReplay[1]),404,'Replay not found');const sequence=Number(publicReplay[2]);insist(publicReplay[2]===undefined||Number.isSafeInteger(sequence),400,'Invalid input sequence');respond(publicReplay[2]===undefined?await service.replay(publicReplay[1]):await service.replayInputs(publicReplay[1],sequence));return;}
    const board=/^\/v1\/courses\/([\w-]+)\/leaderboard$/.exec(pathname);
    if(req.method==='GET'&&board){const player=req.headers.authorization?await service.authenticate(credential(req.headers.authorization)):null;respond(await service.board(board[1],player?.id));return;}
    const player=await service.authenticate(credential(req.headers.authorization));
+   const publication=/^\/v1\/publications\/([^/]+)$/.exec(pathname);
+   if(req.method==='POST'&&publication){const m=fields(await body(req),['course','baseRevision','header']);respond(await service.publish(player,publication[1],m.course,m.baseRevision,m.header),201);return;}
    if(req.method==='GET'&&pathname==='/v1/progress'){respond({entries:await service.progress(player.id)});return;}
    const match=/^\/v1\/attempts\/([^/]+)(?:\/(seal|advance|cancel|inputs)(?:\/(\d+))?)?$/.exec(pathname);
    insist(match&&uuid(match[1]),404,'Route not found');const [,id,action,rawSequence]=match;

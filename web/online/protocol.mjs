@@ -12,4 +12,4 @@ export function credential(header){
 }
 export const sameHash=(a,b)=>typeof a==='string'&&typeof b==='string'&&a.length===64&&b.length===64&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 export const ranked=(a,b)=>b.score-a.score||a.duration-b.duration||a.accepted-b.accepted||a.attempt.localeCompare(b.attempt);
-export const view=job=>({attempt:job.id,state:job.state,uploadedChunks:job.inputChunks,uploadedSteps:job.inputSteps,walkingSteps:job.walkingSteps||0,shotSteps:job.shotSteps||0,...(job.state==='verified'?{result:job.result}:{}),...(job.message?{message:job.message}:{})});
+export const view=job=>({attempt:job.id,state:job.state,uploadedChunks:job.inputChunks,uploadedSteps:job.inputSteps,walkingSteps:job.walkingSteps||0,shotSteps:job.shotSteps||0,...(job.state==='verified'?{result:job.result}:{}),...(job.state==='published'?{course:job.publication.course}:{}),...(job.message?{message:job.message}:{})});

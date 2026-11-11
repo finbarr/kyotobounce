@@ -11,6 +11,7 @@ import {StaticWorld} from '../public/physics/static-world.js';
 import {decodeCollisionPack} from '../public/physics/collision-pack.js';
 import {course,header,fixtureWorld,shape,simulate} from './verification-fixture.mjs';
 import {v} from '../public/physics/math.js';
+import {coursePublicationTests,stationPublicationTests} from './course-publication.mjs';
 
 assert.match(process.env.FIRESTORE_EMULATOR_HOST||'',/^127\.0\.0\.1:\d+$/,'These record-creating checks must use the isolated emulator');
 assert.equal(process.env.GOOGLE_CLOUD_PROJECT,'demo-kyoto-verification');
@@ -161,6 +162,8 @@ try{
  await request(revised,path(id),{player:alice,status:409});await request(revised,'/v1/replays/'+id,{status:409});await stop(revised);
  console.log('PASS durable authoritative standings: tied ordering, top ten, personal rank, names, completion, late recall retraction and current-course isolation');
 
+ await coursePublicationTests({start,stop,service,request,register,submit,finish,world,deferred,advanceClock:()=>{clock+=31000;}});
+
  if(process.argv.includes('--station')){
   const began=performance.now();stationWorld=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin')));
   const catalog=JSON.parse(await readFile('web/starter-challenges.json')).map(c=>({...c,physics:BROWSER_PHYSICS}));assert.equal(catalog.length,30);
@@ -176,6 +179,7 @@ try{
    const sha256=createHash('sha256').update(JSON.stringify(baseline)).digest('hex');receipts.push({id:c.id,score:result.score,duration:result.duration,checkpointBytes:checkpoint.length,sha256});
    console.log('PASS HTTP/Firestore restart, complete independent score and public replay: '+c.name);
   }
+  await stationPublicationTests({endpoint:station,request,player:alice,world:stationWorld,catalog});
   await writeFile('.local/verification/service-proof.json',JSON.stringify({physics:BROWSER_PHYSICS,layout:stationWorld.layoutSha256,elapsedMs:performance.now()-began,receipts},null,2)+'\n');await stop(station);
  }
 }finally{

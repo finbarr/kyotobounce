@@ -47,7 +47,8 @@ is not a ranked attempt; playing a saved custom course records controls normally
 
 The authenticated HTTP service verifies and stores campaign scores, standings,
 completion and public replay inputs. The browser now synchronizes saved campaign
-shots when a verifier is configured. Online course publishing is still pending.
+shots when a verifier is configured. The service also validates and publishes
+custom courses; connecting that publishing flow to the browser creator is pending.
 No verifier has been deployed.
 
 ## Browser synchronization
@@ -117,10 +118,46 @@ replace its identity. Do not reuse a native service credential. The API rejects
 foreign ownership, unexpected fields, replaced inputs and retired course
 versions. Published standings always come from the verifier's calculation.
 
+## Custom-course publication
+
+`POST /v1/publications/:id` accepts exactly `{course, baseRevision, header}`.
+The course contains its ID, next revision, name, current layout/physics/scoring/
+throw-model versions, start, optional goal and waypoints. It cannot include a
+creator, score, result, launch, claimed solution or client hint. Authentication
+sets the creator; the input header supplies the independently verified hint.
+The service validates every start/goal disk and waypoint against the canonical
+collision world, including floor support, surface normals, capsule clearance,
+fixed faces, radius bounds and unique targets.
+
+A publication uses the same immutable control upload, seal, checkpoint and
+bounded advance routes as a scored attempt. Its proposed course remains private
+while the existing published revision remains playable. Only a legal throw that
+hits every required waypoint, reaches the goal when present, and comes to full
+translation/spin rest can publish. A design proof never enters the leaderboard
+or completes the player's course progress. Its verified input seed is available
+through the public replay API; separately playing the published course produces
+a ranked attempt through the normal score-verification route.
+
+Course IDs are reserved to their authenticated creator. Every update must name
+the current base revision and propose exactly the next revision. Publication
+and revision replacement are transactional: two competing candidates cannot
+overwrite one another, and an old worker cannot publish after a newer candidate
+wins. Repeated requests are idempotent. A cancelled or unsuccessful draft stays
+private. A published course cannot be retracted by recalling its design proof.
+Old revisions immediately stop accepting scores and replay requests; new
+standings and completion use the new trusted course definition.
+
+The public catalog returns the campaign plus at most 100 current custom courses
+on its first page. A non-null `next` cursor is passed as `?after=...` to retrieve
+more custom courses. Private drafts and retired station/physics versions are
+excluded. Browser catalog synchronization, creator publishing controls and
+offline publication queueing are the next integration step.
+
 | Method and path | Purpose |
 | --- | --- |
-| `GET /health`, `GET /v1/courses` | Process readiness and trusted campaign catalog |
+| `GET /health`, `GET /v1/courses[?after=...]` | Process readiness and current public course catalog |
 | `POST /v1/identity` | Register/retry/rename with credential and `{name}` |
+| `POST /v1/publications/:id` | Reserve/revise an owned course with geometry and legal solution controls |
 | `POST /v1/attempts/:id` | Create idempotently with `{header}` |
 | `PUT /v1/attempts/:id/inputs/:sequence` | Append/retry immutable `{runs}` |
 | `POST /v1/attempts/:id/seal` | Finish uploading the complete walking route |
@@ -175,7 +212,15 @@ pose/contact stream against a run reconstructed from checkpoints after every
 batch. These prove persistence across verifier process replacement against the
 local emulator; they do not claim managed-cloud durability or deployment.
 
-Before full migration acceptance, finish course publishing, request/storage
+The service suite also covers private publication drafts, malformed geometry,
+forged solution fields, creator ownership, restart and expired-lease recovery,
+missed waypoints/goals, cancelled drafts, competing revision publication,
+revision-scoped standings and bounded catalog pagination. With `--station` it
+generates three courses using the real station's design recorder, publishes
+them from independently verified controls, and exactly reconstructs their
+public solutions, including a basement course with a full-rest finish target.
+
+Before full migration acceptance, finish the browser publishing flow, request/storage
 abuse bounds and abandoned-data/cache cleanup, then static hosting and
 scale-to-zero deployment packaging. No compatibility archive or native score
 migration is planned.

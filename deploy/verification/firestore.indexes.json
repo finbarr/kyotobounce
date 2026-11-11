@@ -1,6 +1,16 @@
 {
   "indexes": [
     {
+      "collectionGroup": "courses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "published", "order": "ASCENDING"},
+        {"fieldPath": "layout", "order": "ASCENDING"},
+        {"fieldPath": "physics", "order": "ASCENDING"},
+        {"fieldPath": "__name__", "order": "ASCENDING"}
+      ]
+    },
+    {
       "collectionGroup": "attempts",
       "queryScope": "COLLECTION",
       "fields": [
@@ -37,6 +47,8 @@
     }
   ],
   "fieldOverrides": [
+    {"collectionGroup": "courses", "fieldPath": "current", "indexes": []},
+    {"collectionGroup": "attempts", "fieldPath": "publication", "indexes": []},
     {"collectionGroup": "attempts", "fieldPath": "header", "indexes": []},
     {"collectionGroup": "attempts", "fieldPath": "result", "indexes": []},
     {"collectionGroup": "attempts", "fieldPath": "checkpoint", "indexes": []},
