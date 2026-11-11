@@ -1,7 +1,7 @@
 import {localStore} from './local-store.js';
 const order=(a,b)=>b.score-a.score||a.accepted-b.accepted||a.attempt.localeCompare(b.attempt);
 export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
- let worker,store,profile,catalog,selected,currentAttempt,provisional,stopped=false,presentation,ready=false,skipping=false,lastProgress=-Infinity;
+ let worker,store,profile,catalog,selected,currentAttempt,provisional,stopped=false,presentation,ready=false,skipping=false,lastProgress=-Infinity,inputWrites=Promise.resolve();
  const emit=m=>{if(!stopped)onMessage(m);},error=e=>emit({type:'error',message:e.message||String(e)});
  async function board(c=selected){const entries=(await store.records(c)).sort(order);return {type:'leaderboard',local:true,challenge:c,entries:entries.slice(0,10),personal:entries[0]?{entry:entries[0],rank:1}:null};}
  async function progress(){const entries=await Promise.all(catalog.map(async c=>{const rows=(await store.records(c)).sort(order);return {challengeId:c.id,revision:c.revision,completed:rows.some(r=>r.completed),bestScore:rows[0]?.score||0,rank:rows.length?1:null};}));emit({type:'course-progress',full:true,entries});}
@@ -39,6 +39,14 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
   worker=new WorkerImpl('/physics-worker.js',{type:'module'});
   worker.onmessage=event=>{
    const m=event.data;
+   if(['input-start','input-chunk','input-close'].includes(m.type)){
+    inputWrites=inputWrites.then(async()=>{
+     if(stopped)return;
+     if(m.type==='input-close'){await store.closeRoute(m.route);return;}
+     if(m.type==='input-start')await store.startRoute(m.route,m.course);else await store.appendInputs(m.route,m.sequence,m.runs);
+     if(!stopped)worker.postMessage({type:'input-ack',route:m.route,sequence:m.type==='input-start'?-1:m.sequence});
+    }).catch(()=>{if(!stopped)worker.postMessage({type:'input-error',route:m.route});});return;
+   }
    if(m.type==='ready'){
     ready=true;onStatus('connected',{});emit({type:'worker-status',status:'ready',capabilities:['shot-skip-v1','design-ball-v1'],local:true});emit(m);progress().catch(error);return;
    }

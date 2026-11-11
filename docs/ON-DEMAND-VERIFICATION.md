@@ -31,9 +31,24 @@ Server-owned resumable jobs will be necessary for requests that exceed one
 invocation's execution allowance. A continuation supplied by a client must never
 be accepted as trusted physics or scoring state.
 
-This first component is not yet an online leaderboard. Browser input recording,
-authenticated submission, durable job/result storage, idempotent acceptance,
-course publishing and UI synchronization remain to be connected and verified.
+The browser now records each actual fixed-step walking control, including idle,
+charging and release movement. Runs of identical controls are compressed, with
+at most 128 runs in a pending chunk and 128 accumulating runs in the worker.
+Storage acknowledgments apply backpressure; release waits for its final control
+chunk to commit before launching. A storage error forfeits the pending attempt.
+
+IndexedDB stores each walking route once. Attempts reference immutable prefixes;
+consecutive throws do not copy the route. Returning home or selecting a course
+starts a new route. Cleanup removes unused tails, abandoned routes and retired
+course references, while browser locks protect other active tabs. Complete
+replays carry the route reference and versioned input header. `inputProof()` and
+the bounded `inputChunks()` iterator expose saved controls after reload. These
+records remain untrusted until independently simulated. Design capture itself
+is not a ranked attempt; playing a saved custom course records controls normally.
+
+This is not yet an online leaderboard. Authenticated submission, durable
+job/result storage, idempotent acceptance, course publishing and UI
+synchronization remain to be connected and verified.
 
 ## Hosting evidence, checked November 10, 2026
 

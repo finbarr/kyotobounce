@@ -24,7 +24,10 @@ self.onmessage=async({data:m})=>{
  try{
   if(m.type==='init'){
    const world=new StaticWorld(decodeCollisionPack(await(await fetch('/collision.bin')).arrayBuffer()));
-   session=new GameSession(world,m.catalog,'proof-player',reply=>self.postMessage(reply.type==='local-result'?{...reply,proof}:reply));install(session);active=true;self.postMessage({type:'test-ready'});return;
+   session=new GameSession(world,m.catalog,'proof-player',reply=>{
+    if(reply.type==='input-start'||reply.type==='input-chunk')queueMicrotask(()=>session.handle({type:'input-ack',route:reply.route,sequence:reply.type==='input-start'?-1:reply.sequence}));
+    self.postMessage(reply.type==='local-result'?{...reply,proof}:reply);
+   });install(session);active=true;self.postMessage({type:'test-ready'});return;
   }
   if(m.type==='select-challenge'){active=false;session.handle(m);runs=[];steps=0;proof=null;active=true;return;}
   session.handle(m);

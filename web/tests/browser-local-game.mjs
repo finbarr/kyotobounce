@@ -4,7 +4,8 @@ import {chromium} from 'playwright';
 import {backgroundInput} from './background-input.mjs';
 import {StaticWorld} from '../public/physics/static-world.js';
 import {decodeCollisionPack} from '../public/physics/collision-pack.js';
-import {Shot} from '../public/physics/shot.js';
+import {BROWSER_PHYSICS} from '../public/physics/shot.js';
+import {ShotVerification} from '../verification.mjs';
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430';
 assert.equal(new URL(origin).hostname,'127.0.0.1');
 const out='.local/browser-physics/game';await mkdir(out,{recursive:true});
@@ -92,7 +93,7 @@ try{
  await page.waitForFunction(()=>kyotoState.charging);await page.waitForTimeout(2900);
  await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  await page.waitForFunction(()=>kyotoState.phase==='Flight');await page.locator('#mobile-skip').click();await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result);
- state=await page.evaluate(()=>kyotoState);assert.ok(state.result.success);assert.equal(state.result.waypointHits.length,2);assert.equal(state.pointerLocked,false);
+ state=await page.evaluate(()=>kyotoState);assert.ok(state.result.success);assert.equal(state.result.waypointHits.length,2);assert.equal(state.pointerLocked,false);results.push(state.result);
  await page.waitForTimeout(900);await page.screenshot({path:out+'/mobile-clock-in.png'});
  // Let the moving-escalator course play normally: compute-ahead must not bank early, stall
  // the renderer, or drop the music clock. Measure the real station at 1280x800.
@@ -107,17 +108,18 @@ try{
  benchmark=await page.evaluate(()=>{bench.running=false;return {...bench,audioEnd:kyotoState.audio};});
  const frames=benchmark.frames.slice().sort((a,b)=>a-b);benchmark={...benchmark,frames:frames.length,meanFps:1000/(frames.reduce((a,b)=>a+b,0)/frames.length),p95FrameMs:frames[Math.floor(frames.length*.95)],maxFrameMs:frames.at(-1)};
  assert.ok(benchmark.frames>300,'Measured normal playback rather than an early result');assert.equal(benchmark.audioEnd.status,'running');assert.equal(benchmark.audioEnd.skippedMusicSteps,benchmark.audioStart.skippedMusicSteps,'Music clock must not drop beats during flight');
- // Re-simulate real, persisted UI shots in Node using only their launch inputs.
- // This checks that the worker session and replay storage preserve every pose.
+ // Resolve the course from the authoritative catalog, then reconstruct walking
+ // and throwing from saved controls. No client trajectory or launch is trusted.
+ await page.waitForFunction(id=>kyotoState.board.some(r=>r.attempt===id),results.at(-1).attempt);
  const replays=await page.evaluate(async ids=>{
   const {localStore}=await import('/local-store.js'),store=await localStore();
-  try{return await Promise.all(ids.map(id=>store.replay(id)));}finally{store.close();}
+  try{return await Promise.all(ids.map(async id=>{const commands=[];for await(const chunk of store.inputChunks(id))commands.push(...chunk.runs);return {replay:await store.replay(id),proof:await store.inputProof(id),commands};}));}finally{store.close();}
  },results.map(r=>r.attempt));
  const world=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin')));
- for(const replay of replays){
-  const shot=new Shot(world,replay.challenge,{position:replay.launchPosition,velocity:replay.velocity,spin:replay.spin},{attempt:replay.attempt,releaseTime:replay.releaseTime,chargeTime:replay.chargeTime,thrower:replay.thrower});
-  while(!shot.done&&shot.steps<180*120)shot.step();assert.ok(shot.done);
-  const verified=shot.result();for(const key of ['poses','contacts','waypointHits','breakdown','score','success','duration'])assert.deepEqual(verified[key],replay[key],`Stored ${key} must reproduce from launch inputs`);
+ for(const {replay,proof,commands} of replays){
+  const course={...catalog.find(c=>c.id===proof.header.courseId),physics:BROWSER_PHYSICS},job=new ShotVerification(world,course,proof.header,commands,{attempt:replay.attempt,subject:replay.id}),poses=[],contacts=[];let reply;
+  do{reply=await job.advance();if(reply.recording){poses.push(...reply.recording.poses);contacts.push(...reply.recording.contacts);}assert.ok((job.shot?.steps||0)<180*120);}while(reply.status!=='verified');
+  const verified={...reply.result,poses,contacts};for(const key of ['poses','contacts','waypointHits','breakdown','score','success','duration','launchPosition','velocity','spin','thrower','chargeTime','releaseTime'])assert.deepEqual(verified[key],replay[key],`Stored ${key} must independently reproduce from walking and throw controls`);
  }world.free();
  // Every authored stage is reachable from the real menu while offline, with
  // its actual target geometry and suggested controls. Full shot feasibility is

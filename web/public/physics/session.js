@@ -7,18 +7,20 @@ import {ShotRunner} from './shot-runner.js';
 import {validateCourse,validateDisk,placeDisk} from './designer.js';
 import {designGeometry} from '../design-geometry.js';
 import {THROW_MODEL} from '../throw-power.js';
+import {InputRecorder} from './input-recorder.js';
 export class GameSession{
  constructor(world,catalog,id,emit){
   this.world=world;this.catalog=catalog.map(c=>({...c,physics:BROWSER_PHYSICS}));this.id=id;this.emit=emit;this.stationTime=0;this.generation=0;this.lastTick=performance.now();this.accumulator=0;this.input={x:0,z:0,fast:false};
   this.select(this.catalog[0].id,false);this.timer=setInterval(()=>this.tick(),1000/30);
  }
- close(){clearInterval(this.timer);this.runner?.close();this.generation++;}
+ close(){clearInterval(this.timer);this.runner?.close();this.inputs?.close();this.generation++;}
  player(){return {id:this.id,feet:this.walker.feet,release:this.walker.release(this.aim.yaw,this.aim.pitch,this.stationTime)||add(this.walker.feet,v(0,1.5,0)),movement:this.walker.movement,walked:this.walker.walked,grounded:this.walker.grounded,...this.aim,power:this.power||0,powerRange:this.powerRange||'precision'};}
  session(){this.emit({type:'session',id:this.id,busy:['Charging','Release','Flight'].includes(this.phase),attempt:this.attempt,challenge:this.challenge,designing:!!this.designing,local:true});}
  select(id,announce=true){
   const challenge=this.catalog.find(c=>c.id===id);if(!challenge)throw Error('This course is not in the current browser preview');
-  this.runner?.close();this.generation++;this.challenge=challenge;this.designing=false;this.designProof=null;this.phase='Aim';this.attempt=null;this.shot=null;this.power=0;this.chargeTime=this.releaseTime=0;
+  this.runner?.close();this.inputs?.close();this.inputs=new InputRecorder(challenge,this.emit);this.launchWaiting=false;this.generation++;this.challenge=challenge;this.designing=false;this.designProof=null;this.phase='Aim';this.attempt=null;this.shot=null;this.power=0;this.chargeTime=this.releaseTime=0;
   this.walker=new Walker(this.world,add(challenge.start.center,v(0,.03,0)));this.input={x:0,z:0,fast:false};this.aim={yaw:180,pitch:15,top:0,kick:0,...challenge.hint};this.powerRange=challenge.hint?.powerRange||'precision';
+  this.aim={yaw:((this.aim.yaw+180)%360+360)%360-180,pitch:this.aim.pitch,top:this.aim.top,kick:this.aim.kick};
   for(let i=0;i<12;i++)this.walker.move(this.input,this.aim.yaw,false,STEP);
   this.session();if(announce)this.emit({type:'selected',challenge});this.publish();
  }
@@ -26,18 +28,29 @@ export class GameSession{
  publish(){this.emit(this.state());}
  tick(){
   const now=performance.now();this.accumulator+=Math.min(.1,(now-this.lastTick)/1000);this.lastTick=now;
+  if(this.launchWaiting)this.accumulator=0;
   while(this.accumulator>=STEP){
+   if(['Aim','Charging','Release'].includes(this.phase)){
+    const input=this.phase==='Aim'&&now-this.inputAt<300?this.input:{x:0,z:0};
+    if(this.inputs&&!this.inputs.record(input,this.aim.yaw,this.input.fast)){this.accumulator=0;break;}
+    this.walker.move(input,this.aim.yaw,this.input.fast,STEP);
+   }
    this.accumulator-=STEP;if(this.phase!=='Flight')this.stationTime+=STEP;
-   if(['Aim','Charging','Release'].includes(this.phase))this.walker.move(this.phase==='Aim'&&now-this.inputAt<300?this.input:{x:0,z:0},this.aim.yaw,this.input.fast,STEP);
   }
   if(this.phase==='Charging')this.power=clamp((now-this.chargeAt)/2800,0,1);
   if(['Aim','Charging','Release'].includes(this.phase))this.publish();
  }
  handle(m){
+  if(m.type==='input-ack'){
+   if(m.route===this.inputs?.id&&this.inputs.acknowledge(m.sequence)&&this.launchWaiting)this.launch();return;
+  }
+  if(m.type==='input-error'){
+   if(m.route===this.inputs?.id){this.shot?.cancel();this.reset();this.inputs.close();this.emit({type:'error',message:'Could not save your movement. Return to the start to retry.'});}return;
+  }
   if(m.type==='design-start'){
    if(!this.designing&&!['Aim','Result'].includes(this.phase))throw Error('Finish or recall your shot before recording a route');
    if(m.start)validateDisk(this.world,m.start,true);
-   this.returnChallenge=this.challenge?.id||this.returnChallenge;this.reset();this.challenge=null;this.designing=true;this.designProof=null;
+   this.returnChallenge=this.challenge?.id||this.returnChallenge;this.reset();this.inputs?.close();this.inputs=null;this.challenge=null;this.designing=true;this.designProof=null;
    if(m.start){this.walker.place(add(m.start.center,v(0,.03,0)));for(let i=0;i<12;i++)this.walker.move({x:0,z:0},this.aim.yaw,false,STEP);}
    this.session();this.emit({type:'design-ready'});this.publish();return;
   }
@@ -83,15 +96,19 @@ export class GameSession{
   if(m.type==='bank-result'&&m.attempt===this.attempt&&this.shot?.done){this.phase='Result';this.stationTime=Math.max(this.stationTime,this.releaseTime+this.shot.ball.clock);this.session();return;}
   if(m.type==='skip-shot'&&m.attempt===this.attempt){this.runner?.skip();this.emit({type:'shot-skipping',attempt:this.attempt});}
  }
- reset(){this.runner?.close();this.generation++;this.designProof=null;this.phase='Aim';this.attempt=null;this.shot=null;this.input={x:0,z:0};this.power=0;this.session();this.publish();}
+ reset(){this.runner?.close();this.launchWaiting=false;this.generation++;this.designProof=null;this.phase='Aim';this.attempt=null;this.shot=null;this.input={x:0,z:0};this.power=0;this.session();this.publish();}
  launch(){
+  if(this.inputs&&!this.inputs.seal()){this.launchWaiting=true;return;}
+  this.launchWaiting=false;
   const release=this.walker.release(this.aim.yaw,this.aim.pitch,this.stationTime);if(!release){this.reset();this.emit({type:'error',message:'Throw cancelled: the hand is blocked'});return;}
   this.releaseTime=this.stationTime;this.phase='Flight';const thrower=structuredClone(this.player()),launch=launchInput(this.walker.feet,{...this.aim,power:this.power,powerRange:this.powerRange});launch.position=release;
+  const inputs=this.inputs?.proof(this.aim,this.power,this.powerRange,this.chargeTime,this.releaseTime);
   const course=this.challenge||{layout:this.world.layoutSha256,scoring:'waypoint-v4',start:{center:this.walker.feet},goal:null,waypoints:[]};
   const shot=this.shot=new Shot(this.world,course,launch,{attempt:this.attempt,releaseTime:this.releaseTime,chargeTime:this.chargeTime,thrower,design:this.designing});
   const base={...this.state(),launchPosition:launch.position,players:[thrower]},generation=this.generation;
   this.runner=new ShotRunner(shot,base,message=>{
    if(generation!==this.generation)return;
+   if(message.type==='local-result'&&inputs)message.result.inputs=inputs;
    if(message.type==='local-result'&&this.designing){
     const capture=shot.designer.finish(shot);
     if(!capture.error){

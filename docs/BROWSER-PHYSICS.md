@@ -20,8 +20,9 @@ recall, Skip, course creation/revision, local progress and replays. Local leader
 separate. Independent online verification and course publishing are still required.
 The [verification core](ON-DEMAND-VERIFICATION.md) independently reconstructs
 walking and shots from bounded controls against its own course catalog. All 30
-campaign routes pass it; authenticated submission, durable online storage and
-browser synchronization are not yet connected.
+campaign routes pass it. The real game persists control histories alongside
+replays; authenticated submission, durable online storage and browser
+synchronization are not yet connected.
 Selecting a level closes the mobile panel, including First Bounce, whose tutorial
 does not open an automatic overview screen.
 
@@ -77,6 +78,14 @@ does not open an automatic overview screen.
   presented. Full pose/rotation/contact data stays in IndexedDB chunks; live
   scoring retains only necessary bank history. Full replay viewing still loads
   that replay into memory, and saved storage grows with actual shot duration.
+- Walking controls use run-length encoding and immutable IndexedDB chunks.
+  Standing still remains one run. Attempts from the same route share their
+  walking prefix; home/course changes start fresh routes. The worker keeps at
+  most two 128-run chunks and waits for storage when necessary. Release waits
+  for the final controls to commit, and missing controls cannot produce a saved
+  shot. Tab locks and reference cleanup retain current saved attempts without
+  accumulating abandoned routes. Saved control headers bind the course and
+  simulation versions, aim, power and station phase for independent verification.
 - The existing design-ball interface runs entirely offline. The worker derives
   up to eight spaced targets from actual contacts and validates every disk on
   its fixed surface. Floor support uses radial grids; a complete capsule query
@@ -104,6 +113,7 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
 | `npm run test:browser:designer` | Actual station design-route capture and full-clear re-simulation; rendered offline create/play/revise/reload, forged or changed capture rejection, foreign edit rejection, touch creation, cancellation/restart and retired-score cleanup |
 | `npm run test:verification` | All 30 courses verified twice from controls; complete exact replay equality; real offline Chrome walking, sprint, charge and release independently reconstructed in Node; portable forged-result and cancellation checks also run in `npm test` |
+| `npm run test:browser:inputs` | Persistent shared walking prefixes, exact step counts, incomplete/duplicate rejection, reload, live-tab locks and orphan/retired-route cleanup; independent observer comparison against actual Chrome controller inputs |
 | `npm run test:traversal` | 166 station walks: 33 public stair flights, all 48 escalators, connected east atrium stairs and the complete Grand Stair-to-garden route, each in both directions; six offline keyboard walks in rendered Chrome through the real UI/worker |
 | `npm run test:physics:station` | Opening-course geometry checks, including Clock In's first three native contact positions within 0.1 mm, plus Node/Chrome replay equality |
 | `npm run test:physics:solids` | All 457 authored convex casings: 5,941 interior samples, 5,484 exterior casts, outward recovery and contacts on the original visible surfaces; combined-world interior lookup |
@@ -150,6 +160,14 @@ Its 1,832-frame flight averaged 60.00 FPS, with 16.7 ms p95, 16.8 ms maximum,
 no main-thread long tasks and no skipped music beats. Maximum audio scheduler
 gap was 58.7 ms. The test now waits for responsive controls to finish switching
 after a viewport resize before sending menu input.
+
+With persistent control recording enabled, the rendered check independently
+reconstructed four saved desktop/touch shots from walking and throw controls,
+including records kept across reload and walking retained after recall. Poses,
+contacts, launch, thrower state, timing and scores matched exactly. The
+1,773-frame flight averaged 60.00 FPS (16.7 ms p95, 16.8 ms maximum), with no
+long tasks or skipped music steps and a 53.4 ms maximum audio scheduler gap.
+All 30 offline course selections passed at both desktop and mobile widths.
 
 The traversal fixtures cover 80 combinations of step height, speed, direction
 and station-scale coordinates, plus oblique approaches, consecutive risers,

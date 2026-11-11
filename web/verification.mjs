@@ -2,8 +2,9 @@ import {Walker} from './public/physics/walker.js';
 import {Shot,launchInput,BROWSER_PHYSICS} from './public/physics/shot.js';
 import {STEP} from './public/physics/ball.js';
 import {v,add} from './public/physics/math.js';
+import {INPUT_FORMAT} from './public/physics/input-recorder.js';
 
-export const INPUT_FORMAT='kyoto-inputs-1';
+export {INPUT_FORMAT};
 const fail=message=>{throw Error('Invalid shot inputs: '+message);};
 function object(value,keys,label){
  if(!value||typeof value!=='object'||Array.isArray(value)||![Object.prototype,null].includes(Object.getPrototypeOf(value)))fail(label+' must be an object');
