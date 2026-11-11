@@ -21,8 +21,10 @@ separate. Independent online verification and course publishing are still requir
 The [verification core](ON-DEMAND-VERIFICATION.md) independently reconstructs
 walking and shots from bounded controls against its own course catalog. All 30
 campaign routes pass it. The real game persists control histories alongside
-replays; authenticated submission, durable online storage and browser
-synchronization are not yet connected.
+replays. The request-driven verifier now has authenticated control submission,
+Firestore checkpoints, independent result publication, standings and public
+replay seeds. Browser synchronization and online course publishing are not yet
+connected; the preview still shows local scores.
 Selecting a level closes the mobile panel, including First Bounce, whose tutorial
 does not open an automatic overview screen.
 
@@ -202,8 +204,8 @@ under `.local/browser-physics/designer/`; fixed station cases are recorded in
 
 ## Remaining bounded tasks
 
-1. Add independent on-demand online verification, course publishing and score storage. Reconstruct
-   accepted shots from validated inputs; never accept a client's claimed score.
+1. Connect the independently tested on-demand verifier to the browser UI and add
+   course publishing. Complete storage cleanup and request abuse bounds.
    Package static hosting and verification without an always-on physics process
    or a fixed monthly compute subscription.
 2. Verify the complete integrated game, cross-browser replay behavior and broader

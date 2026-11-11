@@ -17,3 +17,12 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/cache@v4
+        with:
+          path: .local/verification/firestore.jar
+          key: firestore-emulator-1.22.0-9b6498b7
+      - run: npm run test:verification:service

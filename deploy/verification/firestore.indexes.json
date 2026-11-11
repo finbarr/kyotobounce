@@ -1,0 +1,49 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "attempts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "courseKey", "order": "ASCENDING"},
+        {"fieldPath": "state", "order": "ASCENDING"},
+        {"fieldPath": "score", "order": "DESCENDING"},
+        {"fieldPath": "duration", "order": "ASCENDING"},
+        {"fieldPath": "accepted", "order": "ASCENDING"},
+        {"fieldPath": "__name__", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "attempts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "courseKey", "order": "ASCENDING"},
+        {"fieldPath": "owner", "order": "ASCENDING"},
+        {"fieldPath": "state", "order": "ASCENDING"},
+        {"fieldPath": "score", "order": "DESCENDING"},
+        {"fieldPath": "duration", "order": "ASCENDING"},
+        {"fieldPath": "accepted", "order": "ASCENDING"},
+        {"fieldPath": "__name__", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "attempts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "courseKey", "order": "ASCENDING"},
+        {"fieldPath": "owner", "order": "ASCENDING"},
+        {"fieldPath": "state", "order": "ASCENDING"},
+        {"fieldPath": "success", "order": "ASCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {"collectionGroup": "attempts", "fieldPath": "header", "indexes": []},
+    {"collectionGroup": "attempts", "fieldPath": "result", "indexes": []},
+    {"collectionGroup": "attempts", "fieldPath": "checkpoint", "indexes": []},
+    {"collectionGroup": "attempts", "fieldPath": "cursor", "indexes": []},
+    {"collectionGroup": "attempts", "fieldPath": "lease", "indexes": []},
+    {"collectionGroup": "inputs", "fieldPath": "runs", "indexes": []},
+    {"collectionGroup": "progress", "fieldPath": "best", "indexes": []},
+    {"collectionGroup": "players", "fieldPath": "credentialHash", "indexes": []}
+  ]
+}

@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Only the verifier's server identity accesses this database through IAM.
+    // Browsers must pass the authenticated, control-only verification API.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
