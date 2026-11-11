@@ -44,7 +44,7 @@ async function select(page,id){
 async function throwShot(page,hold){await page.locator('#game').focus();await page.keyboard.press('h');await page.keyboard.press('Space',{delay:hold});await page.waitForFunction(()=>kyotoState.phase==='Flight');}
 async function saved(page){return page.evaluate(async()=>{const s=await(await import('/local-store.js')).localStore();try{return await s.records(kyotoState.challenge);}finally{s.close();}});}
 async function replayDigest(page,id){return page.evaluate(async id=>{
- const s=await(await import('/local-store.js')).localStore();try{const r=await s.replay(id),bytes=new TextEncoder().encode(JSON.stringify([r.poses,r.contacts]));return {sha256:Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join(''),poses:r.poses.length,remote:!!r.remote,proof:!!r.inputs};}finally{s.close();}
+ const s=await(await import('/local-store.js')).localStore();try{const r=await s.replay(id),bytes=new TextEncoder().encode(JSON.stringify([r.poses,r.contacts]));return {sha256:Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join(''),poses:r.poses.length,remote:!!r.remote,proof:!!r.inputs,cacheBytes:r.cacheBytes};}finally{s.close();}
 },id);}
 async function until(predicate,label){const deadline=Date.now()+90000;while(Date.now()<deadline){if(await predicate())return;await new Promise(resolve=>setTimeout(resolve,100));}throw Error(label);}
 let c,page,second;
@@ -81,7 +81,7 @@ try{
  await page.locator('#score-scope').click();await page.waitForFunction(()=>document.querySelector('#result-leaderboard').dataset.source==='online');
  const original=await replayDigest(page,mobile.attempt);
  await page.locator('#result-leaderboard [data-attempt="'+mobile.attempt+'"] button').click();await page.waitForFunction(()=>kyotoState.mode==='replay',null,{timeout:60000});
- const replacement=await replayDigest(page,mobile.attempt);assert.equal(replacement.sha256,original.sha256);assert.equal(replacement.poses,original.poses);assert.ok(replacement.remote&&replacement.proof);
+ const replacement=await replayDigest(page,mobile.attempt);assert.equal(replacement.sha256,original.sha256);assert.equal(replacement.poses,original.poses);assert.ok(replacement.remote&&replacement.proof);assert.ok(replacement.cacheBytes>0,'The worker accounts for downloaded replay bytes');
  await page.locator('#close-replay').click();
  await page.screenshot({path:out+'/online-verified.png'});
  await page.reload();await enter(page,'Online acceptance');await page.waitForFunction(()=>document.querySelector('#result-leaderboard').dataset.source==='online');

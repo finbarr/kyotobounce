@@ -103,6 +103,16 @@ existing saved replay intact. An accepted cache works offline and does not
 duplicate the collision asset. Direct replay links need no player registration
 or name prompt, and wait for the physics worker to finish loading.
 
+Downloaded public replays use a shared IndexedDB cache limited to eight entries
+and 64 MiB of serialized replay payload. The worker measures each batch, keeping
+that work off the rendering thread; IndexedDB's own storage overhead is additional.
+Reads update recency. Imports return the complete replay before evicting older
+entries, so a replay larger than the budget still plays fully but is not kept
+offline. Imports and reads are serialized across tabs to avoid eviction during
+assembly. Startup removes abandoned downloads and unmeasured old cache entries.
+Saved player scores, queued verification and their control recordings are excluded
+from cache eviction, including a player's own replay reconstructed from the verifier.
+
 ## Request-driven service
 
 `web/online-server.mjs` starts a Node HTTP process with no Unity, simulation
@@ -248,7 +258,7 @@ them from independently verified controls, and exactly reconstructs their
 public solutions, including a basement course with a full-rest finish target.
 
 Before full migration acceptance, finish request/storage
-abuse bounds and abandoned-data/cache cleanup, then static hosting and
+abuse bounds and abandoned server-data cleanup, then static hosting and
 scale-to-zero deployment packaging. No compatibility archive or native score
 migration is planned.
 

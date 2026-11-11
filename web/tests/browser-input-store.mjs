@@ -60,11 +60,60 @@ try{
  await page.evaluate(async()=>{await one.startRoute('crashed',{id:'course',revision:1,layout:'layout',physics:'physics',scoring:'waypoint-v4'});await one.appendInputs('crashed',0,[{steps:100,x:0,z:0,yaw:0,fast:false}]);});await page.close();await second.evaluate(()=>two.cleanInterrupted());assert.deepEqual(await count(),[0,0,0,0,0]);
  for(const length of [3,7,2]){
   const result=await second.evaluate(async length=>{
-   const id=crypto.randomUUID();for(let sequence=0;sequence<length;sequence++)await two.append(id,sequence,{poses:[{t:sequence}],contacts:[],scoreFrames:[]});
+   const id=crypto.randomUUID();for(let sequence=0;sequence<length;sequence++){const chunk={poses:[{t:sequence}],contacts:[],scoreFrames:[]};await two.append(id,sequence,chunk,{cacheBytes:new TextEncoder().encode(JSON.stringify(chunk)).byteLength});}
    await two.imported({attempt:'public',remote:true,recordingChunks:length,challenge:{id:'course',revision:1,layout:'layout',physics:'physics',scoring:'waypoint-v4'}},id);
    return (await two.replay('public')).poses;
   },length);assert.deepEqual(result,Array.from({length},(_,t)=>({t})));assert.deepEqual(await count(),[0,1,length,0,0]);
  }
  await second.evaluate(()=>two.retainCurrent([]));assert.deepEqual(await count(),[0,0,0,0,0],'Retired public replay cache is deleted');
+ await second.evaluate(async()=>{
+  window.limits=(await import('/local-store.js')).PUBLIC_REPLAY_CACHE;
+  window.cacheCourse={id:'course',revision:1,layout:'layout',physics:'physics',scoring:'waypoint-v4'};
+  window.cache=async(id,bytes=0)=>{
+   const temporary=crypto.randomUUID(),chunk={poses:[{t:1,payload:'x'.repeat(bytes)}],contacts:[{surface:id}],scoreFrames:[]};
+   await two.append(temporary,0,chunk,{cacheBytes:new TextEncoder().encode(JSON.stringify(chunk)).byteLength});
+   const replay=await two.imported({attempt:id,remote:true,recordingChunks:1,challenge:cacheCourse},temporary);
+   return {id:replay.attempt,length:replay.poses[0].payload.length,contacts:replay.contacts};
+  };
+  window.cacheState=async()=>{
+   const db=await new Promise(resolve=>{const r=indexedDB.open('kyoto-browser');r.onsuccess=()=>resolve(r.result);});
+   try{return await new Promise(resolve=>{const r=db.transaction('replays').objectStore('replays').getAll();r.onsuccess=()=>resolve(r.result.map(r=>({id:r.attempt,bytes:r.cacheBytes,inputs:!!r.inputs,draft:!!r.draft})));});}finally{db.close();}
+  };
+  // A verified replacement of the player's own shot must retain its legal
+  // controls and score even when downloaded public replays are evicted.
+  await two.startRoute('proof',cacheCourse);await two.appendInputs('proof',0,[{steps:3,x:0,z:0,yaw:0,fast:false}]);
+  const own={attempt:'own',id:'guest',challenge:cacheCourse,score:42,success:true,breakdown:{outcome:'complete'},duration:1,surfaces:1,accepted:1,recordingChunks:1,inputs:{route:'proof',chunks:1,header:{walkSteps:3}}};
+  await two.append('own',0,{poses:[],contacts:[],scoreFrames:[]});await two.finish(own);await two.save(own,{endpoint:'https://scores.example'});await two.closeRoute('proof');await cache('own');
+  for(let i=0;i<limits.maxEntries;i++)await cache('public-'+i);
+ });
+ await second.waitForTimeout(5);await second.evaluate(()=>two.replay('public-0'));await second.waitForTimeout(5);await second.evaluate(()=>cache('new'));
+ let cached=await second.evaluate(()=>cacheState());assert.equal(cached.length,9);assert.ok(cached.some(r=>r.id==='public-0'));assert.ok(!cached.some(r=>r.id==='public-1'),'Reading a replay updates recency before eviction');
+ assert.deepEqual(await count(),[1,9,9,1,1],'Eviction deletes replay chunks as well as headers');
+ assert.equal((await second.evaluate(()=>two.inputProof('own'))).header.walkSteps,3);assert.equal((await second.evaluate(()=>two.pendingSync('https://scores.example'))).length,1);
+ // Use real large payloads, not invented byte counters. The byte ceiling
+ // applies even below the entry limit; an oversized replay is returned whole.
+ const half=await second.evaluate(()=>Math.floor(limits.maxBytes/2));
+ await second.evaluate(bytes=>cache('large-1',bytes),half);await second.waitForTimeout(5);await second.evaluate(bytes=>cache('large-2',bytes),half);
+ cached=await second.evaluate(()=>cacheState());assert.ok(!cached.some(r=>r.id==='large-1'));assert.ok(cached.some(r=>r.id==='large-2'));assert.ok(cached.filter(r=>!r.inputs).reduce((sum,r)=>sum+r.bytes,0)<=half*2);
+ const oversized=await second.evaluate(bytes=>cache('oversized',bytes),half*2+1);assert.equal(oversized.length,half*2+1);assert.deepEqual(oversized.contacts,[{surface:'oversized'}]);
+ assert.ok(!(await second.evaluate(()=>cacheState())).some(r=>r.id==='oversized'),'An oversized replay is playable but not retained');
+ const third=await context.newPage();third.on('pageerror',e=>errors.push(String(e)));await third.goto(origin);
+ await third.evaluate(async()=>{window.three=await(await import('/local-store.js')).localStore();});
+ await Promise.all([second.evaluate(async()=>{for(let i=0;i<10;i++)await cache('concurrent-'+i);}),third.evaluate(async()=>{
+  for(let i=0;i<10;i++){
+   const id='other-'+i,temp=crypto.randomUUID(),chunk={poses:[{t:i}],contacts:[],scoreFrames:[]};
+   await three.append(temp,0,chunk,{cacheBytes:new TextEncoder().encode(JSON.stringify(chunk)).byteLength});
+   const result=await three.imported({attempt:id,remote:true,recordingChunks:1,challenge:{id:'course',revision:1,layout:'layout',physics:'physics',scoring:'waypoint-v4'}},temp);
+   if(result.poses.length!==1||result.poses[0].t!==i)throw Error('Concurrent import lost its replay');
+  }
+ })]);
+ assert.equal((await second.evaluate(()=>cacheState())).filter(r=>!r.inputs).length,8);
+ await second.evaluate(()=>two.append('interrupted-download',0,{poses:[{t:0}],contacts:[],scoreFrames:[]},{cacheBytes:100}));await third.evaluate(()=>three.cleanInterrupted());
+ assert.ok((await second.evaluate(()=>cacheState())).some(r=>r.id==='interrupted-download'),'Another tab keeps an active download');
+ await second.evaluate(()=>two.close());await third.evaluate(()=>three.cleanInterrupted());
+ assert.ok(!(await second.evaluate(()=>cacheState())).some(r=>r.id==='interrupted-download'),'Abandoned downloads are cleaned after their tab closes');
+ assert.equal((await third.evaluate(()=>three.inputProof('own'))).header.walkSteps,3);assert.equal((await third.evaluate(()=>three.records({id:'course',revision:1,layout:'layout',physics:'physics',scoring:'waypoint-v4'}))).length,1);
+ assert.deepEqual(await count(),[1,9,9,1,1]);
  assert.deepEqual(errors,[]);console.log('PASS durable controls: shared immutable prefixes, exact step counts, duplicate/incomplete rejection, reload, live-tab locks, abandoned-tail cleanup, missing chunks and retired-course collection');
+ console.log('PASS public replay cache: entry/byte bounds, recent reads, complete oversized playback, concurrent tabs, abandoned downloads and preservation of saved scores, queued verification and legal controls');
 }finally{await browser?.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}

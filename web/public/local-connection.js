@@ -49,11 +49,11 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
   try{
    if(m.type==='replay-error')throw Error(m.message);
    if(m.type==='replay-recording'){
-    await store.append(active.request,m.sequence,m.recording);
+    await store.append(active.request,m.sequence,m.recording,{cacheBytes:m.cacheBytes});
     if(importing!==active){await store.discard(active.request);return;}
     worker.postMessage({type:'replay-ack',request:active.request,sequence:m.sequence});return;
    }
-   await store.imported(m.result,active.request);const replay=await store.replay(m.result.attempt);
+   const replay=await store.imported(m.result,active.request);
    if(importing===active){importing=null;active.resolve(replay);}
   }catch(e){if(importing===active){importing=null;worker.postMessage({type:'replay-cancel'});await store.discard(active.request);active.reject(e);}}
  }

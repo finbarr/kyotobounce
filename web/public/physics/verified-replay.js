@@ -17,7 +17,10 @@ export class VerifiedReplay{
    const job=new ShotVerification(this.world,result.challenge,header,this.inputs(),{attempt:result.attempt,subject:result.id});let reply;
    do{
     if(this.cancelled)return;reply=await job.advance();
-    if(reply.recording){const sequence=this.sequence++;await new Promise(resolve=>{this.release=resolve;this.post({type:'replay-recording',request:this.request,sequence,recording:reply.recording});});}
+    if(reply.recording){
+     const sequence=this.sequence++,cacheBytes=new TextEncoder().encode(JSON.stringify(reply.recording)).byteLength;
+     await new Promise(resolve=>{this.release=resolve;this.post({type:'replay-recording',request:this.request,sequence,recording:reply.recording,cacheBytes});});
+    }
     await new Promise(resolve=>setTimeout(resolve,0));
    }while(reply.status!=='verified');
    if(this.cancelled)return;

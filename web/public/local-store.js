@@ -2,6 +2,9 @@
 // the launch against its own course/layout before accepting any leaderboard score.
 import {INPUT_CHUNK_RUNS} from './physics/input-recorder.js';
 export const courseKey=c=>[c.layout,c.physics,c.scoring,c.id,c.revision].join(':');
+// Payload bytes are measured in the replay worker; IndexedDB has additional
+// implementation-dependent overhead. Saved player shots are not this cache.
+export const PUBLIC_REPLAY_CACHE={maxEntries:8,maxBytes:64*1024*1024};
 const request=req=>new Promise((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
 const complete=tx=>new Promise((resolve,reject)=>{tx.oncomplete=resolve;tx.onabort=tx.onerror=()=>reject(tx.error||Error('Local save failed'));});
 export async function localStore(){
@@ -54,6 +57,24 @@ export async function localStore(){
   const replay=await request(db.transaction('replays').objectStore('replays').get(id));
   if(!replay||replay.draft||!replay.inputs)throw Error('This shot has no saved control recording');
   return replay.inputs;
+ }
+ const cacheLock=fn=>navigator.locks.request('kyoto-public-replay-cache',fn);
+ async function prunePublicReplays(){
+  const tx=db.transaction(['replays','chunks','records'],'readwrite'),done=complete(tx),s=tx.objectStore('replays');
+  const saved=new Set(await request(tx.objectStore('records').getAllKeys())),rows=(await request(s.getAll())).filter(r=>r.remote&&!r.draft&&!r.inputs&&!saved.has(r.attempt));
+  rows.sort((a,b)=>(b.cacheUsed||0)-(a.cacheUsed||0)||a.attempt.localeCompare(b.attempt));let bytes=0,count=0;
+  for(const r of rows){
+   if(Number.isSafeInteger(r.cacheBytes)&&r.cacheBytes>0&&count<PUBLIC_REPLAY_CACHE.maxEntries&&bytes+r.cacheBytes<=PUBLIC_REPLAY_CACHE.maxBytes){bytes+=r.cacheBytes;count++;continue;}
+   s.delete(r.attempt);deleteChunks(tx,r.attempt);
+  }await done;
+ }
+ async function readReplay(id){
+  const tx=db.transaction(['replays','chunks'],'readwrite'),done=complete(tx),store=tx.objectStore('replays'),replay=await request(store.get(id));
+  if(!replay||replay.draft){await done;throw Error('This replay is not saved on this device');}
+  if(replay.remote&&!replay.inputs){replay.cacheUsed=Date.now();store.put(replay);}
+  const poses=replay.poses||[],contacts=replay.contacts||[],scoreFrames=replay.scoreFrames||[];
+  await new Promise((resolve,reject)=>{const cursor=tx.objectStore('chunks').index('attempt').openCursor(IDBKeyRange.only(id));cursor.onerror=()=>reject(cursor.error);cursor.onsuccess=()=>{const c=cursor.result;if(!c){resolve();return;}poses.push(...c.value.poses);contacts.push(...c.value.contacts);scoreFrames.push(...c.value.scoreFrames);c.continue();};});
+  await done;return {...replay,poses,contacts,scoreFrames};
  }
  return {
   async startRoute(id,course){
@@ -137,7 +158,7 @@ export async function localStore(){
   },
   async pendingSync(endpoint){return request(db.transaction('sync').objectStore('sync').index('pending').getAll(IDBKeyRange.only([endpoint,'queued']),20));},
   async syncResult(endpoint,attempt,value){const tx=db.transaction('sync','readwrite'),done=complete(tx),s=tx.objectStore('sync'),prior=await request(s.get([endpoint,attempt]));if(prior)s.put({...prior,...value});await done;},
-  async imported(replay,temporary){
+  async imported(replay,temporary){return cacheLock(async()=>{
    const tx=db.transaction(['replays','chunks'],'readwrite'),done=complete(tx),s=tx.objectStore('replays'),header=await request(s.get(temporary)),previous=await request(s.get(replay.attempt));
    if(!header?.draft||header.sequence+1!==replay.recordingChunks){tx.abort();await done;}
    if(previous?.draft){tx.abort();await done;}
@@ -145,19 +166,18 @@ export async function localStore(){
    // interleaved cursors could otherwise delete newly inserted chunks.
    await new Promise((resolve,reject)=>{const req=tx.objectStore('chunks').index('attempt').openKeyCursor(IDBKeyRange.only(replay.attempt));req.onerror=()=>reject(req.error);req.onsuccess=()=>{const cursor=req.result;if(!cursor){resolve();return;}tx.objectStore('chunks').delete(cursor.primaryKey);cursor.continue();};});s.delete(temporary);
    tx.objectStore('chunks').index('attempt').openCursor(IDBKeyRange.only(temporary)).onsuccess=e=>{const cursor=e.target.result;if(cursor){tx.objectStore('chunks').put({...cursor.value,attempt:replay.attempt});cursor.delete();cursor.continue();}};
-   s.put({...replay,...(previous?.inputs?{inputs:previous.inputs}:{})});await done;release(temporary);
-  },
-  async replay(id){
-   const tx=db.transaction(['replays','chunks']),replay=await request(tx.objectStore('replays').get(id));
-   if(!replay||replay.draft)throw Error('This replay is not saved on this device');
-   const poses=replay.poses||[],contacts=replay.contacts||[],scoreFrames=replay.scoreFrames||[];
-   await new Promise((resolve,reject)=>{const cursor=tx.objectStore('chunks').index('attempt').openCursor(IDBKeyRange.only(id));cursor.onerror=()=>reject(cursor.error);cursor.onsuccess=()=>{const c=cursor.result;if(!c){resolve();return;}poses.push(...c.value.poses);contacts.push(...c.value.contacts);scoreFrames.push(...c.value.scoreFrames);c.continue();};});
-   return {...replay,poses,contacts,scoreFrames};
-  },
-  async append(id,sequence,recording){
+   s.put({...replay,...(previous?.inputs?{inputs:previous.inputs}:{}),cacheBytes:header.cacheBytes===undefined?null:header.cacheBytes+new TextEncoder().encode(JSON.stringify(replay)).byteLength+256,cacheUsed:Date.now()});await done;release(temporary);
+   // Read the complete new replay before eviction. Even an oversized replay
+   // remains playable in memory, without leaving an oversized persistent cache.
+   const result=await readReplay(replay.attempt);await prunePublicReplays();return result;
+  });},
+  replay(id){return cacheLock(()=>readReplay(id));},
+  async append(id,sequence,recording,{cacheBytes}={}){
+   if(cacheBytes!==undefined&&(!Number.isSafeInteger(cacheBytes)||cacheBytes<0))throw Error('Invalid replay cache size');
    await lease(id);const tx=db.transaction(['replays','chunks'],'readwrite'),done=complete(tx),store=tx.objectStore('replays'),header=await request(store.get(id));
    if((header?.sequence??-1)+1!==sequence||header&&!header.draft){tx.abort();await done;}
-   store.put({...header,attempt:id,draft:1,sequence});tx.objectStore('chunks').put({attempt:id,sequence,...recording});await done;
+   if(sequence>0&&(header.cacheBytes===undefined)!==(cacheBytes===undefined)){tx.abort();await done;}
+   store.put({...header,attempt:id,draft:1,sequence,...(cacheBytes===undefined?{}:{cacheBytes:(header?.cacheBytes||0)+cacheBytes+256})});tx.objectStore('chunks').put({attempt:id,sequence,...recording});await done;
   },
   async finish(replay){
    const tx=db.transaction(['replays','routes','inputs'],'readwrite'),done=complete(tx),store=tx.objectStore('replays'),header=await request(store.get(replay.attempt));
@@ -177,6 +197,7 @@ export async function localStore(){
    for(const id of ids)await navigator.locks.request(lockName(id),{ifAvailable:true},async lock=>{if(lock)await discard(id);});
    const routes=await request(db.transaction('routes').objectStore('routes').getAllKeys());
    for(const id of routes)await navigator.locks.request(lockName('route:'+id),{ifAvailable:true},async lock=>{if(lock)await pruneRoute(id,true);});
+   await cacheLock(prunePublicReplays);
   },
   async save(replay,{endpoint}={}){
    if(replay.score<=0||replay.breakdown.outcome==='forfeit')throw Error('A forfeited shot cannot be saved');
