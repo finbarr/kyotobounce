@@ -14,7 +14,16 @@ try{
  browser=await chromium.launch({channel:'chrome',headless:true});const context=await browser.newContext();await backgroundInput(context);const page=await context.newPage(),origin=`http://127.0.0.1:${server.address().port}`,errors=[];
  page.on('pageerror',e=>errors.push(String(e)));await page.goto(origin);
  await page.evaluate(async()=>{
+  const opening=indexedDB.open('kyoto-browser',3);opening.onupgradeneeded=()=>{
+   const db=opening.result;db.createObjectStore('settings');const replays=db.createObjectStore('replays',{keyPath:'attempt'});replays.createIndex('draft','draft');replays.createIndex('route','inputs.route');
+   db.createObjectStore('records',{keyPath:'attempt'}).createIndex('course','course');db.createObjectStore('routes',{keyPath:'id'});
+   db.createObjectStore('inputs',{keyPath:['route','sequence']}).createIndex('route','route');db.createObjectStore('chunks',{keyPath:['attempt','sequence']}).createIndex('attempt','attempt');
+  };
+  const db=await new Promise(resolve=>{opening.onsuccess=()=>resolve(opening.result);});const tx=db.transaction('settings','readwrite');tx.objectStore('settings').put('retained','upgrade-proof');await new Promise(resolve=>{tx.oncomplete=resolve;});db.close();
+ });
+ await page.evaluate(async()=>{
   window.localStore=(await import('/local-store.js')).localStore;window.one=await localStore();
+  if(await one.setting('upgrade-proof')!=='retained')throw Error('The current database did not survive the outbox upgrade');
   window.course={id:'course',revision:1,layout:'layout',physics:'physics',scoring:'waypoint-v4'};
   window.run=n=>({steps:n,x:0,z:0,yaw:0,fast:false});
   window.counts=async()=>{const db=await new Promise(resolve=>{const r=indexedDB.open('kyoto-browser');r.onsuccess=()=>resolve(r.result);});try{return await Promise.all(['records','replays','chunks','routes','inputs'].map(name=>new Promise(resolve=>{const r=db.transaction(name).objectStore(name).count();r.onsuccess=()=>resolve(r.result);})));}finally{db.close();}};
@@ -49,5 +58,13 @@ try{
  const count=()=>second.evaluate(async()=>{const db=await new Promise(resolve=>{const r=indexedDB.open('kyoto-browser');r.onsuccess=()=>resolve(r.result);});try{return await Promise.all(['records','replays','chunks','routes','inputs'].map(name=>new Promise(resolve=>{const r=db.transaction(name).objectStore(name).count();r.onsuccess=()=>resolve(r.result);})));}finally{db.close();}});
  assert.deepEqual(await count(),[0,0,0,0,0],'Retiring a course releases its last control references');
  await page.evaluate(async()=>{await one.startRoute('crashed',{id:'course',revision:1,layout:'layout',physics:'physics',scoring:'waypoint-v4'});await one.appendInputs('crashed',0,[{steps:100,x:0,z:0,yaw:0,fast:false}]);});await page.close();await second.evaluate(()=>two.cleanInterrupted());assert.deepEqual(await count(),[0,0,0,0,0]);
+ for(const length of [3,7,2]){
+  const result=await second.evaluate(async length=>{
+   const id=crypto.randomUUID();for(let sequence=0;sequence<length;sequence++)await two.append(id,sequence,{poses:[{t:sequence}],contacts:[],scoreFrames:[]});
+   await two.imported({attempt:'public',remote:true,recordingChunks:length,challenge:{id:'course',revision:1,layout:'layout',physics:'physics',scoring:'waypoint-v4'}},id);
+   return (await two.replay('public')).poses;
+  },length);assert.deepEqual(result,Array.from({length},(_,t)=>({t})));assert.deepEqual(await count(),[0,1,length,0,0]);
+ }
+ await second.evaluate(()=>two.retainCurrent([]));assert.deepEqual(await count(),[0,0,0,0,0],'Retired public replay cache is deleted');
  assert.deepEqual(errors,[]);console.log('PASS durable controls: shared immutable prefixes, exact step counts, duplicate/incomplete rejection, reload, live-tab locks, abandoned-tail cleanup, missing chunks and retired-course collection');
 }finally{await browser?.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}

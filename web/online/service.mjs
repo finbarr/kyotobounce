@@ -144,7 +144,10 @@ export class VerificationService{
  }
  async progress(owner){
   const rows=await this.players.doc(owner).collection('progress').get();
-  return rows.docs.map(d=>d.data()).filter(p=>{const c=this.catalog.get(p.courseId);return c&&verificationCourseKey(c)===p.courseKey;}).map(p=>({challengeId:p.courseId,revision:p.revision,completed:p.completed,bestScore:p.best?.score||0,rank:null}));
+  return Promise.all(rows.docs.map(d=>d.data()).filter(p=>{const c=this.catalog.get(p.courseId);return c&&verificationCourseKey(c)===p.courseKey;}).map(async p=>{
+   const b=p.best,rank=b?(await this.rankedQuery(p.courseKey).endBefore(b.score,b.duration,b.accepted,b.attempt).count().get()).data().count+1:null;
+   return {challengeId:p.courseId,revision:p.revision,completed:p.completed,bestScore:b?.score||0,rank};
+  }));
  }
  async replay(id){
   const job=(await this.attempts.doc(id).get()).data();insist(job?.state==='verified',404,'Replay not found');this.current(job);

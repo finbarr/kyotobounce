@@ -1,10 +1,37 @@
 import {localStore} from './local-store.js';
+import {onlineScores,verificationEndpoint} from './online-scores.js';
 const order=(a,b)=>b.score-a.score||a.accepted-b.accepted||a.attempt.localeCompare(b.attempt);
-export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
- let worker,store,profile,catalog,selected,currentAttempt,provisional,stopped=false,presentation,ready=false,skipping=false,lastProgress=-Infinity,inputWrites=Promise.resolve();
- const emit=m=>{if(!stopped)onMessage(m);},error=e=>emit({type:'error',message:e.message||String(e)});
- async function board(c=selected){const entries=(await store.records(c)).sort(order);return {type:'leaderboard',local:true,challenge:c,entries:entries.slice(0,10),personal:entries[0]?{entry:entries[0],rank:1}:null};}
- async function progress(){const entries=await Promise.all(catalog.map(async c=>{const rows=(await store.records(c)).sort(order);return {challengeId:c.id,revision:c.revision,completed:rows.some(r=>r.completed),bestScore:rows[0]?.score||0,rank:rows.length?1:null};}));emit({type:'course-progress',full:true,entries});}
+export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier=document.querySelector('meta[name=kyoto-verifier]')?.content}){
+ let worker,store,profile,catalog,selected,currentAttempt,provisional,stopped=false,presentation,ready=false,skipping=false,lastProgress=-Infinity,inputWrites=Promise.resolve(),online,scope='local',importing;
+ let onlineStatus={configured:false,phase:'disabled'};
+ let resolveReady,rejectReady;const physicsReady=new Promise((resolve,reject)=>{resolveReady=resolve;rejectReady=reject;});physicsReady.catch(()=>{});
+ const emit=m=>{if(!stopped&&m)onMessage(m);},error=e=>emit({type:'error',message:e.message||String(e)});
+ async function board(c=selected){
+  if(!c)return null;const available=!!online&&!c.local;
+  if(available&&scope==='online'){const cached=await online.board(c);if(cached)return {...cached,onlineAvailable:true};}
+  const entries=(await store.records(c)).sort(order);return {type:'leaderboard',local:true,onlineAvailable:available,challenge:c,entries:entries.slice(0,10),personal:entries[0]?{...entries[0],rank:1}:null};
+ }
+ async function progress(){
+  const remote=online&&scope==='online'?await online.progress():[];
+  const entries=await Promise.all(catalog.map(async c=>{const rows=(await store.records(c)).sort(order),verified=remote.find(p=>p.challengeId===c.id&&p.revision===c.revision);
+   return {challengeId:c.id,revision:c.revision,completed:rows.some(r=>r.completed)||!!verified?.completed,bestScore:verified?.bestScore||rows[0]?.score||0,rank:verified?.rank??(online&&scope==='online'&&!c.local?null:rows.length?1:null),local:!verified};
+  }));emit({type:'course-progress',full:true,entries});
+ }
+ function refresh(c=selected){if(c)board(c).then(m=>{if(m)emit(m);}).catch(error);online?.refresh(c);}
+ function cancelReplay(){if(!importing)return;const old=importing;importing=null;worker?.postMessage({type:'replay-cancel'});store.discard(old.request).catch(()=>{});old.reject(Error('Replay loading cancelled'));}
+ async function imported(m){
+  const active=importing;if(!active||m.request!==active.request)return;
+  try{
+   if(m.type==='replay-error')throw Error(m.message);
+   if(m.type==='replay-recording'){
+    await store.append(active.request,m.sequence,m.recording);
+    if(importing!==active){await store.discard(active.request);return;}
+    worker.postMessage({type:'replay-ack',request:active.request,sequence:m.sequence});return;
+   }
+   await store.imported(m.result,active.request);const replay=await store.replay(m.result.attempt);
+   if(importing===active){importing=null;active.resolve(replay);}
+  }catch(e){if(importing===active){importing=null;worker.postMessage({type:'replay-cancel'});await store.discard(active.request);active.reject(e);}}
+ }
  async function result(m){
   if(m.result.attempt!==currentAttempt)return;
   const replay={...m.result,playerName:presentation.name,character:presentation.character,local:true,verified:false,accepted:Date.now()};
@@ -32,13 +59,21 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
  function forget(){const previous=currentAttempt;provisional=null;currentAttempt=null;skipping=false;lastProgress=-Infinity;if(previous)store.discard(previous).catch(error);}
  async function initialize(){
   onStatus('connecting',{});store=await localStore();await store.cleanInterrupted();
-  profile=await store.setting('profile')||{id:crypto.randomUUID(),name:'Player',named:false};await store.setting('profile',profile);
+  await navigator.locks.request('kyoto-browser-profile',async()=>{profile=await store.setting('profile')||{id:crypto.randomUUID(),name:'Player',named:false};await store.setting('profile',profile);});
   const response=await fetch('/campaign.json');if(!response.ok)throw Error('Could not load the campaign');catalog=await response.json();catalog.push(...await store.courses(catalog[0]));await store.retainCurrent(catalog);
   if(stopped){store.close();return;}
   const remembered=await store.setting('selected');selected=catalog.find(c=>c.id===remembered)||catalog[0];
+  let endpoint;try{endpoint=verificationEndpoint(verifier);}catch{onlineStatus={configured:false,phase:'error',message:'Online score configuration is unavailable. Scores are saved locally.'};emit({type:'online-status',...onlineStatus});}
+  if(endpoint){
+   scope='online';online=onlineScores({endpoint,store,getProfile:()=>profile,getCatalog:()=>catalog,getSelected:()=>selected,
+    status:m=>{onlineStatus=m;emit(m);if(selected)board().then(emit).catch(error);},
+    changed:(c,result)=>{if(c?.id===selected?.id)board().then(emit).catch(error);progress().catch(error);if(result)emit({type:'score-sync',...result});}
+   });
+  }
   worker=new WorkerImpl('/physics-worker.js',{type:'module'});
   worker.onmessage=event=>{
    const m=event.data;
+   if(['replay-recording','replay-complete','replay-error'].includes(m.type)){imported(m);return;}
    if(['input-start','input-chunk','input-close'].includes(m.type)){
     inputWrites=inputWrites.then(async()=>{
      if(stopped)return;
@@ -48,7 +83,7 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
     }).catch(()=>{if(!stopped)worker.postMessage({type:'input-error',route:m.route});});return;
    }
    if(m.type==='ready'){
-    ready=true;onStatus('connected',{});emit({type:'worker-status',status:'ready',capabilities:['shot-skip-v1','design-ball-v1'],local:true});emit(m);progress().catch(error);return;
+    ready=true;resolveReady();onStatus('connected',{});emit({type:'worker-status',status:'ready',capabilities:['shot-skip-v1','design-ball-v1'],local:true});emit(m);progress().catch(error);online?.wake();return;
    }
    if(m.type==='save-course'){
     (async()=>{
@@ -62,10 +97,11 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
    if(m.type==='session'){
     if(currentAttempt!==m.attempt)forget();currentAttempt=m.attempt;selected=m.challenge;emit(m);return;
    }
-   if(m.type==='selected'){store.setting('selected',m.challenge.id).catch(error);board(m.challenge).then(emit).catch(error);}
+   if(m.type==='selected'){store.setting('selected',m.challenge.id).catch(error);refresh(m.challenge);}
+   if(m.type==='error'&&!ready)rejectReady(Error(m.message));
    emit(m);
   };
-  worker.onerror=e=>{ready=false;onStatus('failed',{});error(e);};
+  worker.onerror=e=>{ready=false;rejectReady(Error(e.message));onStatus('failed',{});error(e);};
   emit({type:'welcome',id:profile.id,sessionId:profile.id,name:profile.name,nameChosen:profile.named,local:true});emit({type:'catalog',challenges:catalog});
   worker.postMessage({type:'init',collisionURL:'/station.collision.bin',catalog:[selected,...catalog.filter(c=>c!==selected)],id:profile.id});
   board(selected).then(emit).catch(error);
@@ -74,19 +110,21 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
   if(!worker||!ready||stopped)return false;
   if(type==='name'){
    const name=String(extra.name||'').trim();if(!name||name.length>32||/[\u0000-\u001f\u007f]/.test(name)){error(Error('Use 1–32 characters for your name'));return true;}
-   profile={...profile,name,named:true};store.setting('profile',profile).then(()=>emit({type:'named',name})).catch(error);return true;
+   profile={...profile,name,named:true};store.setting('profile',profile).then(()=>{emit({type:'named',name});online?.wake();}).catch(error);return true;
   }
+  if(type==='score-scope'){scope=extra.scope==='online'?'online':'local';refresh(catalog.find(c=>c.id===extra.challengeId)||selected);progress().catch(error);return true;}
   if(type==='course-progress'){progress().catch(error);return true;}
-  if(type==='charge'){presentation={name:profile.name,character:extra.character||'ori'};provisional=null;skipping=false;lastProgress=-Infinity;}
+  if(type==='charge'){cancelReplay();presentation={name:profile.name,character:extra.character||'ori'};provisional=null;skipping=false;lastProgress=-Infinity;}
+  if(type==='home'||type==='select-challenge')cancelReplay();
   if(type==='recall'||type==='home'||type==='select-challenge')forget();
   if(type==='skip-shot'&&extra.attempt===currentAttempt)skipping=true;
   if(type==='client-performance'||type==='playback-rate')return true;
   worker.postMessage({type,...extra});return true;
  };
- function stop(){stopped=true;ready=false;worker?.terminate();store?.close();globalThis.removeEventListener('pagehide',stop);}
+ function stop(){stopped=true;ready=false;rejectReady(Error('Game closed'));cancelReplay();online?.stop();worker?.terminate();store?.close();globalThis.removeEventListener('pagehide',stop);}
  globalThis.addEventListener('pagehide',stop,{once:true});
- setTimeout(()=>initialize().catch(e=>{if(!stopped){onStatus('failed',{});error(e);}}),0);
- return {send,local:true,
+ setTimeout(()=>initialize().catch(e=>{rejectReady(e);if(!stopped){onStatus('failed',{});error(e);}}),0);
+ return {send,local:true,get onlineStatus(){return onlineStatus;},
   playback(attempt,time){
    const now=performance.now();if(attempt!==currentAttempt||now-lastProgress<100)return;
    lastProgress=now;worker.postMessage({type:'playback-progress',attempt,time});
@@ -95,10 +133,17 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
    if(provisional?.attempt!==attempt||attempt!==currentAttempt)return;
    const replay=provisional;provisional=null;
    worker.postMessage({type:'bank-result',attempt});
-   if(replay.score>0){await store.save(replay);await progress();emit(await board(replay.challenge));}else await store.discard(replay.attempt);
+   if(replay.score>0){await store.save(replay,{endpoint:online?.endpoint});await progress();emit(await board(replay.challenge));online?.wake();}else await store.discard(replay.attempt);
   },
-  async replay(attempt){return store.replay(attempt);},
-  async level(id){const course=catalog.find(c=>c.id===id);if(!course)throw Error('Level not found');return board(course);},
+  async replay(attempt){
+   await physicsReady;
+   let cached;try{cached=await store.replay(attempt);}catch{}
+   if(cached&&(!online||scope==='local'||cached.remote))return cached;
+   if(!online){if(cached)return cached;throw Error('This replay is not saved on this device');}
+   let seed;try{seed=await online.api('/v1/replays/'+encodeURIComponent(attempt),{auth:false});}catch(e){if(cached)return cached;throw e;}
+   cancelReplay();const request=crypto.randomUUID();return new Promise((resolve,reject)=>{importing={request,resolve,reject};worker.postMessage({type:'replay-import',request,seed,endpoint:online.endpoint});});
+  },
+  async level(id){const course=catalog.find(c=>c.id===id);if(!course)throw Error('Level not found');if(scope==='online')await online?.refresh(course);return board(course);},
   stop,
  };
 }

@@ -150,6 +150,7 @@ try{
  assert.equal((await request(endpoint,'/v1/courses/test/leaderboard',{player:finalPlayer})).personal.name,'Renamed');
  const first=await submit(endpoint,bob),second=await submit(endpoint,bob);await finish(endpoint,bob,first);await finish(endpoint,bob,second);
  assert.equal((await request(endpoint,'/v1/progress',{player:bob})).entries[0].completed,true);
+  assert.equal((await request(endpoint,'/v1/progress',{player:bob})).entries[0].rank,(await request(endpoint,'/v1/courses/test/leaderboard',{player:bob})).personal.rank);
  await request(endpoint,path(first)+'/cancel',{player:bob,method:'POST',body:{}});await request(endpoint,'/v1/replays/'+first,{status:404});
  assert.equal((await request(endpoint,'/v1/courses/test/leaderboard',{player:bob})).personal.attempt,second);
  await request(endpoint,path(second)+'/cancel',{player:bob,method:'POST',body:{}});await request(endpoint,path(second)+'/cancel',{player:bob,method:'POST',body:{}});

@@ -5,7 +5,7 @@ export const courseKey=c=>[c.layout,c.physics,c.scoring,c.id,c.revision].join(':
 const request=req=>new Promise((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
 const complete=tx=>new Promise((resolve,reject)=>{tx.oncomplete=resolve;tx.onabort=tx.onerror=()=>reject(tx.error||Error('Local save failed'));});
 export async function localStore(){
- const opening=indexedDB.open('kyoto-browser',3);
+ const opening=indexedDB.open('kyoto-browser',4);
  opening.onupgradeneeded=()=>{
   const db=opening.result;
   if(!db.objectStoreNames.contains('settings')){
@@ -16,8 +16,9 @@ export async function localStore(){
   if(!replays.indexNames.contains('draft'))replays.createIndex('draft','draft');
   if(!replays.indexNames.contains('route'))replays.createIndex('route','inputs.route');
   if(!db.objectStoreNames.contains('chunks'))db.createObjectStore('chunks',{keyPath:['attempt','sequence']}).createIndex('attempt','attempt');
-  db.createObjectStore('routes',{keyPath:'id'});
-  db.createObjectStore('inputs',{keyPath:['route','sequence']}).createIndex('route','route');
+  if(!db.objectStoreNames.contains('routes'))db.createObjectStore('routes',{keyPath:'id'});
+  if(!db.objectStoreNames.contains('inputs'))db.createObjectStore('inputs',{keyPath:['route','sequence']}).createIndex('route','route');
+  if(!db.objectStoreNames.contains('sync'))db.createObjectStore('sync',{keyPath:['endpoint','attempt']}).createIndex('pending',['endpoint','state']);
  };
  const db=await new Promise((resolve,reject)=>{
   let blocked=false;
@@ -67,9 +68,9 @@ export async function localStore(){
   },
   async closeRoute(id){try{await pruneRoute(id,true);}finally{release('route:'+id);}},
   inputProof,
-  async *inputChunks(id){
+  async *inputChunks(id,from=0){
    const proof=await inputProof(id);
-   for(let sequence=0;sequence<proof.chunks;sequence++){
+   for(let sequence=from;sequence<proof.chunks;sequence++){
     const chunk=await request(db.transaction('inputs').objectStore('inputs').get([proof.route,sequence]));
     if(!chunk)throw Error('The walking control recording is incomplete');
     yield {sequence,runs:chunk.runs};
@@ -85,6 +86,29 @@ export async function localStore(){
   },
   async setting(key,value){const tx=db.transaction('settings',value===undefined?'readonly':'readwrite'),store=tx.objectStore('settings'),done=complete(tx);const result=await request(value===undefined?store.get(key):store.put(value,key));await done;return result;},
   async records(c){return request(db.transaction('records').objectStore('records').index('course').getAll(courseKey(c)));},
+  async queueSaved(endpoint,catalog){
+   const valid=new Set(catalog.filter(c=>!c.local).map(courseKey)),tx=db.transaction(['records','replays','sync'],'readwrite'),done=complete(tx),sync=tx.objectStore('sync');
+   tx.objectStore('records').openCursor().onsuccess=e=>{
+    const cursor=e.target.result;if(!cursor)return;const row=cursor.value;
+    if(valid.has(row.course)){
+     const proof=tx.objectStore('replays').get(row.attempt);proof.onsuccess=()=>{if(!proof.result?.inputs)return;
+      const prior=sync.get([endpoint,row.attempt]);prior.onsuccess=()=>{if(!prior.result)sync.put({endpoint,attempt:row.attempt,course:row.course,state:'queued'});};
+     };
+    }cursor.continue();
+   };await done;
+  },
+  async pendingSync(endpoint){return request(db.transaction('sync').objectStore('sync').index('pending').getAll(IDBKeyRange.only([endpoint,'queued']),20));},
+  async syncResult(endpoint,attempt,value){const tx=db.transaction('sync','readwrite'),done=complete(tx),s=tx.objectStore('sync'),prior=await request(s.get([endpoint,attempt]));if(prior)s.put({...prior,...value});await done;},
+  async imported(replay,temporary){
+   const tx=db.transaction(['replays','chunks'],'readwrite'),done=complete(tx),s=tx.objectStore('replays'),header=await request(s.get(temporary)),previous=await request(s.get(replay.attempt));
+   if(!header?.draft||header.sequence+1!==replay.recordingChunks){tx.abort();await done;}
+   if(previous?.draft){tx.abort();await done;}
+   // Finish deleting the old stream before inserting its replacement. Two
+   // interleaved cursors could otherwise delete newly inserted chunks.
+   await new Promise((resolve,reject)=>{const req=tx.objectStore('chunks').index('attempt').openKeyCursor(IDBKeyRange.only(replay.attempt));req.onerror=()=>reject(req.error);req.onsuccess=()=>{const cursor=req.result;if(!cursor){resolve();return;}tx.objectStore('chunks').delete(cursor.primaryKey);cursor.continue();};});s.delete(temporary);
+   tx.objectStore('chunks').index('attempt').openCursor(IDBKeyRange.only(temporary)).onsuccess=e=>{const cursor=e.target.result;if(cursor){tx.objectStore('chunks').put({...cursor.value,attempt:replay.attempt});cursor.delete();cursor.continue();}};
+   s.put({...replay,...(previous?.inputs?{inputs:previous.inputs}:{})});await done;release(temporary);
+  },
   async replay(id){
    const tx=db.transaction(['replays','chunks']),replay=await request(tx.objectStore('replays').get(id));
    if(!replay||replay.draft)throw Error('This replay is not saved on this device');
@@ -116,14 +140,19 @@ export async function localStore(){
    const routes=await request(db.transaction('routes').objectStore('routes').getAllKeys());
    for(const id of routes)await navigator.locks.request(lockName('route:'+id),{ifAvailable:true},async lock=>{if(lock)await pruneRoute(id,true);});
   },
-  async save(replay){
+  async save(replay,{endpoint}={}){
    if(replay.score<=0||replay.breakdown.outcome==='forfeit')throw Error('A forfeited shot cannot be saved');
-   const tx=db.transaction(['records','replays'],'readwrite'),done=complete(tx);
+   const tx=db.transaction(['records','replays','sync'],'readwrite'),done=complete(tx);
    tx.objectStore('records').put({attempt:replay.attempt,course:courseKey(replay.challenge),challengeId:replay.challenge.id,score:replay.score,completed:replay.success,guest:replay.id,name:replay.playerName,duration:replay.duration,surfaces:replay.surfaces,accepted:replay.accepted,verified:false});
-   tx.objectStore('replays').put(replay);await done;release(replay.attempt);
+   tx.objectStore('replays').put(replay);
+   if(endpoint&&!replay.challenge.local)tx.objectStore('sync').put({endpoint,attempt:replay.attempt,course:courseKey(replay.challenge),state:'queued'});
+   await done;release(replay.attempt);
   },
   async retainCurrent(catalog){
-   const valid=new Set(catalog.map(courseKey)),tx=db.transaction(['records','replays','chunks'],'readwrite'),done=complete(tx),routes=new Set();
+   const valid=new Set(catalog.map(courseKey)),tx=db.transaction(['records','replays','chunks','sync','settings'],'readwrite'),done=complete(tx),routes=new Set();
+   tx.objectStore('settings').openCursor().onsuccess=e=>{const cursor=e.target.result;if(cursor){if(typeof cursor.key==='string'&&cursor.key.startsWith('online:')&&cursor.key.includes(':board:')&&cursor.value?.challenge&&!valid.has(courseKey(cursor.value.challenge)))cursor.delete();cursor.continue();}};
+   tx.objectStore('sync').openCursor().onsuccess=e=>{const cursor=e.target.result;if(cursor){if(!valid.has(cursor.value.course))cursor.delete();cursor.continue();}};
+   tx.objectStore('replays').openCursor().onsuccess=e=>{const cursor=e.target.result;if(cursor){if(cursor.value.remote&&!valid.has(courseKey(cursor.value.challenge))){deleteChunks(tx,cursor.key);cursor.delete();}cursor.continue();}};
    tx.objectStore('records').openCursor().onsuccess=e=>{const cursor=e.target.result;if(!cursor)return;if(!valid.has(cursor.value.course)){const read=tx.objectStore('replays').get(cursor.key);read.onsuccess=()=>{if(read.result?.inputs)routes.add(read.result.inputs.route);};tx.objectStore('replays').delete(cursor.key);deleteChunks(tx,cursor.key);cursor.delete();}cursor.continue();};await done;
    for(const id of routes)await pruneRoute(id);
   },

@@ -17,14 +17,16 @@ until the full migration passes; an HTML marker selects the browser transport.
 The browser owns walking, throwing, target collection, scoring, full settling,
 recall, Skip, course creation/revision, local progress and replays. Local leaderboards are labelled
 "On this device" and are unverified. Native credentials and scores remain
-separate. Independent online verification and course publishing are still required.
+separate. Online course publishing is still required.
 The [verification core](ON-DEMAND-VERIFICATION.md) independently reconstructs
 walking and shots from bounded controls against its own course catalog. All 30
 campaign routes pass it. The real game persists control histories alongside
 replays. The request-driven verifier now has authenticated control submission,
 Firestore checkpoints, independent result publication, standings and public
-replay seeds. Browser synchronization and online course publishing are not yet
-connected; the preview still shows local scores.
+replay seeds. Configuring `KYOTO_VERIFY_URL` for the browser preview enables a
+durable upload queue, independent online scores, cached standings and public
+replays. With no verifier configured, the preview continues entirely locally.
+Online course publishing remains unimplemented.
 Selecting a level closes the mobile panel, including First Bounce, whose tutorial
 does not open an automatic overview screen.
 
@@ -171,6 +173,16 @@ contacts, launch, thrower state, timing and scores matched exactly. The
 long tasks or skipped music steps and a 53.4 ms maximum audio scheduler gap.
 All 30 offline course selections passed at both desktop and mobile widths.
 
+After connecting the online verifier, the offline regression again passed all
+30 desktop/mobile course selections and independently reconstructed its saved
+shots. Its 1,752-frame flight averaged 60.00 FPS, with 16.8 ms p95 and maximum,
+no long tasks, no skipped music steps and a 58.7 ms maximum audio scheduler gap.
+The separate online UI check covers desktop/touch offline queueing, reconnect,
+reload, verified standings, exact replay-cache replacement, another player's
+replay and anonymous replay links. Captures and the acceptance receipt are in
+`.local/verification/browser/`. These checks do not deploy a verifier or claim
+physical-phone or universal frame-rate performance.
+
 The traversal fixtures cover 80 combinations of step height, speed, direction
 and station-scale coordinates, plus oblique approaches, consecutive risers,
 low ceilings, reversing away, steep slopes and airborne ledges. The station
@@ -204,8 +216,8 @@ under `.local/browser-physics/designer/`; fixed station cases are recorded in
 
 ## Remaining bounded tasks
 
-1. Connect the independently tested on-demand verifier to the browser UI and add
-   course publishing. Complete storage cleanup and request abuse bounds.
+1. Add online course publishing. Complete storage cleanup, public replay cache
+   limits and request abuse bounds.
    Package static hosting and verification without an always-on physics process
    or a fixed monthly compute subscription.
 2. Verify the complete integrated game, cross-browser replay behavior and broader

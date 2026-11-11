@@ -35,6 +35,7 @@
 .mobile-ui:not(.is-replay) #combo-hud .special-label,.mobile-ui:not(.is-replay) #special-track,.mobile-ui:not(.is-replay) #combo-trick,.mobile-ui:not(.is-replay) #combo-motion,.mobile-ui:not(.is-replay) .combo-landing{display:none}
 .mobile-ui:not(.is-replay) #combo-hud .combo-heading{font-size:6px;display:flex}.mobile-ui:not(.is-replay) #combo-hud .combo-heading b{display:none}.mobile-ui:not(.is-replay) #waypoint-card{margin-top:6px}.mobile-ui .waypoint-card-heading{font-size:7px}
 .mobile-ui:not(.is-replay) #result-leaderboard{position:fixed;left:auto;right:10px;top:122px;bottom:auto;width:166px;max-height:118px;margin:0;padding:8px;z-index:10}
+.mobile-ui:not(.is-replay) #result-leaderboard:has(#score-scope:not([hidden])){max-height:148px}
 .mobile-ui:not(.is-replay) #result-leaderboard .board-course,.mobile-ui:not(.is-replay) #result-leaderboard .share-level,.mobile-ui:not(.is-replay) .board-footnote{display:none}
 .mobile-ui:not(.is-replay) #result-leaderboard .board-heading{margin-bottom:6px;gap:4px}.mobile-ui:not(.is-replay) #result-leaderboard .eyebrow{font-size:7px;letter-spacing:.5px}.mobile-ui:not(.is-replay) #result-leaderboard #ranking-announcement{font-size:11px}
 .mobile-ui #result-leaderboard li,.mobile-ui #result-leaderboard [data-rank="1"],.mobile-ui #result-leaderboard [data-rank="2"],.mobile-ui #result-leaderboard [data-rank="3"]{min-height:38px;height:38px}

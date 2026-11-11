@@ -45,10 +45,44 @@ the bounded `inputChunks()` iterator expose saved controls after reload. These
 records remain untrusted until independently simulated. Design capture itself
 is not a ranked attempt; playing a saved custom course records controls normally.
 
-The authenticated HTTP service now verifies and stores campaign scores,
-standings, completion and public replay inputs. The game UI still uses its
-local leaderboard; submission/synchronization and online course publishing
-remain to be connected. No verifier has been deployed.
+The authenticated HTTP service verifies and stores campaign scores, standings,
+completion and public replay inputs. The browser now synchronizes saved campaign
+shots when a verifier is configured. Online course publishing is still pending.
+No verifier has been deployed.
+
+## Browser synchronization
+
+The static shell may set a `kyoto-verifier` meta tag to the HTTPS origin of the
+service. Local preview accepts `KYOTO_VERIFY_URL=http://127.0.0.1:4432` before
+`npm run dev:browser -- 4430`. Without this configuration, the game remains
+entirely local and sends no score-service requests. HTTP is accepted only for
+loopback development origins; credentials cannot appear in the configured URL.
+
+IndexedDB saves a banked shot and its outbox entry atomically. Merely finishing
+compute-ahead does not queue a result: the player must reach the displayed result
+without recalling. Uploads stream the saved control prefix, continue from the
+server's acknowledged chunk count and retry the same immutable attempt ID.
+Network failure cannot cancel gameplay, change the physics connection status or
+delete a local result. Reload retains the queue and the per-endpoint credential;
+browser locks serialize synchronization across tabs. Reconnection and bounded
+retry backoff resume pending work. Local custom courses stay local until their
+publishing flow is implemented.
+
+The scoreboard distinguishes **On this device** from **Online · Verified** and
+lets the player switch between them. Offline online-board caches say **Last
+sync**. Local progress remains available without a connection; online personal
+ranks come from authoritative storage. A locally displayed result is labelled
+verified only after acceptance, and a differing server score is shown explicitly.
+Retired course caches and queued records are discarded with the retired course.
+
+Public replay seeds are independently reconstructed by the existing browser
+physics worker, reusing its collision buffers and spatial index. Bounded replay
+batches are acknowledged only after IndexedDB storage. The reconstructed result
+must match the server's result before it is displayed. A temporary recording
+replaces an older cache transactionally; cancellation or failure leaves the
+existing saved replay intact. An accepted cache works offline and does not
+duplicate the collision asset. Direct replay links need no player registration
+or name prompt, and wait for the physics worker to finish loading.
 
 ## Request-driven service
 
@@ -123,6 +157,16 @@ HTTP API and SDK, and cleans up its test namespace and processes. It requires
 Java 21 or later and caches one emulator JAR in ignored `.local/verification/`.
 It refuses a non-local or non-demo database. CI runs this portable service test.
 
+`npm run test:browser:sync` exercises the browser outbox against the real local
+HTTP service and Firestore emulator without rendering the station.
+`npm run test:browser:online` uses the running browser preview on port 4430 and
+headless Chrome with the background-input guard. It covers desktop/touch throws,
+recall, offline queueing, reload, independent verification, stable identity,
+board switching, exact own-replay replacement, another player's replay and an
+anonymous share link. It injects test configuration through an initialization
+script: intercepting the main navigation would lose Chrome's loopback address
+classification and prevent cross-origin local API requests.
+
 `npm run test:verification:service -- --station` additionally submits all 30
 campaign solutions, restarts the HTTP service with a persisted mid-flight
 checkpoint for each, verifies full clears and compares independently replayed
@@ -131,11 +175,10 @@ pose/contact stream against a run reconstructed from checkpoints after every
 batch. These prove persistence across verifier process replacement against the
 local emulator; they do not claim managed-cloud durability or deployment.
 
-Before full migration acceptance, finish browser synchronization, course
-publishing, request/storage abuse bounds and abandoned-data cleanup, then static
-hosting and scale-to-zero deployment packaging. Per-course progress currently
-returns completion and best score; individual leaderboard requests supply rank.
-No compatibility archive or native score migration is planned.
+Before full migration acceptance, finish course publishing, request/storage
+abuse bounds and abandoned-data/cache cleanup, then static hosting and
+scale-to-zero deployment packaging. No compatibility archive or native score
+migration is planned.
 
 ## Hosting evidence, checked November 10, 2026
 

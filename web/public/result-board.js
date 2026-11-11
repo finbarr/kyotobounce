@@ -1,12 +1,18 @@
 // One persistent board during aiming, flight, menus and results. Rows are shots,
 // and ownership uses the stable guest ID, never a possibly duplicated name.
-export function resultBoard({local=false,host,watch,sound,getGuestId=()=>null,share=()=>{}}){
+export function resultBoard({local=false,host,watch,sound,getGuestId=()=>null,share=()=>{},changeScope=()=>{}}){
  const panel=document.createElement('section');panel.id='result-leaderboard';panel.hidden=true;panel.setAttribute('aria-label','Level scoreboard');
  panel.innerHTML='<div class="board-heading"><span class="eyebrow">LEVEL TOP 10 / ランキング</span><b class="board-course"></b><button class="share-level">Copy level link ↗</button><b id="ranking-announcement" role="status"></b></div><ol aria-label="Level high scores"></ol><p class="board-empty">NO SCORES YET. Put your name on the board.</p><div class="own-placement" hidden><p>YOUR SHOT</p><ol aria-label="Your placement"></ol></div><p class="board-footnote">Every in-bounds shot can rank · select a score to watch</p>';
- if(local){panel.querySelector('.eyebrow').textContent='ON THIS DEVICE · TOP 10';panel.querySelector('.share-level').hidden=true;}
+ const toggle=document.createElement('button');toggle.id='score-scope';toggle.type='button';toggle.hidden=true;panel.querySelector('.board-heading').append(toggle);
  host.append(panel);
  const list=panel.querySelector('ol'),announcement=panel.querySelector('[role=status]'),placement=panel.querySelector('.own-placement'),ownList=placement.querySelector('ol'),empty=panel.querySelector('.board-empty'),title=panel.querySelector('.board-course'),shareButton=panel.querySelector('.share-level');
- let timers=[],animations=[],generation=0,current=null,pending=null,revealing=false,lastShot=null;
+ let timers=[],animations=[],generation=0,current=null,pending=null,revealing=false,lastShot=null,modeLocal=local,modeCached=false,available=false;
+ function source({local=modeLocal,cached=modeCached,onlineAvailable=available}={}){
+  if(local!==modeLocal){cancelAnimation();lastShot=null;}modeLocal=local;modeCached=cached;available=onlineAvailable;
+  panel.dataset.source=local?'local':'online';panel.querySelector('.eyebrow').textContent=local?'ON THIS DEVICE · TOP 10':cached?'ONLINE TOP 10 · LAST SYNC':'ONLINE · VERIFIED TOP 10';
+  shareButton.hidden=local;toggle.hidden=!available;toggle.textContent=local?'Show online scores':'Show this device';
+ }
+ toggle.onclick=()=>changeScope(modeLocal?'online':'local',current?.challenge.id);source();
  shareButton.onclick=()=>{if(current)share(current.challenge.id,shareButton);};
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
  function cancelAnimation(){generation++;timers.forEach(clearTimeout);timers=[];animations.forEach(a=>a.cancel());animations=[];revealing=false;pending=null;}
@@ -25,7 +31,8 @@ export function resultBoard({local=false,host,watch,sound,getGuestId=()=>null,sh
   placement.hidden=!entry;if(!entry)return;
   placement.querySelector('p').textContent=entry===lastShot?'YOUR SHOT':'YOUR BEST';ownList.start=entry.rank;ownList.append(row(entry,entry.rank));
  }
- function update(challenge,entries=[],personal=null){
+ function update(challenge,entries=[],personal=null,options={}){
+  source(options);
   if(!challenge){clear();return;}
   const changed=current?.challenge.id!==challenge.id||current?.challenge.revision!==challenge.revision;
   if(revealing&&!changed){pending={challenge,entries,personal};return;}
@@ -35,6 +42,7 @@ export function resultBoard({local=false,host,watch,sound,getGuestId=()=>null,sh
  function reset(){lastShot=null;if(current)update(current.challenge,current.entries,current.personal);}
  function show(result){
   const standings=result.standings;if(!standings||!result.challenge)return;
+  source({local:!!result.local});
   const {before,after,rank}=standings;cancelAnimation();revealing=true;
   current={challenge:result.challenge,entries:after,personal:current?.personal||null};
   lastShot=rank?{attempt:result.attempt,guest:getGuestId(),name:result.playerName||'You',score:result.score,rank}:null;

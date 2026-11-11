@@ -35,7 +35,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
  closeLevels.onclick=()=>{showLevels(false);resume();};
  document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement)showLevels(false);});
  for(const id of ['show-overview','use-hint'])$(id).addEventListener('click',()=>showLevels(false));
- const ranking=resultBoard({local,host:document.body,watch:openReplay,sound,getGuestId,share:copyLevel});
+ const ranking=resultBoard({local,host:document.body,watch:openReplay,sound,getGuestId,share:copyLevel,changeScope:(scope,challengeId)=>send('score-scope',{scope,challengeId})});
  // A single layout owns replay panels; the game restores these shared widgets on exit.
  const replayView=document.createElement('section');replayView.id='replay-view';replayView.hidden=true;
  replayView.innerHTML=`<div id="replay-stage" aria-label="Replay scene"></div>
@@ -168,7 +168,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
    status.className='course-status';completion.className='course-completion';rank.className='course-rank';
    completion.dataset.completed=String(!!progress?.completed);rank.dataset.first=String(progress?.rank===1);
    completion.textContent=progress?(progress.completed?'✓ COMPLETED':'○ NOT COMPLETED'):'CHECKING…';
-   rank.textContent=progress?(progress.rank?`${progress.rank===1?'★ ':''}RANK #${progress.rank.toLocaleString()}`:'NO SCORE'):'RANK —';
+   rank.textContent=progress?(progress.rank?`${progress.rank===1?'★ ':''}${progress.local?'LOCAL':'RANK'} #${progress.rank.toLocaleString()}`:progress.bestScore?'SAVED LOCALLY':'NO SCORE'):'RANK —';
    status.append(completion,rank);copy.append(status);
    button.setAttribute('aria-label',`${c.name}. ${progress?(progress.completed?'Completed':'Not completed'):'Checking completion'}. ${progress?.rank?`Your rank: ${progress.rank}`:progress?'No score yet':'Checking rank'}.`);
    if(progress?.bestScore)button.title=`Your best: ${progress.bestScore.toLocaleString()} points`;
@@ -177,7 +177,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   if(!ordered.length){const p=document.createElement('p');p.textContent='Explore the station freely. Walk with WASD, hold Space to throw, and press R to recall. Use Create to turn a new trick shot into a level.';list.append(p);}
   if(focusedId){const i=[...list.children].findIndex(b=>b.dataset.challenge===focusedId);if(i>=0)focusLevel(i);}
  }
- function renderBoard(){if(state.mode==='play')ranking.update(state.selected,state.board,state.personal);}
+ function renderBoard(){if(state.mode==='play')ranking.update(state.selected,state.board,state.personal,{local:state.boardLocal??local,cached:state.boardCached,onlineAvailable:state.onlineAvailable});}
  $('share-challenge').onclick=()=>{if(state.selected)copyLevel(state.selected.id,$('share-challenge'));};
  function startDesign(start=null){
   if(designRequest||designSaving)return;
@@ -229,7 +229,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   $('replay-title').textContent=replay.challenge.name;$('replay-score').textContent=`${replay.playerName||'Player'} · ${replay.score.toLocaleString()} PTS FINAL`;document.title=`${replay.playerName||'Player'} · ${replay.score.toLocaleString()} PTS — Kyoto Bounce`;
   for(const id of replayControls)$(id).disabled=false;
   $('play-replay-level').href=levelURL(replay.challenge.id);ranking.clear();$('replay-view').dataset.attempt=replay.attempt;
-  $('replay-scrub').min=String(replayStart());$('replay-scrub').max=String(replay.duration);$('replay-scrub').value=String(state.replayTime);$('replay-play').textContent='Pause';drawDisks(replay.challenge);ranking.update(replay.challenge,replay.standings?.after||[]);getLevel(replay.challenge.id).then(board=>{if(state.replay===replay&&state.mode==='replay')ranking.update(board.challenge,board.entries);}).catch(()=>{});presentation();resetView();
+  $('replay-scrub').min=String(replayStart());$('replay-scrub').max=String(replay.duration);$('replay-scrub').value=String(state.replayTime);$('replay-play').textContent='Pause';drawDisks(replay.challenge);ranking.update(replay.challenge,replay.standings?.after||[],null,{local:!!replay.local});getLevel(replay.challenge.id).then(board=>{if(state.replay===replay&&state.mode==='replay')ranking.update(board.challenge,board.entries,board.personal,board);}).catch(()=>{});presentation();resetView();
  }
  if(sharedReplay)presentation();
  $('close-replay').onclick=()=>{replayRequest++;if(sharedReplay){location.href=$('play-replay-level').href;return;}history.replaceState(null,'',state.selected?levelURL(state.selected.id):'/');document.title=state.selected?`${state.selected.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';feedback.reset();setMode('play');state.replay=null;state.replayPlaying=false;renderBoard();drawDisks(state.selected);presentation();resetView('level');if(completed()){$('result-card').hidden=false;updateCompletionAction();}};
@@ -285,7 +285,15 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
    }
    if(m.type==='saved-challenge'){designSaving=false;clearDesign();renderEditor();setMode('play');presentation();send('select-challenge',{challengeId:m.challenge.id,revision:m.challenge.revision});notice(m.challenge.local?'Level saved on this device.':'Level saved. Copy its level link to share it.');}
    if(m.type==='selected'){history.replaceState(null,'',m.challenge?levelURL(m.challenge.id):'/');document.title=m.challenge?`${m.challenge.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';replayRequest++;$('result-card').hidden=true;resetView('level');if(m.challenge&&state.mode==='play')overview(state.selected||m.challenge,{automatic:true});}
-   if(m.type==='leaderboard'){if(state.selected?.id===m.challenge.id&&state.selected.revision===m.challenge.revision){state.board=m.entries;state.personal=m.personal||null;renderBoard();}}
+   if(m.type==='leaderboard'){
+    if(state.selected?.id===m.challenge.id&&state.selected.revision===m.challenge.revision){state.board=m.entries;state.personal=m.personal||null;state.boardLocal=!!m.local;state.boardCached=!!m.cached;state.onlineAvailable=!!m.onlineAvailable;renderBoard();}
+    if(state.mode==='replay'&&state.replay?.challenge.id===m.challenge.id&&state.replay.challenge.revision===m.challenge.revision)ranking.update(m.challenge,m.entries,m.personal,m);
+   }
+   if(m.type==='score-sync'&&state.lastResult?.attempt===m.attempt){
+    const result=state.lastResult;result.verification=m.state;
+    if(m.state==='verified'){$('result-tip').textContent=m.result.score===result.score?'SCORE VERIFIED ONLINE · R · TRY AGAIN':`ONLINE VERIFIED: ${m.result.score.toLocaleString()} PTS · The local result differs.`;$('share-result').hidden=false;}
+    else if(m.state==='failed')$('result-tip').textContent='SAVED ON THIS DEVICE · This shot could not be verified online.';
+   }
    if(m.type==='replay'){loadReplay(m.replay);}
    if(m.type==='result'){
     if(state.mode==='design'||m.design){

@@ -41,7 +41,9 @@
     "test:verification": "node web/tests/verification-station.mjs && node web/tests/verification-browser.mjs",
     "test:browser:inputs": "node web/tests/browser-input-store.mjs && node web/tests/verification-browser.mjs",
     "dev:verification": "node web/online-server.mjs",
-    "test:verification:service": "node web/tests/firestore-emulator.mjs"
+    "test:verification:service": "node web/tests/firestore-emulator.mjs",
+    "test:browser:online": "npm run build:physics && node web/tests/firestore-emulator.mjs --browser",
+    "test:browser:sync": "node web/tests/firestore-emulator.mjs --browser-sync"
   },
   "dependencies": {
     "@google-cloud/firestore": "9.4.1",

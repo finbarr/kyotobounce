@@ -42,6 +42,7 @@
 #result-leaderboard .board-course{font:800 15px/1.15 system-ui;color:#f8eed6;min-height:0;overflow-wrap:anywhere;letter-spacing:0}
 #result-leaderboard #ranking-announcement{font-size:19px;min-height:0}
 #result-leaderboard .share-level{justify-self:start;font-size:9px;padding:5px 7px;color:#acfff0;border-color:#86e7d555}
+#score-scope{justify-self:start;font-size:9px;padding:5px 7px;min-height:24px}
 #result-leaderboard li{height:27px}
 #result-leaderboard [data-rank="1"],#result-leaderboard [data-rank="2"],#result-leaderboard [data-rank="3"]{height:33px}
 #result-leaderboard li.own-score>button{background:linear-gradient(105deg,#174d52,#203d58);color:#dbfff8;border-color:#81ead3;outline:0;box-shadow:inset 3px 0 #81ead3}
