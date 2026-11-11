@@ -5,7 +5,7 @@ export function verificationEndpoint(value){
  if(url.username||url.password||url.search||url.hash||url.pathname!=='/'||url.protocol!=='https:'&&!(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname)))throw Error('Invalid score service URL');
  return url.origin;
 }
-export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,changed,status,fetchImpl=fetch}){
+export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,changed,status,synchronize,fetchImpl=fetch}){
  let stopped=false,timer,running=false,again=false,delay=1000,token,registeredName,connected=false;
  const controllers=new Set(),refreshes=new Map(),key=name=>'online:'+endpoint+':'+name;
  const state=(phase,message,detail)=>{
@@ -33,6 +33,7 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
  async function progress(){const cached=await store.setting(key('progress'));return (cached?.entries||[]).filter(p=>{const c=getCatalog().find(c=>c.id===p.challengeId&&c.revision===p.revision);return c&&cached.courses?.includes(courseKey(c));});}
  async function refresh(c=getSelected()){
   if(stopped||!c||c.local)return;
+  const current=getCatalog().find(course=>course.id===c.id);if(current&&courseKey(current)!==courseKey(c))return;
   const id=courseKey(c);if(refreshes.has(id))return refreshes.get(id);
   const pending=(async()=>{
    try{
@@ -44,17 +45,21 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
    finally{refreshes.delete(id);}
   })();refreshes.set(id,pending);return pending;
  }
- async function submit(item){
-  const proof=await store.inputProof(item.attempt),path='/v1/attempts/'+item.attempt;
-  let job=await api(path,{method:'POST',body:{header:proof.header}});
+ async function verify(job,proofAttempt){
+  const path='/v1/attempts/'+job.attempt;
   if(job.state==='uploading'){
-   for await(const chunk of store.inputChunks(item.attempt,job.uploadedChunks))await api(path+'/inputs/'+chunk.sequence,{method:'PUT',body:{runs:chunk.runs}});
+   for await(const chunk of store.inputChunks(proofAttempt,job.uploadedChunks))await api(path+'/inputs/'+chunk.sequence,{method:'PUT',body:{runs:chunk.runs}});
    job=await api(path+'/seal',{method:'POST',body:{}});
   }
   while(['pending','verifying'].includes(job.state)&&!stopped){
    state('verifying');job=await api(path+'/advance',{method:'POST',body:{}});
    if(job.state==='verifying')await new Promise(resolve=>setTimeout(resolve,1000));
   }
+  return job;
+ }
+ async function submit(item){
+  const proof=await store.inputProof(item.attempt),path='/v1/attempts/'+item.attempt;
+  const job=await verify(await api(path,{method:'POST',body:{header:proof.header}}),item.attempt);
   if(stopped)return;
   if(!['verified','forfeited','failed','cancelled'].includes(job.state))throw Error('Unknown verification response');
   await store.syncResult(endpoint,item.attempt,{state:job.state,...(job.result?{result:job.result}:{}),message:job.message||''});
@@ -66,8 +71,9 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
   try{
    await navigator.locks.request(key('sync'),{ifAvailable:true},async lock=>{
     if(!lock){again=true;return;}if(navigator.onLine===false){state('offline','Saved locally. Waiting for a connection.');return;}
+    if(synchronize){await synchronize();if(stopped)return;state('connected');}
     if(!await identity())return;
-    await store.queueSaved(endpoint,getCatalog());await refresh();if(!connected)throw Error('Score service unavailable');
+    await store.queueSaved(endpoint,getCatalog());await refresh(getCatalog().find(c=>c.id===getSelected()?.id)||getSelected());if(!connected)throw Error('Score service unavailable');
     while(!stopped){
      const pending=await store.pendingSync(endpoint);if(!pending.length)break;
      for(const item of pending){
@@ -86,5 +92,5 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
  const wake=()=>{delay=1000;pump();},visible=()=>{if(document.visibilityState==='visible')wake();};
  const offline=()=>state('offline','Saved locally. Waiting for a connection.');
  globalThis.addEventListener('online',wake);globalThis.addEventListener('offline',offline);document.addEventListener('visibilitychange',visible);
- return {endpoint,board,progress,refresh,wake,api,get connected(){return connected;},stop(){stopped=true;clearTimeout(timer);for(const c of controllers)c.abort();globalThis.removeEventListener('online',wake);globalThis.removeEventListener('offline',offline);document.removeEventListener('visibilitychange',visible);}};
+ return {endpoint,board,progress,refresh,wake,api,identity,verify,get stopped(){return stopped;},get connected(){return connected;},stop(){stopped=true;clearTimeout(timer);for(const c of controllers)c.abort();globalThis.removeEventListener('online',wake);globalThis.removeEventListener('offline',offline);document.removeEventListener('visibilitychange',visible);}};
 }

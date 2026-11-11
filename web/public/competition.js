@@ -20,6 +20,10 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
 
  <div id="result-card" hidden><span class="eyebrow" id="result-label"></span><div class="result-rank" id="result-rank"></div><h2 id="result-title"></h2><p id="result-breakdown"></p><div id="result-math"></div><p class="result-tip" id="result-tip"></p><div class="actions"><button id="try-result">Try again <kbd>R</kbd></button><button id="watch-result">Watch replay</button><button id="share-result">Copy replay link ↗</button><button id="next-challenge">Next level <kbd>SPACE / N</kbd> →</button></div></div>`;document.body.append(host);
  const completionAction=document.createElement('div');completionAction.id='result-next';$('result-label').after(completionAction);completionAction.append($('next-challenge'));
+ const publishButton=document.createElement('button');publishButton.id='publish-challenge';publishButton.hidden=true;$('share-challenge').before(publishButton);
+ const publicationStatus=document.createElement('p');publicationStatus.id='publication-status';publicationStatus.setAttribute('role','status');publicationStatus.hidden=true;$('challenge-detail').querySelector('.actions').after(publicationStatus);
+ const publishResult=document.createElement('button');publishResult.id='publish-result';publishResult.hidden=true;$('result-card').querySelector('.actions').append(publishResult);
+ const refreshCourses=document.createElement('button');refreshCourses.id='refresh-courses';refreshCourses.textContent='Refresh shared levels';refreshCourses.hidden=true;$('course-list').after(refreshCourses);refreshCourses.onclick=()=>send('refresh-courses');
  const results=document.createElement('div');results.id='results-screen';document.body.append(results);results.append($('result-card'));
  const levelsButton=document.createElement('button');levelsButton.id='toggle-levels';levelsButton.type='button';levelsButton.innerHTML='LEVELS <kbd>L</kbd>';levelsButton.setAttribute('aria-keyshortcuts','L');levelsButton.setAttribute('aria-controls','competition');levelsButton.setAttribute('aria-expanded','false');document.querySelector('.session').prepend(levelsButton);
  const closeLevels=document.createElement('button');closeLevels.id='close-levels';closeLevels.type='button';closeLevels.textContent='×';closeLevels.setAttribute('aria-label','Close levels');$('course-view').querySelector('.panel-top').append(closeLevels);
@@ -47,7 +51,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
  const replayControls=['replay-play','replay-restart','replay-scrub','replay-recenter','replay-free','share-replay'];
  function replayTimeLabel(){const duration=state.replay?.duration||0,t=Math.max(0,Math.min(duration,state.replayTime));const clock=t=>{t=Math.round(t*10)/10;return `${Math.floor(t/60)}:${(t%60).toFixed(1).padStart(4,'0')}`;},label=`${clock(t)} / ${clock(duration)}`;if($('replay-time').textContent!==label){$('replay-time').textContent=label;$('replay-scrub').setAttribute('aria-valuetext',`${t.toFixed(1)} of ${duration.toFixed(1)} seconds`);}}
  const classicScoreGuide=$('score-guide').innerHTML;
- const state={chapter:null,mode:'play',session:null,challenges:[],progress:new Map(),selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v4'},selectedWaypoint:null,editId:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
+ const state={chapter:null,mode:'play',session:null,challenges:[],progress:new Map(),publications:new Map(),onlineConfigured:false,onlinePhase:'disabled',selected:null,board:[],personal:null,draft:{start:null,goal:null,waypoints:[],scoring:'waypoint-v4'},selectedWaypoint:null,editId:null,replay:null,replayTime:0,replayPlaying:false,lastResult:null,hint:null};
  const designPath=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x5fffe3,transparent:true,opacity:.8,depthWrite:false}));scene.add(designPath);designPath.visible=false;
  let capturedDesign=null,designRequest=null,designSaving=false,designNotice='';
  function setMode(mode){showLevels(false);state.mode=mode;onModeChange(mode);}
@@ -107,7 +111,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
  }
  function updateSession(){
   const session=state.session;if(!session)return;if(session.busy)$('result-card').hidden=true;
-  $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?(local?'READY TO THROW · SAVED ON THIS DEVICE':'READY TO THROW · SHARED SCORES'):'FREE EXPLORATION · WALK, AIM AND THROW';
+  $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?(local&&(!state.onlineConfigured||session.challenge.local)?'READY TO THROW · SAVED ON THIS DEVICE':'READY TO THROW · SHARED SCORES'):'FREE EXPLORATION · WALK, AIM AND THROW';
   const changed=state.selected?.id!==session.challenge?.id||state.selected?.revision!==session.challenge?.revision;
   state.selected=session.challenge;
   if(changed){state.lastResult=null;showLevels(false);state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
@@ -120,8 +124,20 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   if(state.selected?.scoring==='waypoint-v4')$('score-guide').innerHTML='<summary>HOW TO SCORE</summary><p>10,000 base × (waypoint multiplier + bank bonus). The first waypoint raises the waypoint multiplier to ×10. Each later unique waypoint doubles it: ×20, ×40, ×80… Each distinct bank adds +0.5× separately. Waypoints never double the bank bonus. Movement adds a flat 100 points per second after multipliers.</p><p>The gold destination is an optional landing bonus equal to your target score (10,000 × combo if no waypoints). Every shot that settles inside the station enters the leaderboard, even with zero targets (×1 base). Collect every waypoint to clear the course; destination-only courses need a landing to clear. Score locks at full rest; recall and leaving the station forfeit.</p>';
   else $('score-guide').innerHTML=classicScoreGuide;
   $('show-overview').disabled=session.busy||session.restoring;
-  renderCatalog();
+  renderCatalog();renderPublication();
  }
+ function renderPublication(){
+  const c=state.selected,info=c&&state.publications.get(c.id),own=!!c&&!c.campaign&&c.creator===getGuestId(),published=!!c&&(!c.local||!!info?.published),available=local&&state.onlineConfigured&&own,pending=info?.state==='queued';
+  if(c&&!state.session?.busy&&state.challenges.some(next=>next.id===c.id&&next.revision!==c.revision))setText($('turn-status'),'NEW REVISION AVAILABLE · CHOOSE THIS LEVEL AGAIN');
+  refreshCourses.hidden=!local||!state.onlineConfigured;
+  publishButton.hidden=!available||published;publishResult.hidden=publishButton.hidden||state.lastResult?.challenge?.id!==c?.id;
+  for(const button of [publishButton,publishResult]){button.textContent=pending?'Publishing…':'Publish level';button.disabled=pending||!info?.proofAttempt||!!state.session?.busy;}
+  publicationStatus.hidden=!available;
+  publicationStatus.textContent=published?'Published · copy its level link to share it.':pending?(state.onlinePhase==='offline'?'Publication queued on this device. Reconnect to finish.':info.message||'Verifying your solution…'):info?.state==='failed'?`Publication failed: ${info.message||'Play a complete solution and retry.'}`:info?.proofAttempt?'Complete solution saved. Publish this level for everyone to play.':'Clear every waypoint and finish zone to publish. Your course stays saved on this device.';
+  if(c)$('share-challenge').hidden=!published;
+  if(pending)$('edit-challenge').disabled=true;else if(!designSaving&&!designRequest)$('edit-challenge').disabled=false;
+ }
+ publishButton.onclick=publishResult.onclick=()=>{if(state.selected)send('publish-course',{challengeId:state.selected.id});};
  $('campaign-chapter').onchange=()=>{state.chapter=$('campaign-chapter').value;renderCatalog();};
  function chooseLevel(c){
   if(selectingLevel||state.session?.restoring||['Release','Flight'].includes(getPhase()))return;
@@ -147,7 +163,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   const ordered=[...state.challenges].sort((a,b)=>(a.order??999)-(b.order??999));
   const chapters=new Map(ordered.filter(c=>c.campaign).map(c=>[String(c.campaign.chapter),c.campaign.chapterTitle]));
   const campaignCount=ordered.filter(c=>c.campaign).length;
-  if(ordered.some(c=>!c.campaign))chapters.set('community',local?'Your levels on this device':'Player-created courses');
+  if(ordered.some(c=>!c.campaign))chapters.set('community',local&&!state.onlineConfigured?'Your levels on this device':'Player-created courses');
   $('campaign-picker').hidden=!campaignCount;
   $('campaign-count').textContent=`${campaignCount} STAGES · ${[...chapters.keys()].filter(k=>k!=='community').length} CHAPTERS`;
   if(!chapters.has(state.chapter))state.chapter=chapters.keys().next().value;
@@ -163,6 +179,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
    button.setAttribute('aria-pressed',String(state.selected?.id===c.id));
    const copy=document.createElement('span'),name=document.createElement('strong');copy.className='course-copy';name.textContent=c.name;copy.append(name);
    if(c.campaign){const meta=document.createElement('small');meta.textContent=`${c.campaign.difficulty} · ${c.campaign.distance} m through waypoints`;copy.append(meta);}
+   else{const meta=document.createElement('small');meta.textContent=c.local?'Saved on this device':c.creator===getGuestId()?'Your published level':'Shared level';copy.append(meta);}
    const saved=state.progress.get(c.id),progress=saved?.revision===c.revision?saved:null;
    const status=document.createElement('span'),completion=document.createElement('span'),rank=document.createElement('span');
    status.className='course-status';completion.className='course-completion';rank.className='course-rank';
@@ -266,12 +283,14 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   scorePresentation(){return {score:state.mode==='replay'?scoreAt(state.replay?.scoreFrames,state.replayTime):liveScore,challenge:state.mode==='replay'?state.replay?.challenge:state.selected,attempt:state.mode==='replay'?state.replay?.attempt:scoreAttempt,time:state.mode==='replay'?state.replayTime:getLiveTime(),mode:state.mode,epoch:scoreEpoch};},
   dismissResult(){state.lastResult=null;$('result-card').hidden=true;ranking.reset();feedback.reset();liveScore=null;scoreEpoch++;},
   message(m){
-   if(m.type==='selected'||m.type==='error'){nextRequested=false;selectingLevel=false;renderCatalog();}
+   if(m.type==='online-status'){const changed=state.onlineConfigured!==!!m.configured;state.onlineConfigured=!!m.configured;state.onlinePhase=m.phase;if(changed){updateSession();renderCatalog();}renderPublication();}
+   if(m.type==='course-publication'){const previous=state.publications.get(m.courseId);state.publications.set(m.courseId,{...(m.revision!==undefined&&m.revision!==previous?.revision?{}:previous),...m});renderPublication();}
+   if(m.type==='selected'||m.type==='error'||m.selectionDeferred){nextRequested=false;selectingLevel=false;renderCatalog();}
    if(m.type==='state'&&state.mode!=='replay'){if(m.liveScore){liveScore=m.liveScore;scoreAttempt=m.attempt;feedback.accept(m.liveScore,m.attempt,state.selected);}if(['Aim','Charging'].includes(m.phase)){feedback.reset();liveScore=null;}}
    if(m.type==='worker-status'&&m.status!=='ready'){feedback.reset();liveScore=null;scoreEpoch++;if(['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='Recording interrupted. Throw another design ball after reconnecting.';renderEditor();}}
    if(m.type==='welcome'&&!m.resumed&&['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='The recording session ended. Throw a new design ball before saving.';renderEditor();}
    if(m.type==='session'){state.session=m;if(m.designing&&state.mode==='play')setMode('design');updateSession();}
-   if(m.type==='catalog'){state.challenges=m.challenges;renderCatalog();if(!sharedReplay)send('course-progress');}
+   if(m.type==='catalog'){state.challenges=m.challenges;renderCatalog();renderPublication();if(!sharedReplay)send('course-progress');}
    if(m.type==='course-progress'){
     if(m.full)state.progress.clear();
     for(const entry of m.entries)state.progress.set(entry.challengeId,entry);
@@ -330,6 +349,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
      $('result-tip').textContent=m.success?'Your score is on the Level 1 board. Retry to climb the rankings, or choose another level.':'Touch the purple patch to clear. Retry with R, then H for suggested aim. On touch, tap Try again and Use suggested aim.';
     }
     $('watch-result').hidden=!m.saved;$('share-result').hidden=!m.saved||m.local;ranking.show(m);updateCompletionAction();
+    renderPublication();
     if(!feedback.clearing)sound.cue('result',rank);
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches){const began=performance.now(),attempt=m.attempt;function count(now){if(state.lastResult?.attempt!==attempt)return;const t=Math.min(1,(now-began)/800);$('result-title').textContent=`${Math.round(m.score*(1-(1-t)**3)).toLocaleString()} PTS`;if(t<1)requestAnimationFrame(count);}requestAnimationFrame(count);}
 

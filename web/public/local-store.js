@@ -5,7 +5,7 @@ export const courseKey=c=>[c.layout,c.physics,c.scoring,c.id,c.revision].join(':
 const request=req=>new Promise((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
 const complete=tx=>new Promise((resolve,reject)=>{tx.oncomplete=resolve;tx.onabort=tx.onerror=()=>reject(tx.error||Error('Local save failed'));});
 export async function localStore(){
- const opening=indexedDB.open('kyoto-browser',4);
+ const opening=indexedDB.open('kyoto-browser',5);
  opening.onupgradeneeded=()=>{
   const db=opening.result;
   if(!db.objectStoreNames.contains('settings')){
@@ -19,6 +19,7 @@ export async function localStore(){
   if(!db.objectStoreNames.contains('routes'))db.createObjectStore('routes',{keyPath:'id'});
   if(!db.objectStoreNames.contains('inputs'))db.createObjectStore('inputs',{keyPath:['route','sequence']}).createIndex('route','route');
   if(!db.objectStoreNames.contains('sync'))db.createObjectStore('sync',{keyPath:['endpoint','attempt']}).createIndex('pending',['endpoint','state']);
+  if(!db.objectStoreNames.contains('publications')){const s=db.createObjectStore('publications',{keyPath:['endpoint','courseId']});s.createIndex('pending',['endpoint','state']);s.createIndex('courseId','courseId');}
  };
  const db=await new Promise((resolve,reject)=>{
   let blocked=false;
@@ -81,8 +82,45 @@ export async function localStore(){
    const valid=all.filter(c=>c.layout===current.layout&&c.physics===current.physics&&c.scoring===current.scoring);store.put(valid,'courses');await done;return valid;
   },
   async saveCourse(course){
-   const tx=db.transaction('settings','readwrite'),done=complete(tx),store=tx.objectStore('settings'),all=await request(store.get('courses'))||[];
+   const tx=db.transaction(['settings','publications'],'readwrite'),done=complete(tx),store=tx.objectStore('settings'),all=await request(store.get('courses'))||[];
+   const jobs=await request(tx.objectStore('publications').index('courseId').getAll(course.id));
+   if(jobs.some(p=>p.state==='queued')){await done;throw Error('Wait for this course to finish publishing before revising it.');}
    const next=all.filter(c=>c.id!==course.id);next.push(course);store.put(next,'courses');await done;return next;
+  },
+  async publicCourses(endpoint,current){const rows=await request(db.transaction('settings').objectStore('settings').get('online:'+endpoint+':catalog'))||[];return rows.filter(c=>c.layout===current.layout&&c.physics===current.physics&&c.scoring===current.scoring);},
+  async cacheCourses(endpoint,courses,replace=false){
+   const tx=db.transaction('settings','readwrite'),done=complete(tx),s=tx.objectStore('settings'),key='online:'+endpoint+':catalog',prior=replace?[]:await request(s.get(key))||[],map=new Map(prior.map(c=>[c.id,c]));
+   for(const c of courses)map.set(c.id,c);s.put([...map.values()],key);await done;
+  },
+  async publicationInfo(endpoint,c,owner){
+   const tx=db.transaction(['publications','records','replays']),done=complete(tx),job=await request(tx.objectStore('publications').get([endpoint,c.id]));let proofAttempt=null;
+   if(c.local&&c.creator===owner){
+    const records=await request(tx.objectStore('records').index('course').getAll(courseKey(c)));
+    for(const r of records.filter(r=>r.completed).sort((a,b)=>b.accepted-a.accepted)){
+     const replay=await request(tx.objectStore('replays').get(r.attempt));
+     if(replay?.inputs&&!replay.draft&&replay.success&&(!c.goal||replay.destinationReached)&&c.waypoints.every(w=>replay.waypointHits?.some(hit=>hit.waypointId===w.id))){proofAttempt=r.attempt;break;}
+    }
+   }await done;return {courseId:c.id,revision:c.revision,proofAttempt,...(job?.draftKey===courseKey(c)?{state:job.state,message:job.message}:{}),published:!c.local||job?.state==='published'&&job.draftKey===courseKey(c)};
+  },
+  async queuePublication(endpoint,c,owner,baseRevision,proofAttempt){
+   const tx=db.transaction(['publications','settings','replays'],'readwrite'),done=complete(tx),jobs=tx.objectStore('publications'),prior=await request(jobs.get([endpoint,c.id]));
+   if(prior?.state==='queued'){await done;return prior;}
+   const current=(await request(tx.objectStore('settings').get('courses'))||[]).find(d=>d.id===c.id),replay=await request(tx.objectStore('replays').get(proofAttempt));
+   if(!current?.local||current.creator!==owner||courseKey(current)!==courseKey(c)||!replay?.inputs||replay.draft||courseKey(replay.challenge)!==courseKey(c)||!replay.success||(c.goal&&!replay.destinationReached)||!c.waypoints.every(w=>replay.waypointHits?.some(hit=>hit.waypointId===w.id))){await done;throw Error('Clear every waypoint and finish zone, then publish this saved course.');}
+   const course=Object.fromEntries(['id','revision','name','layout','physics','scoring','throwModel','start','goal','waypoints'].map(k=>[k,current[k]]));course.revision=baseRevision+1;
+   const job={endpoint,courseId:c.id,job:crypto.randomUUID(),proofAttempt,draftKey:courseKey(c),course,baseRevision,header:{...replay.inputs.header,revision:course.revision},state:'queued'};
+   jobs.put(job);await done;return job;
+  },
+  async pendingPublications(endpoint){return request(db.transaction('publications').objectStore('publications').index('pending').getAll(IDBKeyRange.only([endpoint,'queued']),20));},
+  async publicationResult(item,value){
+   const tx=db.transaction(['publications','settings'],'readwrite'),done=complete(tx),jobs=tx.objectStore('publications'),prior=await request(jobs.get([item.endpoint,item.courseId]));
+   if(prior?.job!==item.job){await done;return;}
+   jobs.put({...prior,...value});
+   if(value.state==='published'){
+    const settings=tx.objectStore('settings'),key='online:'+item.endpoint+':catalog',remote=await request(settings.get(key))||[],local=await request(settings.get('courses'))||[];
+    settings.put([...remote.filter(c=>c.id!==item.courseId),value.course],key);
+    settings.put(local.filter(c=>c.id!==item.courseId||courseKey(c)!==item.draftKey),'courses');
+   }await done;
   },
   async setting(key,value){const tx=db.transaction('settings',value===undefined?'readonly':'readwrite'),store=tx.objectStore('settings'),done=complete(tx);const result=await request(value===undefined?store.get(key):store.put(value,key));await done;return result;},
   async records(c){return request(db.transaction('records').objectStore('records').index('course').getAll(courseKey(c)));},
@@ -149,7 +187,8 @@ export async function localStore(){
    await done;release(replay.attempt);
   },
   async retainCurrent(catalog){
-   const valid=new Set(catalog.map(courseKey)),tx=db.transaction(['records','replays','chunks','sync','settings'],'readwrite'),done=complete(tx),routes=new Set();
+   const valid=new Set(catalog.map(courseKey)),tx=db.transaction(['records','replays','chunks','sync','settings','publications'],'readwrite'),done=complete(tx),routes=new Set();
+   tx.objectStore('publications').openCursor().onsuccess=e=>{const cursor=e.target.result;if(cursor){if(!valid.has(cursor.value.draftKey)&&!valid.has(courseKey(cursor.value.course)))cursor.delete();cursor.continue();}};
    tx.objectStore('settings').openCursor().onsuccess=e=>{const cursor=e.target.result;if(cursor){if(typeof cursor.key==='string'&&cursor.key.startsWith('online:')&&cursor.key.includes(':board:')&&cursor.value?.challenge&&!valid.has(courseKey(cursor.value.challenge)))cursor.delete();cursor.continue();}};
    tx.objectStore('sync').openCursor().onsuccess=e=>{const cursor=e.target.result;if(cursor){if(!valid.has(cursor.value.course))cursor.delete();cursor.continue();}};
    tx.objectStore('replays').openCursor().onsuccess=e=>{const cursor=e.target.result;if(cursor){if(cursor.value.remote&&!valid.has(courseKey(cursor.value.challenge))){deleteChunks(tx,cursor.key);cursor.delete();}cursor.continue();}};

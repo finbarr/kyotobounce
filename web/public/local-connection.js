@@ -1,8 +1,9 @@
 import {localStore} from './local-store.js';
 import {onlineScores,verificationEndpoint} from './online-scores.js';
+import {onlineCourses} from './online-courses.js';
 const order=(a,b)=>b.score-a.score||a.accepted-b.accepted||a.attempt.localeCompare(b.attempt);
 export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier=document.querySelector('meta[name=kyoto-verifier]')?.content}){
- let worker,store,profile,catalog,selected,currentAttempt,provisional,stopped=false,presentation,ready=false,skipping=false,lastProgress=-Infinity,inputWrites=Promise.resolve(),online,scope='local',importing;
+ let worker,store,profile,catalog,campaign,selected,currentAttempt,provisional,stopped=false,presentation,ready=false,sessionBusy=false,skipping=false,lastProgress=-Infinity,inputWrites=Promise.resolve(),online,sharing,scope='local',importing,catalogWrites=Promise.resolve(),selection=0;
  let onlineStatus={configured:false,phase:'disabled'};
  let resolveReady,rejectReady;const physicsReady=new Promise((resolve,reject)=>{resolveReady=resolve;rejectReady=reject;});physicsReady.catch(()=>{});
  const emit=m=>{if(!stopped&&m)onMessage(m);},error=e=>emit({type:'error',message:e.message||String(e)});
@@ -18,6 +19,30 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
   }));emit({type:'course-progress',full:true,entries});
  }
  function refresh(c=selected){if(c)board(c).then(m=>{if(m)emit(m);}).catch(error);online?.refresh(c);}
+ function updateCatalog(){
+  catalogWrites=catalogWrites.catch(()=>{}).then(async()=>{
+   if(stopped)return;
+   const remote=online?await store.publicCourses(online.endpoint,campaign[0]):[],local=await store.courses(campaign[0]);
+   const map=new Map(campaign.map(c=>[c.id,c]));for(const c of remote)if(!map.has(c.id))map.set(c.id,{...c,local:false});for(const c of local)if(!campaign.some(b=>b.id===c.id))map.set(c.id,c);
+   catalog=[...map.values()];
+   // An in-flight attempt retains the course it started on. Selecting/home
+   // adopts a newer revision; background synchronization never moves the robot.
+   await store.retainCurrent(selected?[...catalog,selected]:catalog);
+   if(ready)worker.postMessage({type:'catalog-update',catalog});
+   emit({type:'catalog',challenges:catalog});if(ready)await progress();
+   await sharing?.describe(selected);
+  });return catalogWrites;
+ }
+ async function selectCourse(id){
+  const request=++selection;
+  if(!catalog.some(c=>c.id===id)){
+   if(!sharing)throw Error('This course is not saved on this device.');
+   try{await sharing.load(id);}catch(e){throw Error(navigator.onLine===false?'This shared course is not saved on this device. Reconnect to load it.':e.message);}
+  }
+  if(request!==selection||stopped)return;
+  if(sessionBusy){emit({type:'notice',selectionDeferred:true,message:'The course is ready. Choose it from Levels after finishing or recalling this shot.'});return;}
+  cancelReplay();forget();worker.postMessage({type:'select-challenge',challengeId:id});
+ }
  function cancelReplay(){if(!importing)return;const old=importing;importing=null;worker?.postMessage({type:'replay-cancel'});store.discard(old.request).catch(()=>{});old.reject(Error('Replay loading cancelled'));}
  async function imported(m){
   const active=importing;if(!active||m.request!==active.request)return;
@@ -60,16 +85,20 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
  async function initialize(){
   onStatus('connecting',{});store=await localStore();await store.cleanInterrupted();
   await navigator.locks.request('kyoto-browser-profile',async()=>{profile=await store.setting('profile')||{id:crypto.randomUUID(),name:'Player',named:false};await store.setting('profile',profile);});
-  const response=await fetch('/campaign.json');if(!response.ok)throw Error('Could not load the campaign');catalog=await response.json();catalog.push(...await store.courses(catalog[0]));await store.retainCurrent(catalog);
+  const response=await fetch('/campaign.json');if(!response.ok)throw Error('Could not load the campaign');campaign=await response.json();catalog=[...campaign,...await store.courses(campaign[0])];
   if(stopped){store.close();return;}
   const remembered=await store.setting('selected');selected=catalog.find(c=>c.id===remembered)||catalog[0];
   let endpoint;try{endpoint=verificationEndpoint(verifier);}catch{onlineStatus={configured:false,phase:'error',message:'Online score configuration is unavailable. Scores are saved locally.'};emit({type:'online-status',...onlineStatus});}
   if(endpoint){
    scope='online';online=onlineScores({endpoint,store,getProfile:()=>profile,getCatalog:()=>catalog,getSelected:()=>selected,
+    synchronize:()=>sharing.sync(),
     status:m=>{onlineStatus=m;emit(m);if(selected)board().then(emit).catch(error);},
     changed:(c,result)=>{if(c?.id===selected?.id)board().then(emit).catch(error);progress().catch(error);if(result)emit({type:'score-sync',...result});}
    });
+   sharing=onlineCourses({online,store,getProfile:()=>profile,getCatalog:()=>catalog,updated:updateCatalog,status:m=>emit({type:'course-publication',...m})});
+   await updateCatalog();selected=catalog.find(c=>c.id===remembered)||catalog[0];
   }
+  await store.retainCurrent(catalog);
   worker=new WorkerImpl('/physics-worker.js',{type:'module'});
   worker.onmessage=event=>{
    const m=event.data;
@@ -83,21 +112,20 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
     }).catch(()=>{if(!stopped)worker.postMessage({type:'input-error',route:m.route});});return;
    }
    if(m.type==='ready'){
-    ready=true;resolveReady();onStatus('connected',{});emit({type:'worker-status',status:'ready',capabilities:['shot-skip-v1','design-ball-v1'],local:true});emit(m);progress().catch(error);online?.wake();return;
+    ready=true;resolveReady();onStatus('connected',{});emit({type:'worker-status',status:'ready',capabilities:['shot-skip-v1','design-ball-v1'],local:true});emit(m);updateCatalog().catch(error);online?.wake();return;
    }
    if(m.type==='save-course'){
     (async()=>{
-     await store.saveCourse(m.challenge);catalog=catalog.filter(c=>c.id!==m.challenge.id);catalog.push(m.challenge);await store.retainCurrent(catalog);
-     emit({type:'catalog',challenges:catalog});worker.postMessage({type:'course-saved',id:m.challenge.id,revision:m.challenge.revision});await progress();
+     await store.saveCourse(m.challenge);await updateCatalog();worker.postMessage({type:'course-saved',id:m.challenge.id,revision:m.challenge.revision});await progress();
     })().catch(e=>{worker.postMessage({type:'course-save-failed'});error(e);});return;
    }
    if(m.type==='recording-chunk'){recording(m);return;}
    if(m.type==='recording-error'){if(m.attempt===currentAttempt){send('recall');error(m);}return;}
    if(m.type==='local-result'){result(m).catch(e=>{if(m.result.attempt===currentAttempt){send('recall');error(e);}});return;}
    if(m.type==='session'){
-    if(currentAttempt!==m.attempt)forget();currentAttempt=m.attempt;selected=m.challenge;emit(m);return;
+    if(currentAttempt!==m.attempt)forget();currentAttempt=m.attempt;selected=m.challenge;sessionBusy=!!m.busy;emit(m);sharing?.describe(selected).catch(error);return;
    }
-   if(m.type==='selected'){store.setting('selected',m.challenge.id).catch(error);refresh(m.challenge);}
+   if(m.type==='selected'){store.setting('selected',m.challenge.id).catch(error);store.retainCurrent([...catalog,m.challenge]).catch(error);refresh(m.challenge);}
    if(m.type==='error'&&!ready)rejectReady(Error(m.message));
    emit(m);
   };
@@ -113,9 +141,12 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
    profile={...profile,name,named:true};store.setting('profile',profile).then(()=>{emit({type:'named',name});online?.wake();}).catch(error);return true;
   }
   if(type==='score-scope'){scope=extra.scope==='online'?'online':'local';refresh(catalog.find(c=>c.id===extra.challengeId)||selected);progress().catch(error);return true;}
+  if(type==='publish-course'){sharing?.queue(catalog.find(c=>c.id===extra.challengeId)||selected).catch(error);return true;}
+  if(type==='refresh-courses'){online?.wake();return true;}
   if(type==='course-progress'){progress().catch(error);return true;}
-  if(type==='charge'){cancelReplay();presentation={name:profile.name,character:extra.character||'ori'};provisional=null;skipping=false;lastProgress=-Infinity;}
-  if(type==='home'||type==='select-challenge')cancelReplay();
+  if(type==='charge'){sessionBusy=true;cancelReplay();presentation={name:profile.name,character:extra.character||'ori'};provisional=null;skipping=false;lastProgress=-Infinity;}
+  if(type==='select-challenge'){selectCourse(extra.challengeId).catch(error);return true;}
+  if(type==='home')cancelReplay();
   if(type==='recall'||type==='home'||type==='select-challenge')forget();
   if(type==='skip-shot'&&extra.attempt===currentAttempt)skipping=true;
   if(type==='client-performance'||type==='playback-rate')return true;
@@ -133,7 +164,7 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
    if(provisional?.attempt!==attempt||attempt!==currentAttempt)return;
    const replay=provisional;provisional=null;
    worker.postMessage({type:'bank-result',attempt});
-   if(replay.score>0){await store.save(replay,{endpoint:online?.endpoint});await progress();emit(await board(replay.challenge));online?.wake();}else await store.discard(replay.attempt);
+   if(replay.score>0){await store.save(replay,{endpoint:online?.endpoint});await progress();emit(await board(replay.challenge));await sharing?.describe(replay.challenge);online?.wake();}else await store.discard(replay.attempt);
   },
   async replay(attempt){
    await physicsReady;
@@ -143,7 +174,7 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
    let seed;try{seed=await online.api('/v1/replays/'+encodeURIComponent(attempt),{auth:false});}catch(e){if(cached)return cached;throw e;}
    cancelReplay();const request=crypto.randomUUID();return new Promise((resolve,reject)=>{importing={request,resolve,reject};worker.postMessage({type:'replay-import',request,seed,endpoint:online.endpoint});});
   },
-  async level(id){const course=catalog.find(c=>c.id===id);if(!course)throw Error('Level not found');if(scope==='online')await online?.refresh(course);return board(course);},
+  async level(id){if(!catalog.some(c=>c.id===id)&&sharing)await sharing.load(id);const course=catalog.find(c=>c.id===id);if(!course)throw Error('Level not found');if(scope==='online')await online?.refresh(course);return board(course);},
   stop,
  };
 }

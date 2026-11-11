@@ -26,6 +26,7 @@ try{
   const saved={...replay,score:replay.score+1000000000,id:player.id,playerName:player.name,recordingChunks:1,accepted:Date.now(),inputs:{route,chunks:0,header}};await store.finish(saved);await store.save(saved,{endpoint});
   window.config={endpoint,store,getProfile:()=>player,getCatalog:()=>[course],getSelected:()=>course,changed:(c,result)=>{window.accepted=result||window.accepted;},status:m=>{window.syncStatus=m;}};
   window.makeSync=(await import('/online-scores.js')).onlineScores;
+  window.makeSharing=(await import('/online-courses.js')).onlineCourses;
   window.makeBoard=(await import('/result-board.js')).resultBoard;
  },{player,course,header,replay:baseline.result,endpoint});
  await context.setOffline(true);await page.evaluate(()=>{window.sync=makeSync(config);sync.wake();});
@@ -44,5 +45,30 @@ try{
   board.update(config.getSelected(),[],null,{local:false,cached:true,onlineAvailable:true});board.reset();return document.querySelector('#result-leaderboard .eyebrow').textContent.includes('LAST SYNC');
  }),'Resetting a cached board must not relabel it as freshly synchronized');
  assert.deepEqual(errors,[]);console.log('PASS browser synchronization: offline outbox, tampered local score ignored, stable credential, cached rank, offline status and idempotent restart');
-}catch(error){console.error(JSON.stringify({errors,status:await page.evaluate(()=>window.syncStatus),jobs:(await service.attempts.get()).docs.map(d=>({id:d.id,state:d.data().state}))}));throw error;}
+ // More than one bounded outbox page must drain on a single reconnect. These
+ // are real control proofs against the real HTTP service, not claimed scores.
+ const drafts=await page.evaluate(async({course,header,replay,player})=>{
+  sync.stop();window.catalog=[course];const base=course;
+  let sharing;
+  window.sync=makeSync({...config,getCatalog:()=>catalog,synchronize:()=>sharing.sync()});
+  sharing=makeSharing({online:sync,store,getProfile:()=>player,getCatalog:()=>catalog,status(){},updated:async()=>{catalog=[base,...(await store.publicCourses(config.endpoint,base)).filter(c=>c.id!==base.id),...await store.courses(base)];}});
+  const drafts=[],hit=replay.waypointHits[0];
+  for(let i=0;i<21;i++){
+   const c={...course,id:crypto.randomUUID(),revision:3,name:'Queued course '+i,creator:player.id,local:true,throwModel:'robot-v4',waypoints:[{id:'bank',center:hit.point,normal:hit.normal,surface:hit.surface,radius:.1}]};
+   await store.saveCourse(c);catalog.push(c);const route=crypto.randomUUID(),attempt=crypto.randomUUID();
+   await store.startRoute(route,c);await store.append(attempt,0,{poses:[],contacts:[],scoreFrames:[]});
+   const saved={...replay,attempt,challenge:c,id:player.id,playerName:player.name,recordingChunks:1,accepted:Date.now(),inputs:{route,chunks:0,header:{...header,courseId:c.id,revision:3}}};
+   await store.finish(saved);await store.save(saved);await sharing.queue(c);drafts.push(c);
+  }return drafts;
+ },{course,header,replay:baseline.result,player});
+ assert.equal((await page.evaluate(()=>store.pendingPublications(config.endpoint))).length,20);
+ assert.equal((await page.evaluate(()=>store.courses(config.getSelected()))).length,21);
+ await context.setOffline(false);await page.evaluate(()=>window.dispatchEvent(new Event('online')));
+ await page.waitForFunction(()=>catalog.filter(c=>c.creator===config.getProfile().id&&!c.local).length===21&&!catalog.some(c=>c.local),null,{timeout:90000});
+ assert.equal((await page.evaluate(()=>store.pendingPublications(config.endpoint))).length,0);
+ assert.equal((await service.courses.where('published','==',true).get()).size,21);
+ assert.ok(await page.evaluate(async c=>(await store.publicationInfo(config.endpoint,c,config.getProfile().id)).published,drafts[0]),'An active old draft remains labelled published after promotion renumbers it');
+ assert.ok((await page.evaluate(()=>store.publicCourses(config.endpoint,config.getSelected()))).filter(c=>c.creator===player.id).every(c=>c.revision===1));
+ assert.deepEqual(errors,[]);console.log('PASS browser publication outbox: 21 real solutions drain across bounded pages on one reconnect, offline draft revisions become one public revision and promotion removes duplicate drafts');
+}catch(error){console.error(JSON.stringify({errors,status:await page.evaluate(()=>window.syncStatus),local:await page.evaluate(async()=>({drafts:(await store.setting('courses'))?.length,pending:(await store.pendingPublications(config.endpoint)).length})),jobs:(await service.attempts.get()).docs.map(d=>({id:d.id,state:d.data().state}))}));throw error;}
 finally{await browser.close();server.closeAllConnections();site.closeAllConnections();await Promise.all([new Promise(resolve=>server.close(resolve)),new Promise(resolve=>site.close(resolve))]);await db.recursiveDelete(service.root);await db.terminate();world.free();}

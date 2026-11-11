@@ -41,6 +41,12 @@ export class GameSession{
   if(['Aim','Charging','Release'].includes(this.phase))this.publish();
  }
  handle(m){
+  if(m.type==='catalog-update'){
+   this.catalog=m.catalog.map(c=>({...c,physics:BROWSER_PHYSICS}));
+   const c=this.catalog.find(c=>c.id===this.challenge?.id&&c.revision===this.challenge.revision);
+   if(c&&this.challenge.local&&!c.local){this.challenge=c;this.session();}
+   return;
+  }
   if(m.type==='input-ack'){
    if(m.route===this.inputs?.id&&this.inputs.acknowledge(m.sequence)&&this.launchWaiting)this.launch();return;
   }

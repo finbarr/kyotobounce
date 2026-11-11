@@ -46,9 +46,9 @@ records remain untrusted until independently simulated. Design capture itself
 is not a ranked attempt; playing a saved custom course records controls normally.
 
 The authenticated HTTP service verifies and stores campaign scores, standings,
-completion and public replay inputs. The browser now synchronizes saved campaign
-shots when a verifier is configured. The service also validates and publishes
-custom courses; connecting that publishing flow to the browser creator is pending.
+completion and public replay inputs. The browser synchronizes saved campaign
+and published custom-course shots when a verifier is configured. Its creator
+can queue a course for publication after saving a complete legal playthrough.
 No verifier has been deployed.
 
 ## Browser synchronization
@@ -66,8 +66,26 @@ server's acknowledged chunk count and retry the same immutable attempt ID.
 Network failure cannot cancel gameplay, change the physics connection status or
 delete a local result. Reload retains the queue and the per-endpoint credential;
 browser locks serialize synchronization across tabs. Reconnection and bounded
-retry backoff resume pending work. Local custom courses stay local until their
-publishing flow is implemented.
+retry backoff resume pending work. Custom courses stay local until their creator
+chooses **Publish level** after clearing every waypoint and finish zone.
+
+Publication requests persist separately from score submissions and reference
+the already saved control stream. A reload or outage resumes the same immutable
+job. A queued course cannot be revised, including through another database
+connection, until that job finishes. Successful publication atomically replaces
+the private draft with its public definition; it does not copy assets or replay
+poses. Several offline draft edits become one next public revision. Scores from
+retired draft revisions are discarded instead of migrated. Failed publication
+leaves the local course and saved solution available for retry.
+
+The browser fetches the public catalog without requiring a player registration,
+caches compatible courses for offline play, and shows them alongside local
+drafts under **Player-created courses**. A direct level link can load a course
+that was never cached on that device. **Refresh shared levels**, reconnection
+and page visibility resume synchronization. A catalog update never teleports
+the robot or replaces the course underneath an active shot; selecting the level
+again or returning to its start adopts the current revision. A retired active
+revision cannot block verification of other current scores.
 
 The scoreboard distinguishes **On this device** from **Online · Verified** and
 lets the player switch between them. Offline online-board caches say **Last
@@ -150,8 +168,7 @@ standings and completion use the new trusted course definition.
 The public catalog returns the campaign plus at most 100 current custom courses
 on its first page. A non-null `next` cursor is passed as `?after=...` to retrieve
 more custom courses. Private drafts and retired station/physics versions are
-excluded. Browser catalog synchronization, creator publishing controls and
-offline publication queueing are the next integration step.
+excluded. The browser follows these pages and caches the current catalog.
 
 | Method and path | Purpose |
 | --- | --- |
@@ -196,6 +213,8 @@ It refuses a non-local or non-demo database. CI runs this portable service test.
 
 `npm run test:browser:sync` exercises the browser outbox against the real local
 HTTP service and Firestore emulator without rendering the station.
+It also publishes 21 offline-created courses on one reconnect, crossing the
+20-item queue page boundary and checking that draft promotion leaves no duplicates.
 `npm run test:browser:online` uses the running browser preview on port 4430 and
 headless Chrome with the background-input guard. It covers desktop/touch throws,
 recall, offline queueing, reload, independent verification, stable identity,
@@ -203,6 +222,14 @@ board switching, exact own-replay replacement, another player's replay and an
 anonymous share link. It injects test configuration through an initialization
 script: intercepting the main navigation would lose Chrome's loopback address
 classification and prevent cross-origin local API requests.
+
+`npm run test:browser:courses` runs the full rendered creator and sharing flow
+against the local emulator: offline design and complete solution, publication
+queueing, edit fencing, reload/reconnect, independently ranked play, a fresh
+visitor's level link and public replay, offline mobile play/publication, multiple
+draft edits becoming one public revision, and catalog refresh during a shot.
+It uses the same headless/background-input guard and leaves its visual receipts
+in ignored `.local/verification/course-sharing/`.
 
 `npm run test:verification:service -- --station` additionally submits all 30
 campaign solutions, restarts the HTTP service with a persisted mid-flight
@@ -220,7 +247,7 @@ generates three courses using the real station's design recorder, publishes
 them from independently verified controls, and exactly reconstructs their
 public solutions, including a basement course with a full-rest finish target.
 
-Before full migration acceptance, finish the browser publishing flow, request/storage
+Before full migration acceptance, finish request/storage
 abuse bounds and abandoned-data/cache cleanup, then static hosting and
 scale-to-zero deployment packaging. No compatibility archive or native score
 migration is planned.
