@@ -1,5 +1,5 @@
 import {createHash,timingSafeEqual} from 'node:crypto';
-export class HttpError extends Error{constructor(status,message){super(message);this.status=status;}}
+export class HttpError extends Error{constructor(status,message,retryAfter){super(message);this.status=status;this.retryAfter=retryAfter;}}
 export function insist(condition,status,message){if(!condition)throw new HttpError(status,message);}
 export const uuid=value=>typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value);
 export function fields(value,names){insist(value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).length===names.length&&Object.keys(value).every(k=>names.includes(k)),400,'Missing or unsupported request fields');return value;}

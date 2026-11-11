@@ -1,5 +1,6 @@
 import http from 'node:http';
 import {HttpError,insist,uuid,fields,playerName,credential} from './protocol.mjs';
+import {requestGate} from './resource-policy.mjs';
 const MAX_BODY=65536;
 function body(req){
  insist((req.headers['content-type']||'').split(';')[0]==='application/json',415,'Send JSON');
@@ -10,17 +11,18 @@ function body(req){
   req.on('error',()=>{if(!ended){ended=true;reject(new HttpError(400,'Request interrupted'));}});
  });
 }
-export function verificationHttp(service,{origins=[]}={}){
+export function verificationHttp(service,{origins=[],gate=requestGate()}={}){
  const allowed=new Set(origins);
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
   const controller=new AbortController();res.on('close',()=>{if(!res.writableEnded)controller.abort();});
   const respond=(value,status=200)=>{if(!res.destroyed){res.writeHead(status);res.end(JSON.stringify(value));}};
   try{
+   const release=gate();res.once('finish',release);res.once('close',release);
    const origin=req.headers.origin;if(origin){insist(allowed.has(origin),403,'Origin is not allowed');res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Vary','Origin');}
    if(req.method==='OPTIONS'){res.setHeader('Access-Control-Allow-Methods','GET, POST, PUT, OPTIONS');res.setHeader('Access-Control-Allow-Headers','Authorization, Content-Type');res.setHeader('Access-Control-Max-Age','600');respond({},204);return;}
    const {pathname,searchParams}=new URL(req.url,'http://localhost');
-   insist(!searchParams.size||req.method==='GET'&&pathname==='/v1/courses'&&searchParams.size===1&&searchParams.has('after'),400,'Unsupported query parameters');
+   insist(!searchParams.size||req.method==='GET'&&['/v1/courses','/v1/progress'].includes(pathname)&&searchParams.size===1&&searchParams.has('after'),400,'Unsupported query parameters');
    if(req.method==='GET'&&pathname==='/health'){respond({status:'ready',layout:service.layout,physics:[...service.catalog.values()][0].physics});return;}
    if(req.method==='GET'&&pathname==='/v1/courses'){respond(await service.listCourses(searchParams.get('after')??undefined));return;}
    if(req.method==='POST'&&pathname==='/v1/identity'){const c=credential(req.headers.authorization),m=fields(await body(req),['name']);respond(await service.identity(c,playerName(m.name)));return;}
@@ -31,7 +33,7 @@ export function verificationHttp(service,{origins=[]}={}){
    const player=await service.authenticate(credential(req.headers.authorization));
    const publication=/^\/v1\/publications\/([^/]+)$/.exec(pathname);
    if(req.method==='POST'&&publication){const m=fields(await body(req),['course','baseRevision','header']);respond(await service.publish(player,publication[1],m.course,m.baseRevision,m.header),201);return;}
-   if(req.method==='GET'&&pathname==='/v1/progress'){respond({entries:await service.progress(player.id)});return;}
+   if(req.method==='GET'&&pathname==='/v1/progress'){respond(await service.progress(player.id,searchParams.get('after')??undefined));return;}
    const match=/^\/v1\/attempts\/([^/]+)(?:\/(seal|advance|cancel|inputs)(?:\/(\d+))?)?$/.exec(pathname);
    insist(match&&uuid(match[1]),404,'Route not found');const [,id,action,rawSequence]=match;
    if(req.method==='GET'&&!action){respond(await service.status(player.id,id));return;}
@@ -42,7 +44,8 @@ export function verificationHttp(service,{origins=[]}={}){
    respond(reply,action==='advance'&&['pending','verifying'].includes(reply.state)?202:200);
   }catch(error){
    if(!(error instanceof HttpError))console.error(JSON.stringify({event:'verification-error',code:String(error.code||'internal')}));
-   respond({error:error instanceof HttpError?error.message:'Verification is temporarily unavailable'},error instanceof HttpError?error.status:503);
+   if(error.retryAfter)res.setHeader('Retry-After',String(error.retryAfter));req.resume();
+   respond({error:error instanceof HttpError?error.message:'Verification is temporarily unavailable',...(error.retryAfter?{retryAfter:error.retryAfter}:{})},error instanceof HttpError?error.status:503);
   }
  });
  server.headersTimeout=10000;server.requestTimeout=30000;server.keepAliveTimeout=5000;return server;

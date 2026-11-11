@@ -226,10 +226,7 @@ under `.local/browser-physics/designer/`; fixed station cases are recorded in
 
 ## Remaining bounded tasks
 
-1. Complete abandoned server-data cleanup and request/storage abuse bounds.
-   The downloaded public replay cache is bounded to eight entries and 64 MiB
-   of serialized payload, excluding saved player scores and their control proofs.
-   Package static hosting and verification without an always-on physics process
+1. Package static hosting and verification without an always-on physics process
    or a fixed monthly compute subscription.
 2. Verify the complete integrated game, cross-browser replay behavior and broader
    desktop/mobile controls and performance. Remove remaining runtime dependence

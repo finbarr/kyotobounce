@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {ShotVerification,INPUT_FORMAT} from '../verification.mjs';
 import {StaticWorld} from '../public/physics/static-world.js';
 import {BROWSER_PHYSICS} from '../public/physics/shot.js';
+import {VerifiedReplay} from '../public/physics/verified-replay.js';
 import {v,identity} from '../public/physics/math.js';
 const shape=(id,position,half)=>({kind:'box',id,position,half,rotation:identity(),material:'stone',mask:3});
 const make=(shapes,fallLimitY=-10)=>new StaticWorld({layoutSha256:'test',shapes,escalators:[],fallLimitY});
@@ -39,3 +40,14 @@ try{
  assert.ok(Object.values(job.shot.ball.velocity).some(x=>x!==0));job.cancel();assert.deepEqual(await job.advance(),{status:'cancelled'});
 }finally{endless.free();}
 console.log('PASS independent verification: strict control-only schema, canonical course/version binding, legal walking blocked by geometry, exact bounded replay batches, forged-result rejection, cancellation and >240 s moving shot without a false result');
+const originalFetch=globalThis.fetch;let timeout;
+try{
+ const calls=[];globalThis.fetch=async url=>{calls.push(url);return new Response(JSON.stringify(calls.length===1?{retryAfter:.01}:{sequence:0,runs:[]}),{status:calls.length===1?429:200});};
+ const replay=new VerifiedReplay(null,{result:{attempt:'fixture'}},'https://scores.example','request',()=>{});
+ assert.deepEqual(await replay.chunk(0),{sequence:0,runs:[]});assert.equal(calls.length,2);assert.equal(calls[0],calls[1]);
+ globalThis.fetch=async()=>new Response(JSON.stringify({retryAfter:3600}),{status:503});
+ const cancelled=new VerifiedReplay(null,{result:{attempt:'fixture'}},'https://scores.example','request',()=>{}),waiting=cancelled.chunk(0);
+ await new Promise(resolve=>setImmediate(resolve));cancelled.cancel();
+ await assert.rejects(Promise.race([waiting,new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('Replay cancellation timed out')),500);})]),/cancelled/);
+}finally{clearTimeout(timeout);globalThis.fetch=originalFetch;}
+console.log('PASS replay input retry: resumes the same chunk and cancellation interrupts a long server retry delay');

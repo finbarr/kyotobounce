@@ -1,12 +1,14 @@
 import {randomUUID} from 'node:crypto';
 import {setImmediate} from 'node:timers/promises';
-import {FieldPath} from '@google-cloud/firestore';
+import {FieldPath,FieldValue} from '@google-cloud/firestore';
 import {ShotVerification,validateInputHeader,validateWalkRun} from '../verification.mjs';
 import {saveVerification,restoreVerification,verificationCourseKey} from '../verification-checkpoint.mjs';
 import {INPUT_CHUNK_RUNS} from '../public/physics/input-recorder.js';
 import {BROWSER_PHYSICS} from '../public/physics/shot.js';
 import {HttpError,insist,uuid,digest,sameHash,ranked,view} from './protocol.mjs';
 import {publicationCourse,solvedPublication} from './course-publication.mjs';
+import {ResourcePolicy} from './resource-policy.mjs';
+import {cleanup} from './cleanup.mjs';
 
 const terminal=new Set(['verified','published','forfeited','cancelled','failed']);
 const clean=value=>JSON.parse(JSON.stringify(value));
@@ -23,13 +25,14 @@ class InputReader{
 }
 
 export class VerificationService{
- constructor({db,catalog,world,namespace='kyoto',sliceMs=1000,batchLimit=10000,now=Date.now}){
+ constructor({db,catalog,world,namespace='kyoto',sliceMs=1000,batchLimit=10000,now=Date.now,limits}){
   insist(/^[a-zA-Z0-9_-]{1,64}$/.test(namespace),500,'Invalid storage namespace');
   this.db=db;this.root=db.collection('games').doc(namespace);this.players=this.root.collection('players');this.attempts=this.root.collection('attempts');
   this.courses=this.root.collection('courses');
   this.catalog=new Map(catalog.map(c=>[c.id,structuredClone(c)]));insist(this.catalog.size===catalog.length,500,'Duplicate canonical course');
   insist(catalog.length&&catalog.every(c=>c.layout===catalog[0].layout&&c.physics===BROWSER_PHYSICS&&c.scoring==='waypoint-v4'),500,'Incompatible canonical catalog');
   this.layout=catalog[0].layout;this.loadWorld=world;this.sliceMs=sliceMs;this.batchLimit=batchLimit;this.now=now;
+  this.policy=new ResourcePolicy(this.root,now,limits);
  }
  async course(id,tx){
   const canonical=this.catalog.get(id);if(canonical)return canonical;
@@ -53,21 +56,24 @@ export class VerificationService{
  }
  inputRef(id,sequence){return this.attempts.doc(id).collection('inputs').doc(inputId(sequence));}
  progressRef(owner,key){return this.players.doc(owner).collection('progress').doc(key);}
- owned(job,owner){insist(job&&job.owner===owner,404,'Attempt not found');return job;}
+ owned(job,owner){insist(job&&job.owner===owner,404,'Attempt not found');if(job.state==='deleting')throw new HttpError(503,'Expired upload cleanup is in progress. Your saved work will retry.',1);return job;}
+ cleanup(){this.cleanupPromise??=cleanup(this).finally(()=>{this.cleanupPromise=null;});return this.cleanupPromise;}
  async world(){this.worldPromise??=Promise.resolve().then(this.loadWorld).catch(error=>{this.worldPromise=null;throw error;});return this.worldPromise;}
  async identity(credential,name){
   const ref=this.players.doc(credential.id);
-  return this.db.runTransaction(async tx=>{
+  const result=await this.db.runTransaction(async tx=>{
    const prior=(await tx.get(ref)).data();insist(!prior||sameHash(prior.credentialHash,credential.hash),401,'Invalid credential');
+   if(!prior)await this.policy.take(tx,null,{identities:1});
    tx.set(ref,{credentialHash:credential.hash,name,created:prior?.created??this.now()});return {id:credential.id,name};
-  });
+  });await this.cleanup();return result;
  }
  async authenticate(credential){const player=(await this.players.doc(credential.id).get()).data();insist(player&&sameHash(player.credentialHash,credential.hash),401,'Invalid credential');return {id:credential.id,name:player.name};}
  job(player,id,course,header,extra={}){
-  return {id,owner:player.id,playerName:player.name,header,inputHash:digest(JSON.stringify(header)),courseKey:verificationCourseKey(course),state:'uploading',inputChunks:0,inputSteps:0,created:this.now(),lease:null,checkpoint:null,cursor:{chunk:0,run:0},...extra};
+  return {id,owner:player.id,playerName:player.name,header,inputHash:digest(JSON.stringify(header)),courseKey:verificationCourseKey(course),courseId:course.id,state:'uploading',inputChunks:0,inputSteps:0,inputBytes:0,created:this.now(),expiresAt:this.now()+this.policy.limits.idleMs,lease:null,checkpoint:null,cursor:{chunk:0,run:0},...extra};
  }
  async publish(player,id,submitted,baseRevision,submittedHeader){
-  insist(uuid(id),400,'Invalid publication ID');const world=await this.world();insist(world.layoutSha256===this.layout,500,'The verifier collision pack does not match its catalog');
+  insist(uuid(id),400,'Invalid publication ID');await this.cleanup();await this.db.runTransaction(tx=>this.policy.take(tx,player.id,{compute:1}));
+  const world=await this.world();insist(world.layoutSha256===this.layout,500,'The verifier collision pack does not match its catalog');
   const course=publicationCourse(world,submitted,player.id,baseRevision);insist(!this.catalog.has(course.id),409,'Campaign courses cannot be replaced');let header;
   try{header=validateInputHeader(submittedHeader,course,world);}catch(error){throw new HttpError(400,error.message);}
   const a=header.aim;course.hint={yaw:a.yaw,pitch:a.pitch,top:a.top,kick:a.kick,powerRange:a.powerRange,holdMs:a.power*2800,note:'Verified solution controls. Walking and moving escalators may require matching the original route and timing.'};
@@ -77,19 +83,23 @@ export class VerificationService{
    if(prior){this.owned(prior,player.id);insist(prior.publication?.hash===hash&&prior.inputHash===digest(JSON.stringify(header))&&prior.publication.baseRevision===baseRevision,409,'Publication inputs cannot be replaced');await this.current(prior,tx);return view(prior);}
    insist(!row||row.owner===player.id,403,'Only the creator can revise a course');
    insist((row?.revision||0)===baseRevision,409,'The course revision changed');
+   insist(header.walkSteps<=this.policy.limits.walkSteps,413,'The walking route is too long for online verification. Start a new route for your next shot.');
    const job=this.job(player,id,course,header,{publication:{course,baseRevision,hash}});
+   await this.policy.take(tx,player.id,{jobs:1});
    if(!row)tx.create(courseRef,{owner:player.id,revision:0,published:false,current:null,layout:this.layout,physics:BROWSER_PHYSICS});
    tx.create(ref,job);return view(job);
   });
  }
  async create(player,id,submitted){
-  insist(uuid(id),400,'Invalid attempt ID');const ref=this.attempts.doc(id);
+  insist(uuid(id),400,'Invalid attempt ID');await this.cleanup();const ref=this.attempts.doc(id);
   return this.db.runTransaction(async tx=>{
    const course=await this.course(submitted?.courseId,tx);let header;
    try{header=validateInputHeader(submitted,course,{layoutSha256:this.layout});}catch(error){throw new HttpError(400,error.message);}
    const prior=(await tx.get(ref)).data();
    if(prior){this.owned(prior,player.id);insist(!prior.publication&&prior.inputHash===digest(JSON.stringify(header)),409,'Attempt inputs cannot be replaced');await this.current(prior,tx);return view(prior);}
+   insist(header.walkSteps<=this.policy.limits.walkSteps,413,'The walking route is too long for online verification. Start a new route for your next shot.');
    const job=this.job(player,id,course,header);
+   await this.policy.take(tx,player.id,{jobs:1});
    tx.create(ref,job);return view(job);
   });
  }
@@ -103,13 +113,16 @@ export class VerificationService{
    if(sequence<job.inputChunks){const previous=(await tx.get(chunkRef)).data();insist(previous?.hash===hash,409,'Uploaded controls cannot be replaced');return view(job);}
    insist(job.state==='uploading'&&sequence===job.inputChunks,409,'Input chunks must arrive in order before sealing');
    const steps=job.inputSteps+runs.reduce((sum,r)=>sum+r.steps,0);insist(steps<=job.header.walkSteps,400,'Too many walking steps');
-   tx.create(chunkRef,{hash,runs});Object.assign(job,{inputChunks:sequence+1,inputSteps:steps});tx.update(ref,{inputChunks:job.inputChunks,inputSteps:steps});return view(job);
+   const bytes=Buffer.byteLength(JSON.stringify(runs)),inputBytes=(job.inputBytes||0)+bytes;
+   insist(sequence<this.policy.limits.jobInputChunks&&inputBytes<=this.policy.limits.jobInputBytes,413,'This control recording exceeds online storage limits. Your score remains saved locally.');
+   await this.policy.take(tx,null,{inputBytes:bytes});
+   tx.create(chunkRef,{hash,runs,bytes});Object.assign(job,{inputChunks:sequence+1,inputSteps:steps,inputBytes});tx.update(ref,{inputChunks:job.inputChunks,inputSteps:steps,inputBytes,expiresAt:this.now()+this.policy.limits.idleMs});return view(job);
   });
  }
  async seal(owner,id){
   const ref=this.attempts.doc(id);return this.db.runTransaction(async tx=>{
    const job=this.owned((await tx.get(ref)).data(),owner);await this.current(job,tx);insist(job.inputSteps===job.header.walkSteps,409,'Upload the complete walking route before verification');
-   if(job.state==='uploading'){job.state='pending';tx.update(ref,{state:job.state});}return view(job);
+   if(job.state==='uploading'){job.state='pending';tx.update(ref,{state:job.state,expiresAt:this.now()+this.policy.limits.idleMs});}return view(job);
   });
  }
  async status(owner,id){const job=this.owned((await this.attempts.doc(id).get()).data(),owner);await this.current(job);return view(job);}
@@ -125,7 +138,7 @@ export class VerificationService{
     const other=best.docs.map(d=>d.data()).find(j=>j.id!==id),completed=complete.docs.some(d=>d.id!==id);
     tx.set(this.progressRef(owner,key),{courseId:job.header.courseId,revision:job.header.revision,courseKey:key,completed,best:other?this.entry(other):null});
    }
-   tx.update(ref,{state:'cancelled',score:0,success:false,result:null,checkpoint:null,lease:null});return view({...job,state:'cancelled',result:null});
+   tx.update(ref,{state:'cancelled',score:0,success:false,result:null,checkpoint:null,lease:null,expiresAt:this.now()+this.policy.limits.discardMs});return view({...job,state:'cancelled',result:null});
   });
  }
  async claim(owner,id){
@@ -133,7 +146,8 @@ export class VerificationService{
    const job=this.owned((await tx.get(ref)).data(),owner);await this.current(job,tx);insist(job.state!=='uploading',409,'Seal inputs before verification');
    if(terminal.has(job.state)||job.lease?.until>this.now())return {job};
    const lease={token:randomUUID(),until:this.now()+Math.max(30000,this.sliceMs+15000)};
-   tx.update(ref,{state:'verifying',lease});return {job:{...job,state:'verifying',lease},lease};
+   await this.policy.take(tx,owner,{compute:1});
+   tx.update(ref,{state:'verifying',lease,expiresAt:Math.max(this.now()+this.policy.limits.idleMs,lease.until+1)});return {job:{...job,state:'verifying',lease},lease};
   });
  }
  async advance(owner,id,signal){
@@ -147,15 +161,17 @@ export class VerificationService{
    const began=performance.now();let batches=0;
    do{reply=await verification.advance();batches++;await setImmediate();}while(reply.status!=='verified'&&!signal?.aborted&&batches<this.batchLimit&&performance.now()-began<this.sliceMs);
    const checkpoint=reply.status==='verified'?null:saveVerification(verification),ref=this.attempts.doc(id);
+   insist(!checkpoint||checkpoint.length<=this.policy.limits.checkpointBytes,413,'Verification checkpoint exceeds storage limits');
    return await this.db.runTransaction(async tx=>{
     const latest=this.owned((await tx.get(ref)).data(),owner);if(latest.lease?.token!==lease.token||latest.state!=='verifying')return view(latest);
     await this.current(latest,tx);const progressRef=this.progressRef(owner,job.courseKey),progress=reply.status==='verified'&&!job.publication?(await tx.get(progressRef)).data():null;
-    const patch={state:'pending',lease:null,checkpoint,cursor:reader.cursor,walkingSteps:reply.walkingSteps,shotSteps:reply.shotSteps};
+    const patch={state:'pending',lease:null,checkpoint,cursor:reader.cursor,walkingSteps:reply.walkingSteps,shotSteps:reply.shotSteps,expiresAt:this.now()+this.policy.limits.idleMs};
     if(reply.status==='verified'){
      const result=clean({...reply.result,id:owner,playerName:job.playerName,verified:true,local:false});
+     insist(Buffer.byteLength(JSON.stringify(result))<=this.policy.limits.resultBytes,413,'Verification result exceeds storage limits');
      insist(Number.isSafeInteger(result.score)&&result.score>=0,500,'The verified score is invalid');
      const state=job.publication?(solvedPublication(course,result)?'published':'failed'):result.score>0&&result.breakdown.outcome!=='forfeit'?'verified':'forfeited';
-     Object.assign(patch,{state,result,score:state==='verified'?result.score:0,duration:result.duration,success:result.success,accepted:this.now()});
+     Object.assign(patch,{state,result,score:state==='verified'?result.score:0,duration:result.duration,success:result.success,accepted:this.now(),expiresAt:['verified','published'].includes(state)?FieldValue.delete():this.now()+this.policy.limits.discardMs});
      if(job.publication){
       if(state==='published')tx.update(this.courses.doc(course.id),{revision:course.revision,published:true,current:course,solution:id,updated:this.now(),layout:course.layout,physics:course.physics});
       else patch.message='The solution must hit every waypoint, reach the finish if present, and come to full rest inside the station';
@@ -174,7 +190,7 @@ export class VerificationService{
    if(!(error instanceof HttpError)&&!/Invalid shot inputs|Cannot verify|checkpoint/.test(error.message))throw error;
    const ref=this.attempts.doc(id);return this.db.runTransaction(async tx=>{
     const latest=this.owned((await tx.get(ref)).data(),owner);if(latest.lease?.token!==lease.token)return view(latest);
-    const patch={state:'failed',lease:null,checkpoint:null,message:'This control recording could not be verified'};tx.update(ref,patch);return view({...latest,...patch});
+    const patch={state:'failed',lease:null,checkpoint:null,expiresAt:this.now()+this.policy.limits.discardMs,message:error.status===413?'Verification exceeded its storage budget. Your local result remains available.':'This control recording could not be verified'};tx.update(ref,patch);return view({...latest,...patch});
    });
   }
  }
@@ -187,13 +203,15 @@ export class VerificationService{
   if(personal){const rank=(await this.rankedQuery(key).endBefore(personal.score,personal.duration,personal.accepted,personal.id).count().get()).data().count+1;placement={...entry(personal),rank};}
   return {challenge:course,entries:rows.map(entry),personal:placement};
  }
- async progress(owner){
-  const rows=await this.players.doc(owner).collection('progress').get();
-  return (await Promise.all(rows.docs.map(d=>d.data()).map(async p=>{
+ async progress(owner,after){
+  insist(after===undefined||typeof after==='string'&&/^[a-zA-Z0-9_.:-]{1,512}$/.test(after),400,'Invalid progress cursor');
+  let query=this.players.doc(owner).collection('progress').orderBy(FieldPath.documentId());if(after)query=query.startAfter(after);
+  const rows=(await query.limit(101).get()).docs,visible=rows.slice(0,100);
+  const entries=(await Promise.all(visible.map(d=>d.data()).map(async p=>{
    let c;try{c=await this.course(p.courseId);}catch(error){if(error.status===404)return null;throw error;}if(verificationCourseKey(c)!==p.courseKey)return null;
    const b=p.best,rank=b?(await this.rankedQuery(p.courseKey).endBefore(b.score,b.duration,b.accepted,b.attempt).count().get()).data().count+1:null;
    return {challengeId:p.courseId,revision:p.revision,completed:p.completed,bestScore:b?.score||0,rank};
-  }))).filter(Boolean);
+  }))).filter(Boolean);return {entries,next:rows.length>100?visible.at(-1).id:null};
  }
  async replay(id){
   const job=(await this.attempts.doc(id).get()).data();insist(job?.state==='verified'||job?.state==='published',404,'Replay not found');await this.current(job);

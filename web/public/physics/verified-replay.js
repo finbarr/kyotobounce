@@ -4,10 +4,23 @@ export class VerifiedReplay{
  constructor(world,seed,endpoint,request,post){this.world=world;this.seed=seed;this.endpoint=endpoint;this.request=request;this.post=post;this.sequence=0;this.controller=new AbortController();}
  ack(sequence){if(sequence===this.sequence-1){this.release?.();this.release=null;}}
  cancel(){this.cancelled=true;this.controller.abort();this.release?.();}
+ async chunk(sequence){
+  let delay=1000;
+  while(!this.cancelled){
+   const response=await fetch(`${this.endpoint}/v1/replays/${this.seed.result.attempt}/inputs/${sequence}`,{signal:this.controller.signal});
+   if(response.ok)return response.json();
+   if(![429,503].includes(response.status))throw Error('Could not load replay controls');
+   const body=await response.json().catch(()=>({})),wait=Number.isFinite(body.retryAfter)&&body.retryAfter>0?Math.min(86400000,body.retryAfter*1000):delay;
+   await new Promise(resolve=>{
+    const done=()=>{clearTimeout(timer);this.controller.signal.removeEventListener('abort',done);resolve();},timer=setTimeout(done,wait);
+    this.controller.signal.addEventListener('abort',done,{once:true});if(this.cancelled)done();
+   });delay=Math.min(60000,delay*2);
+  }
+  throw Error('Replay loading cancelled');
+ }
  async *inputs(){
   for(let sequence=0;sequence<this.seed.inputChunks;sequence++){
-   const response=await fetch(`${this.endpoint}/v1/replays/${this.seed.result.attempt}/inputs/${sequence}`,{signal:this.controller.signal});if(!response.ok)throw Error('Could not load replay controls');
-   const chunk=await response.json();if(chunk.sequence!==sequence)throw Error('Replay input sequence changed');yield*chunk.runs;
+   const chunk=await this.chunk(sequence);if(chunk.sequence!==sequence)throw Error('Replay input sequence changed');yield*chunk.runs;
   }
  }
  async run(){

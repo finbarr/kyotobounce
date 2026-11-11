@@ -128,6 +128,55 @@ JSON bodies are limited to 64 KiB. The verifier retains one input chunk and
 one simulation/replay batch at a time. Replay data is the verified input seed
 and result: replay poses are reconstructed, rather than stored a second time.
 
+## Resource limits and cleanup
+
+Firestore transactions enforce creation, input-storage and compute quotas across
+processes. An idempotent retry does not consume another job or upload allocation;
+an already leased or finished attempt does not consume another compute slice.
+Publication geometry checks share the compute budget. Defaults are:
+
+| Resource | Limit |
+| --- | --- |
+| New identities | 1,000 per UTC day; 50,000 retained identities |
+| New verification/publication jobs | 200 per player and 2,000 globally per UTC day; 100,000 retained jobs |
+| Compute slices / publication checks | 600 per player and 2,400 globally per minute; 5,000 per player and 20,000 globally per UTC day |
+| Uploaded control payload | 512 MiB retained globally; 8 MiB and 2,048 chunks per job |
+| Walking proof | At most 324,000 steps, approximately 30 minutes |
+| Persisted checkpoint / result | 512 KiB / 256 KiB per job |
+| HTTP process | 32 concurrent requests, burst of 120, refill of 40 requests per second; 64 KiB request bodies |
+
+These are online verification limits. Browser gameplay keeps running locally.
+Rate responses include `Retry-After` and a matching JSON delay; the browser keeps
+the same queued proof and waits, including across reconnect events. A storage
+capacity response is retriable. A recording that exceeds a per-job limit remains
+local and is not labelled verified. Exhausting a compute allowance leaves the
+job pending; it never finishes the ball or fabricates a score. Limits can be
+overridden through validated `KYOTO_VERIFY_LIMITS_JSON` configuration.
+
+Ordinary identity, submission and publication requests perform one bounded
+cleanup pass. Inactive unaccepted jobs expire after seven days; cancelled,
+forfeited and failed jobs after one day. A pass reclaims at most 32 input
+documents from one job. A persistent deletion marker fences uploads and late
+workers, so a restart resumes cleanup safely. Reclaimed input bytes and job
+slots are refunded transactionally. The browser can re-upload an expired proof
+under the same attempt ID after cleanup; deleting work is never an accepted result.
+Live leases remain protected. A bounded cursor also finds retired course versions
+and removes their attempts, progress and orphan course records. Current accepted
+scores and published solutions have no expiry and are never removed to make room.
+
+Personal progress is paginated in pages of at most 100 stored entries, with a
+`next` cursor supplied as `?after=...`; the browser follows every page. Payload
+limits exclude database/index overhead. These controls bound admitted work and
+retained data, but are not a provider billing cap or protection against all HTTP
+traffic costs. Deployment still needs explicit instance/concurrency limits.
+There is no cleanup timer, scheduled worker or always-running simulation.
+The shared admission counter favors a strict global cap over write throughput.
+The emulator checks atomicity, not managed-database latency; an authorized cloud
+smoke/load test must measure this counter in the deployment region. Firestore's
+single-document throughput depends on workload and contention.
+[Firestore best practices](https://firebase.google.com/docs/firestore/best-practices),
+[transaction contention](https://firebase.google.com/docs/firestore/transaction-data-contention).
+
 Checkpoints use compressed Node V8 serialization to retain Maps, Sets, Infinity,
 negative zero and support-contact state exactly. They are private database
 bytes, never request fields or public responses, and bind the course, attempt
@@ -190,7 +239,7 @@ excluded. The browser follows these pages and caches the current catalog.
 | `POST /v1/attempts/:id/seal` | Finish uploading the complete walking route |
 | `POST /v1/attempts/:id/advance` | Verify another slice; 202 while unfinished |
 | `POST /v1/attempts/:id/cancel` | Forfeit/retract the owned attempt |
-| `GET /v1/attempts/:id`, `GET /v1/progress` | Authenticated status and progress |
+| `GET /v1/attempts/:id`, `GET /v1/progress[?after=...]` | Authenticated status and bounded progress pages |
 | `GET /v1/courses/:id/leaderboard` | Top ten and optional authenticated personal rank |
 | `GET /v1/replays/:id[/inputs/:sequence]` | Public verified seed and bounded controls |
 
@@ -225,6 +274,8 @@ It refuses a non-local or non-demo database. CI runs this portable service test.
 HTTP service and Firestore emulator without rendering the station.
 It also publishes 21 offline-created courses on one reconnect, crossing the
 20-item queue page boundary and checking that draft promotion leaves no duplicates.
+It checks a real rate-limit response, reconnect events during its retry delay,
+and complete loading of 102 progress entries across pages.
 `npm run test:browser:online` uses the running browser preview on port 4430 and
 headless Chrome with the background-input guard. It covers desktop/touch throws,
 recall, offline queueing, reload, independent verification, stable identity,
@@ -256,11 +307,15 @@ revision-scoped standings and bounded catalog pagination. With `--station` it
 generates three courses using the real station's design recorder, publishes
 them from independently verified controls, and exactly reconstructs their
 public solutions, including a basement course with a full-rest finish target.
+Resource checks race admissions and cleanup against the real emulator, restart
+between cleanup pages, preserve current accepted scores and live leases, reclaim
+retired publications, fence late workers, and reject oversized evidence without
+creating a result. Browser replay checks delay an input request and require its
+exact reconstruction after retry; portable tests also cancel a long retry wait.
 
-Before full migration acceptance, finish request/storage
-abuse bounds and abandoned server-data cleanup, then static hosting and
-scale-to-zero deployment packaging. No compatibility archive or native score
-migration is planned.
+Before full migration acceptance, finish static hosting and scale-to-zero
+deployment packaging, then run the complete integrated acceptance checks.
+No compatibility archive or native score migration is planned.
 
 ## Hosting evidence, checked November 10, 2026
 

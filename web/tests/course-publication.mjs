@@ -6,6 +6,7 @@ import {Shot,launchInput,BROWSER_PHYSICS} from '../public/physics/shot.js';
 import {Walker} from '../public/physics/walker.js';
 import {v,add} from '../public/physics/math.js';
 import {STEP} from '../public/physics/ball.js';
+import {verificationCourseKey} from '../verification-checkpoint.mjs';
 
 // Runs against the same real HTTP server and isolated Firestore emulator as
 // online-service.mjs. No fake storage and no writes to deployed services.
@@ -78,7 +79,7 @@ export async function coursePublicationTests({start,stop,service,request,registe
  assert.equal((await request(endpoint,'/v1/courses/'+candidate.id+'/leaderboard')).challenge.name,'Winning revision');
  assert.deepEqual((await request(endpoint,'/v1/courses/'+candidate.id+'/leaderboard')).entries,[]);
  assert.ok(!(await request(endpoint,'/v1/progress',{player:bob})).entries.some(p=>p.challengeId===candidate.id));
- await request(endpoint,'/v1/replays/'+playId,{status:409});await request(endpoint,path(playId),{player:bob,status:409});
+ await request(endpoint,'/v1/replays/'+playId,{status:[404,409]});await request(endpoint,path(playId),{player:bob,status:[404,409]});
  await publish(endpoint,alice,randomUUID(),revision,undefined,1,409);
  // A worker that crashes mid-publication leaves a lease, not a warm server.
  const takeoverCourse={...candidate,id:randomUUID()},takeover=await prepare(endpoint,alice,takeoverCourse);
@@ -86,13 +87,16 @@ export async function coursePublicationTests({start,stop,service,request,registe
  console.log('PASS publication failure/recall exclusion, full-rest finish targets, creator-only revisions, atomic revision races and expired-process recovery');
 
  // Exercise bounded public pagination independently of expensive simulation.
- const temporary=[];for(let i=0;i<102;i++){const id=randomUUID();temporary.push(id);await endpoint.service.courses.doc(id).set({owner:alice.id,revision:1,published:true,layout:course.layout,physics:course.physics,current:{...accepted.course,id}});}
+ const temporary=[];for(let i=0;i<102;i++){const id=randomUUID(),c={...accepted.course,id},key=verificationCourseKey(c);temporary.push(id);await endpoint.service.courses.doc(id).set({owner:alice.id,revision:1,published:true,layout:course.layout,physics:course.physics,current:c});await endpoint.service.progressRef(alice.id,key).set({courseId:id,revision:1,courseKey:key,completed:true,best:null});}
  const first=await request(endpoint,'/v1/courses');assert.equal(first.courses.length,101);assert.ok(first.next);
  const second=await request(endpoint,'/v1/courses?after='+first.next);assert.equal(second.next,null);assert.ok(second.courses.length>0&&second.courses.length<100);
  assert.equal(new Set([...first.courses,...second.courses].map(c=>c.id)).size,first.courses.length+second.courses.length);
  await request(endpoint,'/v1/courses?after=bad',{status:400});
+ const progress=await request(endpoint,'/v1/progress',{player:alice});assert.ok(progress.entries.length<=100);assert.ok(progress.next);
+ const more=await request(endpoint,'/v1/progress?after='+encodeURIComponent(progress.next),{player:alice});assert.equal(more.next,null);assert.equal(new Set([...progress.entries,...more.entries].map(p=>p.challengeId)).size,102);
+ await request(endpoint,'/v1/progress?after=%2F',{player:alice,status:400});
  await Promise.all(temporary.map(id=>endpoint.service.courses.doc(id).delete()));await stop(endpoint);
- console.log('PASS bounded public-course pagination without duplicates or private drafts');
+ console.log('PASS bounded course and personal-progress pagination without duplicates or private drafts');
 }
 
 export async function stationPublicationTests({endpoint,request,player,world,catalog}){

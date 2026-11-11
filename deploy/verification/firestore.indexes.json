@@ -56,6 +56,14 @@
     {"collectionGroup": "attempts", "fieldPath": "lease", "indexes": []},
     {"collectionGroup": "inputs", "fieldPath": "runs", "indexes": []},
     {"collectionGroup": "progress", "fieldPath": "best", "indexes": []},
-    {"collectionGroup": "players", "fieldPath": "credentialHash", "indexes": []}
+    {"collectionGroup": "players", "fieldPath": "credentialHash", "indexes": []},
+    {"collectionGroup": "usage", "fieldPath": "identities", "indexes": []},
+    {"collectionGroup": "usage", "fieldPath": "jobs", "indexes": []},
+    {"collectionGroup": "usage", "fieldPath": "inputBytes", "indexes": []},
+    {"collectionGroup": "usage", "fieldPath": "identityDay", "indexes": []},
+    {"collectionGroup": "usage", "fieldPath": "jobDay", "indexes": []},
+    {"collectionGroup": "usage", "fieldPath": "computeMinute", "indexes": []},
+    {"collectionGroup": "usage", "fieldPath": "computeDay", "indexes": []},
+    {"collectionGroup": "maintenance", "fieldPath": "after", "indexes": []}
   ]
 }

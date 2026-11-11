@@ -6,7 +6,7 @@ export function verificationEndpoint(value){
  return url.origin;
 }
 export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,changed,status,synchronize,fetchImpl=fetch}){
- let stopped=false,timer,running=false,again=false,delay=1000,token,registeredName,connected=false;
+ let stopped=false,timer,running=false,again=false,delay=1000,retryUntil=0,token,registeredName,connected=false;
  const controllers=new Set(),refreshes=new Map(),key=name=>'online:'+endpoint+':'+name;
  const state=(phase,message,detail)=>{
   if(['connected','verifying'].includes(phase)&&navigator.onLine===false){phase='offline';message='Saved locally. Waiting for a connection.';}
@@ -22,15 +22,30 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
  }
  async function api(path,{method='GET',body,auth=true}={}){
   if(stopped)throw Error('Score synchronization stopped');
+  if(Date.now()<retryUntil)throw Object.assign(Error('Online verification is waiting to retry.'),{status:429});
   const controller=new AbortController();controllers.add(controller);const timeout=setTimeout(()=>controller.abort(),15000);
   try{
    const response=await fetchImpl(endpoint+path,{method,signal:controller.signal,headers:{...(auth?{Authorization:'Bearer '+await credential()}:{}),...(body!==undefined?{'Content-Type':'application/json'}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})});
-   const value=await response.json();if(!response.ok)throw Object.assign(Error(value.error||'Score verification unavailable'),{status:response.status});return value;
+   const value=await response.json();
+   if(!response.ok){
+    if([429,503].includes(response.status)&&Number.isFinite(value.retryAfter)&&value.retryAfter>0){
+     retryUntil=Math.max(retryUntil,Date.now()+Math.min(86400,value.retryAfter)*1000);
+     if(!running){clearTimeout(timer);timer=setTimeout(pump,retryUntil-Date.now());}
+    }
+    throw Object.assign(Error(value.error||'Score verification unavailable'),{status:response.status});
+   }return value;
   }finally{clearTimeout(timeout);controllers.delete(controller);}
  }
  async function identity(){const profile=await store.setting('profile')||getProfile();if(!profile.named)return false;if(registeredName!==profile.name){await api('/v1/identity',{method:'POST',body:{name:profile.name}});registeredName=profile.name;state('connected');}return true;}
  async function board(c){const cached=await store.setting(key('board:'+courseKey(c)));return cached?{...cached,type:'leaderboard',local:false,cached:!connected||navigator.onLine===false}:null;}
  async function progress(){const cached=await store.setting(key('progress'));return (cached?.entries||[]).filter(p=>{const c=getCatalog().find(c=>c.id===p.challengeId&&c.revision===p.revision);return c&&cached.courses?.includes(courseKey(c));});}
+ async function loadProgress(){
+  const entries=[],seen=new Set();let after;
+  do{
+   const page=await api('/v1/progress'+(after?'?after='+encodeURIComponent(after):''));if(!Array.isArray(page.entries))throw Error('Invalid online progress');
+   entries.push(...page.entries);after=page.next;if(after){if(seen.has(after))throw Error('Online progress cursor did not advance');seen.add(after);}
+  }while(after&&!stopped);return {entries};
+ }
  async function refresh(c=getSelected()){
   if(stopped||!c||c.local)return;
   const current=getCatalog().find(course=>course.id===c.id);if(current&&courseKey(current)!==courseKey(c))return;
@@ -38,7 +53,7 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
   const pending=(async()=>{
    try{
     const authenticated=await identity();
-    const [board,progress]=await Promise.all([api('/v1/courses/'+encodeURIComponent(c.id)+'/leaderboard',{auth:authenticated}),authenticated?api('/v1/progress'):{entries:[]}]);
+    const [board,progress]=await Promise.all([api('/v1/courses/'+encodeURIComponent(c.id)+'/leaderboard',{auth:authenticated}),authenticated?loadProgress():{entries:[]}]);
     if(courseKey(board.challenge)!==id)throw Object.assign(Error('The online course changed. Reload for the current course.'),{status:409});
     await store.setting(key('board:'+id),board);await store.setting(key('progress'),{courses:getCatalog().filter(c=>!c.local).map(courseKey),entries:progress.entries});state('connected');changed(c);
    }catch(error){if(!stopped)state(error.status===401?'error':'offline',error.status===401?'Online identity could not be authenticated.':'Saved locally. Online scores will reconnect.',error.message);}
@@ -67,7 +82,7 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
   changed(c,{attempt:item.attempt,state:job.state,result:job.result});
  }
  async function pump(){
-  clearTimeout(timer);if(stopped)return;if(running){again=true;return;}running=true;again=false;
+  clearTimeout(timer);if(stopped)return;if(Date.now()<retryUntil){timer=setTimeout(pump,retryUntil-Date.now());return;}if(running){again=true;return;}running=true;again=false;
   try{
    await navigator.locks.request(key('sync'),{ifAvailable:true},async lock=>{
     if(!lock){again=true;return;}if(navigator.onLine===false){state('offline','Saved locally. Waiting for a connection.');return;}
@@ -86,8 +101,8 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
      }
     }delay=1000;if(!stopped)state('connected');
    });
-  }catch(error){if(!stopped){registeredName=undefined;state(error.status===401?'error':'offline','Saved locally. Online verification will retry.',error.message);timer=setTimeout(pump,delay);delay=Math.min(60000,delay*2);}}
-  finally{running=false;if(again&&!stopped)timer=setTimeout(pump,1000);}
+  }catch(error){if(!stopped){registeredName=undefined;state(error.status===401?'error':'offline','Saved locally. Online verification will retry.',error.message);timer=setTimeout(pump,Math.max(delay,retryUntil-Date.now()));delay=Math.min(60000,delay*2);}}
+  finally{running=false;if(again&&!stopped)timer=setTimeout(pump,Math.max(1000,retryUntil-Date.now()));}
  }
  const wake=()=>{delay=1000;pump();},visible=()=>{if(document.visibilityState==='visible')wake();};
  const offline=()=>state('offline','Saved locally. Waiting for a connection.');

@@ -6,6 +6,7 @@ import {chromium} from 'playwright';
 import {backgroundInput} from './background-input.mjs';
 import {VerificationService} from '../online/service.mjs';
 import {verificationHttp} from '../online/http.mjs';
+import {HttpError} from '../online/protocol.mjs';
 import {StaticWorld} from '../public/physics/static-world.js';
 import {decodeCollisionPack} from '../public/physics/collision-pack.js';
 import {BROWSER_PHYSICS} from '../public/physics/shot.js';
@@ -14,6 +15,8 @@ const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430';assert.equal
 const catalog=JSON.parse(await readFile('web/starter-challenges.json')).map(c=>({...c,physics:BROWSER_PHYSICS}));
 const world=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin'))),db=new Firestore({projectId:process.env.GOOGLE_CLOUD_PROJECT});
 const service=new VerificationService({db,catalog,world:()=>world,namespace:'browser-'+randomUUID(),batchLimit:3}),server=verificationHttp(service,{origins:[origin]});
+const replayInputs=service.replayInputs.bind(service),inputRequests=[];let delayReplay=true;
+service.replayInputs=async(...args)=>{inputRequests.push(Date.now());if(delayReplay){delayReplay=false;throw new HttpError(429,'Replay controls are busy',1);}return replayInputs(...args);};
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const endpoint=`http://127.0.0.1:${server.address().port}`;
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist','--mute-audio']}),errors=[],out='.local/verification/browser';await mkdir(out,{recursive:true});
 async function context(){
@@ -82,6 +85,7 @@ try{
  const original=await replayDigest(page,mobile.attempt);
  await page.locator('#result-leaderboard [data-attempt="'+mobile.attempt+'"] button').click();await page.waitForFunction(()=>kyotoState.mode==='replay',null,{timeout:60000});
  const replacement=await replayDigest(page,mobile.attempt);assert.equal(replacement.sha256,original.sha256);assert.equal(replacement.poses,original.poses);assert.ok(replacement.remote&&replacement.proof);assert.ok(replacement.cacheBytes>0,'The worker accounts for downloaded replay bytes');
+ assert.ok(inputRequests.length>=2&&inputRequests[1]-inputRequests[0]>=900,'The replay worker respects the server retry delay and resumes the same input chunk');
  await page.locator('#close-replay').click();
  await page.screenshot({path:out+'/online-verified.png'});
  await page.reload();await enter(page,'Online acceptance');await page.waitForFunction(()=>document.querySelector('#result-leaderboard').dataset.source==='online');
