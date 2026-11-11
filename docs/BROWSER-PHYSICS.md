@@ -135,6 +135,7 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm run test:browser:rendered` | Rebuilds the static package once; sequential Chrome/Firefox/WebKit rendered gameplay and creator checks, offline shots/replays/progress, all 30 desktop/mobile-width menus, mobile hold/Skip, create/play/revise/reload/cancel, independent replay and creator-solution verification, unskipped frame/audio measurements and visible download Retry |
 | `npm run test:browser:controls` | Native Chrome touch gestures against the static package: joystick/dead zone/release, aim and spin sliders, second-finger charge ownership and Cancel, pointer cancellation, speed/Skip/recall, replay pause/seek/orbit/pinch, scout height/boost, orientation cancellation and desktop keyboard return; independent reconstruction of a walking/spin shot |
 | `npm run test:browser:local` | Rendered game, walking/home, six complete shots across three courses, desktop and mobile controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
+| `npm run test:browser:transitions` | Offline Chrome selection/overview/return for all 30 courses at desktop and mobile widths, repeated viewport changes, real audio scheduling, frame/long-task/shader/canvas diagnostics; optional `KYOTO_TRANSITION_PROFILE=1` records a Chrome CPU profile |
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
 | `npm run test:browser:designer` | Actual station design-route capture and full-clear re-simulation; rendered offline create/play/revise/reload, forged or changed capture rejection, foreign edit rejection, touch creation, cancellation/restart and retired-score cleanup |
 | `npm run test:verification` | All 30 courses verified twice from controls; complete exact replay equality; real offline Chrome walking, sprint, charge and release independently reconstructed in Node; portable forged-result and cancellation checks also run in `npm test` |
@@ -384,11 +385,31 @@ by pinning sharp 0.35.5 and its updated libvips packages. Source/codec tests and
 the browser build pass; the rebuilt robot GLB is byte-identical. `npm audit`
 reports zero vulnerabilities. Evidence is in `.local/image-dependency-check/`.
 
-1. Investigate transition audio stalls. An earlier Chrome run observed a roughly
-   1.1-second scheduler gap during automated course/viewport changes; the rendered Firefox run also
-   observed one skipped music step before its flight benchmark. Their causes
-   remain unproven. Keep the worker/storage diagnostics for the earlier Chrome
-   Skip timeout while checking these transitions.
+The transition suite now independently exercises 60 selections, 58 overview
+returns, and 11 viewport requests while offline. It also reselects First Bounce
+from its own menu: that previously left the desktop picker open because closing
+was conditional on a changed course. Accepted selections now always close it.
+Canvas size and pixel ratio are applied together, reducing actual dimension
+writes from 40 to 20 across the same viewport sequence. An unchanged viewport
+does not reset the drawing buffer, and every resulting canvas size is checked.
+
+Chrome 157.0.8103.52 recorded 4,830 frames across these transitions, averaging
+58.82 FPS with 16.8 ms p95 and 66.7 ms maximum frame time. No music steps were
+skipped; the maximum audio scheduling gap was 85.3 ms. These are transition
+measurements, separate from the steady-flight benchmark. The receipt at
+`.local/browser-transition-test/receipt.json` includes Long Animation Frame
+attribution, slow WebGL calls, canvas changes, and live GPU resource counts.
+The optional CPU profile identified synchronous shader work; the default trace
+then measured `getProgramInfoLog` calls of up to 46 ms, mainly for basic marker
+materials and some station materials. Layout flushes were below 1 ms in the
+observed slow callbacks. Actual canvas width changes can still cost 34–42 ms;
+removing redundant resets does not eliminate that browser/GPU cost.
+
+1. Finish transition shader preparation and reuse. Investigate discarded marker
+   programs and offscreen station materials missed by the existing warmup.
+   The older roughly 1.1-second Chrome audio gap and the Firefox skipped music
+   step have not been reproduced or explained by these shorter shader stalls.
+   Keep the worker/storage diagnostics for the earlier Chrome Skip timeout.
 2. Audit the full migration against current runtime evidence, commands and
    documentation, removing obsolete runtime entry points before declaring it done.
 

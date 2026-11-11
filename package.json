@@ -53,7 +53,8 @@
     "configure:verifier": "node deploy/verification/cloud-run.mjs",
     "test:verifier:container": "node web/tests/firestore-emulator.mjs --container",
     "build:verifier:image": "node deploy/verification/image.mjs",
-    "test:assets:setup": "node web/tests/asset-setup.mjs"
+    "test:assets:setup": "node web/tests/asset-setup.mjs",
+    "test:browser:transitions": "npm run build:static && node web/tests/browser-transitions.mjs"
   },
   "dependencies": {
     "@google-cloud/firestore": "9.4.1",

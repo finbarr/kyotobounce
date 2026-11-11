@@ -303,7 +303,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
     designRequest=null;clearDesign();setMode('play');resetView('level');drawDisks(state.selected);renderEditor();presentation();resume();
    }
    if(m.type==='saved-challenge'){designSaving=false;clearDesign();renderEditor();setMode('play');presentation();send('select-challenge',{challengeId:m.challenge.id,revision:m.challenge.revision});notice(m.challenge.local?'Level saved on this device.':'Level saved. Copy its level link to share it.');}
-   if(m.type==='selected'){history.replaceState(null,'',m.challenge?levelURL(m.challenge.id):'/');document.title=m.challenge?`${m.challenge.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';replayRequest++;$('result-card').hidden=true;resetView('level');if(m.challenge&&state.mode==='play')overview(state.selected||m.challenge,{automatic:true});}
+   if(m.type==='selected'){showLevels(false);history.replaceState(null,'',m.challenge?levelURL(m.challenge.id):'/');document.title=m.challenge?`${m.challenge.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';replayRequest++;$('result-card').hidden=true;resetView('level');if(m.challenge&&state.mode==='play')overview(state.selected||m.challenge,{automatic:true});}
    if(m.type==='leaderboard'){
     if(state.selected?.id===m.challenge.id&&state.selected.revision===m.challenge.revision){state.board=m.entries;state.personal=m.personal||null;state.boardLocal=!!m.local;state.boardCached=!!m.cached;state.onlineAvailable=!!m.onlineAvailable;renderBoard();}
     if(state.mode==='replay'&&state.replay?.challenge.id===m.challenge.id&&state.replay.challenge.revision===m.challenge.revision)ranking.update(m.challenge,m.entries,m.personal,m);
