@@ -1,18 +1,45 @@
-import { readFile, writeFile, access } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
-import { resolve } from 'node:path';
+import {readFile,writeFile,readdir,stat} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {build} from 'esbuild';
 import {socialPage} from './social-metadata.ts';
-import { withChallengeRules } from './types.ts';
+import {stationRelease,hashFile} from '../deploy/station.mjs';
 import {buildRuntimeAssets} from '../tools/optimize-browser-assets.mjs';
-await buildRuntimeAssets();
-const shellPath='web/public/index.html',shell=await readFile(shellPath,'utf8'),socialShell=socialPage(shell,{});
-if(shell!==socialShell)await writeFile(shellPath,socialShell);
-const starterFile='web/starter-challenges.json';
-const starterText=await readFile(starterFile,'utf8'),starterData=JSON.stringify(JSON.parse(starterText).map(withChallengeRules),null,2)+'\n';
-if(starterText!==starterData)await writeFile(starterFile,starterData);
-const files=['web/public/asset-download.js','web/public/tutorial.js','web/public/tutorial.css','web/social-metadata.ts','web/public/brand/kyoto-bounce-social.jpg','web/public/favicon.svg','web/public/favicon.ico','web/public/apple-touch-icon.png','web/public/loading.js','web/public/loading.css','web/public/mobile.css','web/public/mobile-controls.js','web/public/touch-input.js','web/public/waypoint-card.js','web/public/static-transforms.js','web/public/static-ray-queries.js','web/public/dom-updates.js','web/public/camera-obstacles.js','web/public/robot-cutaway.js','web/public/fly-camera.js','web/public/station-boundary.js','web/public/design-geometry.js','web/public/speed-blur.js','web/public/throw-style.js','web/public/replay-links.js','web/public/level-links.js','web/public/level-entry.js','web/public/level-progress.js','web/public/result-board.js','web/public/player-name.js','web/public/celebration.js','web/public/replays.css','web/public/index.html','web/public/style.css','web/public/game.js','web/public/connection.js','web/public/local-connection.js','web/public/local-store.js','web/public/online-scores.js','web/public/online-courses.js','web/public/performance.js','web/public/shot-playback.js','web/public/live-throw.js','web/public/concourse-details.js','web/public/ball-rotation.js','web/public/throw-power.js','web/public/charge-meter.js','web/public/aim-reticle.js','web/public/avatar.js','web/public/character-picker.js','web/public/debug.js','web/public/station-look.js','web/public/station-materials.js','web/public/station-lighting.js','web/public/station-installations.js','web/public/station-details.js','web/public/escalators.js','web/public/competition.js','web/public/start-marker.js','web/public/waypoint-targets.js','web/public/waypoint-score.js','web/public/ball-heat.js','web/public/arcade-audio.js','web/public/arcade-feedback.js','web/public/arcade-particles.js','web/public/briefing.js','web/public/arcade.css','web/starter-challenges.json','web/public/assets/runtime/atrium.glb','web/public/assets/runtime/optimization.json','web/public/assets/station.json','web/public/assets/runtime/atrium-detail.glb','web/public/assets/atrium-detail.json','web/public/assets/runtime/ori.glb','web/server.ts','web/connection-queue.ts','web/performance.ts','web/shot-stream.ts','web/competition.ts','web/store.ts','web/replay-cache.ts','web/replay-http.ts','web/level-http.ts','web/worker.ts','web/macos-worker.ts','web/types.ts','web/scoring.ts','web/stop.mjs','package.json','package-lock.json'];
-const manifest={builtUtc:new Date().toISOString(),renderer:'three-0.185.1',scope:'Local browser assets and service sources; native physics worker is built separately',files:{}};
-for(const file of files){await access(file);const bytes=await readFile(file);manifest.files[file]={bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')};}
-await writeFile('web/public/browser-build.json',JSON.stringify(manifest,null,2)+'\n');
-console.log('Browser modules and authored assets ready:',resolve('web/public/browser-build.json'));
-console.log('First-time native setup: npm run build:worker. Start local game: npm start');
+import {buildCollisionPack} from '../tools/browser-collision.mjs';
+import {buildBrowserPhysics} from './build-physics.mjs';
+import {BROWSER_PHYSICS} from './public/physics/shot.js';
+
+// Use the current station in place. Never regenerate the retired root station
+// or write a half-gigabyte layout/asset overlay for each preview port.
+export async function buildBrowser(){
+ const station=await stationRelease();
+ await buildCollisionPack(station.layoutBytes);delete station.layoutBytes;
+ await buildRuntimeAssets({names:['ori.glb']});
+ await buildBrowserPhysics();
+ const graph=await build({entryPoints:['web/public/game.js'],alias:{'three-mesh-bvh':resolve('node_modules/three-mesh-bvh/build/index.module.js')},bundle:true,write:false,metafile:true,format:'esm',platform:'browser',logLevel:'silent'});
+ const shellPath='web/public/index.html',shell=await readFile(shellPath,'utf8'),socialShell=socialPage(shell,{});
+ if(shell!==socialShell)await writeFile(shellPath,socialShell);
+ const manifest={builtUtc:new Date().toISOString(),renderer:'three-0.185.1',scope:'Browser game: current station and dedicated physics worker',layoutSha256:station.layoutSha256,physics:BROWSER_PHYSICS,files:{}};
+ const record=async(name,file)=>{manifest.files[name]={bytes:(await stat(file)).size,sha256:await hashFile(file)};};
+ async function publicFiles(directory){
+  for(const item of await readdir(directory,{withFileTypes:true})){
+   const file=directory+'/'+item.name;
+   if(file==='web/public/assets'||file==='web/public/browser-build.json')continue;
+   if(item.isDirectory())await publicFiles(file);
+   else if(item.isFile()&&/\.(js|css|html|svg|png|jpe?g|ico|woff2)$/.test(file))await record(file,file);
+  }
+ }
+ await publicFiles('web/public');
+ for(const file of Object.keys(graph.metafile.inputs))await record(file,file);
+ for(const [name,file] of Object.entries(station.files))await record('web/public/'+name,file);
+ await record('web/public/physics-worker.js','.local/browser-physics/worker.js');
+ await record('web/public/station.collision.bin','.local/browser-physics/station.collision.bin');
+ manifest.files['web/public/assets/station.json']={bytes:Buffer.byteLength(station.stationBytes),sha256:createHash('sha256').update(station.stationBytes).digest('hex')};
+ await record('web/starter-challenges.json','web/starter-challenges.json');
+ await writeFile('web/public/browser-build.json',JSON.stringify(manifest,null,2)+'\n');
+ return {...station,manifest};
+}
+if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+ await buildBrowser();console.log('Browser game ready. Start local play: npm start');
+}

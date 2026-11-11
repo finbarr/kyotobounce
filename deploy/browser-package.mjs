@@ -5,8 +5,8 @@ import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {build} from 'esbuild';
-import {stationRelease,hashFile} from './station.mjs';
-import {buildBrowserPhysics} from '../web/build-physics.mjs';
+import {hashFile} from './station.mjs';
+import {buildBrowser} from '../web/build-browser.mjs';
 import {BROWSER_PHYSICS} from '../web/public/physics/shot.js';
 import {verificationEndpoint} from '../web/public/online-scores.js';
 
@@ -40,13 +40,11 @@ export async function inventory(directory){
 export async function packageBrowser({output=resolve('.local/browser-release'),verifier=process.env.KYOTO_VERIFY_URL}={}){
  // Reject invalid endpoint configuration before replacing the previous bundle.
  verifier=verificationEndpoint(verifier);
- const station=await stationRelease(),collision='.local/browser-physics/station.collision.bin';
+ const station=await buildBrowser(),collision='.local/browser-physics/station.collision.bin';
  const receipt=JSON.parse(await readFile(collision+'.json','utf8'));
  assert.equal(receipt.layoutSha256,station.layoutSha256,'Run npm run assets:collision for this station');
  assert.equal(await hashFile(collision),receipt.sha256,'The collision pack must match its receipt');
  assert.equal((await stat(collision)).size,receipt.bytes);
- delete station.layoutBytes;
- await buildBrowserPhysics();
  // Resolve the same browser import graph without changing its module layout.
  // Only dependencies actually used by the renderer go into the static bundle.
  // BVH's package export points to src/index.js, but the existing import map

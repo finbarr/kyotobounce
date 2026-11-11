@@ -8,11 +8,17 @@ Deployment is outside the current goal.
 
 ## Current browser preview
 
-Run `npm run assets:collision` once for the current asset pack, then
-`npm run dev:browser -- 4430`. The preview at `http://127.0.0.1:4430` serves all
-30 campaign courses without Unity, a WebSocket or a gameplay HTTP API. It uses
-existing station files directly. The regular native launcher remains available
-until the full migration passes; an HTML marker selects the browser transport.
+With the current station bundle installed, run `npm run setup`, then
+`npm run dev -- 4173` (or `npm start`). Setup and startup prepare browser physics
+without Unity, a WebSocket or a gameplay HTTP API. Existing station files are
+used directly; each preview shares one generated collision pack. Missing or
+corrupt generated collision data is rebuilt, while mismatched source art stops
+the build. `npm run build:static` uses the same preparation.
+
+The current station is still absent from the old public `assets-v7` archive;
+[asset distribution](ASSETS.md) remains a migration requirement. Normal setup no
+longer fetches that retired station. The native runtime source remains for
+reference and the existing live service until an authorized cutover.
 
 The browser owns walking, throwing, target collection, scoring, full settling,
 recall, Skip, course creation/revision, local progress and replays. Local leaderboards are labelled
@@ -313,14 +319,41 @@ replay reconstruction and all 30 desktop/mobile course selections. A deliberatel
 missing collision chunk must display Retry. This is local browser acceptance,
 not a Cloudflare deployment or a physical-phone test.
 
+## Default startup acceptance
+
+`npm start` and `npm run dev -- PORT` now launch the browser game. Normal setup
+and `build:web` prepare the current station, browser worker and collision pack;
+Unity and the retired root station are not part of that path. `npm run
+test:browser` runs `web/tests/browser-startup.mjs`, which exercises the real npm
+commands, environment/CLI port selection, invalid ports, deep links, missing API
+routes and shutdown. The macOS stop command leaves an unrelated listener alive.
+
+The latest Chrome 157.0.8103.52 run passed offline walking, home, full settling,
+recall, replay seeking, reload persistence, native touch holds/repeated Skip,
+all 30 level menus at both widths, and independent exact reconstruction of six
+saved shots. Its 1,762-frame flight measured 60.00 FPS, 16.8 ms p95/maximum,
+no long tasks and no skipped music steps; the maximum observed audio scheduler
+gap was 69.3 ms. This does not resolve the older intermittent transition stalls.
+Receipts are `.local/browser-startup-test/receipt.json` and `game/receipt.json`.
+
+Recompiling collision produced the same 58,843,636 bytes and SHA-256
+`62e0e5a0e623f0171ed06c282dc5ea1376b0bb03d48489d3a851e25c3fbbeb79`.
+Portable tests cover cached-file reuse, corrupted bytes, incomplete receipts
+and source/compiler invalidation. Missing current station sources fail with
+explicit paths. The rebuilt static package passed its full checksum inventory,
+file limits and local routing checks. No native process or preview remained
+after verification.
+
 ## Remaining bounded tasks
 
 The static package and pinned Linux verifier image now have local runtime
 acceptance. `docs/DEPLOYING.md` documents their builds and a request-billed,
 zero-minimum-instance service configuration; no cloud deployment was performed.
 
-1. Make the browser path the default startup/setup workflow and remove remaining
-   runtime dependence on the native worker.
+1. Prepare a distributable current station asset pack and verify a fresh setup.
+   The public assets-v7 pack and its authoring allowlist still contain the retired
+   station; the current bundle must not depend on files unique to this laptop.
+   Remove remaining obsolete runtime entry points during the final audit.
 2. Investigate transition audio stalls. An earlier Chrome run observed a roughly
    1.1-second scheduler gap during automated course/viewport changes; the rendered Firefox run also
    observed one skipped music step before its flight benchmark. Their causes

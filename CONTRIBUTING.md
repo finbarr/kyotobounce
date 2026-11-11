@@ -5,8 +5,8 @@ Use a branch and a focused pull request. Include the player-facing change, what 
 1. Follow [local setup](docs/LOCAL_PLAY.md).
 2. Make one bounded improvement with a clear acceptance check.
 3. Run `npm run typecheck`, `npm test`, and `npm run build:web` when assets are installed.
-4. For native changes, rebuild the worker and exercise the actual game. For UI changes, verify the rendered result and controls in a browser. For scores/persistence, verify historical replays and challenge revisions.
-5. Open a PR. Include a screenshot or short capture for visible changes when useful. Native test receipts may be summarized; never upload guest tokens or private databases.
+4. For gameplay changes, test the actual browser worker and rendered game. For UI changes, verify the rendered result and controls. For scores/persistence, verify current-version replays and independent online reconstruction.
+5. Open a PR. Include a screenshot or short capture for visible changes when useful. Browser and verification receipts may be summarized; never upload guest tokens or private databases.
 
 Asset changes follow [the asset workflow](docs/ASSETS.md). Editable source and matching runtime exports must travel together. A Blender file cannot be meaningfully merged like text; coordinate ownership before editing the same file.
 

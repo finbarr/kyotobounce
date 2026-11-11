@@ -6,17 +6,16 @@ The browser migration can be packaged without Node, Unity or a gameplay API
 running on the host. This is a local build/preview workflow; the migration has
 not been deployed and its final integrated acceptance is still in progress.
 
+With the current station bundle installed (see [asset availability](ASSETS.md)):
+
 ```sh
-npm run assets:fetch
-npm run build:web
-npm run assets:collision
 npm run build:static
 npm run test:browser:static
 npm run preview:static -- 4431
 ```
 
 `build:static` uses the validated current station in `web/v2/assets.json` and
-requires a matching collision receipt. It builds the physics worker, includes
+builds or verifies the collision pack. It builds the physics worker, includes
 all 30 courses and renderer dependencies, and replaces one generated directory:
 `.local/browser-release`. It refuses to replace an unrelated directory. Do not
 commit this output. No Unity editor, native worker, player database, research
@@ -132,9 +131,11 @@ and deployment/cutover is authorized.
 ## Existing native deployment
 
 The currently deployed architecture uses a long-running Node service plus a
-native Linux Unity dedicated-server worker. The instructions below maintain
-that deployment until the browser migration is accepted and a replacement
-deployment is explicitly authorized.
+native Linux Unity dedicated-server worker. The notes below describe that existing deployment for operational reference.
+The current default build/start commands now target the browser game; use the
+existing deployed release for native maintenance or rollback, not the browser
+branch's old native packaging scripts. A replacement deployment still requires
+explicit authorization.
 
 The supplied scripts target an Ubuntu 24.04 x86_64 server with systemd and Caddy. The initial deployment used 2 vCPUs and 4 GB RAM; capacity depends on concurrent physics sessions and needs load testing for your traffic.
 

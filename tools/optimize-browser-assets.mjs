@@ -382,7 +382,7 @@ export async function optimizeGLB(source) {
     },
   };
 }
-export async function buildRuntimeAssets() {
+export async function buildRuntimeAssets({ names = ["atrium.glb", "atrium-detail.glb", "ori.glb"] } = {}) {
   const out = resolve("web/public/assets/runtime");
   await mkdir(out, { recursive: true });
   const fingerprint = hash(
@@ -395,7 +395,7 @@ export async function buildRuntimeAssets() {
       .then(JSON.parse)
       .catch(() => null),
     report = { format: 1, lossless: true, fingerprint, assets: {} };
-  for (const name of ["atrium.glb", "atrium-detail.glb", "ori.glb"]) {
+  for (const name of names) {
     const source = await readFile("web/public/assets/" + name),
       previous = old?.assets?.[name];
     if (

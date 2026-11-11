@@ -11,20 +11,28 @@ A robot, a bouncing ball, and a Kyoto Station inspired atrium. Build a line thro
 
 ## Run locally
 
-The browser uses Three.js. A Node.js service owns challenges, SQLite storage and score validation. A native Unity worker runs the authoritative ball physics. This is **not a static-only website**.
+The Three.js game runs its physics in a dedicated browser worker. Walking, all
+30 levels, the creator, scores and replays work offline after loading. Optional
+online scores are independently reconstructed by the on-demand verifier.
+Unity is not needed for browser development or play.
 
-The tested development platform is macOS with **Node.js 22.23.2**, **Unity 6000.3.23f1** and its macOS build support. Install and activate Unity through Unity Hub. Blender **5.2.1 LTS** is only needed for art changes. Linux production uses Unity's dedicated-server build.
+Use **Node.js 22.23.2**. This checkout currently requires the station bundle
+identified by `web/v2/assets.json` and the robot source GLB. The published
+`assets-v7` archive contains a retired station; a fresh clone cannot obtain the
+current station through `assets:fetch` yet. See [asset availability](docs/ASSETS.md).
+
+With those assets installed:
 
 ```sh
-git clone https://github.com/finbarr/kyotobounce.git
-cd kyotobounce
 npm run setup
 npm run dev -- 4173
 ```
 
-Open **http://127.0.0.1:4173/**. The first Unity import/build can take several minutes. Set `UNITY_EDITOR` if the editor is installed at a different path. Windows development is not currently verified.
-
-`npm run setup` installs packages, downloads the pinned art pack, builds the physics worker and checks browser assets. Subsequent JavaScript/UI changes need a page reload; server changes need a restart; C# changes need `npm run build:worker` followed by a restart.
+Open **http://127.0.0.1:4173/**. `npm start` uses the same browser-only launcher.
+`npm run setup` installs packages and builds/verifies the browser worker, current
+collision pack and delivery assets. It does not install or launch Unity.
+Reload after browser source edits; restart after physics-worker, catalog or art
+changes. Stop with Ctrl-C, or `npm stop -- 4173` on macOS.
 
 ## Controls
 
@@ -47,7 +55,7 @@ Precision throws use a compact arm motion. Robot power uses a wider staggered st
 
 Skip to result is also available on touch screens and while recording a design ball. It waits for the physics worker to finish calculating real rest, including spin. The score and full replay are preserved. While it says “Finishing shot…”, you can still recall to forfeit.
 
-Replays open in free camera: WASD flies, Q/E moves down/up, and Shift boosts speed. Click to capture the mouse or right-drag to look. Hold Space for 2× playback, including faster music and effects; release it to return to normal speed. Pause/Play and the timeline remain in the replay panel, and Recenter returns the camera to the shot. The camera also moves while playback is paused. Escape releases the mouse for the controls.
+Replays open with an orbit camera. Press F for free camera: WASD flies, Q/E moves down/up, and Shift boosts speed. Click to capture the mouse or right-drag to look. Hold Space for 2× playback, including faster music and effects; release it to return to normal speed. Pause/Play and the timeline remain in the replay panel, and Recenter returns the camera to the shot. The camera also moves while playback is paused. Escape releases the mouse for the controls.
 
 Fast ball flight adds peripheral motion blur above 45 m/s, reaching full strength at 90 m/s and fading as the ball slows. The ball and interface stay readable; reduced-motion settings disable the effect, and replay playback speed scales it.
 
@@ -55,14 +63,17 @@ Fast ball flight adds peripheral motion blur above 45 m/s, reaching full strengt
 
 | Location | Responsibility |
 | --- | --- |
-| `web/public/` | Rendering, robot, controls, menus, audio and effects |
-| `web/*.ts` | Server, challenge protocol, score calculation, persistence |
-| `KyotoRicochet/Assets/Kyoto/Scripts/` | Native physics, walking, spin/contact dynamics and sessions |
-| `art-source/`, `runtime/` | Editable Blender sources, original textures and canonical collision layout |
-| `tools/` | Art exports, asset packaging and isolated local previews |
-| `deploy/` | Linux dedicated worker, Node, Caddy and backup deployment |
+| `web/public/` | Three.js rendering, controls, menus, audio, local persistence and browser physics |
+| `web/public/physics/` | Dedicated worker, walking, ball contacts, spin and scoring |
+| `web/verification.mjs`, `web/online-*.mjs` | Independent online verification and optional score/course service |
+| `web/v2/assets.json` | Current station source, visual exports and hashes |
+| `tools/` | Art exports, collision compilation and asset packaging |
+| `deploy/browser-package.mjs`, `deploy/verification/` | Static game bundle and on-demand verifier packaging |
 
-Large `.blend` and `.glb` files live in a **versioned GitHub release**, not Git history. `assets-manifest.json` pins their checksums; `npm run assets:fetch` installs them and caches the download across worktrees. The pack includes the editable station and robot source, not just the rendered models. See [asset authoring](docs/ASSETS.md).
+Large assets stay outside Git. Build and preview the distributable static game
+with `npm run build:static` and `npm run preview:static -- 4431`. See
+[asset authoring](docs/ASSETS.md), [migration evidence](docs/BROWSER-PHYSICS.md)
+and [deployment preparation](docs/DEPLOYING.md). These commands do not deploy.
 
 ## Checks
 
@@ -70,13 +81,18 @@ Large `.blend` and `.glb` files live in a **versioned GitHub release**, not Git 
 npm run typecheck
 npm test
 npm run build:web
-# With the pinned art pack fetched (no browser or worker required):
-npm run test:avatar
-# With an isolated local server running:
-KYOTO_TEST_ORIGIN=http://127.0.0.1:4173 npm run test:runtime
+# With the current station installed and local Chrome available:
+npm run test:browser
+npm run test:browser:campaign
+npm run test:browser:controls
 ```
 
-The runtime test creates test guests/challenges and takes real native shots; use a disposable local database. Hosted CI runs the TypeScript and pure Node tests. Native Unity behavior is verified locally because it requires an installed, activated editor.
+The startup check starts the normal game, verifies offline desktop/mobile play,
+full rest, recall, saved results and replays, and stops its own preview. Browser
+checks remain headless and cannot capture the desktop pointer. Hosted CI runs
+source and verifier-emulator checks; rendered station tests run locally.
+Legacy native source/tools remain during migration, but are not used by the
+normal setup, start or build commands.
 
 ## License
 

@@ -65,15 +65,31 @@ export function compileCollision(layout,layoutSha256){
  }
  return {metadata:{layoutSha256,spawn:layout.spawn,fallLimitY:fallLimitY(layout),shapes,escalators:layout.escalators||[]},arrays};
 }
+export async function buildCollisionPack(source,{input=process.env.KYOTO_V2_ASSETS||'web/v2/assets.json',output='.local/browser-physics/station.collision.bin'}={}){
+ output=resolve(output);
+ const sha=createHash('sha256').update(source).digest('hex');
+ const compiler=createHash('sha256');
+ for(const file of [import.meta.url,new URL('../web/public/physics/collision-pack.js',import.meta.url),new URL('../web/public/physics/math.js',import.meta.url)])compiler.update(await readFile(new URL(file)));
+ const fingerprint=compiler.digest('hex');
+ try{
+  const receipt=JSON.parse(await readFile(output+'.json','utf8'));
+  if(receipt.layoutSha256===sha&&receipt.compilerSha256===fingerprint){
+   const bytes=await readFile(output);
+   if(bytes.length===receipt.bytes&&createHash('sha256').update(bytes).digest('hex')===receipt.sha256)return receipt;
+  }
+ }catch(error){if(error.code!=='ENOENT'&&!(error instanceof SyntaxError))throw error;}
+ const {metadata,arrays}=compileCollision(JSON.parse(source),sha),bytes=encodeCollisionPack(metadata,arrays);
+ await mkdir(dirname(output),{recursive:true});await writeFile(output,bytes);
+ const receipt={input,output,layoutSha256:sha,compilerSha256:fingerprint,sha256:createHash('sha256').update(bytes).digest('hex'),sourceBytes:Buffer.byteLength(source),bytes:bytes.length,shapes:metadata.shapes.length,movingEscalators:metadata.escalators.length};
+ await writeFile(output+'.json',JSON.stringify(receipt,null,2)+'\n');
+ console.log(`Built collision pack: ${bytes.length} bytes, ${metadata.shapes.length} shapes`);return receipt;
+}
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- const input=process.argv[2],output=resolve(process.argv[3]||'.local/browser-physics/station.collision.bin');
+ const input=process.argv[2],output=process.argv[3];
  // Use the release's validated source/spawn transform without writing another
  // half-gigabyte layout or depending on a particular local preview port.
  const source=input?await readFile(input):(await (await import('../deploy/station.mjs')).stationRelease()).layoutBytes;
  const sha=createHash('sha256').update(source).digest('hex');
  const courses=JSON.parse(await readFile('web/starter-challenges.json','utf8'));if(!courses.every(c=>c.layout===sha))throw Error('Collision source must match the current campaign');
- const {metadata,arrays}=compileCollision(JSON.parse(source),sha),bytes=encodeCollisionPack(metadata,arrays);
- await mkdir(dirname(output),{recursive:true});await writeFile(output,bytes);
- const receipt={input:input||process.env.KYOTO_V2_ASSETS||'web/v2/assets.json',output,layoutSha256:sha,sha256:createHash('sha256').update(bytes).digest('hex'),sourceBytes:Buffer.byteLength(source),bytes:bytes.length,shapes:metadata.shapes.length,movingEscalators:metadata.escalators.length};
- await writeFile(output+'.json',JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify(receipt,null,2));
+ console.log(JSON.stringify(await buildCollisionPack(source,{input,output}),null,2));
 }

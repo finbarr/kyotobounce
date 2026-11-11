@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,access} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import {createHash} from 'node:crypto';
 
@@ -8,6 +8,11 @@ export async function hashFile(path){
 }
 export async function stationRelease(){
  const config=JSON.parse(await readFile(process.env.KYOTO_V2_ASSETS||'web/v2/assets.json','utf8'));
+ const missing=[];
+ for(const file of new Set([config.layout,config.geometry,config.hardware,config.station,config.detail,config.motionLayout])){
+  try{await access(file);}catch(error){if(error.code!=='ENOENT')throw error;missing.push(file);}
+ }
+ if(missing.length)throw Error('Current station assets are missing:\n'+missing.join('\n')+'\nSee docs/ASSETS.md. The published assets-v7 pack contains a retired station and cannot supply these files.');
  const source=await readFile(config.layout);
  const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
  assert.equal(hash(source),config.layoutSha256,'The station source must match its asset receipt');

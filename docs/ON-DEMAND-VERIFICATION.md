@@ -55,7 +55,7 @@ No verifier has been deployed.
 
 The static shell may set a `kyoto-verifier` meta tag to the HTTPS origin of the
 service. Local preview accepts `KYOTO_VERIFY_URL=http://127.0.0.1:4432` before
-`npm run dev:browser -- 4430`. Without this configuration, the game remains
+`npm run dev -- 4430`. Without this configuration, the game remains
 entirely local and sends no score-service requests. HTTP is accepted only for
 loopback development origins; credentials cannot appear in the configured URL.
 

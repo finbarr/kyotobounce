@@ -2,26 +2,52 @@
 
 Project-created game code, models, textures and synthesized audio are MIT licensed. Third-party dependencies retain their original licenses. Unity itself is proprietary and must be installed separately.
 
-## Public asset pack
+## Current station availability
 
-`assets-manifest.json` identifies a GitHub release archive by SHA-256 and lists each file's size and checksum. Run `npm run assets:fetch` to install it. Downloads are cached under `~/.cache/kyotobounce` for reuse across worktrees. Existing modified assets cause an explicit stop, so art edits are never silently replaced.
+The current playable station is pinned by `web/v2/assets.json`. Its canonical
+layout is `.local/v2/current/source/station-layout.json`, with the station's
+layout path symlinked to that file. The manifest also pins the delivered station
+and hardware GLBs, metadata and exploration spawn. `deploy/station.mjs` validates
+these against the 30-course campaign before any browser build or local launch.
+`KYOTO_V2_ASSETS` selects a different manifest for a deliberately isolated art
+candidate; its layout must still match the current campaign.
 
-The pack includes:
+**The current bundle is not yet available in the public asset archive.**
+`assets-manifest.json` and `npm run assets:fetch` still describe `assets-v7`, which
+contains a retired station. They are retained as authoring tools during migration
+and are not part of normal `npm run setup`. Do not use that archive as proof that
+a fresh clone has the current game. Current assets must already be installed at
+the manifest paths; setup reports missing files and stops if they are absent.
+Preparing a checksum-pinned, distributable current asset pack remains required.
 
-- `art-source/atrium/KyotoAtrium.blend`: current editable atrium and packed original procedural textures. The embedded `Kyoto runtime seed.json` text is required for collision export.
-- `art-source/phase3/robot/ORI.blend`: editable robot rig and animation source.
-- `art-source/phase3/atrium-detail/AtriumHardware.blend`: editable station fixtures and signs.
-- `art-source/materials/stairs/`: original generated stair/escalator texture maps.
-- `runtime/station-layout.json` and `runtime/textures/`: canonical native collision layout and material maps.
-- `web/public/assets/`: exported GLBs, station metadata and hardware metadata used by the browser.
-
-The game is pre-launch. Only the current station bundle ships; old geometry, rules and course revisions are discarded. Current high scores and same-version replays remain supported.
+The robot's original export is `web/public/assets/ori.glb`; its editable source is
+`art-source/phase3/robot/ORI.blend`. The original public pack contains that robot.
+Do not overwrite modified art to install a pack. Keep one current station bundle
+and at most one temporary candidate, with original editable sources preserved.
 
 ## Browser delivery build
 
-`npm run build:web` derives `web/public/assets/runtime/` from the original three GLBs. It removes exact duplicate vertex records, encodes geometry with lossless meshopt, and uses lossless WebP for eligible PNG textures when smaller. It preserves triangle order, normals, UV seams, material definitions, rigs and texture dimensions. Profiled textures and unsupported source depths/formats remain in their original encoding. No geometry quantization, simplification or texture downscaling is performed by this build.
+`npm run build:web` verifies the current station, checks the browser import graph,
+bundles the dedicated physics worker and builds the compact collision asset.
+It does not build Unity or regenerate the retired root station. The current
+station and hardware GLBs are already optimized and are read in place.
 
-The browser loads these generated delivery GLBs. The release packager checks their build-manifest hashes and excludes the duplicate authoring GLBs. Keep the originals in the asset pack for editing and reproducible builds; generated delivery files and `.local/texture-cache/` are ignored. Source, tool and dependency changes invalidate the build cache. `node web/tests/lossless-assets.mjs --full` checks the decoded output against every original triangle. See [the rendering benchmark](../web/benchmarks/README.md) for browser texture checks and measured download/frame-rate results.
+The collision build uses the validated canonical layout plus the configured
+exploration spawn without writing a second full layout. The generated
+`.local/browser-physics/station.collision.bin` is reused only when its source hash,
+compiler fingerprint and byte checksum match. Generated files stay ignored.
+
+The robot delivery GLB is derived losslessly from its original export. The
+optimizer retains triangle order, normals, UV seams, materials, rigs and texture
+dimensions. It deduplicates exact vertices and uses meshopt/lossless WebP when
+appropriate; it does not quantize or simplify geometry. The general optimizer
+remains available to art exporters, but normal startup only builds the robot.
+
+`npm run build:static` runs the same preparation and produces one static package
+under `.local/browser-release/`, replacing its previous generated contents.
+Oversized station/collision files are split into checksum-verified delivery
+chunks. Editable Blender files, research media, native binaries, databases and
+credentials never belong in that package. See [deployment](DEPLOYING.md).
 
 ## Rebuild art
 
@@ -58,12 +84,17 @@ The browser exporter clips covered, coplanar architectural faces throughout the 
 
 The exporter reads textures beside the selected layout and writes its audit receipt
 inside the selected output. With no options, the original paths remain unchanged.
-Review both candidates, then copy the layout/textures into `runtime/` and the
-matching browser exports into `web/public/assets/`. Geometry changes alter the layout hash. Verify all current starter routes and update their definitions to match. Startup removes courses and scores from retired layouts/rules; it does not migrate them.
+Review both candidates, then promote the matching source and visual exports into
+the current station bundle and update `web/v2/assets.json`. Do not replace only
+one side of that pair. Geometry changes alter the layout hash; verify all current
+starter routes and update their definitions before publishing a changed station.
 
 `art-source/phase3/robot/build_robot.py` generates the original rig; `tools/build_atrium_detail.py` generates hardware. `tools/build_stair_materials.py` generates textures using Python, NumPy and Pillow. The Blender source remains the editable authority for manually authored station geometry.
 
-For a new release, run `npm run assets:pack -- assets-v8` (increment the current `assets-v7` version), review the archive allowlist and changed manifest, attach the archive from `artifacts/open-source/` to a public GitHub release with the matching tag, and commit the manifest alongside its code changes. Publish a new version instead of replacing an existing archive. Do not add multi-hundred-megabyte binaries to Git history.
+The existing `assets:pack` allowlist also targets the retired root station. It
+must be updated and verified against the current bundle before publishing a new
+asset version. Publish immutable versioned archives rather than replacing a
+published archive, and never add large binaries to Git history.
 
 ## Provenance and boundaries
 
