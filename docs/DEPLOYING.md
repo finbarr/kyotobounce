@@ -1,6 +1,68 @@
 # Deploying your own instance
 
-The game needs a long-running Node service plus a native Linux Unity dedicated-server worker. A static host alone cannot run its authoritative physics.
+## Browser static release
+
+The browser migration can be packaged without Node, Unity or a gameplay API
+running on the host. This is a local build/preview workflow; the migration has
+not been deployed and its final integrated acceptance is still in progress.
+
+```sh
+npm run assets:fetch
+npm run build:web
+npm run assets:collision
+npm run build:static
+npm run test:browser:static
+npm run preview:static -- 4431
+```
+
+`build:static` uses the validated current station in `web/v2/assets.json` and
+requires a matching collision receipt. It builds the physics worker, includes
+all 30 courses and renderer dependencies, and replaces one generated directory:
+`.local/browser-release`. It refuses to replace an unrelated directory. Do not
+commit this output. No Unity editor, native worker, player database, research
+archive, authoring layout, credential or server source belongs in the upload.
+The local preview reads only this directory and exposes no gameplay API.
+
+The station GLB and collision pack exceed [Cloudflare Pages' 25 MiB asset
+limit](https://developers.cloudflare.com/pages/platform/limits/). They are split
+into 16 MiB files with content-addressed paths. The browser verifies each part
+and the complete SHA-256 before decoding the exact original bytes. This does
+not simplify geometry or reduce texture quality, and the output does not retain
+duplicate unsplit files. The packager checks the file size/count limits.
+
+The directory includes Pages [`_redirects`](https://developers.cloudflare.com/pages/configuration/redirects/)
+for level/replay links, a real 404 page, attribution and
+[`_headers`](https://developers.cloudflare.com/pages/configuration/headers/)
+for immutable chunks and revalidated mutable modules/manifests. On another
+static host, configure equivalent rewrites of `/level/*` and `/replay/*` to
+`/index.html`. Shared-link social metadata uses the game's generic static card.
+Gameplay, local scores, replays and the creator work offline after assets load;
+this does not promise a cold offline navigation before those files are loaded.
+
+Omit `KYOTO_VERIFY_URL` for local-only scores. For a release with independently
+verified online scores and published courses, set it to the public HTTPS origin
+of the on-demand verifier **when building**. It is a public endpoint, not a
+credential. The endpoint parser rejects credentials, queries, fragments and
+non-HTTPS remote URLs. Configure the verifier's allowed browser origin as
+described in `docs/ON-DEMAND-VERIFICATION.md`; gameplay remains local while it
+is offline. Verifier hosting/scale-to-zero packaging is a separate migration
+step. Neither this command nor its tests uploads or deploys anything.
+
+`test:browser:static` checks the actual exported file hashes, size limits,
+routes and absence of server files, then runs headless Chrome against only the
+bundle. It asserts that the game downloads the chunks without oversized-file
+fallbacks and runs the existing offline walking, throw/Skip, recall, replay,
+saved-progress, mobile control and 30-course menu acceptance. A missing collision
+chunk must show a visible Retry action instead of hanging at startup. The desktop
+pointer is protected before navigation; receipts are in
+`.local/browser-release-test`.
+
+## Existing native deployment
+
+The currently deployed architecture uses a long-running Node service plus a
+native Linux Unity dedicated-server worker. The instructions below maintain
+that deployment until the browser migration is accepted and a replacement
+deployment is explicitly authorized.
 
 The supplied scripts target an Ubuntu 24.04 x86_64 server with systemd and Caddy. The initial deployment used 2 vCPUs and 4 GB RAM; capacity depends on concurrent physics sessions and needs load testing for your traffic.
 

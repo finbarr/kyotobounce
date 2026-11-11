@@ -224,10 +224,24 @@ Node independently reproduces each saved solution. Captures and receipts are
 under `.local/browser-physics/designer/`; fixed station cases are recorded in
 `.local/browser-physics/designer-proof.json`.
 
+The static release acceptance runs against only `.local/browser-release`, with
+no source-tree fallback, Unity process or gameplay API. The current package has
+121 files; the station model uses ten 16 MiB-or-smaller chunks and collision uses
+four. Their hashes preserve the original station/collision bytes. The rendered
+run passed offline walking, throws, Skip, recall, saved progress, exact
+independent reconstruction of four recorded shots, and all 30 course selections
+at desktop and mobile widths. A deliberately missing collision chunk displayed
+the Retry action. Its 1,872-frame flight averaged 60.00 FPS, with 16.8 ms p95 and
+maximum, no long tasks, no skipped music steps and a 64 ms maximum audio
+scheduler gap. Evidence is in `.local/browser-release-test/`; this is a local
+headless Chrome check, not a Cloudflare deployment or a physical-phone test.
+
 ## Remaining bounded tasks
 
-1. Package static hosting and verification without an always-on physics process
-   or a fixed monthly compute subscription.
+1. Finish scale-to-zero verification packaging without an always-on physics
+   process or a fixed monthly compute subscription. The browser static package
+   is built with `npm run build:static`; see `docs/DEPLOYING.md` for delivery
+   chunking, local verification and hosting configuration.
 2. Verify the complete integrated game, cross-browser replay behavior and broader
    desktop/mobile controls and performance. Remove remaining runtime dependence
    on the native worker when the replacement is proven. Investigate the observed

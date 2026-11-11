@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import {mkdtemp,writeFile,readFile,rm,access} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
+import {emitAsset} from '../../deploy/browser-package.mjs';
+import {loadAsset,readAssetManifest} from '../public/asset-download.js';
+const directory=await mkdtemp(join(tmpdir(),'kyoto-static-'));
+try{
+ const data=Uint8Array.from({length:1003},(_,i)=>i%251),source=join(directory,'source.glb');await writeFile(source,data);
+ const asset=await emitAsset(directory,'model.glb',source,{chunkBytes:128});
+ assert.equal(asset.parts.length,8);assert.equal(asset.sha256,createHash('sha256').update(data).digest('hex'));
+ await assert.rejects(access(join(directory,'model.glb')),'Chunked files must not leave a duplicate full asset');
+ let active=0,maximum=0;const progress=[];
+ const fetcher=async path=>{
+  active++;maximum=Math.max(maximum,active);const bytes=await readFile(join(directory,path));let offset=0;
+  return new Response(new ReadableStream({async pull(c){await new Promise(r=>setTimeout(r,1));if(offset===bytes.length){active--;c.close();return;}c.enqueue(bytes.subarray(offset,offset+23));offset=Math.min(bytes.length,offset+23);}}));
+ };
+ const actual=await loadAsset('/model.glb',(loaded,done)=>progress.push({loaded,done}),{asset,fetcher});
+ assert.deepEqual(new Uint8Array(actual),data);assert.equal(maximum,2);
+ assert(progress.every((p,i)=>i===0||p.loaded>=progress[i-1].loaded));assert.equal(progress.filter(p=>p.done).length,1);assert.deepEqual(progress.at(-1),{loaded:data.length,done:true});
+ const normal=async path=>new Response(await readFile(join(directory,path)));
+ const corrupt=async path=>{const bytes=await readFile(join(directory,path));bytes[0]^=1;return new Response(bytes);};
+ const completions=[];await assert.rejects(loadAsset('/model.glb',(n,done)=>completions.push(done),{asset,fetcher:corrupt}),/checksum mismatch/);assert(!completions.includes(true));
+ await assert.rejects(loadAsset('/model.glb',undefined,{asset,fetcher:async()=>new Response('missing',{status:404})}),/Asset unavailable/);
+ await assert.rejects(loadAsset('/model.glb',undefined,{asset,fetcher:async()=>new Response(new Uint8Array(2))}),/size mismatch/);
+ await assert.rejects(loadAsset('/model.glb',undefined,{asset,fetcher:async()=>new Response(new Uint8Array(129))}),/size mismatch/);
+ await assert.rejects(loadAsset('/model.glb',undefined,{asset:{...asset,sha256:'0'.repeat(64)},fetcher:normal}),/checksum mismatch/);
+ await assert.rejects(loadAsset('/model.glb',undefined,{asset:{...asset,parts:[...asset.parts].reverse()},fetcher:normal}),/checksum mismatch/);
+ let called=false;const never=async()=>{called=true;throw Error('Should not fetch');};
+ for(const change of [{bytes:1004},{parts:[]},{parts:[{...asset.parts[0],url:'https://example.com/private'}]},{parts:[{...asset.parts[0],bytes:Infinity}]}])await assert.rejects(loadAsset('/model.glb',undefined,{asset:{...asset,...change},fetcher:never}));
+ assert.equal(called,false,'Malformed manifests fail before requesting URLs or allocating their declared data');
+ const direct=await emitAsset(directory,'small.glb',source,{chunkBytes:2048});assert.equal(direct.parts,undefined);
+ assert.deepEqual(new Uint8Array(await loadAsset('/small.glb',undefined,{asset:direct,fetcher:normal})),data);
+ await assert.rejects(loadAsset('/small.glb',undefined,{asset:direct,fetcher:corrupt}),/checksum mismatch/);
+ assert.equal(await readAssetManifest({fetcher:async()=>new Response('',{status:404})}),null);
+ await assert.rejects(readAssetManifest({required:true,fetcher:async()=>new Response('',{status:404})}),/unavailable/);
+ await assert.rejects(readAssetManifest({required:true,fetcher:async()=>Response.json({files:{}})}),/invalid/);
+ console.log('PASS exact static asset reassembly, bounded downloads, progress, corruption, missing/truncated/oversize parts and manifest failures');
+}finally{await rm(directory,{recursive:true,force:true});}

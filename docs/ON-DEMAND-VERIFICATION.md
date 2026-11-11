@@ -313,8 +313,9 @@ retired publications, fence late workers, and reject oversized evidence without
 creating a result. Browser replay checks delay an input request and require its
 exact reconstruction after retry; portable tests also cancel a long retry wait.
 
-Before full migration acceptance, finish static hosting and scale-to-zero
-deployment packaging, then run the complete integrated acceptance checks.
+The static browser package and local hosting checks are documented in
+`docs/DEPLOYING.md`. Before full migration acceptance, finish scale-to-zero
+verifier deployment packaging, then run the complete integrated acceptance checks.
 No compatibility archive or native score migration is planned.
 
 ## Hosting evidence, checked November 10, 2026

@@ -11,6 +11,7 @@ import {replayIdFromPath} from './replay-links.js';
 import {playerName} from './player-name.js';
 import {gameConnection} from './connection.js';
 import {browserConnection} from './local-connection.js';
+import {assetManifest} from './asset-download.js';
 const browserRuntime=document.querySelector('meta[name=kyoto-runtime]')?.content==='browser';
 import {clientPerformance} from './performance.js';
 import {ShotPlayback} from './shot-playback.js';
@@ -147,6 +148,7 @@ const connection=sharedReplayId&&!browserRuntime?null:(browserRuntime?browserCon
     if(status==='latency')return;connectionStatus=status;
     if(status==='connected')return;
     workerReady=false;startup?.network(false);workerStatus=status;cancel();if(!shotPlayback.active)clearLiveMotion();
+    if(browserRuntime&&status==='failed'&&startup?.active)startup.fail();
     if(status==='reconnecting')notice(shotPlayback.active?'Reconnecting… Playing the buffered shot.':'Connection interrupted. Reconnecting…',1e8);
     if(status==='replaced')notice('This session was opened on another connection. Reload to start a new session.',1e8);
   },
@@ -410,9 +412,8 @@ async function load(){
     const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
     const models=['atrium','ori','atrium-detail'].map(name=>`/assets/runtime/${name}.glb`);
     const paths=['/assets/station.json',...models,'/assets/atrium-detail.json'];startup.downloads(paths);
-    // Load the tiny size manifest alongside the assets, without delaying them.
-    fetch('/browser-build.json').then(r=>r.ok?r.json():null).then(m=>{if(m)startup.expect(m.files);}).catch(()=>{});
-    const asset=path=>loadAsset(path,(bytes,done)=>startup.download(path,bytes,done));
+    const manifest=await assetManifest();if(manifest)startup.expect(manifest.files);
+    const asset=path=>loadAsset(path,(bytes,done)=>startup.download(path,bytes,done),{asset:manifest?.delivery==='chunks-v1'?manifest.files['web/public'+path]:undefined});
     const json=async path=>JSON.parse(new TextDecoder().decode(await asset(path)));
     const [data,atrium,robot,hardware,detailData]=await Promise.all([
       json(paths[0]),...models.map(async path=>loader.parseAsync(await asset(path),'/assets/runtime/')),json(paths.at(-1))

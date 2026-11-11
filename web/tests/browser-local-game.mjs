@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {mkdir,writeFile,readFile} from 'node:fs/promises';
+import {mkdir,writeFile,readFile,rm} from 'node:fs/promises';
 import {chromium} from 'playwright';
 import {backgroundInput} from './background-input.mjs';
 import {StaticWorld} from '../public/physics/static-world.js';
@@ -8,7 +8,8 @@ import {BROWSER_PHYSICS} from '../public/physics/shot.js';
 import {ShotVerification} from '../verification.mjs';
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430';
 assert.equal(new URL(origin).hostname,'127.0.0.1');
-const out='.local/browser-physics/game';await mkdir(out,{recursive:true});
+const out=process.env.KYOTO_TEST_OUTPUT||'.local/browser-physics/game';await mkdir(out,{recursive:true});
+for(const name of ['failure.json','failure.png'])await rm(out+'/'+name,{force:true});
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist','--mute-audio']});
 const context=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:1});await backgroundInput(context);
 const page=await context.newPage(),errors=[],requests=[],results=[],catalog=JSON.parse(await readFile('web/starter-challenges.json'));let benchmark;page.setDefaultTimeout(30000);
@@ -54,6 +55,11 @@ async function select(id){
 }
 try{
  await page.goto(origin+'/level/atrium-welcome');await enter();console.log('Loaded browser-only station');
+ if(process.env.KYOTO_TEST_STATIC){
+  const manifest=await (await fetch(origin+'/browser-build.json')).json();
+  for(const entry of Object.values(manifest.files))for(const part of entry.parts||[])assert(requests.includes(origin+part.url),'Real game downloaded each packaged station/collision chunk');
+  for(const path of ['/station.collision.bin','/assets/runtime/atrium.glb'])assert(!requests.includes(origin+path),'No fallback to the original oversized file');
+ }
  const before=await page.evaluate(()=>kyotoState.feet);
  await page.locator('#game').focus();await page.keyboard.down('KeyW');await page.waitForTimeout(500);await page.keyboard.up('KeyW');await page.waitForTimeout(100);
  const moved=await page.evaluate(()=>kyotoState.feet);assert.ok(Math.hypot(moved.x-before.x,moved.z-before.z)>.3,'Walking moves the robot');assert.ok(Math.abs(moved.y-before.y)<.02,'Walking stays grounded');
@@ -138,6 +144,14 @@ try{
   console.log(`PASS offline ${width}px menu: all 30 stages, start positions and target geometry`);
  }
  assert.ok(!requests.some(url=>new URL(url).pathname.startsWith('/api/')),'Browser gameplay must never contact the native gameplay API');
+ if(process.env.KYOTO_TEST_STATIC){
+  const manifest=await (await fetch(origin+'/browser-build.json')).json(),part=manifest.files['web/public/station.collision.bin'].parts[0];
+  await context.setOffline(false);await page.route(origin+part.url,route=>route.fulfill({status:404,body:'Missing collision part'}));
+  await page.reload();await page.waitForFunction(()=>document.getElementById('loading')?.dataset.phase==='error',null,{timeout:15000});
+  assert(await page.locator('#loading-retry').isVisible(),'A failed physics download offers retry instead of waiting forever for connection');
+  await page.screenshot({path:out+'/download-retry.png'});
+  console.log('PASS missing collision chunk produces a visible retry state');
+ }
  assert.deepEqual(errors,[]);console.log('PASS browser-only game: walking, home, three levels including moving escalator, offline Skip, recall forfeiture, replay seeking, durable local score, touch hold/release, mobile Skip and all 30 course menus');
 }catch(error){
  await page.screenshot({path:out+'/failure.png'});await writeFile(out+'/failure.json',JSON.stringify({error:String(error),errors,state:await page.evaluate(()=>window.kyotoState)},null,2));throw error;

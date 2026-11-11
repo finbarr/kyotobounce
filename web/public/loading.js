@@ -16,15 +16,7 @@ export class DownloadProgress{
   return {bytes,total,fraction:done?1:known&&total?Math.min(.99,files.reduce((n,f)=>n+Math.min(f.loaded,f.total),0)/total):null};
  }
 }
-export async function loadAsset(path,onProgress,{fetcher=fetch}={}){
- const response=await fetcher(path);if(!response.ok)throw new Error(`Asset unavailable: ${path}`);
- if(!response.body?.getReader){const buffer=await response.arrayBuffer();onProgress(buffer.byteLength,true);return buffer;}
- const reader=response.body.getReader(),chunks=[];let size=0;
- try{for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);size+=value.byteLength;onProgress(size,false);}}
- finally{reader.releaseLock();}
- const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
- onProgress(size,true);return bytes.buffer;
-}
+export {loadAsset} from './asset-download.js';
 export function progressiveLoading({replay=false,onDone=()=>{}}={}){
  const host=document.getElementById('loading'),setup=document.getElementById('loading-setup'),message=document.getElementById('loading-message'),bar=document.getElementById('load-progress'),meter=document.getElementById('loading-meter');
  const gate=new LoadingGate({started:0,replay}),inert=new Map();let resolve,finished=false,percent=0,downloads;

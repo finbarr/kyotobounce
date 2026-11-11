@@ -1,6 +1,7 @@
 import {localStore} from './local-store.js';
 import {onlineScores,verificationEndpoint} from './online-scores.js';
 import {onlineCourses} from './online-courses.js';
+import {assetManifest} from './asset-download.js';
 const order=(a,b)=>b.score-a.score||a.accepted-b.accepted||a.attempt.localeCompare(b.attempt);
 export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier=document.querySelector('meta[name=kyoto-verifier]')?.content}){
  let worker,store,profile,catalog,campaign,selected,currentAttempt,provisional,stopped=false,presentation,ready=false,sessionBusy=false,skipping=false,lastProgress=-Infinity,inputWrites=Promise.resolve(),online,sharing,scope='local',importing,catalogWrites=Promise.resolve(),selection=0;
@@ -126,12 +127,13 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
     if(currentAttempt!==m.attempt)forget();currentAttempt=m.attempt;selected=m.challenge;sessionBusy=!!m.busy;emit(m);sharing?.describe(selected).catch(error);return;
    }
    if(m.type==='selected'){store.setting('selected',m.challenge.id).catch(error);store.retainCurrent([...catalog,m.challenge]).catch(error);refresh(m.challenge);}
-   if(m.type==='error'&&!ready)rejectReady(Error(m.message));
+   if(m.type==='error'&&!ready){rejectReady(Error(m.message));onStatus('failed',{});}
    emit(m);
   };
   worker.onerror=e=>{ready=false;rejectReady(Error(e.message));onStatus('failed',{});error(e);};
   emit({type:'welcome',id:profile.id,sessionId:profile.id,name:profile.name,nameChosen:profile.named,local:true});emit({type:'catalog',challenges:catalog});
-  worker.postMessage({type:'init',collisionURL:'/station.collision.bin',catalog:[selected,...catalog.filter(c=>c!==selected)],id:profile.id});
+  const manifest=await assetManifest();
+  worker.postMessage({type:'init',collisionURL:'/station.collision.bin',collisionAsset:manifest?.delivery==='chunks-v1'?manifest.files['web/public/station.collision.bin']:undefined,catalog:[selected,...catalog.filter(c=>c!==selected)],id:profile.id});
   board(selected).then(emit).catch(error);
  }
  const send=(type,extra={})=>{

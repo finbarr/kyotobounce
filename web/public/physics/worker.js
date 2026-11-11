@@ -3,6 +3,7 @@ import {StaticWorld} from './static-world.js';
 import {Shot,BROWSER_PHYSICS} from './shot.js';
 import {GameSession} from './session.js';
 import {VerifiedReplay} from './verified-replay.js';
+import {loadAsset} from '../asset-download.js';
 
 // Only this worker owns collision buffers and the spatial index. Batches yield
 // so recall and shutdown stay responsive even for a shot that never settles.
@@ -12,8 +13,8 @@ async function handle(message){
  if(message.type==='init'){
   replay?.cancel();replay=null;
   const began=performance.now();
-  const response=await fetch(message.collisionURL);if(!response.ok)throw Error('Unable to load station collision');
-  const pack=decodeCollisionPack(await response.arrayBuffer());world?.free();world=new StaticWorld(pack);
+  const bytes=await loadAsset(message.collisionURL,undefined,{asset:message.collisionAsset});
+  const pack=decodeCollisionPack(bytes);world?.free();world=new StaticWorld(pack);
   post({type:'ready',physics:BROWSER_PHYSICS,layout:world.layoutSha256,fallLimitY:world.fallLimitY,stats:world.stats,buildMs:performance.now()-began});
   if(message.catalog){session?.close();session=new GameSession(world,message.catalog,message.id,post);}return;
  }
