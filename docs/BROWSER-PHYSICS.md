@@ -378,15 +378,18 @@ The static package and pinned Linux verifier image now have local runtime
 acceptance. `docs/DEPLOYING.md` documents their builds and a request-billed,
 zero-minimum-instance service configuration; no cloud deployment was performed.
 
-1. Update the build-only sharp dependency: the clean install audit reports
-   GHSA-wq5f-xc86-pv6w for 0.35.4 and a patched 0.35.5. Verify lossless asset
-   output after the update; the browser and online verifier do not load sharp.
-2. Investigate transition audio stalls. An earlier Chrome run observed a roughly
+The clean install's build-dependency advisory
+[GHSA-wq5f-xc86-pv6w](https://github.com/advisories/GHSA-wq5f-xc86-pv6w) is addressed
+by pinning sharp 0.35.5 and its updated libvips packages. Source/codec tests and
+the browser build pass; the rebuilt robot GLB is byte-identical. `npm audit`
+reports zero vulnerabilities. Evidence is in `.local/image-dependency-check/`.
+
+1. Investigate transition audio stalls. An earlier Chrome run observed a roughly
    1.1-second scheduler gap during automated course/viewport changes; the rendered Firefox run also
    observed one skipped music step before its flight benchmark. Their causes
    remain unproven. Keep the worker/storage diagnostics for the earlier Chrome
    Skip timeout while checking these transitions.
-3. Audit the full migration against current runtime evidence, commands and
+2. Audit the full migration against current runtime evidence, commands and
    documentation, removing obsolete runtime entry points before declaring it done.
 
 Keep one checkout and generated asset set, finish and integrate each bounded
