@@ -50,6 +50,7 @@
     "preview:static": "node web/static-preview.mjs",
     "test:browser:static": "node web/tests/browser-static.mjs",
     "test:browser:rendered": "npm run build:static && node web/tests/browser-static.mjs --engines",
+    "test:browser:controls": "npm run build:static && node web/tests/browser-touch-controls.mjs",
     "build:verifier": "node deploy/verification/build.mjs",
     "configure:verifier": "node deploy/verification/cloud-run.mjs",
     "test:verifier:container": "node web/tests/firestore-emulator.mjs --container",

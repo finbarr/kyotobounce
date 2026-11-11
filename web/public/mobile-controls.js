@@ -8,7 +8,9 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
  const canControl=()=>active&&state.ready&&!state.blocked&&!menu;
  function panel(value){if(value===menu)return;input.reset();cancel();menu=value;document.body.dataset.mobilePanel=menu;$('mobile-close').hidden=!menu;$('mobile-levels').setAttribute('aria-expanded',String(menu==='levels'));$('mobile-settings').setAttribute('aria-expanded',String(menu==='settings'));if(menu)(menu==='levels'?$('competition'):$('throw-panel')).scrollTop=0;else canvas.focus({preventScroll:true});}
  function resize(){const next=coarse.matches||narrow.matches;if(next!==active){input.reset();cancel();active=next;document.body.classList.toggle('mobile-ui',active);if(!active)panel('');}host.hidden=!active;}
- window.addEventListener('orientationchange',()=>{input.reset();cancel();});
+ const orientationChanged=()=>{input.reset();cancel();};
+ if(screen.orientation?.addEventListener)screen.orientation.addEventListener('change',orientationChanged);
+ else window.addEventListener('orientationchange',orientationChanged);
  coarse.addEventListener('change',resize);narrow.addEventListener('change',resize);resize();
  const observer=new ResizeObserver(()=>{const r=$('mobile-stage').getBoundingClientRect();viewport=r.width&&r.height?{x:r.x,y:r.y,width:r.width,height:r.height}:null;const result=$('result-card').getBoundingClientRect();resultTop=result.height?result.y:Infinity;});observer.observe($('mobile-stage'));observer.observe($('result-card'));
  function bind(el,area){
@@ -20,7 +22,13 @@ export function mobileControls({canvas,look,zoom,tap,charge,release,cancel,fly,s
  bind(canvas,'look');bind($('mobile-move'),'move');bind($('mobile-throw'),'throw');bind($('mobile-up'),'up');bind($('mobile-down'),'down');
  $('mobile-levels').onclick=()=>panel(menu==='levels'?'':'levels');$('mobile-settings').onclick=()=>panel(menu==='settings'?'':'settings');$('mobile-close').onclick=()=>panel('');
  const skipButton=document.createElement('button');skipButton.id='mobile-skip';skipButton.hidden=true;skipButton.textContent='Skip to result';$('mobile-speed').after(skipButton);skipButton.onclick=skip;
- $('mobile-scout').onclick=()=>{panel('');fly();};$('mobile-cancel').onclick=()=>{input.reset();cancel();};$('mobile-speed').onclick=speed;$('mobile-recall').onclick=recall;
+ $('mobile-scout').onclick=()=>{panel('');fly();};$('mobile-speed').onclick=speed;$('mobile-recall').onclick=recall;
+ const cancelCharge=()=>{input.reset();cancel();},cancelButton=$('mobile-cancel');
+ // The charging finger remains down. Chrome does not generate a click for the
+ // second finger, so cancellation must act on touch contact itself. Keep click
+ // for mouse/keyboard activation without repeating a touch cancellation.
+ cancelButton.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&e.button===0){e.preventDefault();cancelCharge();}});
+ cancelButton.onclick=e=>{if(e.pointerType!=='touch')cancelCharge();};
  $('mobile-boost').onclick=()=>{boost=!boost;movement.fast=boost;$('mobile-boost').setAttribute('aria-pressed',String(boost));};
  for(const id of ['fly-start','fly-finish','launch-design-ball','design-back','close-editor','show-overview','use-hint'])$(id)?.addEventListener('click',()=>{if(active)panel('');});
  document.addEventListener('keydown',e=>{if(active&&menu&&e.code==='Escape'){e.preventDefault();panel('');}});

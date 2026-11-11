@@ -125,6 +125,7 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm run test:browser:campaign` | All 30 actual Walker release positions; every suggested shot repeated; 184 nearby throws; targets, destinations, authored route features, zero velocity/spin at rest, no collision-budget exhaustion, independent scoring; all 30 hints repeated offline in Chrome with exact Node replay hashes |
 | `npm run test:browser:engines` | Refreshes the Node campaign reference, then sequentially checks Chrome, Firefox and WebKit: 1,025 rotation/heading/normal cases, all 30 release positions/velocities/spins, 30 complete replays plus two regressions each repeated twice offline, early/late recall forfeits, live sprint/direction-change/charge/Skip inputs and exact independent Node reconstruction |
 | `npm run test:browser:rendered` | Rebuilds the static package once; sequential Chrome/Firefox/WebKit rendered gameplay and creator checks, offline shots/replays/progress, all 30 desktop/mobile-width menus, mobile hold/Skip, create/play/revise/reload/cancel, independent replay and creator-solution verification, unskipped frame/audio measurements and visible download Retry |
+| `npm run test:browser:controls` | Native Chrome touch gestures against the static package: joystick/dead zone/release, aim and spin sliders, second-finger charge ownership and Cancel, pointer cancellation, speed/Skip/recall, replay pause/seek/orbit/pinch, scout height/boost, orientation cancellation and desktop keyboard return; independent reconstruction of a walking/spin shot |
 | `npm run test:browser:local` | Rendered game, walking/home, six complete shots across three courses, desktop and mobile controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
 | `npm run test:browser:designer` | Actual station design-route capture and full-clear re-simulation; rendered offline create/play/revise/reload, forged or changed capture rejection, foreign edit rejection, touch creation, cancellation/restart and retired-score cleanup |
@@ -244,6 +245,34 @@ replay and anonymous replay links. Captures and its acceptance receipt are in
 `.local/verification/browser/`. These checks do not deploy a verifier or claim
 physical-phone or universal frame-rate performance.
 
+The native touch check uses CDP contacts with real pointer capture, while the
+headless input guard prevents desktop pointer lock. Its observer records outgoing
+controls, pointer events, long tasks and audio-clock changes without injecting
+physics commands. Receipts and the current screenshots live in
+`.local/browser-release-test/controls/`. Requested camera distance is included
+in read-only camera telemetry so zoom input can be distinguished from collision
+clearance and its easing.
+
+The check reproduced Cancel failing while another finger held Throw: Chrome
+delivered the secondary pointer down/up but no click, and lifting Throw launched
+the shot. Cancel now acts on touch contact and retains mouse/keyboard click
+activation. Browser click generation can vary during multi-touch, as described
+in the [Pointer Events specification](https://www.w3.org/TR/pointerevents3/#compatibility-mapping-with-mouse-events).
+Orientation changes now use `screen.orientation.change` when available, with
+the existing window event as a fallback. Chrome emitted only the modern event
+in the check; listening solely to the window event left a charge held after
+rotation. Both paths discard held controls without releasing a shot.
+
+The final Chrome control run passed all nine groups above, including real
+844×390 landscape layout and a return to 1280×800 desktop controls. Its saved
+touch-walking/spin shot reproduced exactly in Node. No music steps were skipped;
+the largest cumulative scheduler gap was 122.7 ms. A 108 ms main-thread long task
+occurred during the return to desktop layout. The earlier large audio gap did
+not recur in this check, so its cause remains open. A separate full gameplay
+regression passed six exact saved shots, all 30 desktop/mobile course selections
+and download Retry. Its 1,887-frame unskipped flight averaged 60.00 FPS, with
+16.8 ms p95/maximum, no long tasks and no skipped music steps.
+
 The traversal fixtures cover 80 combinations of step height, speed, direction
 and station-scale coordinates, plus oblique approaches, consecutive risers,
 low ceilings, reversing away, steep slopes and airborne ledges. The station
@@ -290,15 +319,15 @@ The static package and pinned Linux verifier image now have local runtime
 acceptance. `docs/DEPLOYING.md` documents their builds and a request-billed,
 zero-minimum-instance service configuration; no cloud deployment was performed.
 
-1. Complete broader desktop/touch gesture coverage and investigate transition
-   audio stalls. An earlier Chrome run observed a roughly 1.1-second scheduler
-   gap during automated course/viewport changes; the rendered Firefox run also
+1. Make the browser path the default startup/setup workflow and remove remaining
+   runtime dependence on the native worker.
+2. Investigate transition audio stalls. An earlier Chrome run observed a roughly
+   1.1-second scheduler gap during automated course/viewport changes; the rendered Firefox run also
    observed one skipped music step before its flight benchmark. Their causes
    remain unproven. Keep the worker/storage diagnostics for the earlier Chrome
    Skip timeout while checking these transitions.
-2. Make the browser path the default startup/setup workflow and remove remaining
-   runtime dependence on the native worker. Audit the full migration against
-   current runtime evidence, commands and documentation before declaring it done.
+3. Audit the full migration against current runtime evidence, commands and
+   documentation before declaring it done.
 
 Keep one checkout and generated asset set, finish and integrate each bounded
 change, and preserve unrelated Unity edits. No migration deployment is authorized.
