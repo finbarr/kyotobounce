@@ -5,6 +5,7 @@ import {Walker} from '../public/physics/walker.js';
 import {StaticWorld} from '../public/physics/static-world.js';
 import {decodeCollisionPack} from '../public/physics/collision-pack.js';
 import {INPUT_FORMAT} from '../verification.mjs';
+import {campaignLaunches} from './browser-launches.mjs';
 let session,active=false,runs=[],steps=0,proof;
 const move=Walker.prototype.move;
 Walker.prototype.move=function(input,yaw,fast,dt){
@@ -27,7 +28,7 @@ self.onmessage=async({data:m})=>{
    session=new GameSession(world,m.catalog,'proof-player',reply=>{
     if(reply.type==='input-start'||reply.type==='input-chunk')queueMicrotask(()=>session.handle({type:'input-ack',route:reply.route,sequence:reply.type==='input-start'?-1:reply.sequence}));
     self.postMessage(reply.type==='local-result'?{...reply,proof}:reply);
-   });install(session);active=true;self.postMessage({type:'test-ready'});return;
+   });install(session);const launches=campaignLaunches(world,m.catalog);active=true;self.postMessage({type:'test-ready',launches});return;
   }
   if(m.type==='select-challenge'){active=false;session.handle(m);runs=[];steps=0;proof=null;active=true;return;}
   session.handle(m);

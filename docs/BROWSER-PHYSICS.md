@@ -116,13 +116,14 @@ does not open an automatic overview screen.
 
 ## Verification
 
-Use headless Chrome with `web/tests/background-input.mjs`; never capture the
+Use headless browsers with `web/tests/background-input.mjs`; never capture the
 user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 
 | Check | What it establishes |
 | --- | --- |
 | `npm test` | Portable geometry, impulse/spin model, floor/wall settling, separation from former support, stair masks, moving treads, recording bounds, scoring and existing UI/service regressions |
 | `npm run test:browser:campaign` | All 30 actual Walker release positions; every suggested shot repeated; 184 nearby throws; targets, destinations, authored route features, zero velocity/spin at rest, no collision-budget exhaustion, independent scoring; all 30 hints repeated offline in Chrome with exact Node replay hashes |
+| `npm run test:browser:engines` | Refreshes the Node campaign reference, then sequentially checks Chrome, Firefox and WebKit: 1,025 rotation/heading/normal cases, all 30 release positions/velocities/spins, 30 complete replays plus two regressions each repeated twice offline, early/late recall forfeits, live sprint/direction-change/charge/Skip inputs and exact independent Node reconstruction |
 | `npm run test:browser:local` | Rendered game, walking/home, three representative complete shots, desktop and touch controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
 | `npm run test:browser:designer` | Actual station design-route capture and full-clear re-simulation; rendered offline create/play/revise/reload, forged or changed capture rejection, foreign edit rejection, touch creation, cancellation/restart and retired-score cleanup |
@@ -150,7 +151,28 @@ of worker computation in yielding batches, with the largest observed batch
 8.7 ms. The main-thread heartbeat p95 was 18.2 ms, maximum 118.3 ms including
 loading and test result transfers. This isolated worker check is not a rendered
 frame-rate or physical-phone benchmark. Receipts:
-`.local/browser-physics/{campaign,campaign-worker}-proof.json`.
+`.local/browser-physics/campaign-proof.json` and
+`.local/browser-physics/campaign-worker-chrome-proof.json`.
+
+Install the pinned extra test engines with `npx playwright install firefox webkit`.
+The matrix uses the installed Chrome channel and Playwright's Firefox/WebKit
+builds, one at a time, against the same collision pack. Individual worker and
+live-input checks also accept `KYOTO_TEST_BROWSER=chrome|firefox|webkit`.
+Per-engine receipts include the engine/version; the combined receipt is
+`.local/browser-physics/browser-engine-matrix.json`. Firefox on macOS uses a
+disposable app-data home to avoid looking up the user's protected Firefox data
+([upstream issue](https://github.com/microsoft/playwright/issues/42768)); the
+launcher removes it after the browser exits. No browser profile or desktop
+pointer is used. These worker checks do not establish rendered UI compatibility
+or physical-phone performance.
+
+The November 11 matrix passed on Chrome 157.0.8103.52, Firefox 155.0 and WebKit
+26.6: 192 complete offline replays matched Node byte for byte, including moving
+contact timing and solid recovery. All 90 per-engine course launches and six
+live controller recordings also matched exactly. Early and late recalls
+forfeited in every engine. Main-thread timer p95 was 18 ms in Chrome and 21 ms
+in Firefox/WebKit; these are worker responsiveness measurements, not rendered
+FPS. No solver changes or relaxed comparison tolerances were needed.
 
 The rendered interface pass completes three representative shots offline and
 reproduces their persisted replays exactly in Node. All 30 courses are selectable
@@ -242,8 +264,9 @@ The static package and pinned Linux verifier image now have local runtime
 acceptance. `docs/DEPLOYING.md` documents their builds and a request-billed,
 zero-minimum-instance service configuration; no cloud deployment was performed.
 
-1. Verify the complete integrated game, cross-browser replay behavior and broader
-   desktop/mobile controls and performance. Remove remaining runtime dependence
+1. Verify the complete integrated rendered game across browsers and broader
+   desktop/mobile controls and performance. Cross-engine physics/replay and
+   recorded-control verification now pass. Remove remaining runtime dependence
    on the native worker when the replacement is proven. Investigate the observed
    audio scheduler gap of about 1.1 seconds during automated course/viewport
    changes; this occurred outside the flight benchmark and its cause is not yet

@@ -3,11 +3,11 @@ import http from 'node:http';
 import {createReadStream} from 'node:fs';
 import {readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-import {chromium} from 'playwright';
+import {launchTestBrowser,testBrowserName} from './browser-engine.mjs';
 import {backgroundInput} from './background-input.mjs';
 import {buildBrowserPhysics} from '../build-physics.mjs';
 import {launchInput,BROWSER_PHYSICS} from '../public/physics/shot.js';
-import {v,add,spinRotation} from '../public/physics/math.js';
+import {v,add,spinRotation,yaw,rotationFromUp} from '../public/physics/math.js';
 await buildBrowserPhysics();
 const files={'/worker.js':'.local/browser-physics/worker.js','/math.js':'web/public/physics/math.js','/collision.bin':'.local/browser-physics/station.collision.bin'};
 const server=http.createServer((req,res)=>{
@@ -18,7 +18,7 @@ const server=http.createServer((req,res)=>{
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 let browser;const results=[],campaign=process.argv.includes('--campaign');
 try{
- browser=await chromium.launch({channel:'chrome',headless:true});
+ browser=await launchTestBrowser();
  const context=await browser.newContext();await backgroundInput(context);const page=await context.newPage(),errors=[];
  page.on('pageerror',e=>errors.push(String(e)));await page.goto(`http://127.0.0.1:${server.address().port}/`);
  // Real manually timed First Bounce input exposed a one-bit quaternion
@@ -27,8 +27,8 @@ try{
  const rotations=[{q:{x:.40015149116516113,y:-2.823299416539258e-23,z:-4.9004432727629954e-17,w:.9164488315582275},w:v(-269.03173828125,-1.2788808281127017e-29,3.294691180034254e-14),dt:Math.fround(1/180)}];
  let seed=12345;const random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/2**32);
  for(let i=0;i<1024;i++){const q={x:random()-.5,y:random()-.5,z:random()-.5,w:random()-.5},norm=Math.sqrt(Object.values(q).reduce((n,x)=>n+x*x,0));for(const key in q)q[key]/=norm;rotations.push({q,w:v((random()-.5)*10000,(random()-.5)*10000,(random()-.5)*10000),dt:Math.fround(random()/180)});}
- const browserRotations=await page.evaluate(async inputs=>{const {spinRotation}=await import('/math.js');return inputs.map(({q,w,dt})=>spinRotation(q,w,dt));},rotations);
- assert.deepEqual(browserRotations,rotations.map(({q,w,dt})=>spinRotation(q,w,dt)),'Rotation arithmetic must match Chrome and Node exactly');
+ const browserRotations=await page.evaluate(async inputs=>{const {spinRotation,yaw,rotationFromUp}=await import('/math.js');return inputs.map(({q,w,dt})=>({spin:spinRotation(q,w,dt),heading:yaw(w,dt*64800-180),up:rotationFromUp(w)}));},rotations);
+ assert.deepEqual(browserRotations,rotations.map(({q,w,dt})=>({spin:spinRotation(q,w,dt),heading:yaw(w,dt*64800-180),up:rotationFromUp(w)})),`Rotation arithmetic must match ${testBrowserName} and Node exactly`);
  await page.evaluate(()=>{
   window.worker=new Worker('/worker.js',{type:'module'});window.messages=[];window.result=null;window.gaps=[];window.tick=performance.now();
   window.worker.onmessage=e=>{const m=e.data;window.messages.push(m);if(m.type==='result')window.result=m;if(m.type==='frames'&&window.recallNext){window.recallNext=false;window.worker.postMessage({type:'recall'});}};
@@ -55,11 +55,11 @@ try{
    const response=await page.evaluate(()=>result||messages.find(m=>m.type==='error'));assert.equal(response.type,'result',response.message);
    const {result,computeMs,maxBatchMs}=response;assert.equal(result.success,expected.expectSuccess??true);assert.equal(result.waypointHits.length,expected.expectedWaypoints??challenge.waypoints.length);
    const digest=createHash('sha256').update(JSON.stringify(result)).digest('hex');
-   assert.equal(digest,expected.sha256,`${label}: Chrome must reproduce the Node verifier byte for byte`);
+   assert.equal(digest,expected.sha256,`${label}: ${testBrowserName} must reproduce the Node verifier byte for byte`);
    if(hash)assert.equal(digest,hash);hash=digest;
    if(!run)results.push({id,label,computeMs,maxBatchMs,duration:result.duration,score:result.score,sha256:digest});
   }
-  console.log(`PASS offline Chrome: ${label}, two identical full replays`);
+  console.log(`PASS offline ${testBrowserName}: ${label}, two identical full replays`);
  }
  // A buffered shot is still recallable after computation has finished, before
  // the user reaches the end of playback. It must not become a banked score.
@@ -72,6 +72,6 @@ try{
  assert.equal(recalled.reason,'Recalled');assert.equal(recalled.score,0);assert.equal(recalled.success,false);assert.ok(recalled.duration<results[0].duration);
  const gaps=await page.evaluate(()=>gaps);gaps.sort((a,b)=>a-b);const heartbeat={count:gaps.length,p95Ms:gaps[Math.floor(gaps.length*.95)],maxMs:Math.max(...gaps)};
  assert.ok(gaps.length>10,'Main thread kept receiving events while physics ran');assert.ok(heartbeat.p95Ms<50,'Worker should not stall the main thread');assert.deepEqual(errors,[]);
- const receipt={browser:await browser.version(),ready,results,recall:{duration:recalled.duration,score:recalled.score},heartbeat};
- await writeFile(`.local/browser-physics/${campaign?'campaign-worker':'worker'}-proof.json`,JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify(receipt,null,2));
+ const receipt={engine:testBrowserName,browser:await browser.version(),physics:BROWSER_PHYSICS,ready,results,recall:{duration:recalled.duration,score:recalled.score},heartbeat};
+ await writeFile(`.local/browser-physics/${campaign?'campaign-worker':'worker'}-${testBrowserName}-proof.json`,JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify({engine:testBrowserName,browser:receipt.browser,cases:results.length,recall:receipt.recall,heartbeat}));
 }finally{await browser?.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
