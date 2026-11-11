@@ -28,28 +28,37 @@ export function fitRouteCamera(camera,course,{left,right,bottom,top}){
 export function waypointGeometry(radius){
  return {ring:new THREE.RingGeometry(Math.max(.01,radius-.05),radius,48),fill:new THREE.CircleGeometry(radius,48)};
 }
-export function waypointTargets(scene){
- const group=new THREE.Group();group.name='waypoint-targets';scene.add(group);let nodes=[];
+export function waypointTargets(scene,prepareMarker=()=>{}){
+ const group=new THREE.Group();group.name='waypoint-targets';scene.add(group);let nodes=[],count=0;
  function clear(){
-  group.traverse(o=>{o.geometry?.dispose();if(o.material){o.material.map?.dispose();o.material.dispose();}});group.clear();nodes=[];
+  group.traverse(o=>{o.geometry?.dispose();if(o.material){o.material.map?.dispose();o.material.dispose();}});group.clear();nodes=[];count=0;
  }
  return {
   draw(waypoints=[],selected=null){
-   clear();
+   // Keep one set of materials per numbered slot. Disposing every patch on
+   // selection also discards the warmed clipping programs and stalls the next
+   // draw. Valid courses cap this pool at 32 slots, including creator routes.
+   count=waypoints.length;for(const n of nodes)n.patch.visible=false;
    waypoints.forEach((d,i)=>{
-    const patch=new THREE.Group(),normal=v(d.normal).normalize();patch.position.copy(v(d.center)).addScaledVector(normal,.025);patch.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),normal);
-    const material=(opacity)=>new THREE.MeshBasicMaterial({color:0xa58aff,side:THREE.DoubleSide,transparent:true,opacity,depthWrite:false});
-    const geometry=waypointGeometry(d.radius);
-    const ring=new THREE.Mesh(geometry.ring,material(.95));
-    const fill=new THREE.Mesh(geometry.fill,material(.13));patch.add(fill,ring);
-    const canvas=document.createElement('canvas');canvas.width=128;canvas.height=128;const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.font='bold 76px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1).padStart(2,'0'),64,66);
-    const label=new THREE.Mesh(new THREE.PlaneGeometry(d.radius*1.1,d.radius*1.1),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,side:THREE.DoubleSide,depthWrite:false}));label.position.z=.006;patch.add(label);group.add(patch);
-    nodes.push({id:d.id,ring,fill,label,selected:d.id===selected});
+    let n=nodes[i];
+    if(!n){
+     const patch=new THREE.Group(),material=opacity=>new THREE.MeshBasicMaterial({color:0xa58aff,side:THREE.DoubleSide,transparent:true,opacity,depthWrite:false});
+     const geometry=waypointGeometry(d.radius),ring=new THREE.Mesh(geometry.ring,material(.95)),fill=new THREE.Mesh(geometry.fill,material(.13));patch.add(fill,ring);
+     const canvas=document.createElement('canvas');canvas.width=128;canvas.height=128;const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.font='bold 76px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1).padStart(2,'0'),64,66);
+     const label=new THREE.Mesh(new THREE.PlaneGeometry(d.radius*1.1,d.radius*1.1),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,side:THREE.DoubleSide,depthWrite:false}));label.position.z=.006;patch.add(label);group.add(patch);
+     prepareMarker(patch);n={patch,ring,fill,label,radius:d.radius};nodes.push(n);
+    }
+    if(n.radius!==d.radius){
+     const geometry=waypointGeometry(d.radius);n.ring.geometry.dispose();n.fill.geometry.dispose();n.label.geometry.dispose();
+     n.ring.geometry=geometry.ring;n.fill.geometry=geometry.fill;n.label.geometry=new THREE.PlaneGeometry(d.radius*1.1,d.radius*1.1);n.radius=d.radius;
+    }
+    const normal=v(d.normal).normalize();n.patch.position.copy(v(d.center)).addScaledVector(normal,.025);n.patch.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),normal);
+    n.patch.visible=true;n.id=d.id;n.selected=d.id===selected;
    });
   },
   update(ids=new Set()){
-   for(const n of nodes){const got=ids.has(n.id),color=got?0x63ffc5:n.selected?0xffffff:0xa58aff;n.ring.material.color.setHex(color);n.fill.material.color.setHex(color);n.fill.material.opacity=got?.37:n.selected?.24:.13;n.label.material.opacity=got?.62:1;}
+   for(const n of nodes){if(!n.patch.visible)continue;const got=ids.has(n.id),color=got?0x63ffc5:n.selected?0xffffff:0xa58aff;n.ring.material.color.setHex(color);n.fill.material.color.setHex(color);n.fill.material.opacity=got?.37:n.selected?.24:.13;n.label.material.opacity=got?.62:1;}
   },
-  get count(){return nodes.length;},dispose(){clear();scene.remove(group);}
+  get count(){return count;},dispose(){clear();scene.remove(group);}
  };
 }

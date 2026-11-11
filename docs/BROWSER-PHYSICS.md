@@ -393,25 +393,44 @@ Canvas size and pixel ratio are applied together, reducing actual dimension
 writes from 40 to 20 across the same viewport sequence. An unchanged viewport
 does not reset the drawing buffer, and every resulting canvas size is checked.
 
-Chrome 157.0.8103.52 recorded 4,830 frames across these transitions, averaging
-58.82 FPS with 16.8 ms p95 and 66.7 ms maximum frame time. No music steps were
-skipped; the maximum audio scheduling gap was 85.3 ms. These are transition
-measurements, separate from the steady-flight benchmark. The receipt at
+Chrome 157.0.8103.52 recorded 4,772 frames across these transitions, averaging
+59.60 FPS with 16.8 ms p95. The longest level-change frame was 33.4 ms; the
+overall maximum was 50.1 ms during resizing. No music steps were skipped; the
+maximum audio scheduling gap was 74.7 ms. These are transition measurements,
+separate from the steady-flight benchmark. The receipt at
 `.local/browser-transition-test/receipt.json` includes Long Animation Frame
-attribution, slow WebGL calls, canvas changes, and live GPU resource counts.
-The optional CPU profile identified synchronous shader work; the default trace
-then measured `getProgramInfoLog` calls of up to 46 ms, mainly for basic marker
-materials and some station materials. Layout flushes were below 1 ms in the
-observed slow callbacks. Actual canvas width changes can still cost 34–42 ms;
-removing redundant resets does not eliminate that browser/GPU cost.
+attribution, WebGL program links and slow calls, canvas changes, and live GPU
+resource counts. It now asserts that all campaign transitions reuse programs
+prepared during loading. The final trace contains zero new links and zero WebGL
+calls over 5 ms. Actual viewport changes can still stall in the browser/GPU;
+this does not claim every transition is a perfect 60 FPS.
 
-1. Finish transition shader preparation and reuse. Investigate discarded marker
-   programs and offscreen station materials missed by the existing warmup.
-   The older roughly 1.1-second Chrome audio gap and the Firefox skipped music
-   step have not been reproduced or explained by these shorter shader stalls.
-   Keep the worker/storage diagnostics for the earlier Chrome Skip timeout.
-2. Audit the full migration against current runtime evidence, commands and
-   documentation, removing obsolete runtime entry points before declaring it done.
+Profiling located synchronous shader initialization of up to 46 ms. The fix
+retains waypoint paint and numbered textures in a pool bounded by the 32-target
+course limit, plus the launch pad and destination materials. Geometry still
+matches each current radius, position and normal; old geometry is disposed when
+replaced. New markers receive the same boundary-fog customization as initial
+markers, so they share the prepared programs. Startup draws the three clipping
+variants with offscreen and temporarily hidden objects included, then restores
+all culling and visibility flags before play. The lifecycle test covers 32 to
+zero to three targets, collected/selected-state reset, geometry replacement,
+bounded reuse and complete resource disposal.
+
+Rendered Chrome gameplay and creator checks also pass: six saved shots reproduce
+independently, creator solutions reproduce after saving/revision/reload, and
+desktop/native-touch recall, Skip and replay remain intact. Normal escalator
+playback measured 60.00 FPS across 1,760 frames, with 16.7 ms p95, 16.8 ms maximum,
+no long tasks and no skipped beats. These gameplay checks exercised the material
+reuse and offscreen warmup; the final transition pass separately verified the
+subsequent hidden-object warmup adjustment. Evidence is in
+`.local/browser-release-test/chrome/` and `.local/browser-transition-test/`.
+
+The older roughly 1.1-second Chrome audio gap and Firefox skipped music step
+have not been reproduced or explained by these shorter shader stalls. Keep
+the worker/storage diagnostics for the earlier Chrome Skip timeout too.
+
+Remaining: audit the full migration against current runtime evidence, commands
+and documentation, removing obsolete runtime entry points before declaring it done.
 
 Keep one checkout and generated asset set, finish and integrate each bounded
 change, and preserve unrelated Unity edits. No migration deployment is authorized.

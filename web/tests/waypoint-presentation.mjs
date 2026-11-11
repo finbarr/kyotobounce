@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {scoreAt,heatTier,collectedIds,scoreEvents,pendingScoreEvent,HEAT_STAGES,allWaypointsCollected} from '../public/waypoint-score.js';
 import {celebrationProfile} from '../public/celebration.js';
-import {routeBounds,routeTargets,fitRouteCamera,waypointGeometry} from '../public/waypoint-targets.js';
+import {routeBounds,routeTargets,fitRouteCamera,waypointGeometry,waypointTargets} from '../public/waypoint-targets.js';
 import {readFile} from 'node:fs/promises';
 import {ballHeat} from '../public/ball-heat.js';
 import * as THREE from 'three';
@@ -104,3 +104,32 @@ for(const course of campaign)for(const [width,height,rect]of [
  }
 }
 console.log('PASS current campaign target disks fit the clear overview area at desktop, laptop and portrait sizes');
+
+// Reusing target paint must not retain a previous course's collected state,
+// dimensions or visibility. Exercise the full creator limit and disposal.
+const previousDocument=globalThis.document;
+try{
+ globalThis.document={createElement:()=>({getContext:()=>({fillText(){}})})};
+ const targetScene=new THREE.Scene(),targets=waypointTargets(targetScene);
+ const disks=Array.from({length:32},(_,i)=>({id:'first-'+i,center:{x:i,y:2,z:-i},normal:{x:0,y:1,z:0},radius:1+i*.01}));
+ targets.draw(disks);targets.update(new Set(disks.map(d=>d.id)));
+ const group=targetScene.getObjectByName('waypoint-targets'),paint=new Set(),textures=new Set();
+ group.traverse(o=>{if(o.material){paint.add(o.material);if(o.material.map)textures.add(o.material.map);}});
+ let disposedPaint=0,disposedTextures=0;for(const m of paint)m.addEventListener('dispose',()=>disposedPaint++);for(const t of textures)t.addEventListener('dispose',()=>disposedTextures++);
+ targets.draw([]);assert.equal(targets.count,0);assert.ok(group.children.every(p=>!p.visible));
+ let replacedGeometry=0;for(const o of group.children[0].children)o.geometry.addEventListener('dispose',()=>replacedGeometry++);
+ const next=disks.slice(0,3).map((d,i)=>({...d,id:'next-'+i,radius:3,center:{x:5,y:4,z:6},normal:{x:1,y:0,z:0}}));
+ targets.draw(next,next[0].id);targets.update(new Set([next[1].id]));
+ assert.equal(targets.count,3);assert.equal(group.children.filter(p=>p.visible).length,3);assert.equal(replacedGeometry,3);
+ for(const [i,p] of group.children.slice(0,3).entries()){
+  assert.ok(p.position.distanceTo(new THREE.Vector3(5.025,4,-6))<1e-8);
+  assert.ok(new THREE.Vector3(0,0,1).applyQuaternion(p.quaternion).distanceTo(new THREE.Vector3(1,0,0))<1e-8);
+  const [fill,ring,label]=p.children;assert.equal(ring.geometry.parameters.outerRadius,3);assert.equal(fill.geometry.parameters.radius,3);assert.ok(Math.abs(label.geometry.parameters.width-3.3)<1e-12);
+  assert.equal(ring.material.color.getHex(),i===0?0xffffff:i===1?0x63ffc5:0xa58aff);assert.equal(label.material.opacity,i===1?.62:1);
+ }
+ for(let i=0;i<40;i++){targets.draw(i%2?disks:next);targets.update();}
+ assert.equal(group.children.length,32,'Changing courses does not accumulate marker slots');assert.equal(disposedPaint,0);assert.equal(disposedTextures,0);
+ const remainingGeometry=new Set();group.traverse(o=>{if(o.geometry)remainingGeometry.add(o.geometry);});let disposedGeometry=0;for(const g of remainingGeometry)g.addEventListener('dispose',()=>disposedGeometry++);
+ targets.dispose();assert.equal(targetScene.children.length,0);assert.equal(targets.count,0);assert.equal(disposedPaint,paint.size);assert.equal(disposedTextures,textures.size);assert.equal(disposedGeometry,remainingGeometry.size);
+}finally{if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;}
+console.log('PASS 32-slot target lifecycle, changed radius/normal/labels/collection, empty routes and complete GPU resource disposal');

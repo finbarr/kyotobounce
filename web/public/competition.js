@@ -11,7 +11,7 @@ import {arcadeFeedback} from './arcade-feedback.js';
 import {waypointTargets} from './waypoint-targets.js';
 import {scoreAt,collectedIds,allWaypointsCollected} from './waypoint-score.js';
 const $=id=>document.getElementById(id),v=p=>new THREE.Vector3(p.x,p.y,-p.z);
-export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchLevel,onModeChange=()=>{},focusTarget=()=>{},resume=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
+export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchLevel,onModeChange=()=>{},focusTarget=()=>{},resume=()=>{},prepareMarker=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
  const feedback=arcadeFeedback(sound);
  const host=document.createElement('aside');host.id='competition';host.innerHTML=`
  <div id="course-view"><div class="panel-top"><span class="eyebrow">STAGE SELECT / 選択</span><button id="new-challenge">＋ Create</button></div><h2 id="course-title">EXPLORE KYOTO.</h2><div id="turn-status"></div><label class="campaign-picker" id="campaign-picker" hidden><span id="campaign-count"></span><select id="campaign-chapter" aria-label="Campaign chapter"></select></label><div id="course-list"></div><div id="challenge-detail" hidden><p id="challenge-description"></p><button id="show-overview">◎ View course overview</button><button id="use-hint" hidden>Set suggested aim <kbd>H</kbd></button><p id="hint-note"></p><div id="timing-hint" hidden><span class="eyebrow">ESCALATOR RELEASE TIMING</span><div class="timing-track"><i id="timing-window"></i><b id="timing-cursor"></b></div><p id="timing-caption"></p></div><div class="actions"><button id="share-challenge">Copy level link ↗</button><button id="edit-challenge" hidden>Revise</button></div><details id="score-guide"><summary>HOW TO SCORE</summary><p><strong>10,000 base × (1 + 0.5 per distinct bank) × landing accuracy.</strong> Banks add to the multiplier; impact speed does not multiply it.</p><p>Keep 100% inside the gold bullseye. The outer rings show 75%, 50% and 25%, fading to zero at the edge. Height counts too. Tagging the target guarantees 25% even if it rolls out.</p><p>Spaced banks count once per surface; a flight of treads counts as one. Movement adds 100 points per second outside every multiplier. Waiting and spinning in place add nothing. Banks freeze at the first target hit. A far miss still banks its movement points.</p><p>The score locks only when the ball stops moving and spinning. Recall forfeits the shot.</p></details></div></div>
@@ -60,23 +60,27 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
  function showProof(){$('design-proof').hidden=!capturedDesign;$('design-proof').textContent='✓ RECORDED ROUTE · Your shot reached every generated target. Its aim and power are saved with the level.';$('design-proof').dataset.verified=String(!!proofUnchanged());}
  const powerMarker=document.createElement('b');powerMarker.id='hint-power-marker';powerMarker.hidden=true;document.querySelector('.power-track').append(powerMarker);
  let replayFeedbackTime=-Infinity,liveScore=null,scoreAttempt='',scoreEpoch=0;
- const targetMarkers=waypointTargets(scene);
+ const targetMarkers=waypointTargets(scene,prepareMarker);
  const markers=new THREE.Group();scene.add(markers);
+ const launchPad=startMarker({center:{x:0,y:0,z:0},radius:1});prepareMarker(launchPad);
+ const goalMaterials=[.95,.16].map(opacity=>new THREE.MeshBasicMaterial({color:0xffd260,side:THREE.DoubleSide,transparent:true,opacity,depthWrite:false}));
+ const retainedMaterials=new Set([launchPad.material,...goalMaterials]);
  function drawDisks(challenge){
-  while(markers.children.length){const o=markers.children[0];markers.remove(o);o.geometry?.dispose();o.material?.map?.dispose();o.material?.dispose();}
+  while(markers.children.length){const o=markers.children[0];markers.remove(o);if(o!==launchPad)o.geometry?.dispose();if(!retainedMaterials.has(o.material)){o.material?.map?.dispose();o.material?.dispose();}}
   targetMarkers.draw(challenge?.waypoints||[],state.mode==='editor'?state.selectedWaypoint:null);
   if(!challenge)return;
   const arcade=['combo-v7'].includes(challenge.scoring);
   const range=challenge.start&&challenge.goal?THREE.MathUtils.clamp(v(challenge.start.center).distanceTo(v(challenge.goal.center))*.35,3,12):3;
   for(const [key,color]of [['start',0x39d9ed],['goal',0xffd260]]){
    const d=challenge[key];if(!d)continue;
-   if(key==='start'){markers.add(startMarker(d,challenge.hint?.yaw||0));continue;}
-   const mesh=(geometry,opacity,tint=color,height=.016)=>{
-    const o=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:tint,side:THREE.DoubleSide,transparent:true,opacity,depthWrite:false}));
-    o.rotation.x=-Math.PI/2;o.position.copy(v(d.center));o.position.y+=height;o.userData={key,opacity,tint};markers.add(o);return o;
+   if(key==='start'){launchPad.scale.setScalar(d.radius);launchPad.rotation.set(-Math.PI/2,0,-(challenge.hint?.yaw||0)*Math.PI/180);launchPad.position.copy(v(d.center));launchPad.position.y+=.02;markers.add(launchPad);continue;}
+   const mesh=(geometry,opacity,tint=color,height=.016,material)=>{
+    const o=new THREE.Mesh(geometry,material||new THREE.MeshBasicMaterial({color:tint,side:THREE.DoubleSide,transparent:true,opacity,depthWrite:false}));
+    o.material.color.setHex(tint);o.material.opacity=opacity;
+    o.rotation.x=-Math.PI/2;o.position.copy(v(d.center));o.position.y+=height;o.userData={key,opacity,tint};prepareMarker(o);markers.add(o);return o;
    };
-   mesh(new THREE.RingGeometry(Math.max(.01,d.radius-.045),d.radius+.045,96),.95);
-   mesh(new THREE.CircleGeometry(d.radius,80),.16);
+   mesh(new THREE.RingGeometry(Math.max(.01,d.radius-.045),d.radius+.045,96),.95,color,.016,goalMaterials[0]);
+   mesh(new THREE.CircleGeometry(d.radius,80),.16,color,.016,goalMaterials[1]);
    if(key==='goal'&&arcade){
     for(let band=1;band<=4;band++){
      const inner=d.radius+range*(band-1)/4,outer=d.radius+range*band/4;

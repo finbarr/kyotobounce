@@ -14,7 +14,7 @@ try{
  browser=await launchTestBrowser({render:true});const context=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:1});
  await backgroundInput(context);await silentOutput(context);
  await context.addInitScript(()=>{
-  const bench=window.transitionBench={operation:'loading',active:false,frames:[],tasks:[],longFrames:[],gl:[],canvasResizes:[],audioGaps:[],visibility:[],operations:[],resources:{},resourceMax:{},audio:[]};
+  const bench=window.transitionBench={operation:'loading',active:false,frames:[],tasks:[],longFrames:[],gl:[],programLinks:[],canvasResizes:[],audioGaps:[],visibility:[],operations:[],resources:{},resourceMax:{},audio:[]};
   for(const name of ['width','height']){
    const descriptor=Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype,name);
    Object.defineProperty(HTMLCanvasElement.prototype,name,{...descriptor,set(value){const at=performance.now();descriptor.set.call(this,value);if(bench.active&&this.id==='game')bench.canvasResizes.push({at,ms:performance.now()-at,name,value,operation:bench.operation});}});
@@ -40,7 +40,7 @@ try{
    const original=WebGL2RenderingContext.prototype[name];WebGL2RenderingContext.prototype[name]=function(...args){if(name==='shaderSource')shaderNames.set(args[0],args[1].match(/#define SHADER_NAME (.*)/)?.[1]||args[1].match(/#define SHADER_TYPE (.*)/)?.[1]);else programNames.set(args[0],shaderNames.get(args[1]));return original.apply(this,args);};
   }
   for(const name of ['compileShader','linkProgram','getProgramParameter','getShaderParameter','getProgramInfoLog','getShaderInfoLog','texImage2D','texSubImage2D','bufferData']){
-   const original=WebGL2RenderingContext.prototype[name];WebGL2RenderingContext.prototype[name]=function(...args){const at=performance.now();try{return original.apply(this,args);}finally{const ms=performance.now()-at;if(bench.active&&ms>5)bench.gl.push({name,at,ms,shader:programNames.get(args[0])||shaderNames.get(args[0]),operation:bench.operation});}};
+   const original=WebGL2RenderingContext.prototype[name];WebGL2RenderingContext.prototype[name]=function(...args){const at=performance.now();try{return original.apply(this,args);}finally{const ms=performance.now()-at,shader=programNames.get(args[0])||shaderNames.get(args[0]);if(bench.active&&name==='linkProgram')bench.programLinks.push({at,shader,operation:bench.operation});if(bench.active&&ms>5)bench.gl.push({name,at,ms,shader,operation:bench.operation});}};
   }
   for(const kind of ['Texture','Buffer','Program','Shader','Framebuffer','Renderbuffer']){
    const live=new WeakSet();bench.resources[kind]=0;bench.resourceMax[kind]=0;
@@ -93,12 +93,14 @@ try{
  const music=await page.evaluate(()=>({start:transitionBench.operations[0].audioStart,end:kyotoState.audio}));
  assert.equal(music.end.status,'running');assert.ok(music.end.step>music.start.step+10,'The real audio clock continued scheduling music');
  assert.equal(music.end.skippedMusicSteps,music.start.skippedMusicSteps,'Transitions must not drop scheduled music beats');
+ assert.deepEqual(await page.evaluate(()=>transitionBench.programLinks),[],'Campaign transitions must reuse programs prepared during loading');
  passed=true;
 }catch(error){errors.push(String(error));throw error;}
 finally{
- if(profiler)try{const {profile}=await profiler.send('Profiler.stop');await writeFile(output+'/cpu-profile.json',JSON.stringify(profile)+'\n');await profiler.detach();}catch(error){errors.push(String(error));passed=false;}
+ if(profiler)try{const {profile}=await profiler.send('Profiler.stop');await writeFile(output+'/cpu-profile.json',JSON.stringify(profile)+'\n');await profiler.detach();}catch(error){errors.push(String(error));passed=false;process.exitCode=1;}
  let measurements;
  if(page)try{measurements=await page.evaluate(()=>{transitionBench.active=false;return {...transitionBench,finalAudio:window.kyotoState?.audio};});}catch{}
+ if(passed&&!measurements){passed=false;errors.push('Transition measurements unavailable');process.exitCode=1;}
  const operations=(measurements?.operations||[]).map(op=>{
   const frames=measurements.frames.filter(f=>f.at>=op.start&&f.at<=op.end).map(f=>f.ms).sort((a,b)=>a-b);
   return {...op,frames:frames.length,frameP95Ms:frames[Math.floor(frames.length*.95)]||0,frameMaxMs:frames.at(-1)||0,skippedMusicSteps:(op.audioEnd?.skippedMusicSteps||0)-(op.audioStart?.skippedMusicSteps||0)};
