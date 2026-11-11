@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,rm} from 'node:fs/promises';
 import {spawn} from 'node:child_process';
 import {staticPreview} from '../static-preview.mjs';
 import {inventory,STATIC_FILE_LIMIT} from '../../deploy/browser-package.mjs';
+import {browserEngines,testBrowserName} from './browser-engine.mjs';
+const matrix=process.argv.includes('--engines'),out='.local/browser-release-test',results=[];
+await mkdir(out,{recursive:true});if(matrix)await rm(out+'/browser-matrix.json',{force:true});
 const directory='.local/browser-release',files=await inventory(directory);
 assert(Object.keys(files).length<20000);assert(Object.values(files).every(f=>f.bytes<=STATIC_FILE_LIMIT));
 assert(!Object.keys(files).some(f=>/\.(sqlite|cs|ts|env|pem|key)$/.test(f)||/^(node_modules|research|Builds|runtime)\//.test(f)));
@@ -24,8 +27,18 @@ try{
  assert.equal((await fetch(origin+'/credits.html')).status,200);
  const part=manifest.files['web/public/station.collision.bin'].parts[0],response=await fetch(origin+part.url,{method:'HEAD'});assert.equal(response.status,200);assert.equal(response.headers.get('content-length'),String(part.bytes));assert.match(response.headers.get('cache-control'),/immutable/);
  console.log('PASS static-only release inventory, checksums, size limits, deep links, missing routes and attribution');
- await new Promise((resolve,reject)=>{
-  const child=spawn(process.execPath,['web/tests/browser-local-game.mjs'],{stdio:'inherit',env:{...process.env,KYOTO_TEST_ORIGIN:origin,KYOTO_TEST_STATIC:'1',KYOTO_TEST_OUTPUT:'.local/browser-release-test'}});
-  child.once('error',reject);child.once('exit',(code,signal)=>code===0?resolve():reject(Error(`Packaged browser acceptance failed: ${code??signal}`)));
- });
+ for(const engine of matrix&&!process.env.KYOTO_TEST_BROWSER?browserEngines:[testBrowserName]){
+  const receipts={engine};
+  for(const [name,script]of [['game','browser-local-game'],...(matrix?[['designer','browser-designer-ui']]:[])]){
+   const output=`${out}/${engine}/${name}`;
+   await new Promise((resolve,reject)=>{
+    const child=spawn(process.execPath,[`web/tests/${script}.mjs`],{stdio:'inherit',env:{...process.env,KYOTO_TEST_BROWSER:engine,KYOTO_TEST_ORIGIN:origin,KYOTO_TEST_STATIC:'1',KYOTO_TEST_OUTPUT:output}});
+    child.once('error',reject);child.once('exit',(code,signal)=>code===0?resolve():reject(Error(`Packaged ${engine} ${name} acceptance failed: ${code??signal}`)));
+   });
+   const receipt=JSON.parse(await readFile(output+'/receipt.json'));assert.equal(receipt.passed,true);assert.equal(receipt.engine,engine);assert.deepEqual(receipt.errors,[]);
+   receipts[name]=name==='game'?{browser:receipt.browser,shots:receipt.results.length,mobileInputKind:receipt.mobileInputKind,frameClock:receipt.frameClock,benchmark:receipt.benchmark}:{revisions:receipt.revision,mobileInputKind:receipt.mobileInputKind};
+  }
+  results.push(receipts);
+ }
+ if(matrix){await writeFile(out+'/browser-matrix.json',JSON.stringify({layout:manifest.layoutSha256,physics:manifest.physics,results},null,2)+'\n');console.log('PASS packaged rendered game and creator: '+results.map(r=>r.engine).join(', '));}
 }finally{await new Promise(resolve=>server.close(resolve));}

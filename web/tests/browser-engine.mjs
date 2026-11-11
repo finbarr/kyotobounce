@@ -8,8 +8,8 @@ import {promisify} from 'node:util';
 export const browserEngines=['chrome','firefox','webkit'];
 export const testBrowserName=process.env.KYOTO_TEST_BROWSER||'chrome';
 if(!browserEngines.includes(testBrowserName))throw new Error(`Unsupported KYOTO_TEST_BROWSER: ${testBrowserName}`);
-export async function launchTestBrowser(){
- if(testBrowserName==='chrome')return chromium.launch({channel:'chrome',headless:true});
+export async function launchTestBrowser({render=false}={}){
+ if(testBrowserName==='chrome')return chromium.launch({channel:'chrome',headless:true,args:render?['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist','--mute-audio']:[]});
  if(testBrowserName==='webkit')return webkit.launch({headless:true});
  if(process.platform!=='darwin')return firefox.launch({headless:true});
  // Firefox still looks up app data outside its temporary profile. On macOS 27

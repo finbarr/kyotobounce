@@ -111,8 +111,8 @@ does not open an automatic overview screen.
   checks reject changed geometry, forged capture tokens and edits to another
   creator's course. Current custom courses and their exact launch solutions
   survive reload; revisions discard retired local scores. These checks support
-  local authoring, not online authority. A future service must independently
-  verify submitted inputs against its own geometry and rules.
+  local authoring. Online authority comes from the verifier independently
+  reproducing submitted inputs against its own geometry and rules.
 
 ## Verification
 
@@ -124,7 +124,8 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm test` | Portable geometry, impulse/spin model, floor/wall settling, separation from former support, stair masks, moving treads, recording bounds, scoring and existing UI/service regressions |
 | `npm run test:browser:campaign` | All 30 actual Walker release positions; every suggested shot repeated; 184 nearby throws; targets, destinations, authored route features, zero velocity/spin at rest, no collision-budget exhaustion, independent scoring; all 30 hints repeated offline in Chrome with exact Node replay hashes |
 | `npm run test:browser:engines` | Refreshes the Node campaign reference, then sequentially checks Chrome, Firefox and WebKit: 1,025 rotation/heading/normal cases, all 30 release positions/velocities/spins, 30 complete replays plus two regressions each repeated twice offline, early/late recall forfeits, live sprint/direction-change/charge/Skip inputs and exact independent Node reconstruction |
-| `npm run test:browser:local` | Rendered game, walking/home, three representative complete shots, desktop and touch controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
+| `npm run test:browser:rendered` | Rebuilds the static package once; sequential Chrome/Firefox/WebKit rendered gameplay and creator checks, offline shots/replays/progress, all 30 desktop/mobile-width menus, mobile hold/Skip, create/play/revise/reload/cancel, independent replay and creator-solution verification, unskipped frame/audio measurements and visible download Retry |
+| `npm run test:browser:local` | Rendered game, walking/home, six complete shots across three courses, desktop and mobile controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
 | `npm run test:browser:designer` | Actual station design-route capture and full-clear re-simulation; rendered offline create/play/revise/reload, forged or changed capture rejection, foreign edit rejection, touch creation, cancellation/restart and retired-score cleanup |
 | `npm run test:verification` | All 30 courses verified twice from controls; complete exact replay equality; real offline Chrome walking, sprint, charge and release independently reconstructed in Node; portable forged-result and cancellation checks also run in `npm test` |
@@ -174,44 +175,72 @@ forfeited in every engine. Main-thread timer p95 was 18 ms in Chrome and 21 ms
 in Firefox/WebKit; these are worker responsiveness measurements, not rendered
 FPS. No solver changes or relaxed comparison tolerances were needed.
 
-The rendered interface pass completes three representative shots offline and
-reproduces their persisted replays exactly in Node. All 30 courses are selectable
-with their current starts, targets and hints at 1280×800 and 390×664. Keyboard
-hold timing is measured from keydown, avoiding a telemetry wait that overcharged
-short throws. Level selection waits for the replacement physics state, including
-First Bounce, whose immediate entry briefly clears readiness without an overview.
-The earlier unskipped escalator flight averaged 59.97 FPS. Subsequent runs varied
-from 49.51 to 57.11 FPS, with p95 frame times of 16.8–33.4 ms, maximum 66.7 ms,
-and one 54–59 ms main-thread long task per run. Music skipped no beats during
-those flights; maximum audio scheduler gap was 122.7 ms. A host check reported
-7.85 GB of swap in use, no recorded thermal warning and no leftover headless
-test processes; the cause of the performance variation is not established.
-These are headless Chrome laptop measurements,
-not physical-phone results or a guarantee of 60 FPS. Current receipts and captures
-are under `.local/browser-physics/game/`.
+The rendered matrix uses the same static package in each engine; it never
+starts a native worker or an online verifier. Screenshots and per-engine
+receipts are under `.local/browser-release-test/<engine>/{game,designer}/`,
+with the combined receipt at `.local/browser-release-test/browser-matrix.json`.
+Chrome exercises native touch hold/release; Firefox and WebKit use native DOM
+pointer holds on the mobile controls because Playwright exposes only touch tap
+in those engines. These inputs stay in headless tabs and never use the desktop
+pointer. A final zero-gain node silences test audio while retaining the actual
+audio graph, scheduling and clock. Engines without the Long Tasks API report
+`longTasks: null`, not a false zero. Physical-phone input/performance remains
+outside this local emulation check.
 
-The creator integration UI run passed all desktop/mobile course selections, exact
-re-simulation of its three stored shots, offline controls and reload persistence.
-Its 1,832-frame flight averaged 60.00 FPS, with 16.7 ms p95, 16.8 ms maximum,
-no main-thread long tasks and no skipped music beats. Maximum audio scheduler
-gap was 58.7 ms. The test now waits for responsive controls to finish switching
-after a viewport resize before sending menu input.
+Set `KYOTO_TEST_BROWSER` to run only one engine while diagnosing a failure.
+Each gameplay receipt includes an empty-page animation-clock baseline so a
+browser frame cap can be distinguished from scene rendering cost. The live
+escalator benchmark waits for an existing authored release phase before pressing
+the normal throw key. It does not stop or reset the moving steps. An untimed
+Firefox throw was independently reproduced in Node: the riser rejected boarding
+and the ball returned to the lower floor at full rest. That launch cleared 29
+of 32 sampled phases, so arbitrary test startup timing cannot imply a guaranteed
+clear. The rendered check still requires its timed shot to clear and verifies
+its complete saved replay independently.
 
-With persistent control recording enabled, the rendered check independently
-reconstructed four saved desktop/touch shots from walking and throw controls,
-including records kept across reload and walking retained after recall. Poses,
-contacts, launch, thrower state, timing and scores matched exactly. The
-1,773-frame flight averaged 60.00 FPS (16.7 ms p95, 16.8 ms maximum), with no
-long tasks or skipped music steps and a 53.4 ms maximum audio scheduler gap.
-All 30 offline course selections passed at both desktop and mobile widths.
+The rendered interface check completes six shots across three representative
+courses, including three successive mobile hold/Skip attempts (immediate and
+while playback is underway). Node reconstructs every saved shot from controls
+and compares its full replay and score exactly. All 30 courses are selectable
+with their current starts, targets and hints at 1280×800 and 390×664. The creator
+check records, plays, revises and reloads a course and independently reproduces
+all three saved solutions. Selecting a course waits for its actual overview and
+replacement physics state; returning from a cancelled design does not expect a
+new overview. WebKit's early injected test helper uses an absolute import URL
+because relative imports there resolve against its inspector bootstrap URL.
 
-After connecting the online verifier, the offline regression again passed all
-30 desktop/mobile course selections and independently reconstructed its saved
-shots. Its 1,752-frame flight averaged 60.00 FPS, with 16.8 ms p95 and maximum,
-no long tasks, no skipped music steps and a 58.7 ms maximum audio scheduler gap.
+The latest sequential rendered gameplay run passed all three engines against
+the same static package: 18 complete saved shots reconstructed exactly, all 180
+course selections passed (30 at two widths in each engine), and each engine
+showed Retry for a missing collision chunk. All three creator runs also passed
+revision persistence, forgery rejection and cancellation; Node reproduced all
+nine recorded course solutions. The unskipped escalator measurements were:
+
+| Engine | Frames | Mean FPS | p95 frame | Longest frame |
+| --- | ---: | ---: | ---: | ---: |
+| Chrome 157.0.8103.52 | 1,867 | 60.00 | 16.7 ms | 16.8 ms |
+| Firefox 155.0 | 909 | 31.18 | 66.5 ms | 134.2 ms |
+| Webkit 26.6 | 1,864 | 59.90 | 23.0 ms | 54.0 ms |
+
+Each empty-page frame-clock baseline was approximately 60 FPS. No engine skipped
+music steps during the measured flight; Chrome reported no long tasks. Firefox
+had already skipped one music step before that flight, with a cumulative maximum
+scheduler gap of 469.3 ms. Chrome's largest recording chunk-to-acknowledgment
+delay across the gameplay run was 8.3 ms. These results demonstrate the Chrome
+laptop target in this run, not universal 60 FPS or stall-free transitions.
+
+An earlier Chrome run timed out after mobile Skip with Flight telemetry stalled
+at 1.933 seconds; rendering and audio were still active. It did not capture
+worker acknowledgments, so its cause is unproven. The test now records bounded
+worker-message diagnostics and recording acknowledgment timings, preserves the
+original error if screenshot capture fails, and requires an explicit successful
+receipt. Repeated throws cover the affected path without changing gameplay or
+weakening full-rest assertions. Do not describe this instrumentation as a
+production fix for the earlier timeout.
+
 The separate online UI check covers desktop/touch offline queueing, reconnect,
 reload, verified standings, exact replay-cache replacement, another player's
-replay and anonymous replay links. Captures and the acceptance receipt are in
+replay and anonymous replay links. Captures and its acceptance receipt are in
 `.local/verification/browser/`. These checks do not deploy a verifier or claim
 physical-phone or universal frame-rate performance.
 
@@ -250,13 +279,10 @@ The static release acceptance runs against only `.local/browser-release`, with
 no source-tree fallback, Unity process or gameplay API. The current package has
 121 files; the station model uses ten 16 MiB-or-smaller chunks and collision uses
 four. Their hashes preserve the original station/collision bytes. The rendered
-run passed offline walking, throws, Skip, recall, saved progress, exact
-independent reconstruction of four recorded shots, and all 30 course selections
-at desktop and mobile widths. A deliberately missing collision chunk displayed
-the Retry action. Its 1,872-frame flight averaged 60.00 FPS, with 16.8 ms p95 and
-maximum, no long tasks, no skipped music steps and a 64 ms maximum audio
-scheduler gap. Evidence is in `.local/browser-release-test/`; this is a local
-headless Chrome check, not a Cloudflare deployment or a physical-phone test.
+checks require offline walking, throws, Skip, recall, saved progress, independent
+replay reconstruction and all 30 desktop/mobile course selections. A deliberately
+missing collision chunk must display Retry. This is local browser acceptance,
+not a Cloudflare deployment or a physical-phone test.
 
 ## Remaining bounded tasks
 
@@ -264,13 +290,15 @@ The static package and pinned Linux verifier image now have local runtime
 acceptance. `docs/DEPLOYING.md` documents their builds and a request-billed,
 zero-minimum-instance service configuration; no cloud deployment was performed.
 
-1. Verify the complete integrated rendered game across browsers and broader
-   desktop/mobile controls and performance. Cross-engine physics/replay and
-   recorded-control verification now pass. Remove remaining runtime dependence
-   on the native worker when the replacement is proven. Investigate the observed
-   audio scheduler gap of about 1.1 seconds during automated course/viewport
-   changes; this occurred outside the flight benchmark and its cause is not yet
-   isolated.
+1. Complete broader desktop/touch gesture coverage and investigate transition
+   audio stalls. An earlier Chrome run observed a roughly 1.1-second scheduler
+   gap during automated course/viewport changes; the rendered Firefox run also
+   observed one skipped music step before its flight benchmark. Their causes
+   remain unproven. Keep the worker/storage diagnostics for the earlier Chrome
+   Skip timeout while checking these transitions.
+2. Make the browser path the default startup/setup workflow and remove remaining
+   runtime dependence on the native worker. Audit the full migration against
+   current runtime evidence, commands and documentation before declaring it done.
 
 Keep one checkout and generated asset set, finish and integrate each bounded
 change, and preserve unrelated Unity edits. No migration deployment is authorized.

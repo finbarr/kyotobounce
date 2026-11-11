@@ -49,6 +49,7 @@
     "build:static": "node deploy/browser-package.mjs",
     "preview:static": "node web/static-preview.mjs",
     "test:browser:static": "node web/tests/browser-static.mjs",
+    "test:browser:rendered": "npm run build:static && node web/tests/browser-static.mjs --engines",
     "build:verifier": "node deploy/verification/build.mjs",
     "configure:verifier": "node deploy/verification/cloud-run.mjs",
     "test:verifier:container": "node web/tests/firestore-emulator.mjs --container",
