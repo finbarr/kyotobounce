@@ -7,7 +7,12 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
  async function progress(){const entries=await Promise.all(catalog.map(async c=>{const rows=(await store.records(c)).sort(order);return {challengeId:c.id,revision:c.revision,completed:rows.some(r=>r.completed),bestScore:rows[0]?.score||0,rank:rows.length?1:null};}));emit({type:'course-progress',full:true,entries});}
  async function result(m){
   if(m.result.attempt!==currentAttempt)return;
-  const replay={...m.result,playerName:presentation.name,character:presentation.character,local:true,verified:false,accepted:Date.now()},previous=(await store.records(replay.challenge)).sort(order);
+  const replay={...m.result,playerName:presentation.name,character:presentation.character,local:true,verified:false,accepted:Date.now()};
+  if(replay.design){
+   await store.finish(replay);if(replay.attempt!==currentAttempt){await store.discard(replay.attempt);return;}
+   provisional=replay;emit({...replay,type:'result',saved:false});return;
+  }
+  const previous=(await store.records(replay.challenge)).sort(order);
   if(replay.attempt!==currentAttempt)return;
   const entry={attempt:replay.attempt,guest:profile.id,name:replay.playerName,score:replay.score,duration:replay.duration,surfaces:replay.surfaces,accepted:replay.accepted},after=[...previous,entry].sort(order),rank=after.findIndex(e=>e.attempt===entry.attempt)+1;
   replay.standings={before:previous.slice(0,10),after:after.slice(0,10),rank};replay.rank=rank;replay.records={personalBest:replay.score>(previous[0]?.score||0),courseBest:replay.score>(previous[0]?.score||0)};
@@ -28,14 +33,20 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
  async function initialize(){
   onStatus('connecting',{});store=await localStore();await store.cleanInterrupted();
   profile=await store.setting('profile')||{id:crypto.randomUUID(),name:'Player',named:false};await store.setting('profile',profile);
-  const response=await fetch('/campaign.json');if(!response.ok)throw Error('Could not load the campaign');catalog=await response.json();await store.retainCurrent(catalog);
+  const response=await fetch('/campaign.json');if(!response.ok)throw Error('Could not load the campaign');catalog=await response.json();catalog.push(...await store.courses(catalog[0]));await store.retainCurrent(catalog);
   if(stopped){store.close();return;}
   const remembered=await store.setting('selected');selected=catalog.find(c=>c.id===remembered)||catalog[0];
   worker=new WorkerImpl('/physics-worker.js',{type:'module'});
   worker.onmessage=event=>{
    const m=event.data;
    if(m.type==='ready'){
-    ready=true;onStatus('connected',{});emit({type:'worker-status',status:'ready',capabilities:['shot-skip-v1'],local:true});emit(m);progress().catch(error);return;
+    ready=true;onStatus('connected',{});emit({type:'worker-status',status:'ready',capabilities:['shot-skip-v1','design-ball-v1'],local:true});emit(m);progress().catch(error);return;
+   }
+   if(m.type==='save-course'){
+    (async()=>{
+     await store.saveCourse(m.challenge);catalog=catalog.filter(c=>c.id!==m.challenge.id);catalog.push(m.challenge);await store.retainCurrent(catalog);
+     emit({type:'catalog',challenges:catalog});worker.postMessage({type:'course-saved',id:m.challenge.id,revision:m.challenge.revision});await progress();
+    })().catch(e=>{worker.postMessage({type:'course-save-failed'});error(e);});return;
    }
    if(m.type==='recording-chunk'){recording(m);return;}
    if(m.type==='recording-error'){if(m.attempt===currentAttempt){send('recall');error(m);}return;}
@@ -58,7 +69,6 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker}){
    profile={...profile,name,named:true};store.setting('profile',profile).then(()=>emit({type:'named',name})).catch(error);return true;
   }
   if(type==='course-progress'){progress().catch(error);return true;}
-  if(['design-start','design-cancel','save-challenge','place'].includes(type)){error(Error('Course creation is not available in this preview yet'));return true;}
   if(type==='charge'){presentation={name:profile.name,character:extra.character||'ori'};provisional=null;skipping=false;lastProgress=-Infinity;}
   if(type==='recall'||type==='home'||type==='select-challenge')forget();
   if(type==='skip-shot'&&extra.attempt===currentAttempt)skipping=true;

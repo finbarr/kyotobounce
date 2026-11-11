@@ -9,12 +9,26 @@ export function segmentSweep(p,d,a,b,radius){
 export function triangleSweep(p,d,radius,triangle){
  const normal=triangle.getNormal(new Vector3());if(normal.lengthSq()<.5)return null;
  const signed=new Vector3().subVectors(p,triangle.a).dot(normal),speed=d.dot(normal);let best=Infinity;
+ if(radius===0){
+  if(Math.abs(speed)<1e-14)return null;
+  const fraction=-signed/speed,point=p.clone().addScaledVector(d,fraction);
+  return fraction>=0&&fraction<=1&&triangle.containsPoint(point)?{fraction,point,normal:normal.multiplyScalar(speed<0?1:-1)}:null;
+ }
  for(const sign of [-1,1]){if(speed*sign>=-1e-14)continue;const t=(sign*radius-signed)/speed;if(t<0||t>1||t>=best)continue;const point=p.clone().addScaledVector(d,t).addScaledVector(normal,-sign*radius);if(triangle.containsPoint(point))best=t;}
  for(const [a,b]of [[triangle.a,triangle.b],[triangle.b,triangle.c],[triangle.c,triangle.a]])best=Math.min(best,segmentSweep(p,d,a,b,radius));
  if(best>1)return null;const center=p.clone().addScaledVector(d,best),point=triangle.closestPointToPoint(center,new Vector3()),n=center.clone().sub(point).normalize();
  return d.dot(n)<-1e-14?{fraction:best,point,normal:n}:null;
 }
 export function boxSweep(p,d,half,radius){
+ if(radius===0){
+  let enter=-Infinity,leave=Infinity,normal=new Vector3();
+  for(const axis of ['x','y','z']){
+   if(Math.abs(d[axis])<1e-14){if(Math.abs(p[axis])>half[axis])return null;continue;}
+   const a=(-half[axis]-p[axis])/d[axis],b=(half[axis]-p[axis])/d[axis],near=Math.min(a,b);
+   if(near>enter){enter=near;normal.set(0,0,0);normal[axis]=d[axis]>0?-1:1;}leave=Math.min(leave,Math.max(a,b));if(enter>leave)return null;
+  }
+  return enter>=0&&enter<=1?{fraction:enter,point:p.clone().addScaledVector(d,enter),normal}:null;
+ }
  let enter=0,leave=1;
  for(const axis of ['x','y','z']){const h=half[axis]+radius;if(Math.abs(d[axis])<1e-14){if(Math.abs(p[axis])>h)return null;continue;}const a=(-h-p[axis])/d[axis],b=(h-p[axis])/d[axis];enter=Math.max(enter,Math.min(a,b));leave=Math.min(leave,Math.max(a,b));if(enter>leave)return null;}
  const closest=q=>new Vector3(Math.max(-half.x,Math.min(half.x,q.x)),Math.max(-half.y,Math.min(half.y,q.y)),Math.max(-half.z,Math.min(half.z,q.z)));let best=Infinity;

@@ -112,6 +112,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   state.selected=session.challenge;
   if(changed){state.lastResult=null;showLevels(false);state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
   $('course-title').textContent=state.selected?.name||'EXPLORE KYOTO.';$('challenge-detail').hidden=!state.selected;
+  $('share-challenge').hidden=!!state.selected?.local;
   if(state.selected){const c=state.selected;$('challenge-description').textContent=c.scoring==='waypoint-v4'?`Throw from anywhere · ${c.waypoints?.length||0} waypoints · ${c.goal?(c.waypoints?.length?'optional destination bonus':'destination required'):'no destination required'} · all shots can rank · collect every waypoint to clear`:`Throw from anywhere · settle inside ${c.goal.radius.toFixed(2)} m${c.requiredSurface?' · required route contact':''}`;if(c.campaign)$('challenge-description').textContent=c.campaign.brief+' '+$('challenge-description').textContent;state.hint=state.selected.hint||null;$('use-hint').hidden=!state.hint;$('hint-note').textContent=state.hint?.note||'';$('edit-challenge').hidden=state.selected.creator!==getGuestId();}
   if(state.mode==='play')drawDisks(state.selected);
   $('timing-hint').hidden=!state.selected?.hint?.period;
@@ -146,7 +147,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   const ordered=[...state.challenges].sort((a,b)=>(a.order??999)-(b.order??999));
   const chapters=new Map(ordered.filter(c=>c.campaign).map(c=>[String(c.campaign.chapter),c.campaign.chapterTitle]));
   const campaignCount=ordered.filter(c=>c.campaign).length;
-  if(ordered.some(c=>!c.campaign))chapters.set('community','Player-created courses');
+  if(ordered.some(c=>!c.campaign))chapters.set('community',local?'Your levels on this device':'Player-created courses');
   $('campaign-picker').hidden=!campaignCount;
   $('campaign-count').textContent=`${campaignCount} STAGES · ${[...chapters.keys()].filter(k=>k!=='community').length} CHAPTERS`;
   if(!chapters.has(state.chapter))state.chapter=chapters.keys().next().value;
@@ -282,7 +283,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
    if(m.type==='design-cancelled'){
     designRequest=null;clearDesign();setMode('play');resetView('level');drawDisks(state.selected);renderEditor();presentation();resume();
    }
-   if(m.type==='saved-challenge'){designSaving=false;clearDesign();renderEditor();setMode('play');presentation();send('select-challenge',{challengeId:m.challenge.id,revision:m.challenge.revision});notice('Level saved. Copy its level link to share it.');}
+   if(m.type==='saved-challenge'){designSaving=false;clearDesign();renderEditor();setMode('play');presentation();send('select-challenge',{challengeId:m.challenge.id,revision:m.challenge.revision});notice(m.challenge.local?'Level saved on this device.':'Level saved. Copy its level link to share it.');}
    if(m.type==='selected'){history.replaceState(null,'',m.challenge?levelURL(m.challenge.id):'/');document.title=m.challenge?`${m.challenge.name} — Kyoto Bounce`:'Kyoto Bounce — Station Arcade';replayRequest++;$('result-card').hidden=true;resetView('level');if(m.challenge&&state.mode==='play')overview(state.selected||m.challenge,{automatic:true});}
    if(m.type==='leaderboard'){if(state.selected?.id===m.challenge.id&&state.selected.revision===m.challenge.revision){state.board=m.entries;state.personal=m.personal||null;renderBoard();}}
    if(m.type==='replay'){loadReplay(m.replay);}

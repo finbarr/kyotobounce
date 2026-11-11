@@ -2,6 +2,7 @@ import {Ball,STEP} from './ball.js';
 import {v,add,sub,dot,plane,length,yaw,clamp} from './math.js';
 import {throwSpeed} from '../throw-power.js';
 import {ComboTracker,waypointRouteComplete} from '../../scoring.ts';
+import {DesignRecorder} from './designer.js';
 
 // This version must never share a leaderboard with the native solver. Verification
 // will reproduce inputs with this module, not accept the result sent by a browser.
@@ -11,18 +12,20 @@ export function launchInput(feet,input){
  return {position:add(feet,yaw(v(.22,1.5,.42),input.yaw)),velocity:yaw(v(0,speed*Math.sin(angle),speed*Math.cos(angle)),input.yaw),spin:yaw(v(input.top,0,-input.kick),input.yaw)};
 }
 export class Shot{
- constructor(world,challenge,launch,{attempt='local',releaseTime=0,chargeTime=0,thrower=null}={}){
+ constructor(world,challenge,launch,{attempt='local',releaseTime=0,chargeTime=0,thrower=null,design=false}={}){
   if(challenge.layout!==world.layoutSha256)throw Error('Course and collision layout differ');
   this.world=world;this.challenge={...challenge,physics:BROWSER_PHYSICS};this.attempt=attempt;this.releaseTime=releaseTime;this.chargeTime=chargeTime;this.thrower=thrower;
   this.launch=structuredClone(launch);this.ball=new Ball(world);this.ball.stationTime=releaseTime;this.ball.launch(launch.position,launch.velocity,launch.spin);
   this.tracker=new ComboTracker(this.challenge,world.fallLimitY);this.poses=[];this.contacts=[];this.waypointHits=[];this.events=[];this.impactTimes=new Map();this.surfaces=new Set();this.collected=new Set();
+  this.designer=design?new DesignRecorder(world,thrower):null;
   this.steps=0;this.impacts=0;this.sleepDwell=0;this.goalDwell=0;this.done=false;this.reason='';this.destinationReached=false;this.recordPose();
  }
- recordPose(){const pose={t:this.ball.clock,p:{...this.ball.position},q:{...this.ball.rotation}};this.poses.push(pose);this.tracker.poses([pose]);return pose;}
+ recordPose(){const pose={t:this.ball.clock,p:{...this.ball.position},q:{...this.ball.rotation}};this.poses.push(pose);this.tracker.poses([pose]);this.designer?.pose(pose.p);return pose;}
  step(){
   if(this.done)return;
   const b=this.ball;b.step();this.steps++;
   for(const contact of b.contacts.splice(0)){
+   this.designer?.contact(contact);
    for(const target of this.challenge.waypoints||[]){
     if(this.collected.has(target.id)||target.surface!==contact.surface||dot(contact.normal,target.normal)<.995)continue;
     const offset=sub(contact.point,target.center);

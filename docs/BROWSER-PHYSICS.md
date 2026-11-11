@@ -15,9 +15,9 @@ existing station files directly. The regular native launcher remains available
 until the full migration passes; an HTML marker selects the browser transport.
 
 The browser owns walking, throwing, target collection, scoring, full settling,
-recall, Skip, local progress and replays. Local leaderboards are labelled
+recall, Skip, course creation/revision, local progress and replays. Local leaderboards are labelled
 "On this device" and are unverified. Native credentials and scores remain
-separate. Course creation and independent online verification are still required.
+separate. Independent online verification and course publishing are still required.
 Selecting a level closes the mobile panel, including First Bounce, whose tutorial
 does not open an automatic overview screen.
 
@@ -73,6 +73,19 @@ does not open an automatic overview screen.
   presented. Full pose/rotation/contact data stays in IndexedDB chunks; live
   scoring retains only necessary bank history. Full replay viewing still loads
   that replay into memory, and saved storage grows with actual shot duration.
+- The existing design-ball interface runs entirely offline. The worker derives
+  up to eight spaced targets from actual contacts and validates every disk on
+  its fixed surface. Floor support uses radial grids; a complete capsule query
+  checks start clearance. Dedicated zero-radius ray branches retain surface
+  normals without changing positive-radius ball sweeps. Design recording keeps
+  at most 512 contact candidates and 2,001 preview points while normal replay
+  chunks stream to storage. Design shots never enter local leaderboards.
+- A captured route can be named, saved and revised on the same device. Worker
+  checks reject changed geometry, forged capture tokens and edits to another
+  creator's course. Current custom courses and their exact launch solutions
+  survive reload; revisions discard retired local scores. These checks support
+  local authoring, not online authority. A future service must independently
+  verify submitted inputs against its own geometry and rules.
 
 ## Verification
 
@@ -85,6 +98,7 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm run test:browser:campaign` | All 30 actual Walker release positions; every suggested shot repeated; 184 nearby throws; targets, destinations, authored route features, zero velocity/spin at rest, no collision-budget exhaustion, independent scoring; all 30 hints repeated offline in Chrome with exact Node replay hashes |
 | `npm run test:browser:local` | Rendered game, walking/home, three representative complete shots, desktop and touch controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
+| `npm run test:browser:designer` | Actual station design-route capture and full-clear re-simulation; rendered offline create/play/revise/reload, forged or changed capture rejection, foreign edit rejection, touch creation, cancellation/restart and retired-score cleanup |
 | `npm run test:traversal` | 166 station walks: 33 public stair flights, all 48 escalators, connected east atrium stairs and the complete Grand Stair-to-garden route, each in both directions; six offline keyboard walks in rendered Chrome through the real UI/worker |
 | `npm run test:physics:station` | Opening-course geometry checks, including Clock In's first three native contact positions within 0.1 mm, plus Node/Chrome replay equality |
 | `npm run test:physics:solids` | All 457 authored convex casings: 5,941 interior samples, 5,484 exterior casts, outward recovery and contacts on the original visible surfaces; combined-world interior lookup |
@@ -102,9 +116,9 @@ presentation through the existing Skip protocol while still requiring full rest.
 
 Offline Chrome 157 on this laptop reproduces all 30 complete replay hashes and
 both the timed-contact and solid-recovery regressions twice. Collision
-loading/indexing took 1.059 seconds. These cases took 3.9–438.4 ms
+loading/indexing took 1.203 seconds. These cases took 3.9–448.2 ms
 of worker computation in yielding batches, with the largest observed batch
-8.8 ms. The main-thread heartbeat p95 was 18.0 ms, maximum 123.6 ms including
+8.7 ms. The main-thread heartbeat p95 was 18.2 ms, maximum 118.3 ms including
 loading and test result transfers. This isolated worker check is not a rendered
 frame-rate or physical-phone benchmark. Receipts:
 `.local/browser-physics/{campaign,campaign-worker}-proof.json`.
@@ -125,11 +139,11 @@ These are headless Chrome laptop measurements,
 not physical-phone results or a guarantee of 60 FPS. Current receipts and captures
 are under `.local/browser-physics/game/`.
 
-The solid-casing UI run passed all desktop/mobile course selections, exact
+The creator integration UI run passed all desktop/mobile course selections, exact
 re-simulation of its three stored shots, offline controls and reload persistence.
 Its 1,832-frame flight averaged 60.00 FPS, with 16.7 ms p95, 16.8 ms maximum,
 no main-thread long tasks and no skipped music beats. Maximum audio scheduler
-gap was 53.3 ms. The test now waits for responsive controls to finish switching
+gap was 58.7 ms. The test now waits for responsive controls to finish switching
 after a viewport resize before sending menu input.
 
 The traversal fixtures cover 80 combinations of step height, speed, direction
@@ -154,15 +168,22 @@ east concourse casing: its first physics step escapes, it reaches full rest,
 and it does not claim the distant waypoint. The receipt is
 `.local/browser-physics/solid-proof.json`.
 
+The creator station proof derives four targets from First Bounce, six from
+Clock In, and a destination-only course from Basement Upward Bound. Their exact
+recorded launches clear every generated target and destination at full rest.
+The rendered test creates a separate route through normal keyboard input,
+plays it, revises it, reloads it and saves a third revision using touch input.
+Node independently reproduces each saved solution. Captures and receipts are
+under `.local/browser-physics/designer/`; fixed station cases are recorded in
+`.local/browser-physics/designer-proof.json`.
+
 ## Remaining bounded tasks
 
-1. Implement browser course creation/editing, validation and durable saved
-   courses using the existing interface.
-2. Add independent on-demand online verification and score storage. Reconstruct
+1. Add independent on-demand online verification, course publishing and score storage. Reconstruct
    accepted shots from validated inputs; never accept a client's claimed score.
    Package static hosting and verification without an always-on physics process
    or a fixed monthly compute subscription.
-3. Verify the complete integrated game, cross-browser replay behavior and broader
+2. Verify the complete integrated game, cross-browser replay behavior and broader
    desktop/mobile controls and performance. Remove remaining runtime dependence
    on the native worker when the replacement is proven. Investigate the observed
    audio scheduler gap of about 1.1 seconds during automated course/viewport

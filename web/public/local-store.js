@@ -34,6 +34,14 @@ export async function localStore(){
   if(header?.draft){tx.objectStore('replays').delete(id);deleteChunks(tx,id);}await done;release(id);
  }
  return {
+  async courses(current){
+   const tx=db.transaction('settings','readwrite'),done=complete(tx),store=tx.objectStore('settings'),all=await request(store.get('courses'))||[];
+   const valid=all.filter(c=>c.layout===current.layout&&c.physics===current.physics&&c.scoring===current.scoring);store.put(valid,'courses');await done;return valid;
+  },
+  async saveCourse(course){
+   const tx=db.transaction('settings','readwrite'),done=complete(tx),store=tx.objectStore('settings'),all=await request(store.get('courses'))||[];
+   const next=all.filter(c=>c.id!==course.id);next.push(course);store.put(next,'courses');await done;return next;
+  },
   async setting(key,value){const tx=db.transaction('settings',value===undefined?'readonly':'readwrite'),store=tx.objectStore('settings'),done=complete(tx);const result=await request(value===undefined?store.get(key):store.put(value,key));await done;return result;},
   async records(c){return request(db.transaction('records').objectStore('records').index('course').getAll(courseKey(c)));},
   async replay(id){

@@ -1,4 +1,4 @@
-// Stable comparison for an untouched, server-recorded course. UI-only fields
+// Stable comparison for an untouched, physics-recorded course. UI-only fields
 // and floor normals do not affect collision or the recorded solution.
 export function designGeometry(c){
  const point=p=>[p.x,p.y,p.z],disk=d=>d?[point(d.center),d.radius,d.surface]:null;
