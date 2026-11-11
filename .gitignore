@@ -34,6 +34,7 @@ node_modules/
 docs/*
 !docs/LOCAL_PLAY.md
 !docs/BROWSER-PHYSICS.md
+!docs/ON-DEMAND-VERIFICATION.md
 !docs/ASSETS.md
 !docs/ARCADE-SCORING.md
 !docs/PARALLEL_DEVELOPMENT.md

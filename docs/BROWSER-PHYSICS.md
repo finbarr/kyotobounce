@@ -18,6 +18,10 @@ The browser owns walking, throwing, target collection, scoring, full settling,
 recall, Skip, course creation/revision, local progress and replays. Local leaderboards are labelled
 "On this device" and are unverified. Native credentials and scores remain
 separate. Independent online verification and course publishing are still required.
+The [verification core](ON-DEMAND-VERIFICATION.md) independently reconstructs
+walking and shots from bounded controls against its own course catalog. All 30
+campaign routes pass it; authenticated submission, durable online storage and
+browser synchronization are not yet connected.
 Selecting a level closes the mobile panel, including First Bounce, whose tutorial
 does not open an automatic overview screen.
 
@@ -99,6 +103,7 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm run test:browser:local` | Rendered game, walking/home, three representative complete shots, desktop and touch controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
 | `npm run test:browser:designer` | Actual station design-route capture and full-clear re-simulation; rendered offline create/play/revise/reload, forged or changed capture rejection, foreign edit rejection, touch creation, cancellation/restart and retired-score cleanup |
+| `npm run test:verification` | All 30 courses verified twice from controls; complete exact replay equality; real offline Chrome walking, sprint, charge and release independently reconstructed in Node; portable forged-result and cancellation checks also run in `npm test` |
 | `npm run test:traversal` | 166 station walks: 33 public stair flights, all 48 escalators, connected east atrium stairs and the complete Grand Stair-to-garden route, each in both directions; six offline keyboard walks in rendered Chrome through the real UI/worker |
 | `npm run test:physics:station` | Opening-course geometry checks, including Clock In's first three native contact positions within 0.1 mm, plus Node/Chrome replay equality |
 | `npm run test:physics:solids` | All 457 authored convex casings: 5,941 interior samples, 5,484 exterior casts, outward recovery and contacts on the original visible surfaces; combined-world interior lookup |
