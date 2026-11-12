@@ -14,13 +14,13 @@ const out='.local/browser-release-test/controls';await mkdir(out,{recursive:true
 for(const name of ['receipt.json','failure.json','failure.png'])await rm(out+'/'+name,{force:true});
 const server=await staticPreview('.local/browser-release');await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const origin=`http://127.0.0.1:${server.address().port}`;
-let browser,context,page,touch,stage='startup',passed=false,metrics,recorded,result;
-const errors=[],requests=[],checks=[];
+let browser,context,page,touch,stage='startup',passed=false,metrics,recorded,result,musicStart,musicEnd;
+const errors=[],requests=[],checks=[],results=[],holds=[];
 try{
  browser=await launchTestBrowser({render:true});context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1});
  await backgroundInput(context);await silentOutput(context);
  await context.addInitScript(()=>{
-  const data=window.controls={stage:'startup',markers:[],slowFrames:[],audioChanges:[],longTasks:[],commands:[],worker:[],pointers:[],frames:{}};let state,last=performance.now(),audio={};
+  const data=window.controls={stage:'startup',markers:[],slowFrames:[],audioChanges:[],longTasks:[],commands:[],worker:[],pointers:[],frames:{},chargeStates:{}};let state,last=performance.now(),audio={};
   for(const type of ['pointerdown','pointerup','pointercancel','click'])document.addEventListener(type,e=>{data.pointers.push({at:performance.now(),stage:data.stage,type,id:e.pointerId,primary:e.isPrimary,target:e.target.closest('[id]')?.id});if(data.pointers.length>100)data.pointers.shift();},true);
   Object.defineProperty(window,'kyotoState',{get:()=>state,set:value=>{
    state=value;const now=performance.now(),ms=now-last;last=now;
@@ -36,7 +36,7 @@ try{
   }).observe({type:'longtask'});
   const NativeWorker=Worker;
   window.Worker=class extends NativeWorker{
-   constructor(...args){super(...args);this.addEventListener('message',e=>{const m=e.data;if(['session','local-result','recording-error','error'].includes(m.type)){data.worker.push({at:performance.now(),stage:data.stage,type:m.type,attempt:m.attempt??m.result?.attempt,score:m.result?.score,message:m.message});if(data.worker.length>50)data.worker.shift();}});}
+   constructor(...args){super(...args);this.addEventListener('message',e=>{const m=e.data;if(['session','local-result','recording-error','error'].includes(m.type)){data.worker.push({at:performance.now(),stage:data.stage,type:m.type,attempt:m.attempt??m.result?.attempt,score:m.result?.score,message:m.message});if(data.worker.length>50)data.worker.shift();}if(m.type==='state'&&['Charging','Release'].includes(m.phase)){const sample={at:performance.now(),phase:m.phase,power:m.power,attempt:m.attempt};const entry=data.chargeStates[data.stage]??={first:sample,count:0};entry.last=sample;entry.count++;}});}
    postMessage(m,...args){
     if(['input','charge','release','cancel','recall','skip-shot','bank-result'].includes(m.type)){
      const text=JSON.stringify(m);if(text!==this.lastCommand){data.commands.push({at:performance.now(),stage:data.stage,...m});if(data.commands.length>500)data.commands.shift();this.lastCommand=text;}
@@ -54,7 +54,14 @@ try{
  // touchMove does not release it. Verify the actual pointer-up in the trace.
  const up=async id=>{const p=points.get(id);assert(p);points.delete(id);await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[p]});};
  const cancel=async()=>{points.clear();await dispatch('touchCancel');};
- async function center(selector){const el=page.locator(selector);await el.waitFor({state:'visible'});await el.scrollIntoViewIfNeeded();const r=await el.boundingBox();assert(r);return {x:r.x+r.width/2,y:r.y+r.height/2};}
+ async function visibleBox(selector){
+  const el=page.locator(selector);await el.waitFor({state:'visible'});let r=await el.boundingBox();assert(r);
+  const viewport=page.viewportSize();
+  // Do not ask the headless driver to scroll controls already in view.
+  if(r.x<0||r.y<0||r.x+r.width>viewport.width||r.y+r.height>viewport.height){await el.scrollIntoViewIfNeeded();r=await el.boundingBox();assert(r);}
+  return r;
+ }
+ async function center(selector){const r=await visibleBox(selector);return {x:r.x+r.width/2,y:r.y+r.height/2};}
  async function tap(selector,id=9){await down(id,await center(selector));await up(id);}
  async function mark(name){stage=name;await page.evaluate(name=>{controls.stage=name;controls.markers.push({stage:name,at:performance.now()});},name);console.log(name);}
  async function state(){return page.evaluate(()=>kyotoState);}
@@ -66,11 +73,13 @@ try{
   });
  }
  async function home(){await tap('#mobile-settings');await tap('#home');await tap('#mobile-close');await page.waitForFunction(()=>Math.hypot(kyotoState.feet.x-kyotoState.challenge.start.center.x,kyotoState.feet.z-kyotoState.challenge.start.center.z)<.01);}
- async function dragRange(selector,fraction){const el=page.locator(selector);await el.scrollIntoViewIfNeeded();const r=await el.boundingBox(),y=r.y+r.height/2;await down(1,{x:r.x+r.width/2,y});await move(1,{x:r.x+12+(r.width-24)*fraction,y});await up(1);}
+ async function dragRange(selector,fraction){const r=await visibleBox(selector),y=r.y+r.height/2;await down(1,{x:r.x+r.width/2,y});await move(1,{x:r.x+12+(r.width-24)*fraction,y});await up(1);}
  await page.goto(origin+'/level/atrium-welcome');await page.waitForFunction(()=>document.getElementById('loading-message')?.textContent.includes('Station ready'),null,{timeout:120000});
  await page.locator('#loading-name input[name=player]').fill('Touch acceptance');await page.keyboard.press('Enter');
  await page.waitForFunction(()=>!document.body.classList.contains('is-loading')&&window.kyotoState?.ready,null,{timeout:120000});
  if(await page.locator('#tutorial-hide').isVisible())await tap('#tutorial-hide');
+ const initialMusicStep=(await state()).audio.step;await page.waitForFunction(step=>kyotoState.audio.step>step+2,initialMusicStep);
+ musicStart=await page.evaluate(()=>({...kyotoState.audio,at:performance.now()}));
  await context.setOffline(true);const offlineStart=requests.length;
 
  await mark('joystick dead zone, walking and release');
@@ -115,7 +124,7 @@ try{
  assert.equal(await page.evaluate(()=>controls.commands.filter(m=>m.type==='release').length),1,'Only the charging finger releases');
  await tap('#mobile-speed');await page.waitForFunction(()=>kyotoState.audio.playbackRate===2);await tap('#mobile-speed');await page.waitForFunction(()=>kyotoState.audio.playbackRate===1);
  await tap('#mobile-skip');await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result);
- result=(await state()).result;assert(result.score>0);assert.equal(result.thrower.top,spin.top);assert.equal(result.thrower.kick,spin.kick);
+ result=(await state()).result;results.push(result);assert(result.score>0);assert.equal(result.thrower.top,spin.top);assert.equal(result.thrower.kick,spin.kick);
  assert.equal(Math.hypot(...Object.values((await state()).velocity)),0);assert.equal(Math.hypot(...Object.values((await state()).spin)),0);
  await page.waitForFunction(id=>kyotoState.board.some(r=>r.attempt===id),result.attempt);
  checks.push('second-finger aim preserves charge ownership; spin reaches physics; speed toggle and Skip finish at full rest');
@@ -158,6 +167,37 @@ try{
  await page.waitForFunction(p=>Math.hypot(kyotoState.feet.x-p.x,kyotoState.feet.z-p.z)>.3,feet);await up(1);
  await page.screenshot({path:out+'/landscape.png'});checks.push('recall preserves prior records; real orientation cancels charge; landscape joystick works');
 
+ await mark('repeated native charge duration and Skip');
+ await page.setViewportSize({width:390,height:844});
+ await touch.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false,screenOrientation:{type:'portraitPrimary',angle:0}});
+ await tap('#mobile-levels');await page.locator('#campaign-chapter').selectOption('1');await tap('#course-list button[data-challenge="atrium-clock-in"]');
+ await tap('#briefing-play');await page.waitForFunction(()=>kyotoState.challenge?.id==='atrium-clock-in'&&!kyotoState.briefing&&!kyotoState.briefingTransition&&kyotoState.phase==='Aim');
+ for(const [index,scenario]of [{hold:600,skipAfter:0},{hold:1900,skipAfter:600},{hold:2900,skipAfter:0},{hold:2900,skipAfter:600},{hold:2900,skipAfter:0,drag:true},{hold:2900,skipAfter:600}].entries()){
+  if(index){await tap('#try-result');await page.waitForFunction(()=>kyotoState.phase==='Aim'&&!kyotoState.robotChargeQueued);}
+  await mark(`native hold ${index+1}: ${scenario.hold} ms${scenario.drag?' outside button':''}`);
+  const button=await center('#mobile-throw');await down(1,button);
+  // Keep the actual press duration; waiting for sampled Charging telemetry
+  // first would lengthen a short hold and hide start/acknowledgment delays.
+  if(scenario.drag){await page.waitForTimeout(100);await move(1,await scenePoint());await page.waitForTimeout(scenario.hold-100);}
+  else await page.waitForTimeout(scenario.hold);
+  await up(1);await page.waitForFunction(()=>kyotoState.phase==='Flight');
+  const timing=await page.evaluate(()=>({commands:controls.commands.filter(m=>m.stage===controls.stage&&['charge','release','cancel'].includes(m.type)),pointers:controls.pointers.filter(p=>p.stage===controls.stage),worker:controls.chargeStates[controls.stage]}));
+  const charge=timing.commands.filter(m=>m.type==='charge'),release=timing.commands.filter(m=>m.type==='release');
+  assert.equal(charge.length,1);assert.equal(release.length,1);assert.equal(timing.commands.filter(m=>m.type==='cancel').length,0);
+  const sentMs=release[0].at-charge[0].at;
+  if(scenario.skipAfter)await page.waitForTimeout(scenario.skipAfter);
+  await tap('#mobile-skip');await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result);
+  const current=await state(),shot=current.result;
+  const evidence={...scenario,attempt:shot.attempt,sentMs,expectedPower:Math.min(1,sentMs/2800),power:shot.thrower.power,timing};holds.push(evidence);
+  assert(Math.abs(evidence.power-evidence.expectedPower)<.025,'Worker power must match the actual charge-to-release interval');
+  if(scenario.hold>=2800){assert.equal(shot.thrower.power,1,'A full hold must reach full charge');assert(shot.success);assert.equal(shot.waypointHits.length,2);}
+  assert.equal(current.diagnostics.sleeping,true);assert.equal(current.diagnostics.contactBudgetExhaustions,0);
+  assert.equal(Math.hypot(...Object.values(current.velocity)),0);assert.equal(Math.hypot(...Object.values(current.spin)),0);
+  assert(shot.score>0);results.push(shot);await page.waitForFunction(id=>kyotoState.board.some(r=>r.attempt===id),shot.attempt);
+ }
+ checks.push('six native timed holds, full charge, capture outside the button, repeated immediate/delayed Skip and genuine rest');
+ await tap('#try-result');await page.waitForFunction(()=>kyotoState.phase==='Aim');
+
  await mark('desktop keyboard controls after touch');
  await touch.send('Emulation.clearDeviceMetricsOverride');await touch.send('Emulation.setTouchEmulationEnabled',{enabled:false});await page.setViewportSize({width:1280,height:800});
  await page.waitForFunction(()=>!document.body.classList.contains('mobile-ui'));await page.locator('#home').click();await page.locator('#game').focus();
@@ -165,24 +205,27 @@ try{
  await page.keyboard.press('x');await page.waitForFunction(()=>kyotoState.top===0&&kyotoState.kick===0);await page.keyboard.down('Space');await page.waitForFunction(()=>kyotoState.charging);await page.keyboard.press('Escape');await page.keyboard.up('Space');await page.waitForFunction(()=>kyotoState.phase==='Aim');
  checks.push('desktop keyboard walking, clear spin and cancel after touch/viewport transitions');
  assert.equal((await state()).pointerLocked,false);assert.deepEqual(errors,[]);
+ musicEnd=await page.evaluate(()=>({...kyotoState.audio,at:performance.now()}));
+ assert.equal(musicEnd.status,'running');assert.equal(musicEnd.skippedMusicSteps,musicStart.skippedMusicSteps);
+ assert(musicEnd.step-musicStart.step>(musicEnd.at-musicStart.at)/1000*(112/60*2)*.9,'The real music clock advances throughout native controls');
  assert.deepEqual(requests.slice(offlineStart).filter(url=>!new URL(url).pathname.startsWith('/favicon.')),[],'Every interaction after load is offline');
- recorded=await page.evaluate(async attempt=>{
-  const store=await(await import('/local-store.js')).localStore();try{const commands=[];for await(const chunk of store.inputChunks(attempt))commands.push(...chunk.runs);return {replay:await store.replay(attempt),proof:await store.inputProof(attempt),commands};}finally{store.close();}
- },result.attempt);
- assert(recorded.commands.some(r=>r.x!==0||r.z!==0),'The verified recording includes actual touch walking');
+ recorded=await page.evaluate(async attempts=>{
+  const store=await(await import('/local-store.js')).localStore();try{return await Promise.all(attempts.map(async attempt=>{const commands=[];for await(const chunk of store.inputChunks(attempt))commands.push(...chunk.runs);return {replay:await store.replay(attempt),proof:await store.inputProof(attempt),commands};}));}finally{store.close();}
+ },results.map(r=>r.attempt));
+ assert(recorded[0].commands.some(r=>r.x!==0||r.z!==0),'The verified recording includes actual touch walking');
  const catalog=JSON.parse(await readFile('web/starter-challenges.json')),world=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin')));
  try{
-  const {replay,proof,commands}=recorded,course={...catalog.find(c=>c.id===proof.header.courseId),physics:BROWSER_PHYSICS},job=new ShotVerification(world,course,proof.header,commands,{attempt:replay.attempt,subject:replay.id}),poses=[],contacts=[];let reply;
+  for(const {replay,proof,commands}of recorded){const course={...catalog.find(c=>c.id===proof.header.courseId),physics:BROWSER_PHYSICS},job=new ShotVerification(world,course,proof.header,commands,{attempt:replay.attempt,subject:replay.id}),poses=[],contacts=[];let reply;
   do{reply=await job.advance();if(reply.recording){poses.push(...reply.recording.poses);contacts.push(...reply.recording.contacts);}assert((job.shot?.steps||0)<180*240);}while(reply.status!=='verified');
-  const verified={...reply.result,poses,contacts};for(const key of ['poses','contacts','waypointHits','breakdown','score','success','duration','launchPosition','velocity','spin','thrower','chargeTime','releaseTime'])assert.deepEqual(verified[key],replay[key],`Touch replay ${key} must reconstruct from legal controls`);
+  const verified={...reply.result,poses,contacts};for(const key of ['poses','contacts','waypointHits','breakdown','score','success','duration','launchPosition','velocity','spin','thrower','chargeTime','releaseTime'])assert.deepEqual(verified[key],replay[key],`Touch replay ${key} must reconstruct from legal controls`);}
  }finally{world.free();}
- checks.push('complete touch/spin replay independently reproduces from saved controls');
+ checks.push('all seven touch/spin and timed-hold replays independently reproduce from saved controls');
  metrics=await page.evaluate(()=>controls);await page.screenshot({path:out+'/desktop.png'});passed=true;console.log('PASS native touch and desktop browser-only controls, offline persistence and exact independent replay');
 }catch(error){
  const failure={stage,error:String(error),errors};await writeFile(out+'/failure.json',JSON.stringify(failure,null,2));let deadline;
  try{Object.assign(failure,await Promise.race([page.evaluate(()=>({state:window.kyotoState,metrics:window.controls})),new Promise(resolve=>{deadline=setTimeout(()=>resolve({}),2000);})]));}catch{}finally{clearTimeout(deadline);}
  await writeFile(out+'/failure.json',JSON.stringify(failure,null,2));await page?.screenshot({path:out+'/failure.png',timeout:5000}).catch(()=>{});throw error;
 }finally{
- await writeFile(out+'/receipt.json',JSON.stringify({passed,stage,browser:browser?.version(),checks,errors,result,metrics},null,2)+'\n');
+ await writeFile(out+'/receipt.json',JSON.stringify({passed,stage,browser:browser?.version(),checks,errors,result,holds,musicStart,musicEnd,metrics},null,2)+'\n');
  await browser?.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));
 }

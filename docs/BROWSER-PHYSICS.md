@@ -133,7 +133,7 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm run test:browser:campaign` | All 30 actual Walker release positions; every suggested shot repeated; 184 nearby throws; targets, destinations, authored route features, zero velocity/spin at rest, no collision-budget exhaustion, independent scoring; all 30 hints repeated offline in Chrome with exact Node replay hashes |
 | `npm run test:browser:engines` | Refreshes the Node campaign reference, then sequentially checks Chrome, Firefox and WebKit: 1,025 rotation/heading/normal cases, all 30 release positions/velocities/spins, 30 complete replays plus two regressions each repeated twice offline, early/late recall forfeits, live sprint/direction-change/charge/Skip inputs and exact independent Node reconstruction |
 | `npm run test:browser:rendered` | Rebuilds the static package once; sequential Chrome/Firefox/WebKit rendered gameplay and creator checks, offline shots/replays/progress, all 30 desktop/mobile-width menus, mobile hold/Skip, create/play/revise/reload/cancel, independent replay and creator-solution verification, unskipped frame/audio measurements and visible download Retry |
-| `npm run test:browser:controls` | Native Chrome touch gestures against the static package: joystick/dead zone/release, aim and spin sliders, second-finger charge ownership and Cancel, pointer cancellation, speed/Skip/recall, replay pause/seek/orbit/pinch, scout height/boost, orientation cancellation and desktop keyboard return; independent reconstruction of a walking/spin shot |
+| `npm run test:browser:controls` | Native Chrome touch gestures against the static package: joystick/dead zone/release, aim and spin sliders, second-finger charge ownership and Cancel, pointer cancellation, speed/Skip/recall, replay pause/seek/orbit/pinch, scout height/boost, orientation cancellation and desktop keyboard return; six timed partial/full holds and immediate/delayed Skip; all seven saved shots independently reconstructed, with real audio-clock progression |
 | `npm run test:browser:local` | Rendered game, walking/home, six complete shots across three courses, desktop and mobile controls, offline recall/Skip/replay, reload persistence, exact replay re-simulation, all 30 course selections at desktop and mobile widths, unskipped rendering/audio measurement |
 | `npm run test:browser:transitions` | Offline Chrome selection/overview/return for all 30 courses at desktop and mobile widths, repeated viewport changes, real audio scheduling, frame/long-task/shader/canvas diagnostics; optional `KYOTO_TRANSITION_PROFILE=1` records a Chrome CPU profile |
 | `npm run test:browser:recording` | Real offline worker beyond 240 simulated seconds without a false finish; delayed writes, stale acknowledgments, storage failure, tab locks and interrupted recording cleanup |
@@ -289,15 +289,21 @@ the existing window event as a fallback. Chrome emitted only the modern event
 in the check; listening solely to the window event left a charge held after
 rotation. Both paths discard held controls without releasing a shot.
 
-The final Chrome control run passed all nine groups above, including real
-844×390 landscape layout and a return to 1280×800 desktop controls. Its saved
-touch-walking/spin shot reproduced exactly in Node. No music steps were skipped;
-the largest cumulative scheduler gap was 122.7 ms. A 108 ms main-thread long task
-occurred during the return to desktop layout. The earlier large audio gap did
-not recur in this check, so its cause remains open. A separate full gameplay
-regression passed six exact saved shots, all 30 desktop/mobile course selections
-and download Retry. Its 1,887-frame unskipped flight averaged 60.00 FPS, with
-16.8 ms p95/maximum, no long tasks and no skipped music steps.
+The current Chrome control check passes ten groups, including real 844×390
+landscape layout and a return to 1280×800 desktop controls. Six additional
+native holds cover 600/1,900 ms partial power, four 2,900 ms full charges,
+pointer capture outside Throw, and immediate/delayed Skip. Worker power tracks
+the actual charge/release interval; all four full charges clear both Clock In
+waypoints. Every shot finishes at zero velocity/spin and all seven saved shots
+reproduce exactly in Node, including the original touch-walking/spin route.
+
+The recorded partial holds were 617.6/1,917.2 ms, with at most about 0.1 ms
+difference between command timing and worker power. The real music clock
+advanced 103 steps over 27.66 seconds, with no skipped beats and a 101.3 ms
+maximum scheduling gap. The earlier low-power full hold and isolated Skip
+timeout did not recur; this is stronger current acceptance and diagnostic
+coverage, not a claimed production fix for an unproven cause. The newer rendered
+flight and transition measurements are in BROWSER-MIGRATION-AUDIT.md.
 
 The traversal fixtures cover 80 combinations of step height, speed, direction
 and station-scale coordinates, plus oblique approaches, consecutive risers,

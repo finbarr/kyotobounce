@@ -24,7 +24,7 @@ No live replacement has been deployed or native host stopped.
 | Authoritative optional online scores | Strict control-only verifier schema; trusted catalog/collision data; independent walking, launch and complete flight reconstruction. Emulator tests cover forged results, authentication, restart/checkpoints, quotas, course revisions and atomic ranking. Browser tests cover queued uploads, reload, shared courses and public replay verification. |
 | No always-on physics or fixed compute subscription | Static package has no gameplay service. The Linux verifier container passes all 30 course proofs and restart checks. Deployment configuration uses request billing and zero minimum instances; actual hosting would still have usage-based costs. No cloud deployment is claimed. |
 | Replay determinism across browsers | Matching catalog/input hashes; Chrome, Firefox and WebKit each reproduce all 30 hints and two regressions twice offline against exact Node result hashes. Includes launch/rotation fixtures and real controller input reconstruction. |
-| Desktop and mobile controls | Headless keyboard and native Chrome touch checks: movement, aim, charge ownership, Cancel, spin, speed, Skip, recall, replay, scout, orientation and return to desktop. This is browser/device emulation, not physical-phone testing. |
+| Desktop and mobile controls | Ten headless keyboard/native Chrome touch groups cover movement, aim, charge ownership, Cancel, spin, speed, Skip, recall, replay, scout, orientation and return to desktop. Six timed holds compare physical contacts, worker messages and final power; seven saved replays reconstruct exactly. This is browser/device emulation, not physical-phone testing. |
 | Smooth Chrome rendering and audio | Phase-specific profiling led to static render culling and corrected resolution decisions. Fresh Chrome gameplay with an advancing audio clock records 60.00 FPS across 1,902 frames at pixel ratio 1, 16.8 ms p95/maximum, no long tasks and no skipped music steps. See rendering acceptance below for scope and limits. |
 | Sequential integration without duplicates | One checkout and generated asset set; bounded commits merged into main. Source-only installation uses a disposable directory that is removed afterward. No new persistent project, model copies or Unity builds are required. |
 
@@ -146,14 +146,39 @@ Receipts: `.local/browser-flight-test/`, `.local/browser-flight-culling-test/`,
 `.local/browser-flight-budget-test/` and `.local/browser-flight-transition-test/`;
 no station assets were copied for these diagnostic directories.
 
+## Native charge and Skip acceptance
+
+The focused control check runs six more throws through Chrome's real touch
+events: 600 ms and 1,900 ms partial holds, four 2,900 ms full holds, immediate
+and 600 ms delayed Skip, and a charging finger dragged outside the button.
+It observes pointer events, charge/release posts and the worker's first/last
+charge states without injecting physics inputs or results. Every full hold
+must reach power 1 and clear both Clock In waypoints. Every result must have
+zero translation/spin, physical sleep and no exhausted collision budget.
+
+Chrome 157.0.8103.52 passes all ten control groups. The actual partial holds were
+617.6 and 1,917.2 ms, yielding powers 0.2205357 and 0.6847143; the largest
+command-clock discrepancy was approximately 0.1 ms. All four full holds reached
+power 1. The verifier independently reproduces all seven saved touch/spin and
+timed-hold shots, including complete poses, contacts and scores. Music advances
+from step 6 to 109 across 27.66 seconds without skipped beats; its maximum
+recorded scheduling gap is 101.3 ms. All interactions after loading are offline.
+
+The test reuses the integrated static package; its game, culling, quality,
+touch and physics-session sources were checked against the current checkout.
+No gameplay code or assets changed. Visible controls no longer request an
+unnecessary scroll from the headless driver; actual touch contacts still target
+their rendered positions. Evidence is in `.local/browser-release-test/controls/`.
+
 ## Outstanding acceptance
 
 - Viewport changes still cause occasional long frames (66.8 ms in the final
   transition run). The measured 60 FPS flight does not prove every camera,
   display density or physical phone meets that rate.
-- One native-touch full-hold check recorded only 25% power. The next run's three
-  full holds passed. Bounded charge/release diagnostics now accompany failure
-  receipts; the original discrepancy is unexplained, not a claimed product fix.
+- One earlier native-touch full hold recorded only 25% power. It did not recur
+  in the focused timed-hold/Skip check above. Pointer, command and worker-charge
+  evidence now accompanies failures; the original cause is unexplained and no
+  speculative gameplay fix is claimed.
 - A real short key hold missed the escalator target. Independent simulation
   reproduced its score exactly; nearby timing/power samples can legitimately
   miss. The playback benchmark requires moving-tread contact, real rest and
