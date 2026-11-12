@@ -42,7 +42,7 @@ assertions; a receipt's existence alone is not a pass.
 - Collision SHA-256: `62e0e5a0e623f0171ed06c282dc5ea1376b0bb03d48489d3a851e25c3fbbeb79`.
 - Rebuilt verifier SHA-256: `e38c28890e9b2132fd769d5df12efabb810a6503e1b7f07063a7d8dbb0344107`.
 
-Rebuilding the verifier from `fe12eca` produced exactly the prior tested bundle,
+Rebuilding the verifier from `6cdc2a5` produced exactly the prior tested bundle,
 including matching catalog and collision identities. The source catalog still
 contains the native physics label; every browser/verifier entry point applies
 `BROWSER_PHYSICS`. This audit checks the served identity rather than treating
@@ -170,7 +170,61 @@ No gameplay code or assets changed. Visible controls no longer request an
 unnecessary scroll from the headless driver; actual touch contacts still target
 their rendered positions. Evidence is in `.local/browser-release-test/controls/`.
 
-## Outstanding acceptance
+## Release-readiness audit
+
+The November 12 audit of `6cdc2a5` checks the current files against the receipts
+above. Local implementation acceptance passes; the full migration remains
+incomplete because public setup and the live replacement are not accepted.
+The exact commit's [Source checks run](https://github.com/finbarr/kyotobounce/actions/runs/43277544067)
+completed successfully. This audit changes documentation only.
+
+- All 214 campaign receipts pass and reach rest. All 30 hints clear their
+  complete course, and every course meets its authored neighbor-clear minimum.
+  Their catalog/input hashes match the current files.
+- All three browser workers match the 32 Node result hashes, including both
+  regressions, and record a zero-score recall. The worker tests repeat each
+  case twice offline; the audit inspected those assertions as well as the
+  receipts. The independent verifier, HTTP/Firestore service and Linux
+  container receipts each cover the exact current set of 30 course IDs and
+  agree with the campaign scores.
+- The walking proof covers 83 routes in both directions. Existing creator,
+  online queue/public replay, sharing, startup, native-touch and rendering
+  receipts pass within their documented scope. The latest rendering/audio
+  evidence is the 1,902-frame flight and 130-operation transition run above.
+- An in-memory rebuild produces the exact packaged physics-worker bytes.
+  All 85 copied public source files match the checkout, accounting for the
+  intentional static HTML configuration. All 122 package files satisfy the
+  size limit; every manifest entry and chunk hash matches, and reassembled
+  assets match their original byte count and SHA-256. No second asset tree is
+  created. The package's older `sourceCommit` field alone was not treated as
+  proof of its contents.
+- `assets:verify` passes. The local six-file archive matches its pinned hash,
+  and the source-only setup receipt matches the current asset manifest and
+  regenerated collision checksum. Rebuilding the verifier also preserves the
+  tested server hash, campaign and collision identities.
+
+The current local audit receipt is
+`.local/migration-audit/release-audit.json`. The older `core-receipts.json`
+predates the renderer work and is not current performance acceptance. Likewise,
+the rendered browser-matrix summary was overwritten by a Chrome-only run; it
+does not prove a fresh rendered pass in all three engines. The separate physics
+engine matrix does cover all three engines and its sources are unchanged.
+
+### Remaining release gates
+
+| Gate | Observed state and required next action |
+| --- | --- |
+| Public source setup | The `assets-v8` GitHub release still returns 404. Automatic approval review rejected the public archive upload without explicit authorization; permission remains pending. After approval, publish the prepared archive and verify the actual download against the pinned hash. |
+| Hosted verifier and browser | No new deployment is claimed. The tested static package has no configured online endpoint. With cutover authorization, select the deployment project/region, deploy the tested verifier, verify IAM/indexes/CORS/scaling and real managed-service behavior, then build and publish the static game with that HTTPS endpoint. |
+| Existing authoritative scores | No production scores have been imported, reset or deleted. The new verifier's restart tests prove its own score durability; they do not prove preservation of the current live database. Before cutover, obtain and verify a consistent backup and settle how current live scores are retained. Native results must not be relabelled as verified browser-physics results. |
+| Retire fixed compute | A read-only request to `https://kyotobounce.com/api/health` still returns `status: ready`, `scope: online`, `worker: true`, `shotPlayback: true`. The native service remains live. Stop and release its compute allocation only after the replacement and score handling are accepted and retirement is authorized. |
+
+No production shots, public uploads, provider resource changes or deployments
+were made during this audit. The existing publication/cutover authorization gate
+has remained open across the preceding implementation iterations. Local work is
+ready for that decision; additional unrelated polish would not complete it.
+
+## Measurement limits and unresolved observations
 
 - Viewport changes still cause occasional long frames (66.8 ms in the final
   transition run). The measured 60 FPS flight does not prove every camera,
@@ -188,10 +242,3 @@ their rendered positions. Evidence is in `.local/browser-release-test/controls/`
 - Earlier intermittent audio gaps and a Skip timeout remain documented in
   BROWSER-PHYSICS.md. Subsequent successful measurements do not establish their
   cause or claim they are fixed.
-- The verified six-file `assets-v8` archive is local. Public upload awaits explicit
-  permission after automatic approval review rejected it; a fresh default
-  download cannot work until publication. The local-archive setup path has
-  source-only installation and gameplay acceptance.
-- Deployment and retirement of the live native host require separate explicit
-  authorization. Local packaging and emulator/container tests are not production
-  cutover evidence. Preserve current authoritative scores for that decision.

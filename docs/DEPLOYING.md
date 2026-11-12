@@ -3,8 +3,10 @@
 ## Browser static release
 
 The browser migration can be packaged without Node, Unity or a gameplay API
-running on the host. This is a local build/preview workflow; the migration has
-not been deployed and its final integrated acceptance is still in progress.
+running on the host. Local implementation acceptance is recorded in
+[the migration audit](BROWSER-MIGRATION-AUDIT.md). Public asset publication,
+managed-cloud acceptance, existing-score handling and live cutover remain open;
+the migration has not been deployed.
 
 With the current station bundle installed (see [asset availability](ASSETS.md)):
 

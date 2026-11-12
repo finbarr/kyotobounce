@@ -314,9 +314,13 @@ creating a result. Browser replay checks delay an input request and require its
 exact reconstruction after retry; portable tests also cancel a long retry wait.
 
 The static browser package, pinned verifier image and scale-to-zero configuration
-generator are documented in `docs/DEPLOYING.md`. Complete integrated migration
-acceptance and any explicitly authorized cloud smoke/load checks remain pending.
-No compatibility archive or native score migration is planned.
+generator are documented in `docs/DEPLOYING.md`. Local implementation acceptance
+and the remaining release gates are recorded in `docs/BROWSER-MIGRATION-AUDIT.md`.
+Managed-cloud smoke/load checks and live cutover remain pending authorization.
+No native score importer is implemented. Current live scores have not been
+reset; preserving that authoritative data requires a verified consistent backup
+and an accepted handling decision before retiring the native service. Existing
+native results cannot be relabelled as verified browser-physics results.
 
 The Linux amd64 container acceptance passed all 30 full clears with exact final
 result agreement against independent host reconstruction, recovery from a
