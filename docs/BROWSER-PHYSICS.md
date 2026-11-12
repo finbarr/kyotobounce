@@ -204,8 +204,26 @@ the normal throw key. It does not stop or reset the moving steps. An untimed
 Firefox throw was independently reproduced in Node: the riser rejected boarding
 and the ball returned to the lower floor at full rest. That launch cleared 29
 of 32 sampled phases, so arbitrary test startup timing cannot imply a guaranteed
-clear. The rendered check still requires its timed shot to clear and verifies
-its complete saved replay independently.
+clear. The rendered check requires moving-tread contact, full translation/spin
+rest and exact independent reconstruction of its complete saved replay. The
+separate campaign proof requires all 30 authored solutions and nearby inputs
+to clear their courses; a wall-clock key hold is not that deterministic input.
+
+Set `KYOTO_FLIGHT_PROFILE=1` on the Chrome gameplay check to save
+`flight-cpu-profile.json`. Its gameplay receipt also records per-frame CPU
+costs, draw/triangle counts, resolution, culling counts, worker completion and
+Long Animation Frames. The normal run leaves CPU profiling disabled. Compare
+resolution alongside frame rate: a quality controller can spend saved render
+time on a larger drawing buffer instead of smoother playback.
+
+Rendered tests use Chrome's supported
+[silent audio sink](https://developer.chrome.com/blog/audiocontext-setsinkid)
+when available. This processes the real audio graph and advances its clock
+without using the laptop's selected output device. Other engines retain the
+muted final-gain path. A headless default-output context was observed reporting
+`running` while its clock stayed frozen, even on an empty page. Gameplay now
+requires music-step progression at startup and the intended tempo throughout
+the measured shot; a zero skipped-beat counter alone cannot pass the check.
 
 The rendered interface check completes six shots across three representative
 courses, including three successive mobile hold/Skip attempts (immediate and

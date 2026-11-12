@@ -3,7 +3,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {staticPreview} from '../static-preview.mjs';
 import {launchTestBrowser,testBrowserName} from './browser-engine.mjs';
 import {backgroundInput} from './background-input.mjs';
-import {silentOutput} from './browser-game-input.mjs';
+import {silentOutput,activateButton} from './browser-game-input.mjs';
 import {isTutorial} from '../public/tutorial.js';
 const output=process.env.KYOTO_TEST_OUTPUT||'.local/browser-transition-test';await mkdir(output,{recursive:true});
 await writeFile(output+'/receipt.json',JSON.stringify({passed:false})+'\n');
@@ -80,7 +80,7 @@ try{
    await begin(`choose:${width}:${c.id}`);
    await page.locator('#game').focus();await page.keyboard.press('l');await page.locator('#campaign-chapter').selectOption(String(c.campaign.chapter));await page.locator(`#course-list button[data-challenge="${c.id}"]`).click();
    await page.waitForFunction(c=>kyotoState.ready&&kyotoState.challenge?.id===c.id&&Math.hypot(kyotoState.feet.x-c.start.center.x,kyotoState.feet.z-c.start.center.z)<.01,c);
-   if(!isTutorial(c)){await page.locator('#briefing-play').waitFor({state:'visible'});await page.waitForTimeout(300);await end();await begin(`return:${width}:${c.id}`);await page.locator('#briefing-play').click();}
+   if(!isTutorial(c)){await page.locator('#briefing-play').waitFor({state:'visible'});await page.waitForTimeout(300);await end();await begin(`return:${width}:${c.id}`);await activateButton(page.locator('#briefing-play'));}
    await page.waitForFunction(()=>!kyotoState.briefing&&!kyotoState.briefingTransition);await page.locator('#campaign-chapter').waitFor({state:'hidden'});await page.waitForTimeout(100);await end();
    assert.equal(await page.evaluate(()=>kyotoState.pointerLocked),false);
    if((index+1)%10===0)console.log(`Transition checks: ${width}px ${index+1}/30`);

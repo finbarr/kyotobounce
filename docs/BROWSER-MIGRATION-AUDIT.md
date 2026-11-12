@@ -25,7 +25,7 @@ No live replacement has been deployed or native host stopped.
 | No always-on physics or fixed compute subscription | Static package has no gameplay service. The Linux verifier container passes all 30 course proofs and restart checks. Deployment configuration uses request billing and zero minimum instances; actual hosting would still have usage-based costs. No cloud deployment is claimed. |
 | Replay determinism across browsers | Matching catalog/input hashes; Chrome, Firefox and WebKit each reproduce all 30 hints and two regressions twice offline against exact Node result hashes. Includes launch/rotation fixtures and real controller input reconstruction. |
 | Desktop and mobile controls | Headless keyboard and native Chrome touch checks: movement, aim, charge ownership, Cancel, spin, speed, Skip, recall, replay, scout, orientation and return to desktop. This is browser/device emulation, not physical-phone testing. |
-| Smooth Chrome rendering and audio | Separate unskipped-flight and transition receipts; previous current-renderer flight runs measured about 60 FPS with no skipped music steps. Transition proof measured 59.60 FPS, 16.8 ms p95, zero new shader links and no skipped music steps. Resizing still produced a 50.1 ms maximum frame. Refresh gameplay measurements after client changes. |
+| Smooth Chrome rendering and audio | Phase-specific profiling led to static render culling and corrected resolution decisions. Fresh Chrome gameplay with an advancing audio clock records 60.00 FPS across 1,902 frames at pixel ratio 1, 16.8 ms p95/maximum, no long tasks and no skipped music steps. See rendering acceptance below for scope and limits. |
 | Sequential integration without duplicates | One checkout and generated asset set; bounded commits merged into main. Source-only installation uses a disposable directory that is removed afterward. No new persistent project, model copies or Unity builds are required. |
 
 ## Evidence identity
@@ -79,15 +79,78 @@ The rerun passes publication, a fresh visitor, public custom-course replay,
 offline multi-edit revision publication, atomic promotion and deliberate
 adoption of a new revision without changing geometry during flight.
 
+## Rendering acceptance
+
+Fresh default-startup and packaged runs had measured 50.36 and 49.79 FPS,
+both with 33.4 ms p95, despite a 60 FPS empty-page clock. A Chrome CPU profile
+found flat station traversal and render submission dominating after the physics
+worker had already finished. The renderer now partitions immutable architecture
+under identity containers and rejects entire offscreen branches. It reuses all
+meshes/materials and world transforms, preserves ray-query ordering, and restores
+all casters if the static shadow map needs refreshing. Moving actors/escalators
+remain outside this index.
+
+The profiled comparison reduced average render CPU time from 6.83 to 4.66 ms;
+roughly 1,236 objects per frame were skipped. Those profiled shots still ran
+around 50 FPS. Their resolution telemetry exposed another defect: the median
+frame time remained 16.7 ms during frequent missed refreshes, causing the old
+controller to increase resolution even during a roughly 42 FPS interval.
+Resolution decisions now use mean and p95 frame time, with sustained recovery
+before raising quality. Increases wait for aiming; active shots keep a stable
+quality level unless overloaded. Automatic changes wait through menus/overview
+transitions, where canvas reallocations had caused 150–242 ms stalls. Regression
+fixtures cover the misleading median, flight recovery and transient views.
+
+An unprofiled packaged Chrome 157.0.8103.52 run passed six independently
+reconstructed shots and measured 60 FPS at pixel ratio 1, but that run is not
+valid combined rendering/audio evidence: music stayed at step 2 despite the
+context reporting "running". The transition test correctly rejected the frozen
+clock. An isolated empty-page probe reproduced it with the default output:
+currentTime advanced only 0.0053 seconds over 1.5 seconds of wall time. Chrome's
+supported silent sink advanced 1.5013 seconds over the same interval.
+
+The test harness now uses that real-time silent sink when supported, retaining
+real graph processing and note lifecycles without touching the user's audio
+settings. The product audio code is unchanged. Gameplay checks now require
+actual music-step advancement at the intended tempo, as well as zero skipped
+beats, and reject a frozen clock at startup. The earlier profiles remain CPU
+and rendering diagnostics, not proof of healthy audio.
+
+With the real audio clock advancing, an intermediate flight measured 55.02 FPS.
+It held 60 FPS for several seconds, then lost frames when the old recovery
+policy raised resolution mid-shot. The final policy's unprofiled Chrome run
+passes all six independently reconstructed shots, offline controls/recall/Skip/
+replay, native-touch holds, saved progress, 60 course-menu selections and Retry.
+At 1280×800 its 1,902-frame flight measured 60.00 FPS, 16.8 ms p95 and maximum,
+zero long tasks and zero Long Animation Frames. Music advanced from step 57
+to 176 at the expected tempo without skipped beats; the maximum recorded
+scheduling gap was 40 ms. Pixel ratio remained 1, mean render CPU was 3.81 ms,
+and roughly 1,249 static objects per frame were skipped. This is a measured
+laptop sample, not a universal frame-rate or physical audio-device guarantee.
+
+The final transition pass covers all 30 courses at desktop and mobile widths:
+130 operations, 4,677 frames, 59.19 FPS mean, 16.8 ms p95 and 66.8 ms maximum.
+Both longest frames occurred during actual viewport resizing. Music advances
+through step 297 without skipped beats; maximum scheduling gap is 90.7 ms.
+There are no new shader links or WebGL calls above 5 ms. Two earlier headless
+pointer checks stalled in the driver's scroll-into-view command on visible
+buttons. Overview entry and replay exit now use native keyboard activation,
+with visible/enabled checks; gameplay assertions and native-touch throws remain.
+This is not claimed as a product fix for that unexplained driver behavior.
+
+Portable checks cover 366,591 visible vertex samples, transformed and nested
+render groups, camera returns, authored visibility, dynamic exclusions, shadow
+refresh and ray-query preservation. Typechecking, the repository suite and the
+browser/static build pass. The package contains 122 files / 224,936,274 bytes.
+Receipts: `.local/browser-flight-test/`, `.local/browser-flight-culling-test/`,
+`.local/browser-flight-budget-test/` and `.local/browser-flight-transition-test/`;
+no station assets were copied for these diagnostic directories.
+
 ## Outstanding acceptance
 
-- A fresh default-startup flight measured 50.36 FPS, 33.4 ms p95 and
-  50.1 ms maximum, despite a 60.00 FPS empty-page clock. Two main-thread long
-  tasks measured 55 and 56 ms; no music steps were skipped. This falls short
-  of the 60 FPS target. Packaged playback reproduced the gap: 49.79 FPS across
-  1,560 frames, 33.4 ms p95, 50.0 ms maximum and two 54–55 ms long tasks, with
-  no skipped music steps. Attribute this before claiming the performance target
-  is met; older faster samples do not resolve it.
+- Viewport changes still cause occasional long frames (66.8 ms in the final
+  transition run). The measured 60 FPS flight does not prove every camera,
+  display density or physical phone meets that rate.
 - One native-touch full-hold check recorded only 25% power. The next run's three
   full holds passed. Bounded charge/release diagnostics now accompany failure
   receipts; the original discrepancy is unexplained, not a claimed product fix.

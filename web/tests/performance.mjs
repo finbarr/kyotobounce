@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {Samples,ConnectionMetrics,clientPerformance as sanitize} from '../performance.ts';
 import {clientPerformance} from '../public/performance.js';
+import {renderBudget} from '../public/render-budget.js';
 const samples=new Samples();for(let i=0;i<10000;i++)samples.add(i);samples.add(NaN);samples.add(-1);assert.deepEqual(samples.take(),{count:10000,p50:256,p95:486,max:9999});assert.equal(samples.take().count,0);
 const metrics=new ConnectionMetrics('12345678-secret');metrics.message('input',20);metrics.message('private-user-text',30);metrics.state(100,1);metrics.state(900,1.8);const report=metrics.take();assert.equal(report.snapshotGapMs.max,800);assert.equal(report.simulationStepMs.max,800);assert.equal(report.received.unknown,1);assert.equal(JSON.stringify(report).includes('private-user-text'),false);assert.equal(report.connection,'12345678');assert.equal(metrics.take().snapshotGapMs.count,0);
 let time=0;const document={hidden:false,addEventListener(){}};const client=clientPerformance({now:()=>time,document});
@@ -19,3 +20,22 @@ time=2000;client.traffic('receive','state',100,{phase:'Aim',stationTime:3});time
 time=2066;client.traffic('receive','shot-chunk',100,{frames:[{stationTime:20}]});time=20000;client.traffic('receive','state',100,{phase:'Aim',stationTime:21});
 assert.equal(client.report().liveStateGapMaxMs,33,'Precomputed shots do not look like long live-state delivery gaps');
 console.log('PASS animation freeze, release wait, replay pause and network recovery diagnostics');
+
+const steady=Array(120).fill(1000/60);
+assert.equal(renderBudget(steady),'headroom');
+assert.equal(renderBudget(Array(120).fill(1000/120)),'headroom');
+// Actual failure pattern: the median says 60 FPS while every fifth frame
+// misses a refresh, yielding 50 FPS. Raising resolution makes it worse.
+const missed=steady.map((ms,i)=>i%5===0?ms*2:ms);
+assert.equal(missed.toSorted((a,b)=>a-b)[60],1000/60);
+assert.equal(renderBudget(missed),'over-budget');
+assert.equal(renderBudget(steady.map((ms,i)=>i%15===0?ms*2:ms)),'over-budget','Repeated misses remain visible in the tail');
+assert.equal(renderBudget([53,...steady.slice(1)]),'headroom','One isolated stall does not lower quality');
+assert.equal(renderBudget(Array(120).fill(17.5)),'hold','Hysteresis avoids quality oscillation near the limit');
+assert.equal(renderBudget(Array(120).fill(1000/30)),'over-budget');
+assert.equal(renderBudget(steady,{allowIncrease:false}),'hold','Keep a stable drawing buffer through flight/replay/results');
+assert.equal(renderBudget(missed,{allowIncrease:false}),'over-budget','Active shots can still shed excessive render cost');
+assert.equal(renderBudget(missed,{transitioning:true}),'hold','Transient overview costs must not trigger canvas reallocations');
+assert.equal(renderBudget([...Array(60).fill(1000),...steady.slice(60)]),'hold','Too little recent active-tab evidence');
+assert.equal(renderBudget([...Array(120).fill(33.3),...steady]),'headroom','Retired samples cannot pin resolution');
+console.log('PASS resolution follows sustained frame misses, tail latency and recovery without reacting to isolated stalls');

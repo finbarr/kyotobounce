@@ -3,6 +3,9 @@ import {isTutorial,tutorialUI} from './tutorial.js';
 import {levelEntryAim,levelEntryDistance} from './level-entry.js';
 import {levelIdFromPath} from './level-links.js';
 import {freezeStaticTransforms} from './static-transforms.js';
+import {staticRenderCulling} from './static-render-culling.js';
+import {staticRayQueries} from './static-ray-queries.js';
+import {renderBudget} from './render-budget.js';
 import {FlyCamera,flyTargets} from './fly-camera.js';
 import {StationBoundary} from './station-boundary.js';
 import {CameraObstacles,easeCameraClearance} from './camera-obstacles.js';
@@ -83,7 +86,7 @@ const cameraTarget=new THREE.Vector3(0,1.3,-20),followTarget=cameraTarget.clone(
 camera.position.set(-3.8,2.3,-20);camera.lookAt(cameraTarget);
 let noticeUntil=0,lastImpact=null,startupMs=0;
 let workerStatus='starting',connectionStatus='connecting',loadedLayout='',layoutReloading=false,skipSupported=false;
-let stationLook,robotShadow,ballShadow;
+let stationLook,robotShadow,ballShadow,renderCulling;
 let cameraClearance=3.8,cameraObstacles;
 const robotCutaway=new RobotCutaway();
 function notice(text,duration=4500){$('notice').textContent=text;$('notice').classList.remove('quiet');noticeUntil=performance.now()+duration;}
@@ -422,6 +425,11 @@ async function load(){
       let night=false;lights.onclick=()=>{night=!night;stationLook.setNight(night);lights.textContent=night?'Station lights: Evening':'Station lights: Day';lights.setAttribute('aria-pressed',String(night));};
       document.querySelector('#course-view .actions')?.append(lights);
     }
+    // Preserve authored equal-distance hit order before spatially regrouping
+    // rendering. Ray queries intentionally ignore render-container visibility.
+    staticRayQueries(station);
+    renderCulling=staticRenderCulling([station,hardwareScene,details.group]);
+    window.kyotoArt.renderCulling=renderCulling.stats;
     for(const root of [station,hardwareScene,details.group])freezeStaticTransforms(root);
     robotShadow=contactShadow(scene,station);ballShadow=contactShadow(scene,station);
     if(guestId)createAvatar(guestId);
@@ -753,6 +761,7 @@ function animate(now){
   if(avatar)robotShadow(avatar.group.position,1.15,avatar.group.visible&&ui.state.mode!=='replay');
   ballShadow(ball.position,.18,ball.visible&&inFlight);
   const shadowsDone=performance.now();
+  renderCulling.update(camera,{shadowUpdate:renderer.shadowMap.enabled&&(renderer.shadowMap.autoUpdate||renderer.shadowMap.needsUpdate)});
   blur.render(scene,camera,{velocity:snapshot?.velocity,phase:briefing.blocked||fly.active?'Aim':phase,ball:ball.position,playbackRate:presentationRate,reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches});
   window.kyotoArt.frameCost={pose:poseDone-frameStart,camera:cameraDone-poseDone,shadows:shadowsDone-cameraDone,render:performance.now()-shadowsDone};
   tutorial.update({course:ui.state.selected,completed:ui.state.progress.get(ui.state.selected?.id)?.completed,feet:self()?.feet,phase,charging:chargeMeter.charging,result:ui.state.lastResult,mobile:mobile?.active,blocked:startup.active||briefing.blocked||names.active||ui.state.mode!=='play'||levelMenuOpen()||fly.active||!workerReady});
@@ -764,10 +773,10 @@ function animate(now){
   // adapts; the HUD and reticle remain at native screen resolution. Ignore tab
   // suspension and let new shader variants settle before considering a change.
   if(!document.hidden&&now-startupMs>4500&&now-qualityCheck>3000&&frameTimes.length>=120){
-    qualityCheck=now;const recent=frameTimes.slice(-120).filter(t=>t<100).sort((a,b)=>a-b),median=recent[Math.floor(recent.length/2)];
+    qualityCheck=now;const budget=renderBudget(frameTimes,{allowIncrease:phase==='Aim',transitioning:briefing.blocked||levelMenuOpen()||names.active||startup.active});
     const ratio=renderer.getPixelRatio(),limit=pixelRatioLimit();
-    if(median>24){qualityGoodSince=0;if(ratio>Math.min(.65,limit))renderer.setPixelRatio(Math.max(Math.min(.65,limit),ratio*.85));}
-    else if(median<18){
+    if(budget==='over-budget'){qualityGoodSince=0;if(ratio>Math.min(.65,limit))renderer.setPixelRatio(Math.max(Math.min(.65,limit),ratio*.85));}
+    else if(budget==='headroom'){
       qualityGoodSince||=now;
       if(now-qualityGoodSince>12000&&ratio<limit){renderer.setPixelRatio(Math.min(limit,ratio*1.1));qualityGoodSince=now;}
     }else qualityGoodSince=0;
