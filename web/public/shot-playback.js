@@ -1,33 +1,32 @@
 // A shot is a small local movie of authoritative physics, not a live snapshot
-// clock. Network delivery may run far ahead; effects fire only at playback time.
+// clock. Worker delivery may run far ahead; effects fire only at playback time.
 export class ShotPlayback {
  cancelForNotice(message,owner){
   if(message.type!=='notice'||!owner||message.id!==owner)return false;
   this.clear(true);return true;
  }
- shot=null;discarded=new Set();resumeAt=null;rate=1;
+ shot=null;discarded=new Set();rate=1;
  expected=undefined;
  waitForAttempt(){this.clear(true);this.expected=null;}
  expect(attempt){if(attempt&&attempt!==this.expected){this.clear(true);this.expected=attempt;}}
  accepts(attempt){return this.expected===undefined||attempt===this.expected;}
- clear(discard=false){if(discard&&this.shot){this.discarded.add(this.shot.attempt);if(this.discarded.size>8)this.discarded.delete(this.discarded.values().next().value);}this.shot=null;this.resumeAt=null;this.rate=1;}
+ clear(discard=false){if(discard&&this.shot){this.discarded.add(this.shot.attempt);if(this.discarded.size>8)this.discarded.delete(this.discarded.values().next().value);}this.shot=null;this.rate=1;}
  setRate(rate,now){if(rate!==1&&rate!==2)throw new Error('Invalid playback rate');this.advance(now);this.rate=rate;}
- resume(message){if(this.shot?.attempt!==message.attempt)this.resumeAt=message;else if(message.skipToEnd)this.skipToEnd();}
  skipToEnd(){const s=this.shot;if(!s||s.resultSent)return false;s.skipRequested=true;return true;}
  cancelSkip(){if(this.shot)this.shot.skipRequested=false;}
  get skipping(){return !!this.shot?.skipRequested;}
  accept(chunk,now){
   if(!this.accepts(chunk.attempt)||this.discarded.has(chunk.attempt))return false;
   if(this.shot?.attempt!==chunk.attempt){
-   const first={...chunk.base,...chunk.frames[0]},resume=this.resumeAt?.attempt===chunk.attempt?this.resumeAt.time:null;
-   const start=resume??first.releaseTime-.12;
+   const first={...chunk.base,...chunk.frames[0]};
+   const start=first.releaseTime-.12;
    const launch={...first,phase:'Release',stationTime:first.releaseTime,flightTime:0,ball:first.launchPosition,rotationSamples:[],liveScore:null};
-   this.shot={attempt:chunk.attempt,sequence:-1,frames:[launch],events:[],clock:start,now,emitted:-Infinity,eventFloor:resume??-Infinity,complete:false,result:null,resultSent:false,underrunMs:0,skipRequested:this.resumeAt?.attempt===chunk.attempt&&!!this.resumeAt.skipToEnd};this.resumeAt=null;
+   this.shot={attempt:chunk.attempt,sequence:-1,frames:[launch],events:[],clock:start,now,emitted:-Infinity,complete:false,result:null,resultSent:false,underrunMs:0,skipRequested:false};
   }
   const s=this.shot;if(chunk.sequence<=s.sequence)return;
   s.sequence=chunk.sequence;
   for(const frame of chunk.frames)s.frames.push({...chunk.base,...frame});
-  s.events.push(...chunk.events.map(event=>({...event,at:event.stationTime??chunk.base.releaseTime+event.time})).filter(event=>event.at>=s.eventFloor));
+  s.events.push(...chunk.events.map(event=>({...event,at:event.stationTime??chunk.base.releaseTime+event.time})));
   s.complete=chunk.complete;return true;
  }
  result(message){if(this.shot?.attempt!==message.attempt)return false;this.shot.result=message;return true;}
@@ -36,8 +35,7 @@ export class ShotPlayback {
   const s=this.shot;if(!s)return null;
   const elapsed=Math.max(0,(now-s.now)/1000);s.now=now;
   const last=s.frames.at(-1);
-  // A reconnect starts partway through the movie. The first cached chunk may
-  // precede that point; wait for backfill instead of rewinding to its last frame.
+  // Wait for the next worker chunk instead of inventing unavailable motion.
   if(!s.complete&&last.stationTime<s.clock)return null;
   // Only an incomplete buffer can run dry. Once complete, station animation
   // continues locally forever and the resting ball stays at its final pose.
@@ -51,7 +49,7 @@ export class ShotPlayback {
   const s=this.advance(now);if(!s)return null;
   const last=s.frames.at(-1);
   const messages=[];
-  // Wait for both the resting pose and the server's result. Dropped playback
+  // Wait for both the resting pose and the worker's result. Dropped playback
   // events must not turn into a burst of impacts and sounds on the result screen.
   const jumped=!!(s.skipRequested&&s.complete&&last.phase==='Result'&&s.result);
   if(jumped){s.clock=Math.max(s.clock,last.stationTime);s.frames=[last];s.events=[];s.skipRequested=false;this.rate=1;}

@@ -1,5 +1,9 @@
 # Flight camera and contact fixes
 
+Historical native-release evidence. Commands and receipts below describe that
+release, not the current browser game. For current setup and verification use
+[LOCAL_PLAY.md](LOCAL_PLAY.md) and [BROWSER-PHYSICS.md](BROWSER-PHYSICS.md).
+
 The ball camera now has its own view. Mouse and arrow orbit inputs during flight leave the robot's throwing direction and position alone. The reticle disappears at release. Recall restores the exact last throw yaw, pitch and zoom; changing challenges clears that saved aim. The live score sits in a compact bottom corner, and the white power-meter mark is explicitly labeled as the suggested power.
 
 The shot inspector retains the previous flight report after recall. Saving its report includes both current state and the previous shot, including contact surface, support normal, velocity and angular velocity.

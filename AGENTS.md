@@ -26,7 +26,7 @@ Use one Git worktree and branch per independent task. Never have multiple sessio
 
 ## Verification and publication
 
-Run `npm run typecheck` and `npm test` for service changes; `npm run build:web` verifies the browser asset set. Test visible changes in a real browser. For browser integration run `npm run test:browser`; physics/campaign changes also require `npm run test:browser:campaign`, and online scoring requires the verifier integration checks. The native `test:runtime` suite only applies when deliberately changing the legacy native runtime.
+Run `npm run typecheck` and `npm test` for service changes; `npm run build:web` verifies the browser asset set. Test visible changes in a real browser. For browser integration run `npm run test:browser`; physics/campaign changes also require `npm run test:browser:campaign`, and online scoring requires the verifier integration checks. Maintain an existing native deployment from its deployed release, not the current browser project; see `docs/DEPLOYING.md`.
 
 Keep the user's desktop usable during verification. Local browser checks must be headless and install `web/tests/background-input.mjs` before navigation so they cannot capture or move the desktop pointer. Use keyboard controls; do not bring test windows forward or use desktop mouse automation. macOS physics workers must pass the background-only launch check. See `docs/PARALLEL_DEVELOPMENT.md`.
 

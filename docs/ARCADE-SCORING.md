@@ -1,6 +1,6 @@
 # Kyoto Bounce scoring
 
-Only scoring actions build a combo. Translating flight and rolling add **100 points per second**, linearly and outside every multiplier. Time at rest and spinning in place add nothing. Every shot that settles inside the station can bank its score, including a zero-target shot. Time alone cannot clear a course. The native ball still finishes only when translation and rotation stop; recall forfeits.
+Only scoring actions build a combo. Translating flight and rolling add **100 points per second**, linearly and outside every multiplier. Time at rest and spinning in place add nothing. Every shot that settles inside the station can bank its score, including a zero-target shot. Time alone cannot clear a course. The ball finishes only when translation and rotation stop; recall forfeits.
 
 ## Classic courses (`combo-v7`)
 
@@ -12,7 +12,7 @@ Supported rest inside the target keeps 100%. Outside, accuracy falls linearly wi
 
 ## Waypoint courses (`waypoint-v4`)
 
-Courses have up to 32 required waypoints and at most one optional destination; at least one target is required. Native contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; two collected waypoints produce ×20, or 200,000 target points before bank credit. The outer edge of each drawn ring matches its scoring radius.
+Courses have up to 32 required waypoints and at most one optional destination; at least one target is required. Physics contact with a waypoint's actual face collects it once, in any order. Waypoints can occupy fixed floors, walls and ceilings. One contact in an overlap collects every matching waypoint once; two collected waypoints produce ×20, or 200,000 target points before bank credit. The outer edge of each drawn ring matches its scoring radius.
 
 The waypoint component is **×1 with no targets, then ×10, ×20, ×40, ×80…**. With `W > 0` collected waypoints it is `10 × 2^(W − 1)`. Add `0.5 × B` for qualifying distinct banks to get the combined multiplier. Target points are **`10,000 × combined multiplier`**. The first waypoint raises its component to ×10; each later waypoint doubles only that component. Bank credit is always additive and never gets doubled by later waypoints. Order does not affect the final multiplier.
 
@@ -64,4 +64,4 @@ Visual references: the named trick chain, special meter and italic score in [THP
 
 ## Verification
 
-`npm test` checks scoring arithmetic, linear movement, rest/spin exclusion, unmultiplied bonuses, once-only contacts, live/final parity, action-only feedback and bounded heat lifecycle. `npm run test:runtime` exercises the native worker, true rest, target collection, authoritative score/replay parity and rejection of forged scores. Visible effects also require a real browser check.
+`npm test` checks scoring arithmetic, linear movement, rest/spin exclusion, unmultiplied bonuses, once-only contacts, live/final parity, action-only feedback and bounded heat lifecycle. `npm run test:browser:campaign` checks all 30 browser courses, true rest, target collection and exact replay parity. `npm run test:verification` and `npm run test:verification:service` check independent reconstruction, authoritative persistence and rejection of forged results. Visible effects also require a real browser check.

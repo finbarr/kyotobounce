@@ -144,7 +144,6 @@ user's pointer. Receipts and captures stay in `.local/browser-physics/`.
 | `npm run test:physics:station` | Opening-course geometry checks, including Clock In's first three native contact positions within 0.1 mm, plus Node/Chrome replay equality |
 | `npm run test:physics:solids` | All 457 authored convex casings: 5,941 interior samples, 5,484 exterior casts, outward recovery and contacts on the original visible surfaces; combined-world interior lookup |
 | `node web/tests/browser-escalators.mjs --station` | All 48 actual lanes carry a grounded walker; 1,380 rendered-tread/collision comparisons at five phases, maximum measured difference 0.00000213 m |
-| `npm run test:runtime` | Isolated native service campaign, full rest, walking, creator validation, replay, Skip/reconnect and recall regressions while the native path remains in use |
 
 November 10 campaign proof: 30/30 suggested routes and 184/184 nearby throws
 collected every required target/destination and reached true rest. Passage
@@ -314,8 +313,9 @@ under `.local/browser-physics/designer/`; fixed station cases are recorded in
 `.local/browser-physics/designer-proof.json`.
 
 The static release acceptance runs against only `.local/browser-release`, with
-no source-tree fallback, Unity process or gameplay API. The current package has
-121 files; the station model uses ten 16 MiB-or-smaller chunks and collision uses
+no source-tree fallback, Unity process or gameplay API. The package inventory is
+checked at build and test time; the station model uses ten 16 MiB-or-smaller
+chunks and collision uses
 four. Their hashes preserve the original station/collision bytes. The rendered
 checks require offline walking, throws, Skip, recall, saved progress, independent
 replay reconstruction and all 30 desktop/mobile course selections. A deliberately
@@ -429,8 +429,9 @@ The older roughly 1.1-second Chrome audio gap and Firefox skipped music step
 have not been reproduced or explained by these shorter shader stalls. Keep
 the worker/storage diagnostics for the earlier Chrome Skip timeout too.
 
-Remaining: audit the full migration against current runtime evidence, commands
-and documentation, removing obsolete runtime entry points before declaring it done.
+The requirement-by-requirement [migration audit](BROWSER-MIGRATION-AUDIT.md)
+records current evidence, remaining acceptance and unresolved observations.
+Do not treat local packaging or a successful subset of checks as completion.
 
 Keep one checkout and generated asset set, finish and integrate each bounded
 change, and preserve unrelated Unity edits. No migration deployment is authorized.

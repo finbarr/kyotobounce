@@ -20,7 +20,7 @@ const cancelledDesign=new ShotPlayback();for(const chunk of chunks)cancelledDesi
 assert.equal(cancelledDesign.cancelForNotice({type:'notice',id:'other',message:'Shot recalled'},'designer'),false);
 assert.equal(cancelledDesign.active,true,'Another session cannot cancel this buffered shot');
 assert.equal(cancelledDesign.cancelForNotice({type:'notice',id:'designer',message:'Ball left the station'},'designer'),true);
-assert.equal(cancelledDesign.active,false,'A native cancellation must unfreeze the browser even without a result');
+assert.equal(cancelledDesign.active,false,'A physics cancellation must unfreeze the browser even without a result');
 for(const chunk of chunks)cancelledDesign.accept(chunk,100);
 assert.equal(cancelledDesign.active,false,'Late chunks cannot bring an abandoned design shot back');
 assert.equal(chunks[1].frames[0].challenge,undefined,'Repeated course metadata is shared by the chunk');
@@ -33,12 +33,9 @@ const buffered=playback.stats().shotBufferedSeconds;assert.ok(buffered>7.9);
 // No further packets: the same playback module used by the browser must finish.
 frame=playback.sample(10120);assert.equal(frame.phase,'Result');assert.equal(frame.after.ball.x,10);assert.equal(frame.messages.filter(m=>m.type==='result').length,1);
 frame=playback.sample(15120);assert.equal(frame.time,25,'Escalators keep moving after the ball rests');assert.equal(frame.messages.some(m=>m.type==='result'),false);
-playback.accept(chunks.at(-1),15120);assert.equal(playback.shot.frames.length,2,'Reconnect duplicates do not rewind or duplicate samples');
+playback.accept(chunks.at(-1),15120);assert.equal(playback.shot.frames.length,2,'Duplicate chunks do not rewind or duplicate samples');
 playback.clear(true);for(const c of chunks)playback.accept(c,16000);assert.equal(playback.active,false,'Recalled shots cannot return from delayed packets');
-const resumed=new ShotPlayback();resumed.resume({attempt:'a',time:15});for(const c of chunks)resumed.accept(c,20000);assert.equal(resumed.sample(20000).time,15,'Fresh reconnect starts at server presentation time');
-const delayed=new ShotPlayback();delayed.resume({attempt:'a',time:21});delayed.accept(chunks[0],30000);assert.equal(delayed.sample(30010),null,'Resume waits for the requested part of the trajectory');
-for(const c of chunks.slice(1))delayed.accept(c,30020);delayed.result({type:'result',attempt:'a'});const restored=delayed.sample(30020);assert.ok(restored.time>=21);assert.equal(restored.phase,'Result');assert.ok(restored.messages.some(m=>m.type==='result'),'A completed shot is not replayed from the beginning after reconnect');
-console.log('PASS autonomous shot playback, timed effects/results, resume, recall, chunk metadata and input/control flood separation');
+console.log('PASS autonomous shot playback, timed effects/results, recall, chunk metadata and input/control flood separation');
 
 const fast=new ShotPlayback();for(const c of chunks)fast.accept(c,0);
 fast.result({type:'result',attempt:'a',score:300});fast.sample(120);
@@ -55,7 +52,7 @@ console.log('PASS 2x clocks, rate switching, full-rest completion, bounded buffe
 const skip=new ShotPlayback(),result={type:'result',attempt:'a',score:300};
 assert.equal(skip.skipToEnd(),false);
 skip.accept(chunks[0],0);skip.sample(120);assert(skip.skipToEnd());
-assert(skip.skipping);frame=skip.sample(121);assert.equal(frame.jumped,false);assert.equal(frame.phase,'Flight','Skip waits for the full native trajectory');
+assert(skip.skipping);frame=skip.sample(121);assert.equal(frame.jumped,false);assert.equal(frame.phase,'Flight','Skip waits for the full physics trajectory');
 for(const c of chunks.slice(1))skip.accept(c,121);
 frame=skip.sample(122);assert.equal(frame.jumped,false);assert.equal(frame.phase,'Flight','Resting frames cannot invent an authoritative score');
 skip.result(result);frame=skip.sample(123);
@@ -68,9 +65,6 @@ const skipClock=new ShotStream('resume-skip');skipClock.started=performance.now(
 assert.equal(skipClock.resume().skipToEnd,true,'A skip intent survives a reconnect while computing');
 for(const c of chunks)for(const frame of c.frames)skipClock.frame({...c.base,...frame,attempt:'resume-skip'});
 assert(skipClock.resume().time>=19.8,'A completed skip advances the resume clock to rest');
-const reconnectSkip=new ShotPlayback();reconnectSkip.resume({...skipClock.resume(),attempt:'a'});
-for(const c of chunks)reconnectSkip.accept(c,0);reconnectSkip.result(result);
-assert.equal(reconnectSkip.sample(1).jumped,true,'Reconnect goes directly to the finished shot');
 const recalledSkip=new ShotPlayback();recalledSkip.expect('a');recalledSkip.accept(chunks[0],0);recalledSkip.skipToEnd();recalledSkip.waitForAttempt();
 for(const c of chunks)recalledSkip.accept(c,1);assert.equal(recalledSkip.result(result),false);assert.equal(recalledSkip.active,false);assert.equal(recalledSkip.skipping,false);
-console.log('PASS skip waits for authoritative rest/result, emits once, drops skipped effects, restores after reconnect and forfeits on recall');
+console.log('PASS skip waits for authoritative rest/result, emits once, drops skipped effects and forfeits on recall');

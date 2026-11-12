@@ -70,7 +70,7 @@ export async function packageBrowser({output=resolve('.local/browser-release'),v
  }
  for(const [source,destination]of [['LICENSE','LICENSE'],['node_modules/three/LICENSE','vendor/three/LICENSE'],['node_modules/three-mesh-bvh/LICENSE','vendor/bvh/LICENSE']])await write(destination,await readFile(source));
  let html=await readFile('web/public/index.html','utf8');
- html=html.replace('</head>',`<meta name="kyoto-runtime" content="browser"><meta name="kyoto-assets" content="chunks-v1">${verifier?`<meta name="kyoto-verifier" content="${verifier}">`:''}</head>`);
+ html=html.replace('</head>',`<meta name="kyoto-assets" content="chunks-v1">${verifier?`<meta name="kyoto-verifier" content="${verifier}">`:''}</head>`);
  await write('index.html',html);
  await write('404.html','<!doctype html><meta charset="utf-8"><title>Not found · Kyoto Bounce</title><h1>Page not found</h1><a href="/">Play Kyoto Bounce</a>');
  await write('_redirects','/level/* /index.html 200\n/replay/* /index.html 200\n');

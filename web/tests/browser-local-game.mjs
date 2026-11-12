@@ -17,7 +17,7 @@ const context=await browser.newContext({viewport:{width:1280,height:800},deviceS
 await context.addInitScript(()=>{
  const NativeWorker=Worker;window.workerTrace=[];window.recordingTrace={};
  const trace=(direction,m)=>{
-  if(!['session','recording-chunk','recording-ack','local-result','recording-error','skip-shot','shot-skipping','recall','recalled','error'].includes(m.type))return;
+  if(!['charge','release','cancel','session','recording-chunk','recording-ack','local-result','recording-error','skip-shot','shot-skipping','recall','recalled','error'].includes(m.type))return;
   const at=performance.now(),attempt=m.attempt??m.result?.attempt;
   if(attempt&&['recording-chunk','recording-ack','local-result'].includes(m.type)){
    const r=recordingTrace[attempt]??={chunks:0,maxAckMs:0,started:at};
@@ -149,7 +149,10 @@ try{
   function sample(now){if(kyotoState.phase==='Flight'){bench.frames.push(now-last);bench.audioStart??={...kyotoState.audio};}last=now;if(bench.running)requestAnimationFrame(sample);}requestAnimationFrame(sample);
  });
  await begin(movingProof.shot.holdMs,movingTiming);await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result,null,{timeout:90000});
- state=await page.evaluate(()=>kyotoState);assert.ok(state.result.success);assert.equal(state.result.waypointHits.length,1);assert.ok(state.diagnostics.sleeping);assert.equal(Math.hypot(...Object.values(state.velocity)),0);assert.equal(Math.hypot(...Object.values(state.spin)),0);results.push(state.result);
+ // Real keyboard timing varies by milliseconds. A tread can legally reject
+ // that launch: the saved inputs must reproduce the outcome, including misses.
+ // All 30 exact authored solutions still must clear in test:browser:campaign.
+ state=await page.evaluate(()=>kyotoState);assert.equal(state.result.challenge.id,movingProof.id);assert.ok(state.diagnostics.sleeping);assert.equal(state.diagnostics.contactBudgetExhaustions,0);assert.equal(Math.hypot(...Object.values(state.velocity)),0);assert.equal(Math.hypot(...Object.values(state.spin)),0);results.push(state.result);
  benchmark=await page.evaluate(()=>{bench.running=false;return {...bench,audioEnd:kyotoState.audio};});
  benchmark.releasePhase=state.result.releaseTime%movingTiming.period;
  const frames=benchmark.frames.slice().sort((a,b)=>a-b);benchmark={...benchmark,frames:frames.length,meanFps:1000/(frames.reduce((a,b)=>a+b,0)/frames.length),p95FrameMs:frames[Math.floor(frames.length*.95)],maxFrameMs:frames.at(-1)};
@@ -163,6 +166,8 @@ try{
   try{return await Promise.all(ids.map(async id=>{const commands=[];for await(const chunk of store.inputChunks(id))commands.push(...chunk.runs);return {replay:await store.replay(id),proof:await store.inputProof(id),commands};}));}finally{store.close();}
  },results.map(r=>r.attempt));
  const world=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin')));
+ const movingReplay=replays.find(({replay})=>replay.challenge.id===movingProof.id).replay;
+ assert(movingReplay.contacts.some(contact=>world.escalators.some(lane=>lane.id===contact.surface)),'The unskipped benchmark must actually contact a moving escalator');
  for(const {replay,proof,commands} of replays){
   const course={...catalog.find(c=>c.id===proof.header.courseId),physics:BROWSER_PHYSICS},job=new ShotVerification(world,course,proof.header,commands,{attempt:replay.attempt,subject:replay.id}),poses=[],contacts=[];let reply;
   do{reply=await job.advance();if(reply.recording){poses.push(...reply.recording.poses);contacts.push(...reply.recording.contacts);}assert.ok((job.shot?.steps||0)<180*120);}while(reply.status!=='verified');

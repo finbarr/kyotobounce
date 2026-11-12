@@ -11,6 +11,7 @@ import {decodeCollisionPack} from '../public/physics/collision-pack.js';
 import {BROWSER_PHYSICS} from '../public/physics/shot.js';
 assert.match(process.env.FIRESTORE_EMULATOR_HOST||'',/^127\.0\.0\.1:\d+$/);assert.equal(process.env.GOOGLE_CLOUD_PROJECT,'demo-kyoto-verification');
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430',out='.local/verification/course-sharing';assert.equal(new URL(origin).hostname,'127.0.0.1');await mkdir(out,{recursive:true});
+await writeFile(out+'/receipt.json',JSON.stringify({passed:false})+'\n');
 const catalog=JSON.parse(await readFile('web/starter-challenges.json')).map(c=>({...c,physics:BROWSER_PHYSICS})),world=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin')));
 const db=new Firestore({projectId:process.env.GOOGLE_CLOUD_PROJECT}),service=new VerificationService({db,catalog,world:()=>world,namespace:'sharing-'+randomUUID(),batchLimit:3}),server=verificationHttp(service,{origins:[origin]});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const endpoint=`http://127.0.0.1:${server.address().port}`;
@@ -26,10 +27,13 @@ async function context(){
 }
 async function dismiss(p){if(await p.locator('#tutorial-hide').isVisible())await p.locator('#tutorial-hide').click();if(await p.evaluate(()=>kyotoState.briefing))await p.locator('#briefing-play').click();await p.waitForFunction(()=>!kyotoState.briefing&&!kyotoState.briefingTransition);}
 async function enter(p,name){await p.waitForFunction(()=>document.getElementById('loading-message')?.textContent.includes('Station ready'),null,{timeout:120000});await p.locator('#loading-name input').fill(name);await p.locator('#loading-name button[type=submit]').click();await p.waitForFunction(()=>!document.body.classList.contains('is-loading')&&window.kyotoState?.ready,null,{timeout:120000});await dismiss(p);}
-async function throwShot(p,hold){await p.locator('#game').focus();await p.keyboard.press('h');await p.keyboard.press('Space',{delay:hold});await p.waitForFunction(()=>kyotoState.phase==='Flight');await p.keyboard.press('Enter');}
+async function throwShot(p,hold){await p.locator('#game').focus();await p.keyboard.press('h');await p.keyboard.press('Space',{delay:hold>=2800?Math.max(hold,2900):hold});await p.waitForFunction(()=>kyotoState.phase==='Flight');await p.keyboard.press('Enter');}
 async function design(p,edit,name,revision){
  await p.locator('#game').focus();await p.keyboard.press('l');await p.locator(edit?'#edit-challenge':'#new-challenge').click();await p.waitForFunction(()=>kyotoState.mode==='design'&&kyotoState.phase==='Aim');
- await throwShot(p,2250);await p.waitForFunction(()=>kyotoState.mode==='editor');await p.locator('#challenge-name').fill(name);await p.locator('#save-challenge').click();
+ // This suite verifies publication and revision workflows. A saturated real
+ // hold reproduces the same launch despite browser event-delivery jitter;
+ // a partial hold can legitimately miss its own narrowly generated targets.
+ await throwShot(p,2900);await p.waitForFunction(()=>kyotoState.mode==='editor');await p.locator('#challenge-name').fill(name);await p.locator('#save-challenge').click();
  await p.waitForFunction(revision=>kyotoState.mode==='play'&&kyotoState.challenge?.local&&kyotoState.challenge.revision===revision,revision);await dismiss(p);return p.evaluate(()=>kyotoState.challenge);
 }
 async function clear(p,c){
@@ -87,7 +91,7 @@ try{
  // the current revision deliberately, without interrupting an in-flight ball.
  assert.equal(await other.evaluate(()=>kyotoState.challenge.revision),1);await adopt(other,created.id);await other.waitForFunction(()=>kyotoState.challenge.revision===2);
  assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>kyotoState.pointerLocked),false);assert.equal(await other.evaluate(()=>kyotoState.pointerLocked),false);
- await writeFile(out+'/receipt.json',JSON.stringify({course:created.id,revision:2,author:created.creator,publication:published.solution,errors},null,2)+'\n');
+ await writeFile(out+'/receipt.json',JSON.stringify({passed:true,course:created.id,revision:2,author:created.creator,publication:published.solution,errors},null,2)+'\n');
  console.log('PASS offline multi-edit revision publication, atomic local promotion, current public catalog and deliberate adoption of updated course geometry');
 }catch(error){for(const [name,p]of [['owner',page],['visitor',other]])if(p){await p.screenshot({path:out+'/'+name+'-failure.png'}).catch(()=>{});await writeFile(out+'/'+name+'-failure.json',JSON.stringify({error:String(error),errors,state:await p.evaluate(()=>window.kyotoState),local:await p.evaluate(()=>window.kyotoState?.challenge?readLocal():null)},null,2));}throw error;}
 finally{await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await db.recursiveDelete(service.root);await db.terminate();world.free();}

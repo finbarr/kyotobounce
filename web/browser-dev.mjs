@@ -12,7 +12,7 @@ const verifier=verificationEndpoint(process.env.KYOTO_VERIFY_URL);
 const release=await buildBrowser();
 const catalog=JSON.parse(await readFile('web/starter-challenges.json','utf8')).map(c=>({...c,physics:BROWSER_PHYSICS}));
 const verificationMeta=verifier?`<meta name="kyoto-verifier" content="${verifier}">`:'';
-const html=(await readFile('web/public/index.html','utf8')).replace('</head>','<meta name="kyoto-runtime" content="browser">'+verificationMeta+'</head>');
+const html=(await readFile('web/public/index.html','utf8')).replace('</head>',verificationMeta+'</head>');
 const memory={'/':html,'/assets/station.json':release.stationBytes,'/campaign.json':JSON.stringify(catalog),'/browser-build.json':JSON.stringify(release.manifest)};
 const files={'/physics-worker.js':'.local/browser-physics/worker.js','/station.collision.bin':'.local/browser-physics/station.collision.bin',...Object.fromEntries(Object.entries(release.files).map(([name,file])=>['/'+name,file]))};
 const mime={'.js':'text/javascript','.html':'text/html','.json':'application/json','.css':'text/css','.glb':'model/gltf-binary','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2','.ico':'image/x-icon'};

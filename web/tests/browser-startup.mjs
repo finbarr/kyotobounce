@@ -40,7 +40,7 @@ try{
  const start=run(['start'],{KYOTO_PORT:String(p)});await ready(start,origin);
  for(const path of ['/','/index.html','/level/atrium-welcome','/replay/test-replay']){
   const response=await fetch(origin+path);assert.equal(response.status,200);
-  assert.match(await response.text(),/name="kyoto-runtime" content="browser"/);
+  const html=await response.text();assert.match(html,/src="\/game.js"/);assert(!html.includes('kyoto-runtime'),'No native runtime selector');
  }
  const campaign=await (await fetch(origin+'/campaign.json')).json();assert.equal(campaign.length,30);
  const manifest=await (await fetch(origin+'/browser-build.json')).json();assert.equal(manifest.layoutSha256,catalog[0].layout);
@@ -49,7 +49,7 @@ try{
   const response=await fetch(origin+path,{method:'HEAD'});assert.equal(response.status,200);
   assert.equal(Number(response.headers.get('content-length')),manifest.files['web/public'+path].bytes);
  }
- for(const path of ['/api/health','/api/scores','/assets/atrium.glb','/web/server.ts','/assets/runtime/optimization.json'])assert.equal((await fetch(origin+path)).status,404,path);
+ for(const path of ['/api/health','/api/scores','/assets/atrium.glb','/web/server.ts','/assets/runtime/optimization.json','/connection.js'])assert.equal((await fetch(origin+path)).status,404,path);
  assert.equal((await fetch(origin,{method:'POST'})).status,405);
  assert.equal((await run(['run','test:browser:local'],{KYOTO_TEST_ORIGIN:origin,KYOTO_TEST_OUTPUT:output+'/game',KYOTO_TEST_STATIC:''}).done).code,0);
  const gameplay=JSON.parse(await readFile(output+'/game/receipt.json'));assert.equal(gameplay.passed,true);

@@ -1,10 +1,5 @@
 export const replayIdFromPath=path=>path.match(/^\/replay\/([a-zA-Z0-9_-]{1,64})\/?$/)?.[1]||null;
 export const replayURL=(attempt,origin=location.origin)=>`${origin}/replay/${encodeURIComponent(attempt)}`;
-export async function fetchReplay(attempt,{signal}={}){
- const response=await fetch(`/api/replay/${encodeURIComponent(attempt)}`,{signal});
- if(!response.ok)throw new Error(response.status===404?'Replay not found. This shot may no longer be available.':'Could not load this replay. Please try again.');
- return (await response.json()).replay;
-}
 export async function copyReplay(attempt,button){
  return copyLink(replayURL(attempt),button,'replay');
 }

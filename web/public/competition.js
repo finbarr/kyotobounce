@@ -2,16 +2,16 @@ import {setText,setHidden,setAttribute} from './dom-updates.js';
 import {isTutorial} from './tutorial.js';
 import {startMarker} from './start-marker.js';
 import {completedCourse,nextCampaignCourse} from './level-progress.js';
-import {copyLevel,levelURL,fetchLevel} from './level-links.js';
+import {copyLevel,levelURL} from './level-links.js';
 import {designGeometry} from './design-geometry.js';
 import * as THREE from 'three';
 import {resultBoard} from './result-board.js';
-import {fetchReplay,copyReplay,replayURL} from './replay-links.js';
+import {copyReplay,replayURL} from './replay-links.js';
 import {arcadeFeedback} from './arcade-feedback.js';
 import {waypointTargets} from './waypoint-targets.js';
 import {scoreAt,collectedIds,allWaypointsCollected} from './waypoint-score.js';
 const $=id=>document.getElementById(id),v=p=>new THREE.Vector3(p.x,p.y,-p.z);
-export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchLevel,onModeChange=()=>{},focusTarget=()=>{},resume=()=>{},prepareMarker=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
+export function competitionUI({getReplay,getLevel,onModeChange=()=>{},focusTarget=()=>{},resume=()=>{},prepareMarker=()=>{},scene,send,cancel,notice,getGuestId,getLiveTime,getPhase,resetView,overview,sound,sharedReplay=false,getLayout=()=>null}){
  const feedback=arcadeFeedback(sound);
  const host=document.createElement('aside');host.id='competition';host.innerHTML=`
  <div id="course-view"><div class="panel-top"><span class="eyebrow">STAGE SELECT / 選択</span><button id="new-challenge">＋ Create</button></div><h2 id="course-title">EXPLORE KYOTO.</h2><div id="turn-status"></div><label class="campaign-picker" id="campaign-picker" hidden><span id="campaign-count"></span><select id="campaign-chapter" aria-label="Campaign chapter"></select></label><div id="course-list"></div><div id="challenge-detail" hidden><p id="challenge-description"></p><button id="show-overview">◎ View course overview</button><button id="use-hint" hidden>Set suggested aim <kbd>H</kbd></button><p id="hint-note"></p><div id="timing-hint" hidden><span class="eyebrow">ESCALATOR RELEASE TIMING</span><div class="timing-track"><i id="timing-window"></i><b id="timing-cursor"></b></div><p id="timing-caption"></p></div><div class="actions"><button id="share-challenge">Copy level link ↗</button><button id="edit-challenge" hidden>Revise</button></div><details id="score-guide"><summary>HOW TO SCORE</summary><p><strong>10,000 base × (1 + 0.5 per distinct bank) × landing accuracy.</strong> Banks add to the multiplier; impact speed does not multiply it.</p><p>Keep 100% inside the gold bullseye. The outer rings show 75%, 50% and 25%, fading to zero at the edge. Height counts too. Tagging the target guarantees 25% even if it rolls out.</p><p>Spaced banks count once per surface; a flight of treads counts as one. Movement adds 100 points per second outside every multiplier. Waiting and spinning in place add nothing. Banks freeze at the first target hit. A far miss still banks its movement points.</p><p>The score locks only when the ball stops moving and spinning. Recall forfeits the shot.</p></details></div></div>
@@ -39,7 +39,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
  closeLevels.onclick=()=>{showLevels(false);resume();};
  document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement)showLevels(false);});
  for(const id of ['show-overview','use-hint'])$(id).addEventListener('click',()=>showLevels(false));
- const ranking=resultBoard({local,host:document.body,watch:openReplay,sound,getGuestId,share:copyLevel,changeScope:(scope,challengeId)=>send('score-scope',{scope,challengeId})});
+ const ranking=resultBoard({local:true,host:document.body,watch:openReplay,sound,getGuestId,share:copyLevel,changeScope:(scope,challengeId)=>send('score-scope',{scope,challengeId})});
  // A single layout owns replay panels; the game restores these shared widgets on exit.
  const replayView=document.createElement('section');replayView.id='replay-view';replayView.hidden=true;
  replayView.innerHTML=`<div id="replay-stage" aria-label="Replay scene"></div>
@@ -100,7 +100,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   const replaying=state.mode==='replay'||sharedReplay;
   const throwing=['Release','Flight'].includes(getPhase());
   if(throwing||replaying||document.body.classList.contains('is-briefing')||document.body.classList.contains('mobile-ui'))showLevels(false);
-  setHidden(levelsButton,replaying||state.mode!=='play');levelsButton.disabled=throwing||!!state.session?.restoring;
+  setHidden(levelsButton,replaying||state.mode!=='play');levelsButton.disabled=throwing;
   setAttribute(levelsButton,'title',throwing?'Finish your shot, or press R to recall it':'L · Choose a level or robot');
   document.body.classList.toggle('is-results',!replaying&&!$('result-card').hidden);document.body.classList.toggle('is-replay',replaying);
   setHidden(host,replaying);
@@ -115,7 +115,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
  }
  function updateSession(){
   const session=state.session;if(!session)return;if(session.busy)$('result-card').hidden=true;
-  $('turn-status').textContent=session.restoring?'Restoring your attempt…':session.busy?'Your shot is in flight':session.challenge?(local&&(!state.onlineConfigured||session.challenge.local)?'READY TO THROW · SAVED ON THIS DEVICE':'READY TO THROW · SHARED SCORES'):'FREE EXPLORATION · WALK, AIM AND THROW';
+  $('turn-status').textContent=session.busy?'Your shot is in flight':session.challenge?((!state.onlineConfigured||session.challenge.local)?'READY TO THROW · SAVED ON THIS DEVICE':'READY TO THROW · SHARED SCORES'):'FREE EXPLORATION · WALK, AIM AND THROW';
   const changed=state.selected?.id!==session.challenge?.id||state.selected?.revision!==session.challenge?.revision;
   state.selected=session.challenge;
   if(changed){state.lastResult=null;showLevels(false);state.chapter=state.selected?.campaign?String(state.selected.campaign.chapter):state.selected?'community':state.chapter;feedback.reset();liveScore=null;scoreAttempt='';scoreEpoch++;state.board=[];state.personal=null;renderBoard();$('result-card').hidden=true;}
@@ -127,13 +127,13 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   $('score-guide').hidden=false;
   if(state.selected?.scoring==='waypoint-v4')$('score-guide').innerHTML='<summary>HOW TO SCORE</summary><p>10,000 base × (waypoint multiplier + bank bonus). The first waypoint raises the waypoint multiplier to ×10. Each later unique waypoint doubles it: ×20, ×40, ×80… Each distinct bank adds +0.5× separately. Waypoints never double the bank bonus. Movement adds a flat 100 points per second after multipliers.</p><p>The gold destination is an optional landing bonus equal to your target score (10,000 × combo if no waypoints). Every shot that settles inside the station enters the leaderboard, even with zero targets (×1 base). Collect every waypoint to clear the course; destination-only courses need a landing to clear. Score locks at full rest; recall and leaving the station forfeit.</p>';
   else $('score-guide').innerHTML=classicScoreGuide;
-  $('show-overview').disabled=session.busy||session.restoring;
+  $('show-overview').disabled=session.busy;
   renderCatalog();renderPublication();
  }
  function renderPublication(){
-  const c=state.selected,info=c&&state.publications.get(c.id),own=!!c&&!c.campaign&&c.creator===getGuestId(),published=!!c&&(!c.local||!!info?.published),available=local&&state.onlineConfigured&&own,pending=info?.state==='queued';
+  const c=state.selected,info=c&&state.publications.get(c.id),own=!!c&&!c.campaign&&c.creator===getGuestId(),published=!!c&&(!c.local||!!info?.published),available=state.onlineConfigured&&own,pending=info?.state==='queued';
   if(c&&!state.session?.busy&&state.challenges.some(next=>next.id===c.id&&next.revision!==c.revision))setText($('turn-status'),'NEW REVISION AVAILABLE · CHOOSE THIS LEVEL AGAIN');
-  refreshCourses.hidden=!local||!state.onlineConfigured;
+  refreshCourses.hidden=!state.onlineConfigured;
   publishButton.hidden=!available||published;publishResult.hidden=publishButton.hidden||state.lastResult?.challenge?.id!==c?.id;
   for(const button of [publishButton,publishResult]){button.textContent=pending?'Publishing…':'Publish level';button.disabled=pending||!info?.proofAttempt||!!state.session?.busy;}
   publicationStatus.hidden=!available;
@@ -144,7 +144,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
  publishButton.onclick=publishResult.onclick=()=>{if(state.selected)send('publish-course',{challengeId:state.selected.id});};
  $('campaign-chapter').onchange=()=>{state.chapter=$('campaign-chapter').value;renderCatalog();};
  function chooseLevel(c){
-  if(selectingLevel||state.session?.restoring||['Release','Flight'].includes(getPhase()))return;
+  if(selectingLevel||['Release','Flight'].includes(getPhase()))return;
   cancel();selectingLevel=true;renderCatalog();
   if(!send('select-challenge',{challengeId:c.id,revision:c.revision})){selectingLevel=false;renderCatalog();notice('Reconnect before changing levels.');}
  }
@@ -167,7 +167,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   const ordered=[...state.challenges].sort((a,b)=>(a.order??999)-(b.order??999));
   const chapters=new Map(ordered.filter(c=>c.campaign).map(c=>[String(c.campaign.chapter),c.campaign.chapterTitle]));
   const campaignCount=ordered.filter(c=>c.campaign).length;
-  if(ordered.some(c=>!c.campaign))chapters.set('community',local&&!state.onlineConfigured?'Your levels on this device':'Player-created courses');
+  if(ordered.some(c=>!c.campaign))chapters.set('community',!state.onlineConfigured?'Your levels on this device':'Player-created courses');
   $('campaign-picker').hidden=!campaignCount;
   $('campaign-count').textContent=`${campaignCount} STAGES · ${[...chapters.keys()].filter(k=>k!=='community').length} CHAPTERS`;
   if(!chapters.has(state.chapter))state.chapter=chapters.keys().next().value;
@@ -179,7 +179,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
    const button=document.createElement('button');button.className='course'+(state.selected?.id===c.id?' selected':'');
    button.dataset.stage=c.campaign?String(c.order+1).padStart(2,'0'):'＋';
    button.dataset.challenge=c.id;
-   button.disabled=selectingLevel||!!state.session?.restoring||['Release','Flight'].includes(getPhase());
+   button.disabled=selectingLevel||['Release','Flight'].includes(getPhase());
    button.setAttribute('aria-pressed',String(state.selected?.id===c.id));
    const copy=document.createElement('span'),name=document.createElement('strong');copy.className='course-copy';name.textContent=c.name;copy.append(name);
    if(c.campaign){const meta=document.createElement('small');meta.textContent=`${c.campaign.difficulty} · ${c.campaign.distance} m through waypoints`;copy.append(meta);}
@@ -198,7 +198,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
   if(!ordered.length){const p=document.createElement('p');p.textContent='Explore the station freely. Walk with WASD, hold Space to throw, and press R to recall. Use Create to turn a new trick shot into a level.';list.append(p);}
   if(focusedId){const i=[...list.children].findIndex(b=>b.dataset.challenge===focusedId);if(i>=0)focusLevel(i);}
  }
- function renderBoard(){if(state.mode==='play')ranking.update(state.selected,state.board,state.personal,{local:state.boardLocal??local,cached:state.boardCached,onlineAvailable:state.onlineAvailable});}
+ function renderBoard(){if(state.mode==='play')ranking.update(state.selected,state.board,state.personal,{local:state.boardLocal??true,cached:state.boardCached,onlineAvailable:state.onlineAvailable});}
  $('share-challenge').onclick=()=>{if(state.selected)copyLevel(state.selected.id,$('share-challenge'));};
  function startDesign(start=null){
   if(designRequest||designSaving)return;
@@ -291,8 +291,7 @@ export function competitionUI({local=false,getReplay=fetchReplay,getLevel=fetchL
    if(m.type==='course-publication'){const previous=state.publications.get(m.courseId);state.publications.set(m.courseId,{...(m.revision!==undefined&&m.revision!==previous?.revision?{}:previous),...m});renderPublication();}
    if(m.type==='selected'||m.type==='error'||m.selectionDeferred){nextRequested=false;selectingLevel=false;renderCatalog();}
    if(m.type==='state'&&state.mode!=='replay'){if(m.liveScore){liveScore=m.liveScore;scoreAttempt=m.attempt;feedback.accept(m.liveScore,m.attempt,state.selected);}if(['Aim','Charging'].includes(m.phase)){feedback.reset();liveScore=null;}}
-   if(m.type==='worker-status'&&m.status!=='ready'){feedback.reset();liveScore=null;scoreEpoch++;if(['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='Recording interrupted. Throw another design ball after reconnecting.';renderEditor();}}
-   if(m.type==='welcome'&&!m.resumed&&['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='The recording session ended. Throw a new design ball before saving.';renderEditor();}
+   if(m.type==='worker-status'&&m.status!=='ready'){feedback.reset();liveScore=null;scoreEpoch++;if(['design','editor'].includes(state.mode)){designRequest=null;designSaving=false;clearDesign();setMode('editor');$('design-review-status').textContent='Recording interrupted. Reload to start a new recording.';renderEditor();}}
    if(m.type==='session'){state.session=m;if(m.designing&&state.mode==='play')setMode('design');updateSession();}
    if(m.type==='catalog'){state.challenges=m.challenges;renderCatalog();renderPublication();if(!sharedReplay)send('course-progress');}
    if(m.type==='course-progress'){

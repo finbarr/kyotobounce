@@ -19,9 +19,9 @@ const server=await staticPreview(directory);await new Promise(resolve=>server.li
 const origin=`http://127.0.0.1:${server.address().port}`;
 try{
  for(const path of ['/','/level/atrium-welcome','/replay/12345678-1234-4234-8234-123456789012']){
-  const response=await fetch(origin+path);assert.equal(response.status,200);const html=await response.text();assert(html.includes('name="kyoto-runtime" content="browser"'));assert(html.includes('name="kyoto-assets"'));assert(!html.includes('name="kyoto-verifier"'),'Offline-only acceptance bundle');
+  const response=await fetch(origin+path);assert.equal(response.status,200);const html=await response.text();assert(!html.includes('kyoto-runtime'),'No native runtime selector');assert(html.includes('name="kyoto-assets"'));assert(!html.includes('name="kyoto-verifier"'),'Offline-only acceptance bundle');
  }
- for(const path of ['/api/health','/unknown','/station.collision.bin','/assets/runtime/atrium.glb','/_headers','/_redirects','/web/server.ts'])assert.equal((await fetch(origin+path)).status,404,path);
+ for(const path of ['/api/health','/unknown','/station.collision.bin','/assets/runtime/atrium.glb','/_headers','/_redirects','/web/server.ts','/connection.js'])assert.equal((await fetch(origin+path)).status,404,path);
  const html=await readFile(directory+'/index.html','utf8'),imports=JSON.parse(/<script type="importmap">(.*?)<\/script>/.exec(html)[1]).imports;
  for(const path of Object.values(imports).filter(p=>!p.endsWith('/'))){const response=await fetch(origin+path,{method:'HEAD'});assert.equal(response.status,200,'Import-map entry must be packaged: '+path);assert.equal(response.headers.get('content-type'),'text/javascript');}
  assert.equal((await fetch(origin+'/credits.html')).status,200);

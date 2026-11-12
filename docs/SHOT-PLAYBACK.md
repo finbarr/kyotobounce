@@ -1,68 +1,77 @@
-# Authoritative shot playback
+# Browser shot playback
 
-Walking, aiming and wind-up use live snapshots. On release, the native worker
-locks the launch state and advances the same 180 Hz contact solver ahead of
-wall time. Each session has its own analytic station clock, including moving
-escalators. The physics rules and timestep do not change.
+Walking, aiming and wind-up use snapshots from the dedicated browser worker.
+Release locks the launch state. The worker advances the 180 Hz contact solver
+ahead of presentation, using the same analytic station clock for moving
+escalators. Rendering and audio remain on their own clocks on the main thread.
 
-The worker yields between batches of twelve steps, with an 8 ms shared budget
-per update and rotating session priority. It computes up to sixty seconds ahead
-so an endlessly moving ball cannot monopolize the service. Ordinary finite
-shots finish computing well before playback; longer shots continue streaming.
+Physics computes at most 30 seconds ahead of acknowledged playback, with one
+step of numerical tolerance. A recording batch contains at most 180 new poses,
+30 presentation frames and a bounded event batch. The worker yields between
+batches and waits for IndexedDB acknowledgments, so a long-running shot cannot
+grow an unbounded in-memory trajectory. These limits pause computation; they
+never finish a moving ball.
 
-Node scores those future samples and sends reliable `shot-chunk` messages.
-The first frame goes immediately, then chunks contain about 200 ms of motion,
-shared scene metadata, 180 Hz orientation samples and timestamped contacts.
-The browser advances an independent playback clock through the buffer. Ball,
-robot, escalators, live score and effects use that clock. Future results and
-sounds are withheld until their playback time. Reconnecting does not discard
-the current buffer; the server can also resend retained chunks for that session.
+`shot-chunk` messages contain motion and timestamped contacts. The browser's
+playback clock drives the ball, robot, escalators, score and effects. Future
+results and sounds stay hidden until their presentation time. A buffer underrun
+waits for physics instead of extrapolating through a collision. Local intent
+fences discarded attempts: late worker messages cannot restore a recalled shot
+or take over the camera while the player holds a new ball.
 
-Native results require physical rest in both translation and rotation. A result
-is held until its flight duration has elapsed on the presentation clock before authoritative
-scoring and persistence, so recalling during playback still forfeits even if
-the complete successful trajectory has already been calculated. The browser
-never supplies a score or trajectory. A reconnect never replays a release.
+A successful result requires both translation and spin to stop. The completed
+recording remains provisional until the result is presented; only then are the
+score, replay header and optional verification outbox entry saved atomically.
+Recall forfeits even when computation has finished ahead of playback. Leaving
+the station is a forfeit, not an artificial rest state.
 
-During a live flight, hold Space for 2× playout and release it for normal speed.
-The prominent fast-forward button can also toggle the speed. Ball and station
-animation, score effects, music tempo, pitch and sound envelopes speed up together.
-Camera input remains responsive at normal speed. Replays retain Space-to-pause.
+During flight, hold Space or use the speed button for 2× playback. Ball and
+station animation, score effects, music and sound envelopes speed up together.
+The physics timestep and scoring duration do not change. Camera controls remain
+responsive at normal speed. Focus loss, menus, recall and completion restore 1×.
 
-The authenticated `playback-rate` command accepts only 1 or 2 and the current
-attempt ID. Native result delivery and reconnect retention follow the same
-piecewise clock as the browser. Neither the 180 Hz solver nor scoring duration
-changes: movement still earns 100 points per simulated moving second. Focus loss,
-menus, recall, disconnection and completion return to 1×. A buffer underrun waits
-for authoritative frames instead of extrapolating through a collision.
+Enter or **Skip to result** removes the compute-ahead lead limit while retaining
+storage backpressure. Playback waits for the final resting pose and result,
+then jumps once without a burst of skipped impact sounds. Full replay data is
+preserved. Recall stays available while **Finishing shot…** is displayed.
 
-Diagnostics log `shot-computed` duration, computation time and transfer size,
-server event-loop and native timing, disconnect causes, and browser frame cost,
-buffer depth and buffer underruns. No names, credentials or control values are
-logged. Shot Details exposes the current buffer and frame/network timings.
+Gameplay has no WebSocket or native-session reconnect path. Network loss only
+affects optional online synchronization; loaded gameplay continues locally.
+Reload retains saved progress, courses and complete shots. It discards an
+unfinished recording rather than awarding an unearned result.
 
-Run portable checks with `npm run typecheck`, `npm test`, `npm run build:web`.
-After rebuilding the native worker, use an isolated local service for
-`npm run test:runtime`, `web/tests/shot-stream-runtime.mjs`,
-`web/tests/network-stall-runtime.mjs` and `web/tests/connection-recovery-runtime.mjs`.
-Use `KYOTO_TEST_ORIGIN` for its URL. Never create test scores on production.
+## Replays and online scores
 
-Browser/service protocol: `shot-stream-v4` (live 2× playout). The native stream
-capability remains `shot-stream-v1`, with `shot-speed-v1` for rate control. Old open pages receive a reload
-message rather than silently waiting for snapshots that no longer arrive.
+Local replays load their original full pose, rotation and contact records from
+IndexedDB. They include launch controls, station/rule versions, player name and
+cosmetic robot choice. The moving station follows the recorded clock. Orbit,
+free camera, pause, seek and playback speed do not change the recorded score.
 
-## Sharing and results
+With a verifier configured, saved legal controls can be independently checked
+online. The service reconstructs walking, release, flight and scoring using its
+own current course and collision assets. It never accepts a client final score,
+trajectory or claimed waypoint hit as evidence. A local result stays labelled
+local until verification succeeds; network failure leaves the saved result and
+pending upload intact.
 
-Saved scoring shots have a public `/replay/<attempt UUID>` URL. `GET /api/replay/<id>` loads the saved authoritative record; neither route requires a guest token or allocates a native physics session. The viewer supports orbit, zoom, pause, scrubbing, quarter/half speed and a link to play the same level. Copy-link controls appear on the result and replay panels. Entering a result releases the mouse so these controls are immediately usable.
+Public `/replay/<attempt>` links fetch a verified input seed. The browser worker
+reconstructs it and checks the server's result before displaying it. Accepted
+replays are cached transactionally for offline viewing, within shared count and
+byte limits. Direct links require neither a player registration nor a name
+prompt. Only verified published results receive public sharing controls.
+See [ON-DEMAND-VERIFICATION.md](ON-DEMAND-VERIFICATION.md) for persistence,
+authentication, bounded verification and cache details.
 
-The record includes the native thrower's feet, yaw/pitch, power and spin settings, launch position/velocity/spin, charge/release times, station/rule versions and recorded poses and score frames. The moving station follows the recorded clock. We play the original authoritative trajectory instead of re-simulating on each view: this preserves the exact collisions and score while avoiding native-worker load or dependence on future physics determinism. The player's name and cosmetic robot choice are captured with the throw.
+## Verification
 
-A bounded in-process LRU stores each full serialized replay plus its gzip response. Entries expire **24 hours after their last read**; API downloads, conditional requests, HEAD requests, share-page views and in-game replay reads all refresh that deadline. Saving a scoring shot warms the cache after its database transaction commits. A cold link loads the original sequence from SQLite, and concurrent readers share one compression job. There is no physics recomputation on either a cache hit or miss.
+Run `npm run typecheck`, `npm test` and `npm run build:web` for portable checks.
+`npm run test:browser` exercises offline desktop/touch play, Skip, recall,
+replay seeking and reload persistence through the normal startup command.
+`npm run test:browser:recording` verifies long-running motion, delayed storage,
+failure handling and interrupted-recording cleanup. `npm run test:browser:sync`
+checks offline queueing, reconnect, verified standings and public replays.
 
-The cache defaults to 128 MiB, at most 512 entries, and 16 MiB per entry (including compressed data); least recently read entries are evicted under pressure. Oversized records remain playable from SQLite but bypass caching. Compression runs in at most two background jobs, with queued work removed on eviction. Expired entries are swept every minute. `KYOTO_REPLAY_CACHE_MB` adjusts the total byte limit. Restarting the service empties the cache; the next read refills it from the saved sequence. This cache is per service process; a future multi-instance deployment would benefit from a shared cache such as Redis.
-
-The API serves cached gzip bytes and an ETag, so repeat downloads can return 304 while still refreshing the server cache. Revising or removing a level invalidates its cached replays. Server performance logs include aggregate hit/miss, byte, eviction, expiry and compression counters; `/api/debug/replay-cache` exposes the same counters only on an isolated local server. No replay IDs, names or contents are logged.
-
-A score commit also captures the level's top ten before and after insertion. Every positive-scoring attempt competes independently, ordered by score descending, duration ascending, acceptance time and attempt ID. There is no per-player limit: one player can own all ten slots, including tied scores from distinct shots. The reveal starts after the score count-up, cascades through rows, then inserts the new attempt into its server-ranked slot, pushes lower attempts down and ejects the displaced tenth entry. Rows and replay links identify individual attempts. Personal-best celebrations still require beating that player's highest score, including scores below the top ten. Names can be entered on first connection and edited from the header; replay presentation remains the name used for that shot.
-
-Five cosmetic celebration tiers range from a proud gesture through fist pumps, character-specific victory dances, podium poses and a jackpot routine. Earned score, personal best and leaderboard position select the tier. Poses still wait for authoritative translation and spin to stop; retries blend them away. Shared replays retain the same character and achievement. Reduced motion removes row movement and uses a shorter, still robot pose.
+The full station and campaign evidence is indexed in
+[BROWSER-PHYSICS.md](BROWSER-PHYSICS.md). Browser checks run headlessly with the
+background input guard installed before navigation. Never create test records
+on production by default.

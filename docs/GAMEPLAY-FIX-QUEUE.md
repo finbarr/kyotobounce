@@ -1,5 +1,9 @@
 # Gameplay fixes
 
+Historical native-release evidence. Commands and receipts below describe that
+release, not the current browser game. For current setup and verification use
+[LOCAL_PLAY.md](LOCAL_PLAY.md) and [BROWSER-PHYSICS.md](BROWSER-PHYSICS.md).
+
 Requested 2026-09-15. The original five gameplay fixes are implemented and verified. Three additional visual/robot reports were added during implementation; they do not resume unrelated historical backlogs.
 
 ## Todo

@@ -130,72 +130,14 @@ and deployment/cutover is authorized.
 
 ## Existing native deployment
 
-The currently deployed architecture uses a long-running Node service plus a
-native Linux Unity dedicated-server worker. The notes below describe that existing deployment for operational reference.
-The current default build/start commands now target the browser game; use the
-existing deployed release for native maintenance or rollback, not the browser
-branch's old native packaging scripts. A replacement deployment still requires
-explicit authorization.
+The existing live release uses a long-running Node service and a Linux Unity
+dedicated-server worker. Current main builds the browser game and on-demand
+verifier only. Its old native packaging scripts are not a supported deployment
+path; maintain or roll back the native service using its existing deployed
+release and matching instructions. No native service has been stopped by this
+migration.
 
-The supplied scripts target an Ubuntu 24.04 x86_64 server with systemd and Caddy. The initial deployment used 2 vCPUs and 4 GB RAM; capacity depends on concurrent physics sessions and needs load testing for your traffic.
-
-The v2 layout has a much larger transient allocation while Unity parses the
-station JSON. The November 2026 release was staged on the existing 4 GB host
-with 4 GB of swap; a 2300 MB staging limit without swap killed the worker during
-startup. Provision startup memory headroom before activation, and inspect both
-resident memory and swap activity during real shots. Swap is startup headroom,
-not a substitute for measuring sustained gameplay load. Preserve its boot
-configuration when maintaining that host.
-
-1. Install Unity 6000.3.23f1 with Linux dedicated-server build support on the build machine. Fetch assets, run the source checks, then `npm run build:worker -- --linux` and `npm run build:web`.
-2. Provision a server with SSH key access. Review `deploy/bootstrap.sh` before running it as root on a **new server**; it installs packages, configures SSH and creates the `kyoto` service user.
-3. Point your domain and `www` DNS records at the server, and allow ports 80/443 plus your SSH access through the firewall.
-4. Set `KYOTO_SSH_TARGET`, `KYOTO_SSH_KEY` and `KYOTO_HOST` explicitly, then run `node deploy/package.mjs` and `node deploy/upload.mjs --stage-only`.
-
-The packager uses the current station bundle pinned by `web/v2/assets.json`.
-It verifies the source, geometry, hardware, moving-step metadata and all 30
-course layout hashes before writing the release's canonical
-`runtime/station-layout.json`. The tested exploration spawn is applied exactly
-as in the local v2 preview. Only current delivery models ship; the older public
-authoring pack is not a substitute for this station bundle. Original sources
-remain in the private versioned authoring bundle, outside the runtime release.
-
-`--stage-only` uploads without switching the live release. Install production
-dependencies in the candidate, make it readable by the `kyoto` user, and run a
-temporary service on a separate loopback port with a separate database and log.
-After native and headless browser checks pass, preserve rollback configuration
-and a consistent database backup, stop the temporary service, then invoke
-`bash RELEASE_DIRECTORY/deploy/activate.sh RELEASE_DIRECTORY HOSTNAME` over SSH.
-
-Example configuration (substitute your own values):
-
-```sh
-export KYOTO_SSH_TARGET=root@your-server
-export KYOTO_SSH_KEY="$HOME/.ssh/your-key"
-export KYOTO_HOST=game.example.com
-node deploy/package.mjs
-node deploy/upload.mjs --stage-only
-```
-
-A maintainer may keep those values in an ignored `.deploy.local.json` with `target`, `key`, and `hostname` fields. Never commit private keys or service data.
-
-Activation installs the release under `/opt/kyoto/releases`, switches `/opt/kyoto/current`, configures HTTPS, restarts the service, and backs up existing SQLite data before migration. Persistent data lives outside releases under `/var/lib/kyoto/data`; the backup timer stores local backups under `/var/lib/kyoto/backups`. Arrange off-server backups separately.
-
-Verify a real shot/replay against the staged release with a separate temporary database. After activation, check the HTTPS page, `/api/health`, public asset hashes, service logs and backup timer. Do not create test records in the production database by default. The upload script does not itself prove gameplay or automatically roll back a failed release. Keep the previous release and database backup available for a coordinated rollback.
-
-Store protected rollback configuration and database snapshots under `/var/lib/kyoto/deployments/<release>`, outside `/var/lib/kyoto/backups`. The backup retention script runs as `kyoto` and must be able to traverse its backup directory. When staging manually, apply the release read/execute permissions from `activate.sh` before starting a temporary service as `kyoto`.
-
-CI does not deploy. Production changes are an explicit maintainer action after reviewing the integrated game.
-
-Live browser connections retry with bounded backoff and a heartbeat. A guest may
-resume its existing native session for 30 seconds using both the session ID and
-its saved guest token. In-flight simulation/scoring continues during that grace
-period; an unreleased windup is cancelled. Explicitly leaving frees the slot.
-After a service restart the client rejoins, and a changed station hash triggers
-an asset reload. Commands, especially releases, are never replayed on reconnect.
-
-Continuous inputs coalesce behind slow native requests, preserving discrete
-command order. Congested sockets skip superseded state snapshots. The service
-logs close code, duration and whether a session was resumable, without recording
-guest credentials. Use those logs and host utilization when investigating online
-lag; the client cannot repair an indefinitely unavailable network.
+A replacement cutover requires explicit authorization after the browser game,
+verifier and score handling are accepted. Preserve the current authoritative
+scores and a consistent database backup for that decision. Only then retire the
+old service and its compute allocation. CI never deploys.

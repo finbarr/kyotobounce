@@ -14,7 +14,6 @@ assert.ok(live.follows(state('old','Flight'),'Flight'));
 reset();
 for(const message of [...oldStates,...oldEvents,chunk('old')])assert.equal(receive(message),false,`Reset rejects old ${message.type}/${message.phase||''}`);
 assert.equal(live.expect('old'),false,'A delayed session cannot authorize a throw while holding');
-assert.equal(live.resume('old'),false,'A delayed resume cannot undo a local reset');
 assert.equal(playback.sample(100),null,'No abandoned trajectory remains to sample');
 // Even a cached frame accidentally reaching the final presentation boundary
 // cannot animate flight or switch camera after the local reset.
@@ -36,7 +35,4 @@ assert.equal(live.expect('old'),false,'A stale session cannot replace an accepte
 reset();live.charge();live.release();assert.ok(live.expect('quick'));
 assert.ok(live.follows(state('quick','Flight'),'Flight'),'Release before the charge acknowledgement is valid');
 reset();assert.ok(receive(state('','Aim')),'Ordinary holding/movement updates still arrive');
-live.reconnect();assert.ok(live.resume('resumed'));assert.ok(live.follows(state('resumed','Flight'),'Flight'));
-reset();assert.equal(live.resume('resumed'),false,'Reset revokes reconnect permission too');
-live.reconnect();live.charge();assert.equal(live.resume('resumed'),false,'A new charge cannot be replaced by reconnect backfill');
-console.log('PASS reset fences raw states, chunks, events, cached phases, camera, stale sessions/resumes; new release and explicit reconnect remain valid');
+console.log('PASS reset fences raw states, chunks, events, cached phases, camera and stale sessions; only a new local release can restore flight');

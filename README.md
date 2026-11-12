@@ -1,13 +1,13 @@
 # Kyoto Bounce
 
-A robot, a bouncing ball, and a Kyoto Station inspired atrium. Build a line through stairs, glass, stone and moving escalators; land near the target to cash out a growing arcade combo.
+A robot, a bouncing ball, and a Kyoto Station inspired atrium. Build a line through stairs, glass, stone and moving escalators; hit waypoints and bank a growing arcade combo.
 
 **[Play Kyoto Bounce](https://kyotobounce.com)** · [Local setup](docs/LOCAL_PLAY.md) · [Contributing](CONTRIBUTING.md) · [Parallel Codex workflow](docs/PARALLEL_DEVELOPMENT.md)
 
 - Walk the atrium, aim with the mouse, set topspin/backspin and sidespin, then hold and release a throw.
 - A smart orbit camera follows the ball while you keep control of the view.
 - Create named challenges with start and target radii. Compete asynchronously through scoreboards and recorded replays.
-- Score live with surface and active-time multipliers, a green target-hit celebration, distance rings and original synthesized arcade audio. The shot ends when the ball stops moving and spinning.
+- Score live with waypoint multipliers, additive bank credit and movement points, plus target celebrations and original synthesized arcade audio. The shot ends when the ball stops moving and spinning.
 
 ## Run locally
 
@@ -89,8 +89,10 @@ The startup check starts the normal game, verifies offline desktop/mobile play,
 full rest, recall, saved results and replays, and stops its own preview. Browser
 checks remain headless and cannot capture the desktop pointer. Hosted CI runs
 source and verifier-emulator checks; rendered station tests run locally.
-Legacy native source/tools remain during migration, but are not used by the
-normal setup, start or build commands.
+The shipped client has one gameplay runtime: the browser worker. Native source
+remains as reference for the existing live release; its connection module and
+legacy npm entry points are removed from the current browser project. Maintain
+that deployed release separately until a replacement cutover is authorized.
 
 ## License
 
