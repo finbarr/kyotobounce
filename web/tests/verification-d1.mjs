@@ -64,18 +64,21 @@ try{
  await request('/v1/publications/'+randomUUID(),{player:bob,method:'POST',body:{course:revision,baseRevision:1,header:proof(revision)},status:403});
  await finish(alice,winner,'published');await request(path(loser)+'/advance',{player:alice,method:'POST',body:{},status:409});
  assert.equal((await request('/v1/courses/'+candidate.id+'/leaderboard')).challenge.revision,2);await request('/v1/replays/'+play,{status:[404,409]});
- const miss={...candidate,id:randomUUID(),waypoints:[{...candidate.waypoints[0],center:{x:20,y:1,z:-2.9}}]};await finish(alice,await publish(miss),'failed');
- assert(!(await request('/v1/courses')).courses.some(c=>c.id===miss.id));
- console.log('PASS course publication: verified solution, private drafts, ownership, restart, revision promotion, retirement and missed-target rejection');
-
  // A losing publication may describe the same geometry as the winning revision.
  // Retiring that job must not erase progress earned on the current course.
+ // Exercise it before another publication's admission can clean up the loser.
+ assert(await h.db.prepare('SELECT id FROM verifier_attempts WHERE id=?').bind(loser).first());
  await new D1Storage(h.db).transaction(async tx=>tx.write('UPDATE verifier_meta SET cleanup_cursor=? WHERE id=1',loser));
  const ownPlay=await submit(alice,proof(revision));await finish(alice,ownPlay);
  assert(await h.db.prepare('SELECT id FROM verifier_attempts WHERE id=?').bind(loser).first());
  await new D1Storage(h.db).transaction(async tx=>tx.write('UPDATE verifier_meta SET cleanup_cursor=? WHERE id=1',loser.slice(0,-1)));
  await new D1VerificationService({db:h.db,catalog:[course],world:()=>world,now:()=>h.config.now}).cleanup();
+ assert.equal(await h.db.prepare('SELECT id FROM verifier_attempts WHERE id=?').bind(loser).first(),null,'The regression must actually retire the losing publication');
  assert((await request('/v1/progress',{player:alice})).entries.some(p=>p.challengeId===candidate.id&&p.completed),'Retiring a losing publication must retain current accepted progress');
+
+ const miss={...candidate,id:randomUUID(),waypoints:[{...candidate.waypoints[0],center:{x:20,y:1,z:-2.9}}]};await finish(alice,await publish(miss),'failed');
+ assert(!(await request('/v1/courses')).courses.some(c=>c.id===miss.id));
+ console.log('PASS course publication: verified solution, private drafts, ownership, restart, revision promotion, retirement and missed-target rejection');
 
  // Schema/query pagination only: private test seeds contain no accepted scores.
  // Actual score admission is exercised above through independent simulation.
