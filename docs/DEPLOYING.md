@@ -6,7 +6,9 @@ The selected replacement host is ChatGPT Sites with D1. The registered project
 is in `.openai/hosting.json`; reuse it. Version 1 is deployed owner-private at
 https://kyoto-bounce.finbarrtaylor.chatgpt.site from `ee3c4bf`. Its D1 migration,
 read-only API requests, asset delivery and an offline browser shot pass hosted
-checks. Managed score-submission acceptance and public cutover remain pending.
+checks. With explicit test-record approval, all 30 hosted campaign proofs also
+match fresh independent simulations; their test scores were then cancelled.
+Current-score handling and public cutover remain pending.
 
 `npm run build` builds the existing game
 directly into `dist/client` and bundles the production Fetch handler at
@@ -48,6 +50,14 @@ Publish this repository through the Sites source/build/archive workflow; keep
 unrelated local edits outside that staging step and restore them afterward.
 Do not change the current domain or retire the native host before managed-runtime
 acceptance and current-score handling are complete.
+
+A consistent backup of the old live database was explicitly approved and saved
+privately at `.local/native-migration/current.sqlite.gz`. Both remote and local
+SQLite integrity checks pass, and the compressed SHA-256 matches across the
+transfer. Its receipt records 10 attempts, 30 courses and 228 guests. It includes
+guest credentials: never commit or publish this archive. The ten authoritative
+native shots contain poses and contacts but no input proof; importing them must
+retain their native provenance rather than claim browser-physics verification.
 
 ## Browser static release
 

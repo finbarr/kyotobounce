@@ -215,8 +215,8 @@ engine matrix does cover all three engines and its sources are unchanged.
 | Gate | Observed state and required next action |
 | --- | --- |
 | Public source setup | Complete: after explicit archive/destination approval on November 12, `assets-v8` was published and its public download streamed through SHA-256 verification. All 159,537,468 bytes match the pinned archive hash. The archive was also reopened and all six regular files checked against the manifest; there are no extra entries. Receipt: `.local/asset-pack/publication-receipt.json`. |
-| Hosted verifier and browser | Private Sites version 1 is deployed with a same-origin D1 verifier. Its migration, read-only API and hosted/offline browser play pass. Actual managed score verification still needs the explicitly approved record-creating acceptance run. |
-| Existing authoritative scores | No production scores have been imported, reset or deleted. The new verifier's restart tests prove its own score durability; they do not prove preservation of the current live database. Before cutover, obtain and verify a consistent backup and settle how current live scores are retained. Native results must not be relabelled as verified browser-physics results. |
+| Hosted verifier and browser | Private Sites version 1 is deployed with a same-origin D1 verifier. Its migration, read-only API and hosted/offline browser play pass. Following explicit approval, all 30 hosted campaign proofs match fresh independent results and their test shots were cancelled. |
+| Existing authoritative scores | An explicitly approved consistent private backup passes remote/local integrity and transfer-hash checks. It retains all 10 accepted shots, 30 courses and 228 guests. Current-score import remains; no existing scores have been imported, reset or deleted. Native results have no input proofs and must not be relabelled as browser-physics verification. |
 | Retire fixed compute | A read-only request to `https://kyotobounce.com/api/health` still returns `status: ready`, `scope: online`, `worker: true`, `shotPlayback: true`. The native service remains live. Stop and release its compute allocation only after the replacement and score handling are accepted and retirement is authorized. |
 
 The original local audit made no production changes. The asset release above
@@ -264,8 +264,20 @@ gzip brings the deployment to about 242 MiB. The bounded decoder checks the
 original raw hashes, and the packaged verifier still exactly matches a fresh
 original-world simulation after cold load and process restart.
 
-Managed verifier CPU/memory acceptance and current-score handling remain before
-public cutover. The existing public domain and native service are unchanged.
+All 30 managed campaign proofs subsequently passed, with exact independent
+results and no request errors across 377 calls. First cold advance was about
+7.3 seconds end to end. Every test shot was cancelled after validation; the
+hosted database confirms 30 cancelled rows with zero score. One test player
+remains as approved. Detailed evidence is in ON-DEMAND-VERIFICATION.md and
+`.local/sites/hosted-verification.json`.
+
+The explicitly approved native backup is private in `.local/native-migration/`.
+Both SQLite integrity checks and the compressed transfer hash pass. All ten
+accepted scores use the current course geometry/revisions; the one campaign
+revision difference is Bridge Pinball, which has no saved attempt. Native replays
+contain poses/contacts but no legal-control proof, so they cannot simply be
+resubmitted as browser shots. Preserving these authoritative results and their
+provenance is the next cutover task. The public domain and native host are unchanged.
 The proposed Google Cloud project was not created. The Cloud Run package is
 earlier implementation evidence, not the selected deployment target.
 

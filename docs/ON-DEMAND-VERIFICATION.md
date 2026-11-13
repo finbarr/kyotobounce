@@ -49,8 +49,8 @@ The authenticated HTTP service verifies and stores campaign scores, standings,
 completion and public replay inputs. The browser synchronizes saved campaign
 and published custom-course shots when a verifier is configured. Its creator
 can queue a course for publication after saving a complete legal playthrough.
-A private Sites/D1 verifier is deployed. The public domain still uses the native
-service; managed score-submission acceptance and score-preserving cutover remain.
+A private Sites/D1 verifier is deployed and all 30 hosted campaign proofs pass.
+The public domain still uses the native service; score-preserving cutover remains.
 
 ## Compact collision world for Workers
 
@@ -190,18 +190,32 @@ sync and public replays plus real creator publication, ownership, offline edits
 and revision adoption against that bundle. Receipts are
 `.local/verification/sites-runtime.json`, `browser-sites/receipt.json` and
 `course-sharing-sites/receipt.json` under `.local/verification/`.
-Managed-hosting CPU/cold-load acceptance and score-preserving cutover remain.
-The existing live native service remains unchanged.
+Managed acceptance below now passes for the 30 campaign proofs. Score-preserving
+cutover remains; the existing live native service is unchanged.
 
 The first private Site publication is version 1, source `ee3c4bf`, at
 https://kyoto-bounce.finbarrtaylor.chatgpt.site. Read-only hosted checks returned
 200 for health, all 30 campaign definitions, First Bounce standings and the
 game shell. Headless Chrome loaded that deployment, disabled networking and
 completed a real First Bounce shot with Skip. All POSTs were intercepted locally;
-hosted player and attempt tables remain empty. The receipt is
-`.local/sites/read-only-hosted.json`. This proves hosted game delivery, D1 reads
-and offline gameplay, not a managed verifier CPU/memory pass. A prepared 30-level
-hosted proof run requires explicit approval because it creates test records.
+hosted player and attempt tables were empty after that read-only check. The receipt is
+`.local/sites/read-only-hosted.json`. This separately proves hosted game delivery,
+D1 reads and offline gameplay.
+
+After explicit approval for record-creating hosted tests, all 30 campaign hints
+completed on the real Site and matched fresh original-world simulations in every
+authoritative result field. All 377 HTTP responses were 200, 201 or 202. The
+first advance, including cold loading, took about 7.3 seconds end to end. A
+100-event Worker sample included 48 advance requests with median 50 ms and
+maximum 272 ms CPU; this sample is not a complete peak-memory measurement.
+The runtime returned no errors in the queried test window. The local constrained
+heap benchmark and these managed runs cover the tested workload, not arbitrary
+traffic or every possible route.
+
+Every test shot was cancelled after checking its public replay and leaderboard
+entry. A hosted database inspection confirmed all 30 attempt rows are cancelled
+with zero score. The one test-player record remains, as approved. Receipts:
+`.local/sites/hosted-verification.json` and `.local/sites/worker-sample.json`.
 
 ## Browser synchronization
 
