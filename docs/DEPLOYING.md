@@ -9,6 +9,10 @@ directly into `dist/client` and bundles the production Fetch handler at
 Node compatibility and D1 binding. The compact verifier geometry is served from
 the same deployment's versioned assets and checked against its bundled manifest.
 It is never rebuilt or fetched from a player-selected URL during verification.
+Sites also limits expanded deployment archives to 256 MiB. The verifier chunks
+are stored as individual gzip files and decoded in at most 4 MiB chunks, with
+the original raw checksums verified afterward. This keeps the deployment below
+the limit without changing geometry or browser assets; the build checks it.
 
 The browser's `same-origin` verifier setting uses the current HTTPS origin (or
 loopback in development), including a future custom domain. Static game requests
