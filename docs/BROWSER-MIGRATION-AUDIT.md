@@ -22,7 +22,7 @@ The private Sites replacement is deployed; the public native game remains live.
 | Creator and saved progress | Actual station design capture plus rendered create/play/revise/reload/cancel; IndexedDB atomic results, selected course, completed courses and creator solutions. Online publication requires an independently verified complete solution. |
 | Offline gameplay after loading | Real browser network disabled after loading for walking, throws, recall, Skip, local scores, replays, creator and all course selections. This does not claim cold offline navigation before assets are available. |
 | Authoritative optional online scores | Strict control-only verifier schema; trusted catalog/collision data; independent walking, launch and complete flight reconstruction. Emulator tests cover forged results, authentication, restart/checkpoints, quotas, course revisions and atomic ranking. Browser tests cover queued uploads, reload, shared courses and public replay verification. |
-| No always-on physics or fixed compute subscription | The private Sites/D1 deployment serves browser gameplay and on-demand score verification without a dedicated compute instance. Hosted delivery and D1 reads pass; managed verification resource acceptance remains. The old public native host has not been retired. |
+| No always-on physics or fixed compute subscription | The private Sites/D1 deployment serves browser gameplay and on-demand score verification without a dedicated compute instance. All 30 hosted campaign proofs pass, including cold start. The old public native host has not been retired. |
 | Replay determinism across browsers | Matching catalog/input hashes; Chrome, Firefox and WebKit each reproduce all 30 hints and two regressions twice offline against exact Node result hashes. Includes launch/rotation fixtures and real controller input reconstruction. |
 | Desktop and mobile controls | Ten headless keyboard/native Chrome touch groups cover movement, aim, charge ownership, Cancel, spin, speed, Skip, recall, replay, scout, orientation and return to desktop. Six timed holds compare physical contacts, worker messages and final power; seven saved replays reconstruct exactly. This is browser/device emulation, not physical-phone testing. |
 | Smooth Chrome rendering and audio | Phase-specific profiling led to static render culling and corrected resolution decisions. Fresh Chrome gameplay with an advancing audio clock records 60.00 FPS across 1,902 frames at pixel ratio 1, 16.8 ms p95/maximum, no long tasks and no skipped music steps. See rendering acceptance below for scope and limits. |
@@ -216,7 +216,7 @@ engine matrix does cover all three engines and its sources are unchanged.
 | --- | --- |
 | Public source setup | Complete: after explicit archive/destination approval on November 12, `assets-v8` was published and its public download streamed through SHA-256 verification. All 159,537,468 bytes match the pinned archive hash. The archive was also reopened and all six regular files checked against the manifest; there are no extra entries. Receipt: `.local/asset-pack/publication-receipt.json`. |
 | Hosted verifier and browser | Private Sites version 1 is deployed with a same-origin D1 verifier. Its migration, read-only API and hosted/offline browser play pass. Following explicit approval, all 30 hosted campaign proofs match fresh independent results and their test shots were cancelled. |
-| Existing authoritative scores | The explicitly approved consistent backup passes integrity/hash checks. The pinned import path preserves all 10 scores, rankings, progress, 228 identities and exact recordings in isolated D1; all ten replays pass in the actual packaged game in headless Chrome. Hosted import/cutover remains. Native-server provenance is retained. See NATIVE-SCORE-MIGRATION.md. |
+| Existing authoritative scores | The approved consistent backup passes integrity/hash checks. All 74 pinned batches are imported into hosted D1: 228 identities, ten native scores and 58 original recording chunks. Hosted rankings, progress, identities and complete recording checksums match. Native-server provenance is retained. See NATIVE-SCORE-MIGRATION.md. |
 | Retire fixed compute | A read-only request to `https://kyotobounce.com/api/health` still returns `status: ready`, `scope: online`, `worker: true`, `shotPlayback: true`. The native service remains live. Stop and release its compute allocation only after the replacement and score handling are accepted and retirement is authorized. |
 
 The original local audit made no production changes. The asset release above
@@ -225,8 +225,8 @@ the migration and DNS changes, and selected Sites + D1 with independent score
 verification. The compact collision-world experiment now reproduces all 216
 campaign/regression results exactly, plus all 30 independent verifier receipts
 inside local Cloudflare workerd. Retained workerd memory measured about 87 MiB;
-cold-start allocation peaks and managed CPU/memory limits still require deployed
-acceptance. See [the compact-world measurements](ON-DEMAND-VERIFICATION.md#compact-collision-world-for-workers).
+cold start and all 30 campaign proofs subsequently passed on the managed runtime.
+See [the compact-world measurements](ON-DEMAND-VERIFICATION.md#compact-collision-world-for-workers).
 The D1 implementation now passes local workerd integration for authentication,
 immutable uploads, saved checkpoints, standings, replay, course publication,
 quotas, cleanup and concurrency. All 30 real station courses survive a complete
@@ -278,8 +278,11 @@ revision difference is Bridge Pinball, which has no saved attempt. Native replay
 contain poses/contacts but no legal-control proof, so they cannot simply be
 resubmitted as browser shots. The pinned import and original-recording playback
 now pass local D1 and actual Site-bundle browser checks for all ten attempts.
-Hosted import and the final data comparison remain. The public domain and native
-host are unchanged. See NATIVE-SCORE-MIGRATION.md for the trust boundary and checks.
+The hosted import and full live-data comparison now pass. Version 3 from
+`8730bb1` omits the temporary importer, confirmed through the deployed API.
+Public access, DNS cutover and native retirement remain; an explicit public-access
+approval is pending after automatic approval review rejected the audience change.
+See NATIVE-SCORE-MIGRATION.md for the trust boundary and checks.
 The proposed Google Cloud project was not created. The Cloud Run package is
 earlier implementation evidence, not the selected deployment target.
 

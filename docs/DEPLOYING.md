@@ -3,14 +3,15 @@
 ## Sites and D1 release
 
 The selected replacement host is ChatGPT Sites with D1. The registered project
-is in `.openai/hosting.json`; reuse it. Version 1 is deployed owner-private at
-https://kyoto-bounce.finbarrtaylor.chatgpt.site from `ee3c4bf`. Its D1 migration,
+is in `.openai/hosting.json`; reuse it. Version 3 is deployed owner-private at
+https://kyoto-bounce.finbarrtaylor.chatgpt.site from `8730bb1`. Its D1 migrations,
 read-only API requests, asset delivery and an offline browser shot pass hosted
 checks. With explicit test-record approval, all 30 hosted campaign proofs also
 match fresh independent simulations; their test scores were then cancelled.
 Version 2 imported the approved native snapshot and verified all ten scores,
 complete recordings, names and progress. See NATIVE-SCORE-MIGRATION.md.
-The normal release must remove the temporary importer before public cutover.
+Version 3 removes the temporary importer; hosted checks confirm normal API
+authentication handles its former route. Public access and DNS cutover remain.
 
 `npm run build` builds the existing game
 directly into `dist/client` and bundles the production Fetch handler at
@@ -69,7 +70,7 @@ retain their native provenance rather than claim browser-physics verification.
 The browser migration can be packaged without Node, Unity or a gameplay API
 running on the host. Local implementation acceptance is recorded in
 [the migration audit](BROWSER-MIGRATION-AUDIT.md). The pinned asset pack is public;
-managed verifier acceptance, existing-score handling and live cutover remain open.
+managed verifier acceptance and existing-score handling pass; live cutover remains.
 The private Site deployment above has not replaced the public native game.
 
 With the current station bundle installed (see [asset availability](ASSETS.md)):

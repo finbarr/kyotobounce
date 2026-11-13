@@ -86,11 +86,18 @@ authenticated progress and exact public/personal rankings. Receipt:
 the live native database still matched the approved snapshot immediately after
 import; no newer scores or identities were missing.
 
+The normal private release also passed headless Chrome playback of all ten
+hosted replays, matching every original sample hash, restoring the existing
+player name, and exercising phone-size playback and cached offline reload.
+Every non-read request was blocked, so this check created no hosted records.
+Receipt: `.local/native-migration/hosted-browser-import-test.json`.
+
 Publish a normal build to remove the temporary import endpoint before making
 the replacement public. This must use a new source commit: Sites reuses the
 saved artifact for an existing commit, even when a different archive is supplied.
-Verify that GET `/v1/native-import/removed` returns `Route not found`, rather
-than the import handler's `Import not found`. Do not treat a successful deploy
+Verify that unauthenticated GET `/v1/native-import/removed` reaches normal API
+authentication (`401 Authentication required`), rather than the import handler's
+`404 Import not found`. Do not treat a successful deploy
 status alone as proof that the import handler was removed.
 
 Switch the domain after normal-release acceptance, recheck the native inventory
