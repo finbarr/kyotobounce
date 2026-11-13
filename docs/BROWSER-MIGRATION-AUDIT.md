@@ -235,8 +235,16 @@ workerd-process restart and finish with the independent Node result; see
 passes the reference Node/Firestore integration. Browser physics assets are
 unchanged; previous Node-verifier bundle hashes predate this backend change.
 
-This still needs the production Site build, hosted D1 migration, real browser
-synchronization and managed-resource acceptance. It has not changed live hosting.
+The actual browser now also passes offline desktop/touch shots, queued score
+uploads after reconnect, reload with the verifier unavailable, retained identity,
+verified rankings and public replay reconstruction/offline caching against local
+workerd + D1. Two consecutive runs passed; the current receipt is
+`.local/verification/browser-d1/receipt.json`. The first run's renderer-lighting
+reload stall remains unexplained; test diagnostics were added without changing
+product rendering behavior.
+
+This still needs the production Site build, hosted D1 migration, creator UI
+publication on D1 and managed-resource acceptance. It has not changed live hosting.
 The proposed Google Cloud project was not created. The Cloud Run package is
 earlier implementation evidence, not the selected deployment target.
 

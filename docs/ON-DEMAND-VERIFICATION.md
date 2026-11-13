@@ -167,10 +167,23 @@ Validation on November 12:
 - The existing Node checkpoint suite and Firestore integration suite also pass
   with the portable codec and shared quota arithmetic. Source CI runs both D1
   and reference-service integration checks.
+- `npm run test:browser:d1` starts an isolated static preview and actual workerd
+  with a temporary D1 database, then runs headless Chrome with the background
+  input guard. It passes desktop/touch offline shots, Skip, recall exclusion,
+  queued uploads after reconnect, reload with the verifier unavailable, stable
+  identity, exact accepted scores, verified standings, retry delays and public
+  replay reconstruction/cache/offline viewing. Two consecutive full runs passed.
+  The current receipt is `.local/verification/browser-d1/receipt.json`.
+
+The first D1 browser run stalled for 120 seconds at the renderer's lighting
+startup stage during reload, before any score upload. It did not recur in the
+two subsequent runs. Test-only diagnostics now retain context-loss and shader
+query observations; no product rendering code changed and no cause or fix is
+claimed. Track this separately from the passing D1 protocol checks.
 
 Remaining integration work is the production Site entry/build, D1 migration
-packaging, real browser synchronization against this backend, and managed-hosting
-CPU/cold-load acceptance. The existing live native service remains unchanged.
+packaging, creator UI publication against D1, and managed-hosting CPU/cold-load
+acceptance. The existing live native service remains unchanged.
 
 ## Browser synchronization
 

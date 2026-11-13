@@ -18,5 +18,5 @@ export async function d1Harness(options={}){
  }
  await start();
  for(const sql of (await readFile('web/online/d1-schema.sql','utf8')).split('--> statement-breakpoint'))await db.prepare(sql).run();
- return {config,get db(){return db;},fetch:(path,options)=>mf.dispatchFetch('https://game.example'+path,options),restart:async patch=>{await mf.dispose();Object.assign(config,patch);await start();},close:async()=>{try{await mf.dispose();}finally{await rm(directory,{recursive:true,force:true});}}};
+ return {config,get db(){return db;},url:async()=>(await mf.ready).origin,fetch:(path,options)=>mf.dispatchFetch('https://game.example'+path,options),restart:async patch=>{await mf.dispose();Object.assign(config,patch);await start();},close:async()=>{try{await mf.dispose();}finally{await rm(directory,{recursive:true,force:true});}}};
 }

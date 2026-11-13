@@ -1,27 +1,31 @@
 import assert from 'node:assert/strict';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
-import {randomUUID} from 'node:crypto';
-import {Firestore} from '@google-cloud/firestore';
 import {chromium} from 'playwright';
 import {backgroundInput} from './background-input.mjs';
-import {VerificationService} from '../online/service.mjs';
-import {verificationHttp} from '../online/http.mjs';
-import {HttpError} from '../online/protocol.mjs';
-import {StaticWorld} from '../public/physics/static-world.js';
-import {decodeCollisionPack} from '../public/physics/collision-pack.js';
+import {onlineBackend} from './online-backend.mjs';
 import {BROWSER_PHYSICS} from '../public/physics/shot.js';
-assert.match(process.env.FIRESTORE_EMULATOR_HOST||'',/^127\.0\.0\.1:\d+$/);assert.equal(process.env.GOOGLE_CLOUD_PROJECT,'demo-kyoto-verification');
 const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430';assert.equal(new URL(origin).hostname,'127.0.0.1');
 const catalog=JSON.parse(await readFile('web/starter-challenges.json')).map(c=>({...c,physics:BROWSER_PHYSICS}));
-const world=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin'))),db=new Firestore({projectId:process.env.GOOGLE_CLOUD_PROJECT});
-const service=new VerificationService({db,catalog,world:()=>world,namespace:'browser-'+randomUUID(),batchLimit:3}),server=verificationHttp(service,{origins:[origin]});
-const replayInputs=service.replayInputs.bind(service),inputRequests=[];let delayReplay=true;
-service.replayInputs=async(...args)=>{inputRequests.push(Date.now());if(delayReplay){delayReplay=false;throw new HttpError(429,'Replay controls are busy',1);}return replayInputs(...args);};
-await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const endpoint=`http://127.0.0.1:${server.address().port}`;
-const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist','--mute-audio']}),errors=[],out='.local/verification/browser';await mkdir(out,{recursive:true});
+const backend=await onlineBackend({d1:process.argv.includes('--d1'),origin,catalog}),endpoint=backend.endpoint,inputRequests=[];
+console.log('Browser online backend: '+backend.kind+' '+endpoint);
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist','--mute-audio']}),errors=[],openings=[],out='.local/verification/browser-'+backend.kind;await mkdir(out,{recursive:true});await writeFile(out+'/receipt.json',JSON.stringify({passed:false,backend:backend.kind})+'\n');
 async function context(){
  const c=await browser.newContext({viewport:{width:1280,height:800}});await backgroundInput(c);
- c.on('page',page=>{page.on('pageerror',e=>{errors.push(String(e));console.error('Browser error: '+String(e));});page.on('console',m=>{if(m.type()==='error')console.error('Browser console: '+m.text());});page.on('websocket',()=>errors.push('Browser opened a gameplay WebSocket'));});
+ c.on('request',request=>{if(request.url().startsWith(endpoint+'/v1/replays/')&&request.url().includes('/inputs/'))inputRequests.push(Date.now());});
+ c.on('page',page=>{page.on('pageerror',e=>{errors.push(String(e));console.error('Browser error: '+String(e));});page.on('console',m=>{if(['error','warning'].includes(m.type()))console.error('Browser console: '+m.text());});page.on('requestfailed',request=>console.error('Browser request failed: '+request.url()+' '+request.failure()?.errorText));page.on('websocket',()=>errors.push('Browser opened a gameplay WebSocket'));});
+ // Read-only diagnostics: preserve every native GL return value and report
+ // context loss/pending shader queries if a real reload cannot finish.
+ await c.addInitScript(()=>{
+  window.kyotoTestGraphics=[];const original=HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext=function(...args){
+   const gl=original.apply(this,args);
+   if(gl?.getProgramParameter&&!gl.kyotoTestObserved){
+    gl.kyotoTestObserved=true;const state={queries:0,lastParameter:null,lastValue:null,lost:false};window.kyotoTestGraphics.push(state);
+    this.addEventListener('webglcontextlost',()=>{state.lost=true;});const get=gl.getProgramParameter;
+    gl.getProgramParameter=function(...args){const value=get.apply(this,args);state.queries++;state.lastParameter=args[1];state.lastValue=value;return value;};
+   }return gl;
+  };
+ });
  // Keep the navigation's real loopback response. Fulfilling its HTML through
  // Playwright loses Chrome's address-space classification and trips Local
  // Network Access when the game contacts the separate loopback verifier.
@@ -31,12 +35,14 @@ async function context(){
  },endpoint);return c;
 }
 async function enter(page,name){
+ const began=performance.now();
  await page.waitForFunction(()=>document.getElementById('loading-message')?.textContent.includes('Station ready'),null,{timeout:120000});
  const form=page.locator('#loading-name');await form.locator('input').fill(name);await form.locator('button[type=submit]').click();
  await page.waitForFunction(()=>!document.body.classList.contains('is-loading')&&window.kyotoState?.ready,null,{timeout:120000});
  if(await page.locator('#tutorial-hide').isVisible())await page.locator('#tutorial-hide').click();
  if(await page.evaluate(()=>kyotoState.briefing))await page.locator('#briefing-play').click();
  await page.waitForFunction(()=>!kyotoState.briefing&&!kyotoState.briefingTransition);
+ openings.push({elapsedMs:performance.now()-began,graphics:await page.evaluate(()=>window.kyotoTestGraphics)});
 }
 async function select(page,id){
  const c=catalog.find(c=>c.id===id);await page.locator('#game').focus();await page.keyboard.press('l');await page.locator('#campaign-chapter').selectOption(String(c.campaign.chapter));await page.locator(`[data-challenge="${id}"]`).click();
@@ -57,7 +63,7 @@ try{
  await c.setOffline(true);
  await throwShot(page,2250);await page.keyboard.press('Enter');await page.waitForFunction(()=>kyotoState.phase==='Result'&&kyotoState.result);
  const first=await page.evaluate(()=>kyotoState.result);assert.ok(first.success);await until(async()=> (await saved(page)).length===1,'Offline result not saved');
- assert.equal((await service.attempts.get()).size,0,'No unfinished or offline shot was uploaded');
+ assert.equal((await backend.records()).length,0,'No unfinished or offline shot was uploaded');
  await select(page,'atrium-clock-in');await throwShot(page,2900);await page.waitForTimeout(600);await page.keyboard.press('r');await page.waitForFunction(()=>kyotoState.phase==='Aim');assert.deepEqual(await saved(page),[]);
  await page.setViewportSize({width:390,height:664});await page.waitForFunction(()=>document.body.classList.contains('mobile-ui'));
  await page.locator('#game').focus();await page.keyboard.press('h');const touch=await c.newCDPSession(page);await touch.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:2});
@@ -72,13 +78,13 @@ try{
  // Reload while the static site works but the verifier is unavailable. The
  // queue and its credential must survive; the game still opens normally.
  const deny=route=>route.abort();await c.route(endpoint+'/**',deny);await c.setOffline(false);await page.reload();await enter(page,'Online acceptance');
- assert.equal((await saved(page)).length,1);assert.equal((await service.attempts.get()).size,0);
+ assert.equal((await saved(page)).length,1);assert.equal((await backend.records()).length,0);
  await c.unroute(endpoint+'/**',deny);await page.evaluate(()=>window.dispatchEvent(new Event('online')));
- await until(async()=> (await service.attempts.where('state','==','verified').get()).size===2,'Queued controls did not independently verify');
+ await until(async()=> (await backend.records()).filter(j=>j.state==='verified').length===2,'Queued controls did not independently verify');
  await page.waitForFunction(()=>document.querySelector('#result-leaderboard')?.dataset.source==='online'&&kyotoState.board.length===1);
  assert.ok(await page.evaluate(()=>{const board=document.querySelector('#result-leaderboard'),row=board.querySelector('li');return row.getBoundingClientRect().bottom<=board.getBoundingClientRect().bottom;}),'The mobile verified row is fully visible below the source switch');
  const board=await page.evaluate(()=>kyotoState.board);assert.equal(board[0].attempt,mobile.attempt);
- const records=(await service.attempts.get()).docs.map(d=>d.data());assert.equal(records.length,2);assert.ok(records.every(r=>r.result.verified&&r.result.success));
+ const records=await backend.records();assert.equal(records.length,2);assert.ok(records.every(r=>r.result.verified&&r.result.success));
  for(const result of [first,mobile])assert.equal(records.find(j=>j.id===result.attempt).score,result.score);
  await page.locator('#score-scope').click();await page.waitForFunction(()=>document.querySelector('#result-leaderboard').dataset.source==='local');
  await page.locator('#score-scope').click();await page.waitForFunction(()=>document.querySelector('#result-leaderboard').dataset.source==='online');
@@ -89,7 +95,7 @@ try{
  await page.locator('#close-replay').click();
  await page.screenshot({path:out+'/online-verified.png'});
  await page.reload();await enter(page,'Online acceptance');await page.waitForFunction(()=>document.querySelector('#result-leaderboard').dataset.source==='online');
- assert.equal((await service.players.get()).size,1,'Reload retains the same authenticated player');assert.equal((await service.attempts.get()).size,2,'Retries never duplicate ranked shots');
+ assert.equal(await backend.playerCount(),1,'Reload retains the same authenticated player');assert.equal((await backend.records()).length,2,'Retries never duplicate ranked shots');
  console.log('PASS reconnect/reload: durable queue, same identity, independent scores, authoritative board, local/online switch and no duplicate attempts');
  await c.close();c=null;
 
@@ -105,14 +111,14 @@ try{
  assert.equal(await page.evaluate(()=>kyotoState.pointerLocked),false);
  await second.close();second=await context();page=await second.newPage();await page.goto(origin+'/replay/'+first.attempt);
  await page.waitForFunction(()=>!document.body.classList.contains('is-loading')&&window.kyotoState?.mode==='replay',null,{timeout:120000});
- assert.equal(await page.locator('#player-name-dialog').evaluate(e=>e.open),false);assert.equal((await service.players.get()).size,2,'An anonymous replay link does not create a player or require a name');
+ assert.equal(await page.locator('#player-name-dialog').evaluate(e=>e.open),false);assert.equal(await backend.playerCount(),2,'An anonymous replay link does not create a player or require a name');
  await page.waitForFunction(()=>document.querySelector('#result-leaderboard').dataset.source==='online'&&document.querySelector('#result-leaderboard li'));
  await page.screenshot({path:out+'/anonymous-replay.png'});
- await writeFile(out+'/receipt.json',JSON.stringify({physics:BROWSER_PHYSICS,layout:world.layoutSha256,attempts:records.map(j=>({attempt:j.id,score:j.score,success:j.result.success})),publicReplay:{score:imported.score,poses:imported.poses.length,contacts:imported.contacts.length},errors},null,2)+'\n');
+ await writeFile(out+'/receipt.json',JSON.stringify({passed:errors.length===0,physics:BROWSER_PHYSICS,layout:catalog[0].layout,backend:backend.kind,openings,attempts:records.map(j=>({attempt:j.id,score:j.score,success:j.result.success})),publicReplay:{score:imported.score,poses:imported.poses.length,contacts:imported.contacts.length},errors},null,2)+'\n');
  assert.deepEqual(errors,[]);console.log('PASS another player’s public replay: worker reconstruction, local cache, offline viewing and no desktop pointer capture');
 }catch(error){
- console.error(JSON.stringify({errors,jobs:(await service.attempts.get()).docs.map(d=>({id:d.id,state:d.data().state,steps:d.data().walkingSteps,shotSteps:d.data().shotSteps})),screen:await page?.evaluate(()=>({loading:document.getElementById('loading-message')?.textContent,connection:document.getElementById('connection')?.textContent,phase:window.kyotoState?.phase,online:window.kyotoState?.online})).catch(()=>null)}));
+ console.error(JSON.stringify({errors,jobs:(await backend.records()).map(j=>({id:j.id,state:j.state,steps:j.walkingSteps,shotSteps:j.shotSteps})),screen:await page?.evaluate(()=>({loading:document.getElementById('loading-message')?.textContent,connection:document.getElementById('connection')?.textContent,phase:window.kyotoState?.phase,online:window.kyotoState?.online,graphics:window.kyotoTestGraphics,resources:performance.getEntriesByType('resource').filter(r=>r.duration>10000).map(r=>({name:r.name,duration:r.duration}))})).catch(()=>null)}));
  await page?.screenshot({path:out+'/failure.png',timeout:5000}).catch(()=>{});throw error;
 }finally{
- await c?.close();await second?.close();await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await db.recursiveDelete(service.root);await db.terminate();world.free();
+ await c?.close();await second?.close();await browser.close();await backend.close();
 }
