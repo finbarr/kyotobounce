@@ -1,29 +1,23 @@
 import assert from 'node:assert/strict';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
-import {randomUUID} from 'node:crypto';
-import {Firestore} from '@google-cloud/firestore';
 import {chromium} from 'playwright';
 import {backgroundInput} from './background-input.mjs';
-import {VerificationService} from '../online/service.mjs';
-import {verificationHttp} from '../online/http.mjs';
-import {StaticWorld} from '../public/physics/static-world.js';
-import {decodeCollisionPack} from '../public/physics/collision-pack.js';
+import {onlineBackend} from './online-backend.mjs';
 import {BROWSER_PHYSICS} from '../public/physics/shot.js';
-assert.match(process.env.FIRESTORE_EMULATOR_HOST||'',/^127\.0\.0\.1:\d+$/);assert.equal(process.env.GOOGLE_CLOUD_PROJECT,'demo-kyoto-verification');
-const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430',out='.local/verification/course-sharing';assert.equal(new URL(origin).hostname,'127.0.0.1');await mkdir(out,{recursive:true});
-await writeFile(out+'/receipt.json',JSON.stringify({passed:false})+'\n');
-const catalog=JSON.parse(await readFile('web/starter-challenges.json')).map(c=>({...c,physics:BROWSER_PHYSICS})),world=new StaticWorld(decodeCollisionPack(await readFile('.local/browser-physics/station.collision.bin')));
-const db=new Firestore({projectId:process.env.GOOGLE_CLOUD_PROJECT}),service=new VerificationService({db,catalog,world:()=>world,namespace:'sharing-'+randomUUID(),batchLimit:3}),server=verificationHttp(service,{origins:[origin]});
-await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const endpoint=`http://127.0.0.1:${server.address().port}`;
+let origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430';assert.equal(new URL(origin).hostname,'127.0.0.1');
+const catalog=JSON.parse(await readFile('web/starter-challenges.json')).map(c=>({...c,physics:BROWSER_PHYSICS}));
+const backend=await onlineBackend({site:process.argv.includes('--sites'),d1:process.argv.includes('--d1'),origin,catalog}),endpoint=backend.endpoint;
+if(backend.kind==='sites')origin=endpoint;
+const out='.local/verification/course-sharing-'+backend.kind;await mkdir(out,{recursive:true});await writeFile(out+'/receipt.json',JSON.stringify({passed:false,backend:backend.kind})+'\n');
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist','--mute-audio']}),errors=[];
 async function context(){
  const c=await browser.newContext({viewport:{width:1280,height:800}});await backgroundInput(c);
  c.on('page',p=>{p.on('pageerror',e=>errors.push(String(e)));p.on('websocket',()=>errors.push('Unexpected gameplay WebSocket'));});
- await c.addInitScript(endpoint=>{
+ await c.addInitScript(({endpoint,inject})=>{
   const install=()=>{if(!document.head)return false;const meta=document.createElement('meta');meta.name='kyoto-verifier';meta.content=endpoint;document.head.append(meta);return true;};
-  if(!install()){const observer=new MutationObserver(()=>{if(install())observer.disconnect();});observer.observe(document,{childList:true,subtree:true});}
+  if(inject&&!install()){const observer=new MutationObserver(()=>{if(install())observer.disconnect();});observer.observe(document,{childList:true,subtree:true});}
   window.readLocal=async()=>{const s=await(await import('/local-store.js')).localStore();try{return {courses:await s.setting('courses')||[],publications:await s.pendingPublications(endpoint),public:await s.publicCourses(endpoint,kyotoState.challenge)};}finally{s.close();}};
- },endpoint);return c;
+ },{endpoint,inject:backend.kind!=='sites'});return c;
 }
 async function dismiss(p){if(await p.locator('#tutorial-hide').isVisible())await p.locator('#tutorial-hide').click();if(await p.evaluate(()=>kyotoState.briefing))await p.locator('#briefing-play').click();await p.waitForFunction(()=>!kyotoState.briefing&&!kyotoState.briefingTransition);}
 async function enter(p,name){await p.waitForFunction(()=>document.getElementById('loading-message')?.textContent.includes('Station ready'),null,{timeout:120000});await p.locator('#loading-name input').fill(name);await p.locator('#loading-name button[type=submit]').click();await p.waitForFunction(()=>!document.body.classList.contains('is-loading')&&window.kyotoState?.ready,null,{timeout:120000});await dismiss(p);}
@@ -49,17 +43,17 @@ try{
  await owner.setOffline(true);const created=await design(page,false,'Shared station banks',1);
  await page.locator('#game').focus();await page.keyboard.press('l');assert.ok(await page.locator('#publish-challenge').isDisabled());await page.locator('#close-levels').click();
  const result=await clear(page,created);await page.locator('#publish-result').click();
- await until(()=>page.evaluate(async()=>(await readLocal()).publications.length===1),'Offline publication was not saved');assert.equal((await service.attempts.get()).size,0);
+ await until(()=>page.evaluate(async()=>(await readLocal()).publications.length===1),'Offline publication was not saved');assert.equal((await backend.records()).length,0);
  assert.ok(await page.evaluate(async()=>{const s=await(await import('/local-store.js')).localStore();try{await s.saveCourse({...kyotoState.challenge,revision:2});return false;}catch(e){return e.message.includes('finish publishing');}finally{s.close();}}),'A second database connection cannot replace a queued course');
  await page.locator('#game').focus();await page.keyboard.press('l');assert.ok(await page.locator('#edit-challenge').isDisabled());
  assert.match(await page.locator('#publication-status').textContent(),/queued|Reconnect/i);await page.locator('#publication-status').scrollIntoViewIfNeeded();await page.screenshot({path:out+'/queued.png'});
- const deny=route=>route.abort();await owner.route(endpoint+'/**',deny);await owner.setOffline(false);await page.reload();await enter(page,'Publishing author');
+ const deny=route=>route.abort();await owner.route(endpoint+'/v1/**',deny);await owner.setOffline(false);await page.reload();await enter(page,'Publishing author');
  assert.equal((await page.evaluate(()=>readLocal())).publications.length,1);
- await owner.unroute(endpoint+'/**',deny);await page.evaluate(()=>window.dispatchEvent(new Event('online')));
- await until(async()=> (await service.courses.doc(created.id).get()).data()?.published,'Queued course did not publish');
+ await owner.unroute(endpoint+'/v1/**',deny);await page.evaluate(()=>window.dispatchEvent(new Event('online')));
+ await until(async()=> (await backend.course(created.id))?.published,'Queued course did not publish');
  await page.waitForFunction(()=>!kyotoState.challenge.local);await until(()=>page.evaluate(async()=>(await readLocal()).publications.length===0),'Published course remained queued');
- await until(async()=> (await service.attempts.where('state','==','verified').get()).size===1,'Published-course proof play did not independently rank');
- const published=(await service.courses.doc(created.id).get()).data();assert.equal(published.current.creator,created.creator);assert.equal(published.revision,1);
+ await until(async()=> (await backend.records()).filter(j=>j.state==='verified').length===1,'Published-course proof play did not independently rank');
+ const published=(await backend.course(created.id));assert.equal(published.current.creator,created.creator);assert.equal(published.revision,1);
  assert.equal((await page.evaluate(()=>readLocal())).courses.length,0,'Promotion removes the private copy');
  await page.locator('#game').focus();await page.keyboard.press('l');assert.ok(await page.locator('#share-challenge').isVisible());assert.ok(await page.locator('#publish-challenge').isHidden());await page.locator('#publication-status').scrollIntoViewIfNeeded();await page.screenshot({path:out+'/published.png'});await page.locator('#close-levels').click();
  console.log('PASS rendered creator publication: clear requirement, offline durable queue, edit fencing, reload/reconnect, verified public course and independently ranked controls');
@@ -78,10 +72,10 @@ try{
  // are discarded on promotion instead of migrating retired scores.
  await owner.setOffline(true);await design(page,true,'Second draft',2);const revised=await design(page,true,'Published revision two',3);await page.setViewportSize({width:390,height:664});await clear(page,revised);await page.locator('#publish-result').click();await page.screenshot({path:out+'/mobile-publication.png'});
  await until(()=>page.evaluate(async()=>(await readLocal()).publications.length===1),'Revised publication was not saved');await owner.setOffline(false);await page.evaluate(()=>window.dispatchEvent(new Event('online')));
- await until(async()=> (await service.courses.doc(created.id).get()).data()?.revision===2,'Revised course did not publish');
+ await until(async()=> (await backend.course(created.id))?.revision===2,'Revised course did not publish');
  await until(()=>page.evaluate(async()=>(await readLocal()).public.some(c=>c.id===kyotoState.challenge.id&&c.revision===2)),'Published revision was not cached');
  await adopt(page,created.id);await page.waitForFunction(()=>kyotoState.challenge.revision===2&&!kyotoState.challenge.local);
- assert.equal((await page.evaluate(()=>readLocal())).courses.length,0);assert.equal((await service.courses.doc(created.id).get()).data().current.name,'Published revision two');
+ assert.equal((await page.evaluate(()=>readLocal())).courses.length,0);assert.equal((await backend.course(created.id)).current.name,'Published revision two');
  await other.locator('#game').focus();await other.keyboard.press('r');await other.waitForFunction(()=>kyotoState.phase==='Aim');await other.keyboard.press('h');await other.keyboard.press('Space',{delay:2250});await other.waitForFunction(()=>kyotoState.phase==='Flight');
  const release=await other.evaluate(()=>kyotoState.releaseTime);
  await visitor.setOffline(false);await other.evaluate(()=>window.dispatchEvent(new Event('online')));await until(()=>other.evaluate(async()=>(await readLocal()).public.some(c=>c.id===kyotoState.challenge.id&&c.revision===2)),'Visitor did not cache the updated course during flight');
@@ -91,7 +85,7 @@ try{
  // the current revision deliberately, without interrupting an in-flight ball.
  assert.equal(await other.evaluate(()=>kyotoState.challenge.revision),1);await adopt(other,created.id);await other.waitForFunction(()=>kyotoState.challenge.revision===2);
  assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>kyotoState.pointerLocked),false);assert.equal(await other.evaluate(()=>kyotoState.pointerLocked),false);
- await writeFile(out+'/receipt.json',JSON.stringify({passed:true,course:created.id,revision:2,author:created.creator,publication:published.solution,errors},null,2)+'\n');
+ await writeFile(out+'/receipt.json',JSON.stringify({passed:true,backend:backend.kind,course:created.id,revision:2,author:created.creator,publication:published.solution,errors},null,2)+'\n');
  console.log('PASS offline multi-edit revision publication, atomic local promotion, current public catalog and deliberate adoption of updated course geometry');
 }catch(error){for(const [name,p]of [['owner',page],['visitor',other]])if(p){await p.screenshot({path:out+'/'+name+'-failure.png'}).catch(()=>{});await writeFile(out+'/'+name+'-failure.json',JSON.stringify({error:String(error),errors,state:await p.evaluate(()=>window.kyotoState),local:await p.evaluate(()=>window.kyotoState?.challenge?readLocal():null)},null,2));}throw error;}
-finally{await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await db.recursiveDelete(service.root);await db.terminate();world.free();}
+finally{await browser.close();await backend.close();}

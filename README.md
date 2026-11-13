@@ -65,7 +65,7 @@ Fast ball flight adds peripheral motion blur above 45 m/s, reaching full strengt
 | `web/verification.mjs`, `web/online-*.mjs` | Independent online verification and optional score/course service |
 | `web/v2/assets.json` | Current station source, visual exports and hashes |
 | `tools/` | Art exports, collision compilation and asset packaging |
-| `deploy/browser-package.mjs`, `deploy/verification/` | Static game bundle and on-demand verifier packaging |
+| `deploy/browser-package.mjs`, `deploy/sites/` | Static game bundle and combined Sites/D1 deployment |
 
 Large assets stay outside Git. Build and preview the distributable static game
 with `npm run build:static` and `npm run preview:static -- 4431`. See

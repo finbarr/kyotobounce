@@ -3,6 +3,10 @@
 !/.gitignore
 !/.gitattributes
 !/.github/
+!/.openai/
+/.openai/*
+!/.openai/hosting.json
+!/drizzle/
 !/.codex/
 !/AGENTS.md
 !/README.md

@@ -4,9 +4,10 @@ import {chromium} from 'playwright';
 import {backgroundInput} from './background-input.mjs';
 import {onlineBackend} from './online-backend.mjs';
 import {BROWSER_PHYSICS} from '../public/physics/shot.js';
-const origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430';assert.equal(new URL(origin).hostname,'127.0.0.1');
+let origin=process.env.KYOTO_TEST_ORIGIN||'http://127.0.0.1:4430';assert.equal(new URL(origin).hostname,'127.0.0.1');
 const catalog=JSON.parse(await readFile('web/starter-challenges.json')).map(c=>({...c,physics:BROWSER_PHYSICS}));
-const backend=await onlineBackend({d1:process.argv.includes('--d1'),origin,catalog}),endpoint=backend.endpoint,inputRequests=[];
+const backend=await onlineBackend({site:process.argv.includes('--sites'),d1:process.argv.includes('--d1'),origin,catalog}),endpoint=backend.endpoint,inputRequests=[];
+if(backend.kind==='sites')origin=endpoint;
 console.log('Browser online backend: '+backend.kind+' '+endpoint);
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist','--mute-audio']}),errors=[],openings=[],out='.local/verification/browser-'+backend.kind;await mkdir(out,{recursive:true});await writeFile(out+'/receipt.json',JSON.stringify({passed:false,backend:backend.kind})+'\n');
 async function context(){
@@ -29,7 +30,7 @@ async function context(){
  // Keep the navigation's real loopback response. Fulfilling its HTML through
  // Playwright loses Chrome's address-space classification and trips Local
  // Network Access when the game contacts the separate loopback verifier.
- await c.addInitScript(endpoint=>{
+ if(backend.kind!=='sites')await c.addInitScript(endpoint=>{
   const install=()=>{if(!document.head)return false;const meta=document.createElement('meta');meta.name='kyoto-verifier';meta.content=endpoint;document.head.append(meta);return true;};
   if(!install()){const observer=new MutationObserver(()=>{if(install())observer.disconnect();});observer.observe(document,{childList:true,subtree:true});}
  },endpoint);return c;
@@ -77,9 +78,9 @@ try{
 
  // Reload while the static site works but the verifier is unavailable. The
  // queue and its credential must survive; the game still opens normally.
- const deny=route=>route.abort();await c.route(endpoint+'/**',deny);await c.setOffline(false);await page.reload();await enter(page,'Online acceptance');
+ const deny=route=>route.abort();await c.route(endpoint+'/v1/**',deny);await c.setOffline(false);await page.reload();await enter(page,'Online acceptance');
  assert.equal((await saved(page)).length,1);assert.equal((await backend.records()).length,0);
- await c.unroute(endpoint+'/**',deny);await page.evaluate(()=>window.dispatchEvent(new Event('online')));
+ await c.unroute(endpoint+'/v1/**',deny);await page.evaluate(()=>window.dispatchEvent(new Event('online')));
  await until(async()=> (await backend.records()).filter(j=>j.state==='verified').length===2,'Queued controls did not independently verify');
  await page.waitForFunction(()=>document.querySelector('#result-leaderboard')?.dataset.source==='online'&&kyotoState.board.length===1);
  assert.ok(await page.evaluate(()=>{const board=document.querySelector('#result-leaderboard'),row=board.querySelector('li');return row.getBoundingClientRect().bottom<=board.getBoundingClientRect().bottom;}),'The mobile verified row is fully visible below the source switch');
@@ -91,7 +92,7 @@ try{
  const original=await replayDigest(page,mobile.attempt);
  await page.locator('#result-leaderboard [data-attempt="'+mobile.attempt+'"] button').click();await page.waitForFunction(()=>kyotoState.mode==='replay',null,{timeout:60000});
  const replacement=await replayDigest(page,mobile.attempt);assert.equal(replacement.sha256,original.sha256);assert.equal(replacement.poses,original.poses);assert.ok(replacement.remote&&replacement.proof);assert.ok(replacement.cacheBytes>0,'The worker accounts for downloaded replay bytes');
- assert.ok(inputRequests.length>=2&&inputRequests[1]-inputRequests[0]>=900,'The replay worker respects the server retry delay and resumes the same input chunk');
+ if(backend.kind!=='sites')assert.ok(inputRequests.length>=2&&inputRequests[1]-inputRequests[0]>=900,'The replay worker respects the server retry delay and resumes the same input chunk');
  await page.locator('#close-replay').click();
  await page.screenshot({path:out+'/online-verified.png'});
  await page.reload();await enter(page,'Online acceptance');await page.waitForFunction(()=>document.querySelector('#result-leaderboard').dataset.source==='online');

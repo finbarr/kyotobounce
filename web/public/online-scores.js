@@ -1,7 +1,7 @@
 import {courseKey} from './local-store.js';
 
-export function verificationEndpoint(value){
- if(!value)return null;const url=new URL(value);
+export function verificationEndpoint(value,origin=globalThis.location?.origin){
+ if(!value)return null;const url=new URL(value==='same-origin'?origin:value);
  if(url.username||url.password||url.search||url.hash||url.pathname!=='/'||url.protocol!=='https:'&&!(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname)))throw Error('Invalid score service URL');
  return url.origin;
 }

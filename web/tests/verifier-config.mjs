@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import {verifierConfig} from '../online/config.mjs';
 import {cloudRunService} from '../../deploy/verification/cloud-run.mjs';
+import {verificationEndpoint} from '../public/online-scores.js';
+assert.equal(verificationEndpoint('same-origin','https://kyotobounce.com'),'https://kyotobounce.com');
+assert.equal(verificationEndpoint('same-origin','http://127.0.0.1:1234'),'http://127.0.0.1:1234');
+assert.equal(verificationEndpoint('https://scores.example/','https://game.example'),'https://scores.example');
+for(const origin of ['null','http://untrusted.example','https://name:secret@example.com','https://example.com/path'])assert.throws(()=>verificationEndpoint('same-origin',origin));
 const local={GOOGLE_CLOUD_PROJECT:'demo-kyoto-verification',FIRESTORE_EMULATOR_HOST:'127.0.0.1:1234'};
 assert.deepEqual(verifierConfig(local).origins,['http://127.0.0.1:4430','http://localhost:4430']);assert.equal(verifierConfig(local).host,'127.0.0.1');
 const production={GOOGLE_CLOUD_PROJECT:'kyoto-example',NODE_ENV:'production',PORT:'8080',KYOTO_ALLOWED_ORIGINS:'https://kyotobounce.com,https://www.kyotobounce.com',KYOTO_VERIFIER_RELEASE:'/app/release.json'};

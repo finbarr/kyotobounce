@@ -1,10 +1,50 @@
 # Deploying your own instance
 
+## Sites and D1 release
+
+The selected replacement host is ChatGPT Sites with D1. The registered project
+is in `.openai/hosting.json`; reuse it. `npm run build` builds the existing game
+directly into `dist/client` and bundles the production Fetch handler at
+`dist/server/index.js`. `dist/server/wrangler.json` declares the asset binding,
+Node compatibility and D1 binding. The compact verifier geometry is served from
+the same deployment's versioned assets and checked against its bundled manifest.
+It is never rebuilt or fetched from a player-selected URL during verification.
+
+The browser's `same-origin` verifier setting uses the current HTTPS origin (or
+loopback in development), including a future custom domain. Static game requests
+do not initialize collision geometry. Score requests use the existing strict
+control-input API and lazily load one shared world per isolate.
+
+`drizzle/0000_verifier.sql` and `drizzle/meta/_journal.json` are the initial,
+schema-only D1 migration. Sites applies packaged migrations before the Worker.
+Do not edit an applied migration or put player data into one. Local tests use
+separate temporary databases, apply the packaged migration and remove the state
+afterward; they never create production scores.
+
+```sh
+npm run build
+npm run test:sites
+npm run test:browser:sites
+```
+
+The package passes local workerd tests for real asset delivery, deep links,
+same-origin scoring and restart through an exact station score. Headless Chrome
+passes offline desktop/touch shots, reconnect/reload, verified public replays,
+course creation/publication, creator ownership and revision adoption against the
+actual production bundle and local D1. These checks do not establish managed
+memory/CPU limits, successful hosted migrations or live cutover.
+
+Publish this repository through the Sites source/build/archive workflow; keep
+`dist/` and the archive ignored. The helper stages all tracked changes, so keep
+unrelated local edits outside that staging step and restore them afterward.
+Do not change the current domain or retire the native host before managed-runtime
+acceptance and current-score handling are complete.
+
 ## Browser static release
 
 The browser migration can be packaged without Node, Unity or a gameplay API
 running on the host. Local implementation acceptance is recorded in
-[the migration audit](BROWSER-MIGRATION-AUDIT.md). Public asset publication,
+[the migration audit](BROWSER-MIGRATION-AUDIT.md). The pinned asset pack is public;
 managed-cloud acceptance, existing-score handling and live cutover remain open;
 the migration has not been deployed.
 

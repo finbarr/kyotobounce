@@ -39,7 +39,7 @@ export async function inventory(directory){
 }
 export async function packageBrowser({output=resolve('.local/browser-release'),verifier=process.env.KYOTO_VERIFY_URL}={}){
  // Reject invalid endpoint configuration before replacing the previous bundle.
- verifier=verificationEndpoint(verifier);
+ verifier=verifier==='same-origin'?verifier:verificationEndpoint(verifier);
  const station=await buildBrowser(),collision='.local/browser-physics/station.collision.bin';
  const receipt=JSON.parse(await readFile(collision+'.json','utf8'));
  assert.equal(receipt.layoutSha256,station.layoutSha256,'Run npm run assets:collision for this station');

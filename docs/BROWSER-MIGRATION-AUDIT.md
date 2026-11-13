@@ -243,8 +243,17 @@ workerd + D1. Two consecutive runs passed; the current receipt is
 reload stall remains unexplained; test diagnostics were added without changing
 product rendering behavior.
 
-This still needs the production Site build, hosted D1 migration, creator UI
-publication on D1 and managed-resource acceptance. It has not changed live hosting.
+The production Site build now packages the existing game and compact verifier
+with a schema-only D1 migration. Local workerd accepts the real packaged assets,
+same-origin API and a process restart during station-score verification. The
+packaged browser tests pass offline shots/reconnect/replays plus real creator
+publication, ownership, multi-edit revisions and public catalog adoption on D1.
+Receipts: `.local/verification/sites-runtime.json`,
+`.local/verification/browser-sites/receipt.json` and
+`.local/verification/course-sharing-sites/receipt.json`.
+
+Hosted migration and managed-resource acceptance remain. The package's local
+acceptance has not changed live hosting.
 The proposed Google Cloud project was not created. The Cloud Run package is
 earlier implementation evidence, not the selected deployment target.
 

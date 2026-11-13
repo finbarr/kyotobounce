@@ -123,9 +123,9 @@ standings, independent completion, public replay inputs, creator publication and
 revision promotion. It uses the same physics and scoring code as the Node service.
 No D1 code accepts a client score, launch position, contacts or checkpoint.
 
-The schema is `web/online/d1-schema.sql`; request handlers never create tables.
-It is applied explicitly to isolated local test databases. Hosting integration
-must package it as a schema-only Site migration before deploying this backend.
+The schema is `drizzle/0000_verifier.sql`; request handlers never create tables.
+The Site build packages it with its Drizzle journal as a schema-only migration.
+It is also applied explicitly to isolated local test databases.
 No hosted D1 database or Site deployment is claimed by these local checks.
 
 D1 batches are atomic, but do not expose Firestore-style interactive transactions.
@@ -181,14 +181,21 @@ two subsequent runs. Test-only diagnostics now retain context-loss and shader
 query observations; no product rendering code changed and no cause or fix is
 claimed. Track this separately from the passing D1 protocol checks.
 
-Remaining integration work is the production Site entry/build, D1 migration
-packaging, creator UI publication against D1, and managed-hosting CPU/cold-load
-acceptance. The existing live native service remains unchanged.
+The production Site entry/build and migration packaging now pass local runtime
+acceptance (`npm run test:sites`). The actual packaged Worker serves the game
+and uses D1 on the same origin. `npm run test:browser:sites` passes offline shot
+sync and public replays plus real creator publication, ownership, offline edits
+and revision adoption against that bundle. Receipts are
+`.local/verification/sites-runtime.json`, `browser-sites/receipt.json` and
+`course-sharing-sites/receipt.json` under `.local/verification/`.
+Managed-hosting CPU/cold-load acceptance and score-preserving cutover remain.
+The existing live native service remains unchanged.
 
 ## Browser synchronization
 
 The static shell may set a `kyoto-verifier` meta tag to the HTTPS origin of the
-service. Local preview accepts `KYOTO_VERIFY_URL=http://127.0.0.1:4432` before
+service, or `same-origin` for the combined Site. Local preview accepts
+`KYOTO_VERIFY_URL=http://127.0.0.1:4432` before
 `npm run dev -- 4430`. Without this configuration, the game remains
 entirely local and sends no score-service requests. HTTP is accepted only for
 loopback development origins; credentials cannot appear in the configured URL.

@@ -53,7 +53,10 @@
     "test:verification:worker": "node web/tests/verification-world-runtime.mjs",
     "test:verification:d1": "node web/tests/verification-d1.mjs",
     "test:verification:d1:station": "node web/tests/verification-d1-station.mjs",
-    "test:browser:d1": "node web/tests/browser-d1.mjs"
+    "test:browser:d1": "node web/tests/browser-d1.mjs",
+    "build": "node deploy/sites/build.mjs",
+    "test:sites": "node web/tests/sites-runtime.mjs",
+    "test:browser:sites": "node web/tests/browser-online.mjs --sites && node web/tests/browser-course-sharing.mjs --sites"
   },
   "dependencies": {
     "@google-cloud/firestore": "9.4.1",
