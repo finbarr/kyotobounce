@@ -16,13 +16,12 @@ The Three.js game runs its physics in a dedicated browser worker. Walking, all
 online scores are independently reconstructed by the on-demand verifier.
 Unity is not needed for browser development or play.
 
-Use **Node.js 22.23.2**. The current `assets-v8` pack is verified locally but
-awaits publication. For a fresh checkout, obtain the prepared archive and supply
-its path below. No Unity editor or Blender installation is required. See
+Use **Node.js 22.23.2**. Setup downloads the checksum-pinned current `assets-v8`
+release. No Unity editor or Blender installation is required. See
 [asset availability and authoring](docs/ASSETS.md).
 
 ```sh
-KYOTO_ASSET_ARCHIVE=/absolute/path/kyoto-assets-v8.tar.gz npm run setup
+npm run setup
 npm run dev -- 4173
 ```
 

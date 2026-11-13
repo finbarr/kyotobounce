@@ -214,15 +214,17 @@ engine matrix does cover all three engines and its sources are unchanged.
 
 | Gate | Observed state and required next action |
 | --- | --- |
-| Public source setup | The `assets-v8` GitHub release still returns 404. Automatic approval review rejected the public archive upload without explicit authorization; permission remains pending. After approval, publish the prepared archive and verify the actual download against the pinned hash. |
+| Public source setup | Complete: after explicit archive/destination approval on November 12, `assets-v8` was published and its public download streamed through SHA-256 verification. All 159,537,468 bytes match the pinned archive hash. The archive was also reopened and all six regular files checked against the manifest; there are no extra entries. Receipt: `.local/asset-pack/publication-receipt.json`. |
 | Hosted verifier and browser | No new deployment is claimed. The tested static package has no configured online endpoint. With cutover authorization, select the deployment project/region, deploy the tested verifier, verify IAM/indexes/CORS/scaling and real managed-service behavior, then build and publish the static game with that HTTPS endpoint. |
 | Existing authoritative scores | No production scores have been imported, reset or deleted. The new verifier's restart tests prove its own score durability; they do not prove preservation of the current live database. Before cutover, obtain and verify a consistent backup and settle how current live scores are retained. Native results must not be relabelled as verified browser-physics results. |
 | Retire fixed compute | A read-only request to `https://kyotobounce.com/api/health` still returns `status: ready`, `scope: online`, `worker: true`, `shotPlayback: true`. The native service remains live. Stop and release its compute allocation only after the replacement and score handling are accepted and retirement is authorized. |
 
-No production shots, public uploads, provider resource changes or deployments
-were made during this audit. The existing publication/cutover authorization gate
-has remained open across the preceding implementation iterations. Local work is
-ready for that decision; additional unrelated polish would not complete it.
+The original local audit made no production changes. The asset release above
+is now public; the live game remains unchanged. The user has authorized finishing
+the migration and DNS changes, and selected Sites + D1 with independent score
+verification. First measure and reduce verifier memory before considering extra
+hosting. The proposed Google Cloud project was not created. The Cloud Run
+package is tested implementation evidence, not the selected deployment target.
 
 ## Measurement limits and unresolved observations
 
