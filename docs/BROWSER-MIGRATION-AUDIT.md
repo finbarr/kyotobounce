@@ -3,7 +3,7 @@
 This audit keeps the full migration objective. It is not a completion receipt.
 The client cleanup removes the last shipped native connection fallback.
 Current acceptance and the remaining gaps are recorded separately below.
-No live replacement has been deployed or native host stopped.
+The private Sites replacement is deployed; the public native game remains live.
 
 ## Requirements and evidence
 
@@ -22,7 +22,7 @@ No live replacement has been deployed or native host stopped.
 | Creator and saved progress | Actual station design capture plus rendered create/play/revise/reload/cancel; IndexedDB atomic results, selected course, completed courses and creator solutions. Online publication requires an independently verified complete solution. |
 | Offline gameplay after loading | Real browser network disabled after loading for walking, throws, recall, Skip, local scores, replays, creator and all course selections. This does not claim cold offline navigation before assets are available. |
 | Authoritative optional online scores | Strict control-only verifier schema; trusted catalog/collision data; independent walking, launch and complete flight reconstruction. Emulator tests cover forged results, authentication, restart/checkpoints, quotas, course revisions and atomic ranking. Browser tests cover queued uploads, reload, shared courses and public replay verification. |
-| No always-on physics or fixed compute subscription | Static package has no gameplay service. The Linux verifier container passes all 30 course proofs and restart checks. Deployment configuration uses request billing and zero minimum instances; actual hosting would still have usage-based costs. No cloud deployment is claimed. |
+| No always-on physics or fixed compute subscription | The private Sites/D1 deployment serves browser gameplay and on-demand score verification without a dedicated compute instance. Hosted delivery and D1 reads pass; managed verification resource acceptance remains. The old public native host has not been retired. |
 | Replay determinism across browsers | Matching catalog/input hashes; Chrome, Firefox and WebKit each reproduce all 30 hints and two regressions twice offline against exact Node result hashes. Includes launch/rotation fixtures and real controller input reconstruction. |
 | Desktop and mobile controls | Ten headless keyboard/native Chrome touch groups cover movement, aim, charge ownership, Cancel, spin, speed, Skip, recall, replay, scout, orientation and return to desktop. Six timed holds compare physical contacts, worker messages and final power; seven saved replays reconstruct exactly. This is browser/device emulation, not physical-phone testing. |
 | Smooth Chrome rendering and audio | Phase-specific profiling led to static render culling and corrected resolution decisions. Fresh Chrome gameplay with an advancing audio clock records 60.00 FPS across 1,902 frames at pixel ratio 1, 16.8 ms p95/maximum, no long tasks and no skipped music steps. See rendering acceptance below for scope and limits. |
@@ -215,7 +215,7 @@ engine matrix does cover all three engines and its sources are unchanged.
 | Gate | Observed state and required next action |
 | --- | --- |
 | Public source setup | Complete: after explicit archive/destination approval on November 12, `assets-v8` was published and its public download streamed through SHA-256 verification. All 159,537,468 bytes match the pinned archive hash. The archive was also reopened and all six regular files checked against the manifest; there are no extra entries. Receipt: `.local/asset-pack/publication-receipt.json`. |
-| Hosted verifier and browser | No new deployment is claimed. The tested static package has no configured online endpoint. With cutover authorization, select the deployment project/region, deploy the tested verifier, verify IAM/indexes/CORS/scaling and real managed-service behavior, then build and publish the static game with that HTTPS endpoint. |
+| Hosted verifier and browser | Private Sites version 1 is deployed with a same-origin D1 verifier. Its migration, read-only API and hosted/offline browser play pass. Actual managed score verification still needs the explicitly approved record-creating acceptance run. |
 | Existing authoritative scores | No production scores have been imported, reset or deleted. The new verifier's restart tests prove its own score durability; they do not prove preservation of the current live database. Before cutover, obtain and verify a consistent backup and settle how current live scores are retained. Native results must not be relabelled as verified browser-physics results. |
 | Retire fixed compute | A read-only request to `https://kyotobounce.com/api/health` still returns `status: ready`, `scope: online`, `worker: true`, `shotPlayback: true`. The native service remains live. Stop and release its compute allocation only after the replacement and score handling are accepted and retirement is authorized. |
 
@@ -252,8 +252,20 @@ Receipts: `.local/verification/sites-runtime.json`,
 `.local/verification/browser-sites/receipt.json` and
 `.local/verification/course-sharing-sites/receipt.json`.
 
-Hosted migration and managed-resource acceptance remain. The package's local
-acceptance has not changed live hosting.
+The first owner-private Sites deployment is version 1 from `ee3c4bf`, at
+https://kyoto-bounce.finbarrtaylor.chatgpt.site. Hosted schema inspection confirms
+all eight D1 tables. Authenticated read-only health, campaign and leaderboard
+requests pass, as does a real headless browser shot after disconnecting from the
+network. All write requests were blocked in that check; hosted player and attempt
+tables remain empty. Receipt: `.local/sites/read-only-hosted.json`.
+
+The initial archive exceeded Sites' 256 MiB expanded limit. Lossless per-chunk
+gzip brings the deployment to about 242 MiB. The bounded decoder checks the
+original raw hashes, and the packaged verifier still exactly matches a fresh
+original-world simulation after cold load and process restart.
+
+Managed verifier CPU/memory acceptance and current-score handling remain before
+public cutover. The existing public domain and native service are unchanged.
 The proposed Google Cloud project was not created. The Cloud Run package is
 earlier implementation evidence, not the selected deployment target.
 

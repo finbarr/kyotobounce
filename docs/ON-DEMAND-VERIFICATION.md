@@ -49,7 +49,8 @@ The authenticated HTTP service verifies and stores campaign scores, standings,
 completion and public replay inputs. The browser synchronizes saved campaign
 and published custom-course shots when a verifier is configured. Its creator
 can queue a course for publication after saving a complete legal playthrough.
-No verifier has been deployed.
+A private Sites/D1 verifier is deployed. The public domain still uses the native
+service; managed score-submission acceptance and score-preserving cutover remain.
 
 ## Compact collision world for Workers
 
@@ -126,7 +127,8 @@ No D1 code accepts a client score, launch position, contacts or checkpoint.
 The schema is `drizzle/0000_verifier.sql`; request handlers never create tables.
 The Site build packages it with its Drizzle journal as a schema-only migration.
 It is also applied explicitly to isolated local test databases.
-No hosted D1 database or Site deployment is claimed by these local checks.
+The hosted Site migration is separately confirmed: all eight verifier tables
+exist in its `DB` binding. Local test success alone is not hosting acceptance.
 
 D1 batches are atomic, but do not expose Firestore-style interactive transactions.
 `d1-storage.mjs` reads through a primary-first D1 session and validates a shared
@@ -190,6 +192,16 @@ and revision adoption against that bundle. Receipts are
 `course-sharing-sites/receipt.json` under `.local/verification/`.
 Managed-hosting CPU/cold-load acceptance and score-preserving cutover remain.
 The existing live native service remains unchanged.
+
+The first private Site publication is version 1, source `ee3c4bf`, at
+https://kyoto-bounce.finbarrtaylor.chatgpt.site. Read-only hosted checks returned
+200 for health, all 30 campaign definitions, First Bounce standings and the
+game shell. Headless Chrome loaded that deployment, disabled networking and
+completed a real First Bounce shot with Skip. All POSTs were intercepted locally;
+hosted player and attempt tables remain empty. The receipt is
+`.local/sites/read-only-hosted.json`. This proves hosted game delivery, D1 reads
+and offline gameplay, not a managed verifier CPU/memory pass. A prepared 30-level
+hosted proof run requires explicit approval because it creates test records.
 
 ## Browser synchronization
 

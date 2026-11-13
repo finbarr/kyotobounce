@@ -3,7 +3,12 @@
 ## Sites and D1 release
 
 The selected replacement host is ChatGPT Sites with D1. The registered project
-is in `.openai/hosting.json`; reuse it. `npm run build` builds the existing game
+is in `.openai/hosting.json`; reuse it. Version 1 is deployed owner-private at
+https://kyoto-bounce.finbarrtaylor.chatgpt.site from `ee3c4bf`. Its D1 migration,
+read-only API requests, asset delivery and an offline browser shot pass hosted
+checks. Managed score-submission acceptance and public cutover remain pending.
+
+`npm run build` builds the existing game
 directly into `dist/client` and bundles the production Fetch handler at
 `dist/server/index.js`. `dist/server/wrangler.json` declares the asset binding,
 Node compatibility and D1 binding. The compact verifier geometry is served from
@@ -49,8 +54,8 @@ acceptance and current-score handling are complete.
 The browser migration can be packaged without Node, Unity or a gameplay API
 running on the host. Local implementation acceptance is recorded in
 [the migration audit](BROWSER-MIGRATION-AUDIT.md). The pinned asset pack is public;
-managed-cloud acceptance, existing-score handling and live cutover remain open;
-the migration has not been deployed.
+managed verifier acceptance, existing-score handling and live cutover remain open.
+The private Site deployment above has not replaced the public native game.
 
 With the current station bundle installed (see [asset availability](ASSETS.md)):
 
@@ -102,7 +107,11 @@ chunk must show a visible Retry action instead of hanging at startup. The deskto
 pointer is protected before navigation; receipts are in
 `.local/browser-release-test`.
 
-## On-demand verifier image
+## Earlier Node/Firestore reference image
+
+This is the earlier container implementation and its local acceptance record.
+Sites + D1 is the selected deployment target; do not provision Google Cloud
+resources from these reference instructions for the current migration.
 
 `npm run build:verifier` validates the current campaign/collision receipt and
 bundles the server into `.local/verification/build`. `npm run build:verifier:image`
@@ -183,7 +192,7 @@ path; maintain or roll back the native service using its existing deployed
 release and matching instructions. No native service has been stopped by this
 migration.
 
-A replacement cutover requires explicit authorization after the browser game,
-verifier and score handling are accepted. Preserve the current authoritative
-scores and a consistent database backup for that decision. Only then retire the
-old service and its compute allocation. CI never deploys.
+The current task authorizes migration deployment and DNS changes. Before that
+cutover, accept the browser game, managed verifier and score handling. Preserve
+the current authoritative scores and verify a consistent database backup. Only
+then retire the old service and its compute allocation. CI never deploys.
