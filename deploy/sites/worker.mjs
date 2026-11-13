@@ -5,8 +5,9 @@ import {loadVerificationWorld} from '../../web/verification-world.mjs';
 import {BROWSER_PHYSICS} from '../../web/public/physics/shot.js';
 import courses from '../../web/starter-challenges.json' with {type:'json'};
 import manifest from '../../.local/verification/world/manifest.json' with {type:'json'};
+import {nativeImportFetch} from './native-import.mjs';
 
-let api;
+let api,importNative;
 export default {async fetch(request,env){
  const url=new URL(request.url),path=url.pathname;
  if(path==='/health'||path==='/v1'||path.startsWith('/v1/')){
@@ -20,8 +21,11 @@ export default {async fetch(request,env){
     // checksum is checked after decompression, before entering the solver.
     return gunzipSync(new Uint8Array(await response.arrayBuffer()),{maxOutputLength:4*1024**2});
    });
-   api=verificationFetch(new D1VerificationService({db:env.DB,catalog:courses.map(c=>({...c,physics:BROWSER_PHYSICS})),world}));
+   const service=new D1VerificationService({db:env.DB,catalog:courses.map(c=>({...c,physics:BROWSER_PHYSICS})),world});
+   api=verificationFetch(service);
+   if(__NATIVE_IMPORT_MANIFEST__)importNative=nativeImportFetch(service,__NATIVE_IMPORT_MANIFEST__);
   }
+  if(importNative&&path.startsWith('/v1/native-import/'))return importNative(request);
   return api(request);
  }
  if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405,headers:{Allow:'GET, HEAD'}});

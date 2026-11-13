@@ -17,6 +17,7 @@ export async function d1Harness(options={}){
   db=await mf.getD1Database('DB');
  }
  await start();
- for(const sql of (await readFile('drizzle/0000_verifier.sql','utf8')).split('--> statement-breakpoint'))await db.prepare(sql).run();
+ const journal=JSON.parse(await readFile('drizzle/meta/_journal.json','utf8'));
+ for(const entry of journal.entries)for(const sql of (await readFile('drizzle/'+entry.tag+'.sql','utf8')).split('--> statement-breakpoint'))await db.prepare(sql).run();
  return {config,get db(){return db;},url:async()=>(await mf.ready).origin,fetch:(path,options)=>mf.dispatchFetch('https://game.example'+path,options),restart:async patch=>{await mf.dispose();Object.assign(config,patch);await start();},close:async()=>{try{await mf.dispose();}finally{await rm(directory,{recursive:true,force:true});}}};
 }

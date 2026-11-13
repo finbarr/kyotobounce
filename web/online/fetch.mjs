@@ -25,6 +25,9 @@ export function verificationFetch(service,{origins=[],gate=requestGate({concurre
    if(method==='GET'&&pathname==='/health')return respond({status:'ready',layout:service.layout,physics:[...service.catalog.values()][0].physics});
    if(method==='GET'&&pathname==='/v1/courses')return respond(await service.listCourses(searchParams.get('after')??undefined));
    if(method==='POST'&&pathname==='/v1/identity'){const c=credential(authorization),m=fields(await body(request),['name']);return respond(await service.identity(c,playerName(m.name)));}
+   if(method==='GET'&&pathname==='/v1/identity')return respond(service.profile?await service.profile(credential(authorization)):{...await service.authenticate(credential(authorization)),named:true});
+   const recording=/^\/v1\/replays\/([^/]+)\/recordings\/(\d+)$/.exec(pathname);
+   if(method==='GET'&&recording){insist(uuid(recording[1])&&Number.isSafeInteger(Number(recording[2]))&&service.replayRecording,404,'Recording not found');return new Response(await service.replayRecording(recording[1],Number(recording[2])),{headers});}
    const replay=/^\/v1\/replays\/([^/]+)(?:\/inputs\/(\d+))?$/.exec(pathname);
    if(method==='GET'&&replay){insist(uuid(replay[1]),404,'Replay not found');const sequence=Number(replay[2]);insist(replay[2]===undefined||Number.isSafeInteger(sequence),400,'Invalid input sequence');return respond(replay[2]===undefined?await service.replay(replay[1]):await service.replayInputs(replay[1],sequence));}
    const board=/^\/v1\/courses\/([\w-]+)\/leaderboard$/.exec(pathname);

@@ -69,10 +69,11 @@ export class D1VerificationService{
   const result=await this.transaction(async tx=>{
    const prior=await tx.one('SELECT * FROM verifier_players WHERE id=?',credential.id);insist(!prior||sameHash(prior.credentialHash,credential.hash),401,'Invalid credential');
    if(!prior)await this.take(tx,null,{identities:1});
-   tx.write('INSERT INTO verifier_players (id,credentialHash,name,created) VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name',credential.id,credential.hash,name,prior?.created??this.now());return {id:credential.id,name};
+   tx.write('INSERT INTO verifier_players (id,credentialHash,name,created) VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,named=1',credential.id,credential.hash,name,prior?.created??this.now());return {id:credential.id,name};
   });await this.cleanup();return result;
  }
  async authenticate(credential){const p=await this.read().one('SELECT * FROM verifier_players WHERE id=?',credential.id);insist(p&&sameHash(p.credentialHash,credential.hash),401,'Invalid credential');return {id:p.id,name:p.name};}
+ async profile(credential){const p=await this.read().one('SELECT * FROM verifier_players WHERE id=?',credential.id);insist(p&&sameHash(p.credentialHash,credential.hash),401,'Invalid credential');return {id:p.id,name:p.name,named:!!p.named};}
  job(player,id,course,header,extra={}){return {id,owner:player.id,playerName:player.name,header,inputHash:digest(JSON.stringify(header)),courseKey:verificationCourseKey(course),courseId:course.id,state:'uploading',inputChunks:0,inputSteps:0,inputBytes:0,created:this.now(),expiresAt:this.now()+this.limits.idleMs,lease:null,checkpoint:null,cursor:{chunk:0,run:0},...extra};}
  header(submitted,course){try{return validateInputHeader(submitted,course,{layoutSha256:this.layout});}catch(error){throw new HttpError(400,error.message);}}
  async create(player,id,submitted){
@@ -191,7 +192,8 @@ export class D1VerificationService{
    return {entries,next:page.length>100?page[99].courseKey:null};
   });
  }
- replay(id){return this.transaction(async tx=>{const job=await this.get(id,tx);insist(job?.state==='verified'||job?.state==='published',404,'Replay not found');await this.current(job,tx);return {format:'kyoto-verified-replay-1',result:job.result,header:job.header,inputChunks:job.inputChunks};});}
+ replay(id){return this.transaction(async tx=>{const job=await this.get(id,tx);insist(job?.state==='verified'||job?.state==='published',404,'Replay not found');await this.current(job,tx);return job.recordings?{format:'kyoto-recorded-replay-1',result:job.result,recordings:job.recordings}:{format:'kyoto-verified-replay-1',result:job.result,header:job.header,inputChunks:job.inputChunks};});}
+ replayRecording(id,sequence){return this.transaction(async tx=>{const job=await this.get(id,tx);insist(job?.state==='verified'&&job.recordings?.[sequence],404,'Recording not found');await this.current(job,tx);const row=await tx.one('SELECT data,hash FROM verifier_recordings WHERE attempt=? AND sequence=?',id,sequence);insist(row&&row.hash===job.recordings[sequence]&&digest(row.data)===row.hash,503,'Recording is unavailable');return row.data;});}
  replayInputs(id,sequence){return this.transaction(async tx=>{const job=await this.get(id,tx);insist(job?.state==='verified'||job?.state==='published',404,'Replay not found');await this.current(job,tx);const row=await tx.one('SELECT runs FROM verifier_inputs WHERE attempt=? AND sequence=?',id,sequence);insist(row,404,'Input chunk not found');return {sequence,runs:JSON.parse(row.runs)};});}
  cleanup(){this.cleanupPromise??=this.cleanOne().finally(()=>{this.cleanupPromise=null;});return this.cleanupPromise;}
  cleanOne(){return this.transaction(async tx=>{
@@ -202,9 +204,9 @@ export class D1VerificationService{
   try{await this.current(job,tx);}catch(error){if(![404,409].includes(error.status))throw error;retired=true;}
   const accepted=['verified','published'].includes(job.state),expired=!accepted&&job.expiresAt!==null&&job.expiresAt<=now;
   if(!(job.lease?.until>now)&& (retired||expired||job.state==='deleting')){
-   const chunks=await tx.all('SELECT sequence,bytes FROM verifier_inputs WHERE attempt=? ORDER BY sequence LIMIT ?',job.id,this.limits.cleanupChunks),bytes=chunks.reduce((n,r)=>n+r.bytes,0);
+   const table=job.recordings?'verifier_recordings':'verifier_inputs',chunks=await tx.all('SELECT sequence,bytes FROM '+table+' WHERE attempt=? ORDER BY sequence LIMIT ?',job.id,this.limits.cleanupChunks),bytes=chunks.reduce((n,r)=>n+r.bytes,0);
    await this.take(tx,null,{jobs:chunks.length?0:-1,inputBytes:-bytes});
-   for(const row of chunks)tx.write('DELETE FROM verifier_inputs WHERE attempt=? AND sequence=?',job.id,row.sequence);
+   for(const row of chunks)tx.write('DELETE FROM '+table+' WHERE attempt=? AND sequence=?',job.id,row.sequence);
    if(!chunks.length){
     tx.write('DELETE FROM verifier_attempts WHERE id=?',job.id);
     if(retired){

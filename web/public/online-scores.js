@@ -5,7 +5,7 @@ export function verificationEndpoint(value,origin=globalThis.location?.origin){
  if(url.username||url.password||url.search||url.hash||url.pathname!=='/'||url.protocol!=='https:'&&!(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname)))throw Error('Invalid score service URL');
  return url.origin;
 }
-export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,changed,status,synchronize,fetchImpl=fetch}){
+export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,changed,status,synchronize,restored,fetchImpl=fetch}){
  let stopped=false,timer,running=false,again=false,delay=1000,retryUntil=0,token,registeredName,connected=false;
  const controllers=new Set(),refreshes=new Map(),key=name=>'online:'+endpoint+':'+name;
  const state=(phase,message,detail)=>{
@@ -36,7 +36,20 @@ export function onlineScores({endpoint,store,getProfile,getCatalog,getSelected,c
    }return value;
   }finally{clearTimeout(timeout);controllers.delete(controller);}
  }
- async function identity(){const profile=await store.setting('profile')||getProfile();if(!profile.named)return false;if(registeredName!==profile.name){await api('/v1/identity',{method:'POST',body:{name:profile.name}});registeredName=profile.name;state('connected');}return true;}
+ async function identity(){
+  let profile=await store.setting('profile')||getProfile();
+  if(profile.nativePending&&!profile.named){
+   const recovered=await api('/v1/identity');
+   if(recovered.id!==profile.id)throw Error('Restored identity changed');
+   await navigator.locks.request('kyoto-browser-profile',async()=>{
+    // A player can choose a new name while the recovery request is pending.
+    // Re-read under the same lock as naming so recovery cannot overwrite it.
+    profile=await store.setting('profile')||getProfile();
+    if(profile.nativePending&&!profile.named){profile={id:recovered.id,name:recovered.name,named:!!recovered.named};await store.setting('profile',profile);restored?.(profile);}
+   });
+  }
+  if(!profile.named)return false;if(registeredName!==profile.name){await api('/v1/identity',{method:'POST',body:{name:profile.name}});registeredName=profile.name;state('connected');}return true;
+ }
  async function board(c){const cached=await store.setting(key('board:'+courseKey(c)));return cached?{...cached,type:'leaderboard',local:false,cached:!connected||navigator.onLine===false}:null;}
  async function progress(){const cached=await store.setting(key('progress'));return (cached?.entries||[]).filter(p=>{const c=getCatalog().find(c=>c.id===p.challengeId&&c.revision===p.revision);return c&&cached.courses?.includes(courseKey(c));});}
  async function loadProgress(){

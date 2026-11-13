@@ -4,11 +4,18 @@ export class VerifiedReplay{
  constructor(world,seed,endpoint,request,post){this.world=world;this.seed=seed;this.endpoint=endpoint;this.request=request;this.post=post;this.sequence=0;this.controller=new AbortController();}
  ack(sequence){if(sequence===this.sequence-1){this.release?.();this.release=null;}}
  cancel(){this.cancelled=true;this.controller.abort();this.release?.();}
- async chunk(sequence){
+ async chunk(sequence,kind='inputs'){
   let delay=1000;
   while(!this.cancelled){
-   const response=await fetch(`${this.endpoint}/v1/replays/${this.seed.result.attempt}/inputs/${sequence}`,{signal:this.controller.signal});
-   if(response.ok)return response.json();
+   const response=await fetch(`${this.endpoint}/v1/replays/${this.seed.result.attempt}/${kind}/${sequence}`,{signal:this.controller.signal});
+   if(response.ok){
+    if(kind==='inputs')return response.json();
+    const text=await response.text(),bytes=new TextEncoder().encode(text);
+    if(bytes.length>512*1024)throw Error('Recorded replay chunk is too large');
+    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(hash!==this.seed.recordings[sequence])throw Error('Recorded replay checksum changed');
+    return JSON.parse(text);
+   }
    if(![429,503].includes(response.status))throw Error('Could not load replay controls');
    const body=await response.json().catch(()=>({})),wait=Number.isFinite(body.retryAfter)&&body.retryAfter>0?Math.min(86400000,body.retryAfter*1000):delay;
    await new Promise(resolve=>{
@@ -23,17 +30,27 @@ export class VerifiedReplay{
    const chunk=await this.chunk(sequence);if(chunk.sequence!==sequence)throw Error('Replay input sequence changed');yield*chunk.runs;
   }
  }
+ async record(recording){
+  const sequence=this.sequence++,cacheBytes=new TextEncoder().encode(JSON.stringify(recording)).byteLength;
+  await new Promise(resolve=>{this.release=resolve;this.post({type:'replay-recording',request:this.request,sequence,recording,cacheBytes});});
+ }
  async run(){
   try{
    const {result,header,format,inputChunks}=this.seed;
+   if(format==='kyoto-recorded-replay-1'){
+    if(result.provenance?.authority!=='native-server'||!Array.isArray(this.seed.recordings)||!this.seed.recordings.length||this.seed.recordings.length>2048||!this.seed.recordings.every(h=>/^[a-f0-9]{64}$/.test(h)))throw Error('Unsupported recorded replay');
+    for(let sequence=0;sequence<this.seed.recordings.length;sequence++){
+     if(this.cancelled)return;const recording=await this.chunk(sequence,'recordings');if(this.cancelled)return;
+     if(!['poses','contacts','scoreFrames'].every(k=>Array.isArray(recording[k])))throw Error('Invalid recorded replay');await this.record(recording);
+    }
+    if(!this.cancelled)this.post({type:'replay-complete',request:this.request,result:{...result,remote:true,local:false,verified:true,recordingChunks:this.sequence}});
+    return;
+   }
    if(format!=='kyoto-verified-replay-1'||!Number.isSafeInteger(inputChunks)||inputChunks<0)throw Error('Unsupported verified replay');
    const job=new ShotVerification(this.world,result.challenge,header,this.inputs(),{attempt:result.attempt,subject:result.id});let reply;
    do{
     if(this.cancelled)return;reply=await job.advance();
-    if(reply.recording){
-     const sequence=this.sequence++,cacheBytes=new TextEncoder().encode(JSON.stringify(reply.recording)).byteLength;
-     await new Promise(resolve=>{this.release=resolve;this.post({type:'replay-recording',request:this.request,sequence,recording:reply.recording,cacheBytes});});
-    }
+    if(reply.recording)await this.record(reply.recording);
     await new Promise(resolve=>setTimeout(resolve,0));
    }while(reply.status!=='verified');
    if(this.cancelled)return;

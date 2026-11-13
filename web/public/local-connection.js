@@ -2,6 +2,7 @@ import {localStore} from './local-store.js';
 import {onlineScores,verificationEndpoint} from './online-scores.js';
 import {onlineCourses} from './online-courses.js';
 import {assetManifest} from './asset-download.js';
+import {initialProfile} from './native-identity.js';
 const order=(a,b)=>b.score-a.score||a.accepted-b.accepted||a.attempt.localeCompare(b.attempt);
 export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier=document.querySelector('meta[name=kyoto-verifier]')?.content}){
  let worker,store,profile,catalog,campaign,selected,currentAttempt,provisional,stopped=false,presentation,ready=false,sessionBusy=false,skipping=false,lastProgress=-Infinity,inputWrites=Promise.resolve(),online,sharing,scope='local',importing,catalogWrites=Promise.resolve(),selection=0;
@@ -85,14 +86,15 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
  function forget(){const previous=currentAttempt;provisional=null;currentAttempt=null;skipping=false;lastProgress=-Infinity;if(previous)store.discard(previous).catch(error);}
  async function initialize(){
   onStatus('connecting',{});store=await localStore();await store.cleanInterrupted();
-  await navigator.locks.request('kyoto-browser-profile',async()=>{profile=await store.setting('profile')||{id:crypto.randomUUID(),name:'Player',named:false};await store.setting('profile',profile);});
+  let endpoint;try{endpoint=verificationEndpoint(verifier);}catch{onlineStatus={configured:false,phase:'error',message:'Online score configuration is unavailable. Scores are saved locally.'};emit({type:'online-status',...onlineStatus});}
+  await navigator.locks.request('kyoto-browser-profile',async()=>{profile=await initialProfile(store,endpoint);});
   const response=await fetch('/campaign.json');if(!response.ok)throw Error('Could not load the campaign');campaign=await response.json();catalog=[...campaign,...await store.courses(campaign[0])];
   if(stopped){store.close();return;}
   const remembered=await store.setting('selected');selected=catalog.find(c=>c.id===remembered)||catalog[0];
-  let endpoint;try{endpoint=verificationEndpoint(verifier);}catch{onlineStatus={configured:false,phase:'error',message:'Online score configuration is unavailable. Scores are saved locally.'};emit({type:'online-status',...onlineStatus});}
   if(endpoint){
    scope='online';online=onlineScores({endpoint,store,getProfile:()=>profile,getCatalog:()=>catalog,getSelected:()=>selected,
     synchronize:()=>sharing.sync(),
+    restored:p=>{profile=p;if(p.named)emit({type:'named',name:p.name});},
     status:m=>{onlineStatus=m;emit(m);if(selected)board().then(emit).catch(error);},
     changed:(c,result)=>{if(c?.id===selected?.id)board().then(emit).catch(error);progress().catch(error);if(result)emit({type:'score-sync',...result});}
    });
@@ -140,7 +142,7 @@ export function browserConnection({onMessage,onStatus,WorkerImpl=Worker,verifier
   if(!worker||!ready||stopped)return false;
   if(type==='name'){
    const name=String(extra.name||'').trim();if(!name||name.length>32||/[\u0000-\u001f\u007f]/.test(name)){error(Error('Use 1–32 characters for your name'));return true;}
-   profile={...profile,name,named:true};store.setting('profile',profile).then(()=>{emit({type:'named',name});online?.wake();}).catch(error);return true;
+   profile={id:profile.id,name,named:true};navigator.locks.request('kyoto-browser-profile',()=>store.setting('profile',profile)).then(()=>{emit({type:'named',name});online?.wake();}).catch(error);return true;
   }
   if(type==='score-scope'){scope=extra.scope==='online'?'online':'local';refresh(catalog.find(c=>c.id===extra.challengeId)||selected);progress().catch(error);return true;}
   if(type==='publish-course'){sharing?.queue(catalog.find(c=>c.id===extra.challengeId)||selected).catch(error);return true;}
