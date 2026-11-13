@@ -10,6 +10,12 @@ import {nativeImportFetch} from './native-import.mjs';
 let api,importNative;
 export default {async fetch(request,env){
  const url=new URL(request.url),path=url.pathname;
+ // The native site kept all browser credentials on the apex origin. Preserve
+ // that canonical address when a returning player opens a www bookmark.
+ if(url.hostname==='www.kyotobounce.com'){
+  url.protocol='https:';url.hostname='kyotobounce.com';url.port='';
+  return Response.redirect(url.href,308);
+ }
  if(path==='/health'||path==='/v1'||path.startsWith('/v1/')){
   if(!api){
    const world=()=>loadVerificationWorld(manifest,async name=>{

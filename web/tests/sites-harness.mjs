@@ -18,5 +18,5 @@ export async function sitesHarness(){
   await start();const journal=JSON.parse(await readFile('dist/.openai/drizzle/meta/_journal.json','utf8'));
   for(const entry of journal.entries)for(const sql of (await readFile('dist/.openai/drizzle/'+entry.tag+'.sql','utf8')).split('--> statement-breakpoint'))await db.prepare(sql).run();
  }catch(error){await mf?.dispose();await rm(directory,{recursive:true,force:true});throw error;}
- return {get db(){return db;},url:async()=>(await mf.ready).origin,fetch:(path,options)=>mf.dispatchFetch('https://site.example'+path,options),restart:async()=>{await mf.dispose();await start();},close:async()=>{try{await mf.dispose();}finally{await rm(directory,{recursive:true,force:true});}}};
+ return {get db(){return db;},url:async()=>(await mf.ready).origin,fetch:(path,options,origin='https://site.example')=>mf.dispatchFetch(origin+path,options),restart:async()=>{await mf.dispose();await start();},close:async()=>{try{await mf.dispose();}finally{await rm(directory,{recursive:true,force:true});}}};
 }
