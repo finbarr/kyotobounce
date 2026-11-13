@@ -4,6 +4,13 @@ import {saveVerification,restoreVerification} from '../verification-checkpoint.m
 import {course,header,fixtureWorld,shape,simulate} from './verification-fixture.mjs';
 import {StaticWorld} from '../public/physics/static-world.js';
 import {v} from '../public/physics/math.js';
+import {encodeState,decodeState} from '../verification-state-codec.mjs';
+
+const shared={zero:-0,positive:Infinity,negative:-Infinity,nan:NaN,absent:undefined},graph={shared,map:new Map(),set:new Set(),nullObject:Object.create(null)};
+graph.self=graph;graph.map.set(shared,graph);graph.set.add(shared);Object.defineProperty(graph.nullObject,'__proto__',{value:shared,enumerable:true});
+const roundtrip=decodeState(encodeState(graph));assert.deepEqual(roundtrip,graph);assert.equal(roundtrip.self,roundtrip);assert.equal(roundtrip.map.get(roundtrip.shared),roundtrip);assert(roundtrip.set.has(roundtrip.shared));assert.equal(Object.getPrototypeOf(roundtrip.nullObject),null);
+assert.throws(()=>decodeState('{"root":["r",2],"nodes":[]}'),/Invalid checkpoint/);
+assert.throws(()=>encodeState(new Date()),/Unsupported checkpoint/);
 
 const options={attempt:'checkpoint',subject:'walker'},world=fixtureWorld();
 try{

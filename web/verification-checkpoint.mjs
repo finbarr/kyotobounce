@@ -1,6 +1,6 @@
-import {serialize,deserialize} from 'node:v8';
 import {deflateRawSync,inflateRawSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
+import {encodeState,decodeState} from './verification-state-codec.mjs';
 import {ShotVerification} from './verification.mjs';
 import {Shot} from './public/physics/shot.js';
 
@@ -14,18 +14,19 @@ function restore(target,saved,omit){
  Object.assign(target,saved);
 }
 // These bytes are server-owned state, never an accepted HTTP request field.
-// V8 serialization preserves Maps, Sets, Infinity and negative zero exactly.
+// The portable graph preserves Maps, Sets, Infinity and negative zero exactly.
 export function saveVerification(job){
  if(job.running||job.failed||job.cancelled||!['walking','flight'].includes(job.status))throw Error('Verification cannot be checkpointed in this state');
  const shot=job.shot;
- const value={format:'kyoto-verifier-state-1',course:verificationCourseKey(job.course),header:job.header,attempt:job.attempt,subject:job.subject,status:job.status,
+ const value={format:'kyoto-verifier-state-2',course:verificationCourseKey(job.course),header:job.header,attempt:job.attempt,subject:job.subject,status:job.status,
   walkedSteps:job.walkedSteps,run:job.run,remaining:job.remaining,walker:copy(job.walker,['world']),
   shot:shot?{state:copy(shot,['world','challenge','ball','tracker','designer']),ball:copy(shot.ball,['world','profile']),tracker:copy(shot.tracker,['c','fallLimitY'])}:null};
- const bytes=deflateRawSync(serialize(value));if(bytes.length>750000)throw Error('Verification checkpoint exceeded its storage limit');return bytes;
+ const text=encodeState(value);if(Buffer.byteLength(text)>8*1024*1024)throw Error('Verification checkpoint exceeded its decoded limit');
+ const bytes=deflateRawSync(text);if(bytes.length>750000)throw Error('Verification checkpoint exceeded its storage limit');return bytes;
 }
 export function restoreVerification(world,course,bytes,commands,options){
- const saved=deserialize(inflateRawSync(bytes,{maxOutputLength:8*1024*1024}));
- if(saved.format!=='kyoto-verifier-state-1'||saved.course!==verificationCourseKey(course)||saved.attempt!==options.attempt||saved.subject!==options.subject||!['walking','flight'].includes(saved.status))throw Error('Verification checkpoint does not match this job');
+ let saved;try{saved=decodeState(inflateRawSync(bytes,{maxOutputLength:8*1024*1024}).toString('utf8'));}catch{throw Error('Invalid verification checkpoint');}
+ if(saved.format!=='kyoto-verifier-state-2'||saved.course!==verificationCourseKey(course)||saved.attempt!==options.attempt||saved.subject!==options.subject||!['walking','flight'].includes(saved.status))throw Error('Verification checkpoint does not match this job');
  const job=new ShotVerification(world,course,saved.header,commands,options);
  restore(job.walker,saved.walker,['world']);Object.assign(job,{walkedSteps:saved.walkedSteps,run:saved.run,remaining:saved.remaining,status:saved.status});
  if(saved.shot){

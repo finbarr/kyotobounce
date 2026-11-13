@@ -50,7 +50,9 @@
     "test:browser:transitions": "npm run build:static && node web/tests/browser-transitions.mjs",
     "build:verification:world": "node web/verification-world-build.mjs",
     "test:verification:world": "node --expose-gc --max-old-space-size=48 --max-semi-space-size=1 web/tests/verification-world-station.mjs",
-    "test:verification:worker": "node web/tests/verification-world-runtime.mjs"
+    "test:verification:worker": "node web/tests/verification-world-runtime.mjs",
+    "test:verification:d1": "node web/tests/verification-d1.mjs",
+    "test:verification:d1:station": "node web/tests/verification-d1-station.mjs"
   },
   "dependencies": {
     "@google-cloud/firestore": "9.4.1",

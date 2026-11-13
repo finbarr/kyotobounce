@@ -227,9 +227,18 @@ campaign/regression results exactly, plus all 30 independent verifier receipts
 inside local Cloudflare workerd. Retained workerd memory measured about 87 MiB;
 cold-start allocation peaks and managed CPU/memory limits still require deployed
 acceptance. See [the compact-world measurements](ON-DEMAND-VERIFICATION.md#compact-collision-world-for-workers).
-This does not yet replace Firestore with D1 or change live hosting. The proposed
-Google Cloud project was not created. The Cloud Run
-package is tested implementation evidence, not the selected deployment target.
+The D1 implementation now passes local workerd integration for authentication,
+immutable uploads, saved checkpoints, standings, replay, course publication,
+quotas, cleanup and concurrency. All 30 real station courses survive a complete
+workerd-process restart and finish with the independent Node result; see
+`.local/verification/d1-station-proof.json`. The portable checkpoint codec also
+passes the reference Node/Firestore integration. Browser physics assets are
+unchanged; previous Node-verifier bundle hashes predate this backend change.
+
+This still needs the production Site build, hosted D1 migration, real browser
+synchronization and managed-resource acceptance. It has not changed live hosting.
+The proposed Google Cloud project was not created. The Cloud Run package is
+earlier implementation evidence, not the selected deployment target.
 
 ## Measurement limits and unresolved observations
 

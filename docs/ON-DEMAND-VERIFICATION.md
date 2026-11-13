@@ -70,8 +70,8 @@ The loader reads checksum-verified chunks of at most 4 MiB directly into final
 arrays. It does not decode the original collision archive or build a spatial tree
 inside a request. Output is disposable generated data in
 `.local/verification/world/`, not a new station export or independent physics model.
-The Node/Firestore service has not yet switched to this loader; it is preparation
-for the selected Sites + D1 implementation.
+The D1/Workers integration uses this loader. The earlier Node/Firestore reference
+service still loads the original pack; it is not the selected hosting target.
 
 November 12 local checks:
 
@@ -112,6 +112,65 @@ server-verified walking prefix can also be reused. Client-supplied checkpoints,
 contact lists or subsets of the station cannot establish correctness: omitted
 walls or contacts could otherwise fabricate a valid-looking result. These ideas
 are not implemented by the compact-world change.
+
+## D1 and Workers service
+
+`web/online/d1-service.mjs` implements the browser's existing online protocol on
+D1. `web/online/fetch.mjs` supplies Fetch-native HTTP routing, strict request
+schemas, bounded JSON bodies, authentication, CORS and an isolate request gate.
+The service includes immutable input uploads, resumable verification, authoritative
+standings, independent completion, public replay inputs, creator publication and
+revision promotion. It uses the same physics and scoring code as the Node service.
+No D1 code accepts a client score, launch position, contacts or checkpoint.
+
+The schema is `web/online/d1-schema.sql`; request handlers never create tables.
+It is applied explicitly to isolated local test databases. Hosting integration
+must package it as a schema-only Site migration before deploying this backend.
+No hosted D1 database or Site deployment is claimed by these local checks.
+
+D1 batches are atomic, but do not expose Firestore-style interactive transactions.
+`d1-storage.mjs` reads through a primary-first D1 session and validates a shared
+revision inside the commit batch. A named CHECK constraint aborts the whole batch
+if another writer changed that revision. Only that conflict is retried; storage
+outages remain retriable errors without fabricated scores. This keeps quotas,
+leases, input chunks, accepted attempts and course promotion consistent across
+isolates. The shared revision favors simple, strict consistency for this game's
+traffic; managed-service contention and latency still need measurement.
+[D1 batch and session APIs](https://developers.cloudflare.com/d1/worker-api/d1-database/).
+
+Each advance request performs at most four batches of 180 fixed physics steps.
+This hard work bound does not depend on a Workers clock advancing during pure CPU
+work. A budget ends the request with a private checkpoint, never a completed shot.
+Progress queries rank a whole page in SQL and fetch its custom courses together,
+avoiding a separate set of database calls for every level. Recall immediately
+removes an accepted attempt from standings and completion calculations.
+
+The shared checkpoint codec now uses a compressed portable object graph rather
+than Node V8 bytes. It retains Maps, Sets, undefined, infinities, signed zero,
+shared references and support-contact state. Both runtimes reconstruct the same
+walking/flight state, and a checkpoint remains bound to its player, attempt and
+course definition. Retired development checkpoint bytes are not migrated.
+
+Validation on November 12:
+
+- `npm run test:verification:d1` runs the actual workerd Fetch handler and local
+  D1 database. It covers strict inputs, authentication, duplicate/concurrent
+  uploads, process restart, exact scores, replay, ranks, recall, publication,
+  ownership, revision races, progress pagination, storage rollback, expired
+  leases, quotas and bounded cleanup. Cleanup of a losing publication retains
+  current accepted progress even when it shares the winning course's geometry.
+- `npm run test:verification:d1:station` verifies all 30 real station courses.
+  Each job saves a checkpoint, the entire workerd process exits, and a fresh
+  process reopens the same D1 files and finishes with the exact independent Node
+  result. Initial checkpoints were at most 1,815 bytes. The receipt is
+  `.local/verification/d1-station-proof.json`.
+- The existing Node checkpoint suite and Firestore integration suite also pass
+  with the portable codec and shared quota arithmetic. Source CI runs both D1
+  and reference-service integration checks.
+
+Remaining integration work is the production Site entry/build, D1 migration
+packaging, real browser synchronization against this backend, and managed-hosting
+CPU/cold-load acceptance. The existing live native service remains unchanged.
 
 ## Browser synchronization
 
@@ -175,7 +234,7 @@ assembly. Startup removes abandoned downloads and unmeasured old cache entries.
 Saved player scores, queued verification and their control recordings are excluded
 from cache eviction, including a player's own replay reconstructed from the verifier.
 
-## Request-driven service
+## Node reference service
 
 `web/online-server.mjs` starts a Node HTTP process with no Unity, simulation
 timer or background job poller. It loads collision data lazily on the first
@@ -239,7 +298,7 @@ single-document throughput depends on workload and contention.
 [Firestore best practices](https://firebase.google.com/docs/firestore/best-practices),
 [transaction contention](https://firebase.google.com/docs/firestore/transaction-data-contention).
 
-Checkpoints use compressed Node V8 serialization to retain Maps, Sets, Infinity,
+Checkpoints use the compressed portable graph codec to retain Maps, Sets, Infinity,
 negative zero and support-contact state exactly. They are private database
 bytes, never request fields or public responses, and bind the course, attempt
 and authenticated player. Physics/world objects are reconstituted around the
