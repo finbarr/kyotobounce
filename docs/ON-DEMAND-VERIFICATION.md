@@ -51,6 +51,68 @@ and published custom-course shots when a verifier is configured. Its creator
 can queue a course for publication after saving a complete legal playthrough.
 No verifier has been deployed.
 
+## Compact collision world for Workers
+
+The verifier imports the browser's actual `Walker` and `Shot` modules, including
+their collision, motion, bounce, spin and scoring routines. It independently
+reconstructs a shot from controls; it does not ask the browser to attest its score.
+
+`web/verification-world-build.mjs` prepares a compact representation of the same
+station at build time. It preserves the spatial tree and triangle visitation
+order, shares only bit-identical vertices, bakes the triangle permutation into
+the index buffer, uses 16-bit shape IDs where possible, and deduplicates surface
+profiles. `VerificationWorld` inherits the existing collision routines. Primitive
+and convex-solid coordinates retain their original precision, including signed
+zero. Bounded caches reconstruct surface objects and walking faces on demand.
+No render meshes, textures or renderer are loaded by verification.
+
+The loader reads checksum-verified chunks of at most 4 MiB directly into final
+arrays. It does not decode the original collision archive or build a spatial tree
+inside a request. Output is disposable generated data in
+`.local/verification/world/`, not a new station export or independent physics model.
+The Node/Firestore service has not yet switched to this loader; it is preparation
+for the selected Sites + D1 implementation.
+
+November 12 local checks:
+
+| Check | Result |
+| --- | --- |
+| Exact Node comparison | All 214 campaign samples and two regression shots match the original full-result hashes, including trajectories, contacts and scores. |
+| Local Cloudflare workerd | All 30 course solutions match the existing independent verifier hashes; four concurrent requests also match. |
+| Stored collision arrays | 76,302,170 bytes; metadata JSON is 7,039,893 bytes. |
+| Constrained Node retained heap + buffers | About 103 MiB after explicit collection, with a 48 MiB old-space cap. |
+| workerd retained heap + backing stores | About 87 MiB after heap snapshots; request-boundary samples before collection were about 102 MiB. |
+
+These measurements demonstrate exact replay and a smaller retained footprint.
+They do not capture every allocation peak during cold loading, prove CPU allowance,
+or enforce the managed platform's 128 MB isolate limit. Taking a heap snapshot
+collects garbage; it is a diagnostic test action, not a production requirement.
+The local runtime test records raw and collected measurements separately and
+includes reported embedder memory. Actual Sites acceptance is still required.
+[Workers limits](https://developers.cloudflare.com/workers/platform/limits/).
+
+After installing the current assets and building collision data, reproduce with:
+
+```sh
+node web/tests/browser-campaign.mjs
+node web/tests/verification-station.mjs
+npm run build:verification:world
+npm run test:verification:world
+npm run test:verification:worker
+```
+
+Receipts are `.local/verification/world-proof.json` and
+`.local/verification/world-runtime-proof.json`. Portable fixture and corrupt-chunk
+checks run in `npm test`; Miniflare/workerd are pinned development dependencies.
+
+Further savings can come from caching independently verified results by canonical
+inputs, course revision, layout, physics and scoring versions, and submitting only
+attempts relevant to personal bests, completion or course publication. A matching
+server-verified walking prefix can also be reused. Client-supplied checkpoints,
+contact lists or subsets of the station cannot establish correctness: omitted
+walls or contacts could otherwise fabricate a valid-looking result. These ideas
+are not implemented by the compact-world change.
+
 ## Browser synchronization
 
 The static shell may set a `kyoto-verifier` meta tag to the HTTPS origin of the

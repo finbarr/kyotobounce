@@ -19,7 +19,7 @@
     "assets:verify": "node tools/assets.mjs verify",
     "assets:pack": "node tools/pack-assets.mjs",
     "dev": "node web/browser-dev.mjs",
-    "test": "node web/tests/background-tools.mjs && node web/tests/store.mjs && node web/tests/course-progress.mjs && node web/tests/social-metadata.mjs && node web/tests/level-sharing.mjs && node web/tests/replay-sharing.mjs && node web/tests/replay-cache.mjs && node web/tests/combo-scoring.mjs && node web/tests/waypoint-presentation.mjs && node web/tests/current-game.mjs && node web/tests/ball-rotation.mjs && node web/tests/throw-power.mjs && node web/tests/throw-presentation.mjs && node web/tests/performance.mjs && node web/tests/gameplay-controls.mjs && node web/tests/live-throw.mjs && node web/tests/shot-stream.mjs && node web/tests/audio-speed.mjs && node web/tests/loading.mjs && node web/tests/static-assets.mjs && node web/tests/browser-build.mjs && node web/tests/asset-install.mjs && node web/tests/tutorial.mjs && node web/tests/touch-input.mjs && node web/tests/fly-camera.mjs && node web/tests/station-boundary.mjs && node web/tests/camera-focus.mjs && node web/tests/flight-camera.mjs && node web/tests/camera-obstacles.mjs && node web/tests/robot-cutaway.mjs && node web/tests/static-ray-queries.mjs && node web/tests/static-render-culling.mjs && node web/tests/escalator-visibility.mjs && node web/tests/station-light-pool.mjs && node web/tests/dining-reflections.mjs && node web/tests/campaign.mjs && node web/tests/objective-distance.mjs && node web/tests/lossless-assets.mjs && node web/tests/browser-physics.mjs && node web/tests/browser-escalators.mjs && node web/tests/browser-shot-flow.mjs && node web/tests/browser-walking.mjs && node web/tests/browser-solids.mjs && node web/tests/browser-designer.mjs && node web/tests/verifier-config.mjs && node web/tests/verification.mjs && node web/tests/browser-input-recording.mjs && node web/tests/verification-checkpoint.mjs",
+    "test": "node web/tests/background-tools.mjs && node web/tests/store.mjs && node web/tests/course-progress.mjs && node web/tests/social-metadata.mjs && node web/tests/level-sharing.mjs && node web/tests/replay-sharing.mjs && node web/tests/replay-cache.mjs && node web/tests/combo-scoring.mjs && node web/tests/waypoint-presentation.mjs && node web/tests/current-game.mjs && node web/tests/ball-rotation.mjs && node web/tests/throw-power.mjs && node web/tests/throw-presentation.mjs && node web/tests/performance.mjs && node web/tests/gameplay-controls.mjs && node web/tests/live-throw.mjs && node web/tests/shot-stream.mjs && node web/tests/audio-speed.mjs && node web/tests/loading.mjs && node web/tests/static-assets.mjs && node web/tests/browser-build.mjs && node web/tests/asset-install.mjs && node web/tests/tutorial.mjs && node web/tests/touch-input.mjs && node web/tests/fly-camera.mjs && node web/tests/station-boundary.mjs && node web/tests/camera-focus.mjs && node web/tests/flight-camera.mjs && node web/tests/camera-obstacles.mjs && node web/tests/robot-cutaway.mjs && node web/tests/static-ray-queries.mjs && node web/tests/static-render-culling.mjs && node web/tests/escalator-visibility.mjs && node web/tests/station-light-pool.mjs && node web/tests/dining-reflections.mjs && node web/tests/campaign.mjs && node web/tests/objective-distance.mjs && node web/tests/lossless-assets.mjs && node web/tests/browser-physics.mjs && node web/tests/browser-escalators.mjs && node web/tests/browser-shot-flow.mjs && node web/tests/browser-walking.mjs && node web/tests/browser-solids.mjs && node web/tests/browser-designer.mjs && node web/tests/verifier-config.mjs && node web/tests/verification.mjs && node web/tests/browser-input-recording.mjs && node web/tests/verification-checkpoint.mjs && node web/tests/verification-world.mjs",
     "build:physics": "node web/build-physics.mjs",
     "test:physics:station": "node web/tests/browser-physics-station.mjs && node web/tests/browser-physics-worker.mjs",
     "assets:collision": "node tools/browser-collision.mjs",
@@ -47,7 +47,10 @@
     "test:verifier:container": "node web/tests/firestore-emulator.mjs --container",
     "build:verifier:image": "node deploy/verification/image.mjs",
     "test:assets:setup": "node web/tests/asset-setup.mjs",
-    "test:browser:transitions": "npm run build:static && node web/tests/browser-transitions.mjs"
+    "test:browser:transitions": "npm run build:static && node web/tests/browser-transitions.mjs",
+    "build:verification:world": "node web/verification-world-build.mjs",
+    "test:verification:world": "node --expose-gc --max-old-space-size=48 --max-semi-space-size=1 web/tests/verification-world-station.mjs",
+    "test:verification:worker": "node web/tests/verification-world-runtime.mjs"
   },
   "dependencies": {
     "@google-cloud/firestore": "9.4.1",
@@ -60,6 +63,7 @@
     "@types/ws": "8.18.1",
     "esbuild": "0.28.2",
     "meshoptimizer": "1.1.0",
+    "miniflare": "5.20261110.2-beta",
     "playwright": "1.63.0",
     "sharp": "0.35.5",
     "typescript": "7.0.2"

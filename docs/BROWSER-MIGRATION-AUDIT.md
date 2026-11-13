@@ -222,8 +222,13 @@ engine matrix does cover all three engines and its sources are unchanged.
 The original local audit made no production changes. The asset release above
 is now public; the live game remains unchanged. The user has authorized finishing
 the migration and DNS changes, and selected Sites + D1 with independent score
-verification. First measure and reduce verifier memory before considering extra
-hosting. The proposed Google Cloud project was not created. The Cloud Run
+verification. The compact collision-world experiment now reproduces all 216
+campaign/regression results exactly, plus all 30 independent verifier receipts
+inside local Cloudflare workerd. Retained workerd memory measured about 87 MiB;
+cold-start allocation peaks and managed CPU/memory limits still require deployed
+acceptance. See [the compact-world measurements](ON-DEMAND-VERIFICATION.md#compact-collision-world-for-workers).
+This does not yet replace Firestore with D1 or change live hosting. The proposed
+Google Cloud project was not created. The Cloud Run
 package is tested implementation evidence, not the selected deployment target.
 
 ## Measurement limits and unresolved observations
