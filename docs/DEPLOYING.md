@@ -8,7 +8,9 @@ https://kyoto-bounce.finbarrtaylor.chatgpt.site from `ee3c4bf`. Its D1 migration
 read-only API requests, asset delivery and an offline browser shot pass hosted
 checks. With explicit test-record approval, all 30 hosted campaign proofs also
 match fresh independent simulations; their test scores were then cancelled.
-Current-score handling and public cutover remain pending.
+Version 2 imported the approved native snapshot and verified all ten scores,
+complete recordings, names and progress. See NATIVE-SCORE-MIGRATION.md.
+The normal release must remove the temporary importer before public cutover.
 
 `npm run build` builds the existing game
 directly into `dist/client` and bundles the production Fetch handler at
@@ -48,6 +50,9 @@ memory/CPU limits, successful hosted migrations or live cutover.
 Publish this repository through the Sites source/build/archive workflow; keep
 `dist/` and the archive ignored. The helper stages all tracked changes, so keep
 unrelated local edits outside that staging step and restore them afterward.
+Saved artifacts are reused by source commit: a build-configuration change needs
+a new commit before publishing a different archive. In particular, do not reuse
+the import-enabled release's commit when removing the temporary importer.
 Do not change the current domain or retire the native host before managed-runtime
 acceptance and current-score handling are complete.
 

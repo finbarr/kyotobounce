@@ -76,13 +76,23 @@ The first command uses synthetic local data and runs in CI. The last two require
 the approved private snapshot; the browser check also requires the import-enabled
 Site build. They use disposable local databases and never write hosted records.
 
-## Remaining cutover work
+## Hosted import and cutover
 
-This implementation has not yet imported production data. Recheck the live
-native data before cutover and capture any new accepted scores or identities in
-a final consistent snapshot. Publish the tested import-enabled version to the
-existing private Site, import only the pinned batches, and compare hosted counts,
-rankings, progress and complete recording checksums. Then publish a normal build
-to remove the temporary import endpoint before making the replacement public.
-Switch the domain only after those checks; retire the native host afterward.
-The public native game and its database remain unchanged until that cutover.
+On November 13, 2026, the private Site accepted all 74 pinned batches: 228
+players, ten authoritative scores and 58 original recording chunks. Read-only
+requests verified every result and recording checksum, both score owners' names,
+authenticated progress and exact public/personal rankings. Receipt:
+`.local/native-migration/hosted-import.json`. A full-table digest comparison with
+the live native database still matched the approved snapshot immediately after
+import; no newer scores or identities were missing.
+
+Publish a normal build to remove the temporary import endpoint before making
+the replacement public. This must use a new source commit: Sites reuses the
+saved artifact for an existing commit, even when a different archive is supplied.
+Verify that GET `/v1/native-import/removed` returns `Route not found`, rather
+than the import handler's `Import not found`. Do not treat a successful deploy
+status alone as proof that the import handler was removed.
+
+Switch the domain after normal-release acceptance, recheck the native inventory
+before stopping writes, and retire the native host once the replacement works
+through both public hostnames. The private backup remains available for recovery.
