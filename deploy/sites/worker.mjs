@@ -37,6 +37,8 @@ export default {async fetch(request,env){
  if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405,headers:{Allow:'GET, HEAD'}});
  // Deep links open the same shell; the browser resolves the selected course or
  // public replay through the verifier without creating an identity just to view.
- if(/^\/(?:level|replay)\/[^/]+\/?$/.test(path))url.pathname='/';
+ if(path==='/'||path==='/index.html'||/^\/(?:level|replay)\/[^/]+\/?$/.test(path)){
+  return new Response(request.method==='HEAD'?null:__GAME_HTML__,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'}});
+ }
  return env.ASSETS.fetch(new Request(url,request));
 }};

@@ -13,11 +13,14 @@ for(const origin of ['null','http://untrusted.example','https://name:secret@exam
 const h=await sitesHarness();
 await writeFile('.local/verification/sites-runtime.json',JSON.stringify({passed:false})+'\n');
 try{
+ // Exercise asset-first hosting: no static homepage may bypass host routing.
+ for(const path of ['dist/client/index.html','dist/client/_redirects'])await assert.rejects(readFile(path),{code:'ENOENT'});
  for(const path of ['/','/index.html','/level/atrium-welcome?from=bookmark','/replay/'+randomUUID()]){
   const r=await h.fetch(path,{redirect:'manual'},'https://www.kyotobounce.com');
   assert.equal(r.status,308);assert.equal(r.headers.get('Location'),'https://kyotobounce.com'+path);
  }
  assert.equal((await h.fetch('/',undefined,'https://kyotobounce.com')).status,200);
+ const head=await h.fetch('/',{method:'HEAD'});assert.equal(head.status,200);assert.match(head.headers.get('content-type'),/text\/html/);assert.equal(await head.text(),'');
  for(const path of ['/','/level/atrium-welcome','/replay/'+randomUUID()]){const r=await h.fetch(path);assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/text\/html/);assert.match(await r.text(),/name="kyoto-verifier" content="same-origin"/);}
  assert.equal((await h.fetch('/not-a-game-route')).status,404);assert.equal((await h.fetch('/v1/identity',{method:'POST',headers:{Origin:'https://foreign.example','Content-Type':'application/json'},body:'{}'})).status,403);
  assert.equal((await h.fetch('/game.js',{method:'HEAD'})).status,200);

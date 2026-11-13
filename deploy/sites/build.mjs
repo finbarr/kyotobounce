@@ -17,6 +17,16 @@ export async function buildSite({nativeImport}={}){
  const receipt={kind:'kyoto-site-v1',complete:false};
  await writeFile('dist/.openai/kyoto-build.json',JSON.stringify(receipt)+'\n');
  const browser=await packageBrowser({output:resolve('dist/client'),verifier:'same-origin'});
+ // Sites can serve matching assets before the Worker. Keep the document in the
+ // handler so the canonical-host redirect also runs for / and /index.html.
+ const html=await readFile('dist/client/index.html','utf8');
+ for(const name of ['index.html','_redirects']){
+  await rm('dist/client/'+name);delete browser.manifest.files['web/public/'+name];
+ }
+ await writeFile('dist/client/browser-build.json',JSON.stringify(browser.manifest)+'\n');
+ const browserFiles=await inventory('dist/client');delete browserFiles['release.json'];
+ Object.assign(browser.identity,{files:Object.keys(browserFiles).length,bytes:Object.values(browserFiles).reduce((n,f)=>n+f.bytes,0)});
+ await writeFile('dist/client/release.json',JSON.stringify(browser.identity,null,2)+'\n');
  const world=await buildVerificationWorld();assert.equal(world.layoutSha256,browser.identity.layoutSha256);
  const assetPath='dist/client/verification-world/'+world.sourceSha256;await mkdir(assetPath,{recursive:true});
  const parts=[...world.metadata.parts,...Object.values(world.arrays).flatMap(a=>a.parts)];
@@ -25,10 +35,10 @@ export async function buildSite({nativeImport}={}){
  // embedded in JS or rebuilt during a score request.
  const importManifest=nativeImport?JSON.parse(await readFile(nativeImport,'utf8')):null;
  if(importManifest)assert(importManifest.format==='kyoto-native-import-1'&&importManifest.batches.every(b=>/^[a-f0-9]{64}$/.test(b.sha256)&&b.bytes<=512*1024),'Invalid pinned import manifest');
- const bundled=await build({entryPoints:['deploy/sites/worker.mjs'],outfile:'dist/server/index.js',bundle:true,format:'esm',platform:'node',target:'es2022',external:['node:*'],define:{__NATIVE_IMPORT_MANIFEST__:JSON.stringify(importManifest)},minify:true,metafile:true});
+ const bundled=await build({entryPoints:['deploy/sites/worker.mjs'],outfile:'dist/server/index.js',bundle:true,format:'esm',platform:'node',target:'es2022',external:['node:*'],define:{__NATIVE_IMPORT_MANIFEST__:JSON.stringify(importManifest),__GAME_HTML__:JSON.stringify(html)},minify:true,metafile:true});
  const modules=Object.keys(bundled.metafile.inputs);assert(!modules.some(m=>m.includes('@google-cloud')||m.includes('online/service.mjs')),'Do not ship the retired reference backend');
  const imports=Object.values(bundled.metafile.outputs).flatMap(o=>o.imports.map(i=>i.path));assert(imports.every(p=>['node:crypto','node:zlib'].includes(p)),'Unexpected server dependency');
- await writeFile('dist/server/wrangler.json',JSON.stringify({name:'kyoto-bounce',main:'index.js',compatibility_date:'2026-11-12',compatibility_flags:['nodejs_compat'],assets:{directory:'../client',binding:'ASSETS',run_worker_first:['/','/index.html','/v1','/v1/*','/health','/level/*','/replay/*'],html_handling:'auto-trailing-slash',not_found_handling:'404-page'},d1_databases:[{binding:'DB',database_name:'kyoto-scores',database_id:'00000000-0000-4000-8000-000000000000',migrations_dir:'../.openai/drizzle'}]},null,2)+'\n');
+ await writeFile('dist/server/wrangler.json',JSON.stringify({name:'kyoto-bounce',main:'index.js',compatibility_date:'2026-11-12',compatibility_flags:['nodejs_compat'],assets:{directory:'../client',binding:'ASSETS',run_worker_first:false,html_handling:'auto-trailing-slash',not_found_handling:'404-page'},d1_databases:[{binding:'DB',database_name:'kyoto-scores',database_id:'00000000-0000-4000-8000-000000000000',migrations_dir:'../.openai/drizzle'}]},null,2)+'\n');
  await cp('.openai/hosting.json','dist/.openai/hosting.json');await cp('drizzle','dist/.openai/drizzle',{recursive:true});
  const assets=await inventory('dist/client');for(const [name,file]of Object.entries(assets))assert(file.bytes<=STATIC_FILE_LIMIT,'Oversize static asset: '+name);
  const expandedBytes=Object.values(await inventory('dist')).reduce((n,f)=>n+f.bytes,0);
