@@ -1,6 +1,6 @@
 # Preserving the current live scores
 
-The current native game has ten accepted scores on unchanged campaign geometry.
+The retired native game had ten accepted scores on unchanged campaign geometry.
 Its recorded physics is `kyoto-p3-3`; new browser shots use `kyoto-browser-4`.
 The migration preserves those authoritative scores, times, owners and complete
 recordings. It does not resimulate old shots with a different solver or accept
@@ -100,6 +100,23 @@ authentication (`401 Authentication required`), rather than the import handler's
 `404 Import not found`. Do not treat a successful deploy
 status alone as proof that the import handler was removed.
 
-Switch the domain after normal-release acceptance, recheck the native inventory
-before stopping writes, and retire the native host once the replacement works
-through both public hostnames. The private backup remains available for recovery.
+The normal release was published without the importer before public access was
+enabled. On November 13, both custom domains switched to Sites with active HTTPS.
+Read-only public checks again matched all ten scores, all 58 original recording
+chunks and both score owners' authenticated names/progress. Headless Chrome
+checked the longest replay through the public domain, phone-size rendering and
+cached offline reload, with every write blocked. Public receipts are
+`.local/native-migration/public-import-verification.json` and
+`.local/native-migration/hosted-browser-import-test.json`.
+
+The www hostname redirects to the apex for the homepage and deep links. This
+preserves the former game's canonical browser origin and its existing saved
+credentials. The final browser check enters through www and confirms arrival
+on the apex before restoring the original identity and replay.
+
+After DNS convergence and the cache grace period, the native service was stopped.
+Full-table digests of its frozen database still exactly matched the backup:
+228 guests, 30 courses, ten attempts and 173 settings. DigitalOcean then deleted
+the old droplet; a fresh lookup returned 404 and its account listing was empty
+for that resource. See `.local/sites/native-retirement.json`. The approved
+private backup remains available for recovery and must never be published.

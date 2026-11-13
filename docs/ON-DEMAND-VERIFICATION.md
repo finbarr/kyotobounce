@@ -49,8 +49,9 @@ The authenticated HTTP service verifies and stores campaign scores, standings,
 completion and public replay inputs. The browser synchronizes saved campaign
 and published custom-course shots when a verifier is configured. Its creator
 can queue a course for publication after saving a complete legal playthrough.
-A private Sites/D1 verifier is deployed and all 30 hosted campaign proofs pass.
-The public domain still uses the native service; score-preserving cutover remains.
+A public Sites/D1 verifier serves https://kyotobounce.com, and all 30 hosted
+campaign proofs pass. Existing authoritative scores and recordings were preserved;
+the former native service and its dedicated compute allocation are retired.
 
 ## Compact collision world for Workers
 
@@ -190,8 +191,8 @@ sync and public replays plus real creator publication, ownership, offline edits
 and revision adoption against that bundle. Receipts are
 `.local/verification/sites-runtime.json`, `browser-sites/receipt.json` and
 `course-sharing-sites/receipt.json` under `.local/verification/`.
-Managed acceptance below now passes for the 30 campaign proofs. Score-preserving
-cutover remains; the existing live native service is unchanged.
+Managed acceptance below passes for the 30 campaign proofs. The score-preserving
+public cutover completed on November 13, 2026; see NATIVE-SCORE-MIGRATION.md.
 
 The first private Site publication is version 1, source `ee3c4bf`, at
 https://kyoto-bounce.finbarrtaylor.chatgpt.site. Read-only hosted checks returned
@@ -480,14 +481,14 @@ retired publications, fence late workers, and reject oversized evidence without
 creating a result. Browser replay checks delay an input request and require its
 exact reconstruction after retry; portable tests also cancel a long retry wait.
 
-The static browser package, pinned verifier image and scale-to-zero configuration
-generator are documented in `docs/DEPLOYING.md`. Local implementation acceptance
-and the remaining release gates are recorded in `docs/BROWSER-MIGRATION-AUDIT.md`.
-Managed-cloud smoke/load checks and live cutover remain pending authorization.
-No native score importer is implemented. Current live scores have not been
-reset; preserving that authoritative data requires a verified consistent backup
-and an accepted handling decision before retiring the native service. Existing
-native results cannot be relabelled as verified browser-physics results.
+The static browser package and earlier reference container are documented in
+`docs/DEPLOYING.md`. Sites + D1 is the actual public deployment; no Google Cloud
+resources were provisioned. Managed campaign acceptance, score preservation,
+public-domain cutover and native retirement are recorded in
+`docs/BROWSER-MIGRATION-AUDIT.md`. The bounded one-time importer preserved all ten
+authoritative native scores and complete recordings, then was removed from the
+normal release. Those results retain native-server provenance and are never
+relabelled as verified browser-physics results.
 
 The Linux amd64 container acceptance passed all 30 full clears with exact final
 result agreement against independent host reconstruction, recovery from a

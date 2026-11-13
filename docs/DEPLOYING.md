@@ -2,16 +2,20 @@
 
 ## Sites and D1 release
 
-The selected replacement host is ChatGPT Sites with D1. The registered project
-is in `.openai/hosting.json`; reuse it. Version 3 is deployed owner-private at
-https://kyoto-bounce.finbarrtaylor.chatgpt.site from `8730bb1`. Its D1 migrations,
-read-only API requests, asset delivery and an offline browser shot pass hosted
-checks. With explicit test-record approval, all 30 hosted campaign proofs also
-match fresh independent simulations; their test scores were then cancelled.
-Version 2 imported the approved native snapshot and verified all ten scores,
-complete recordings, names and progress. See NATIVE-SCORE-MIGRATION.md.
-Version 3 removes the temporary importer; hosted checks confirm normal API
-authentication handles its former route. Public access and DNS cutover remain.
+The public game uses ChatGPT Sites with D1 at https://kyotobounce.com. Reuse the
+registered project in `.openai/hosting.json`. Version 5, source `f88c525`, was
+deployed on November 13, 2026. Both custom domains have active HTTPS;
+`www.kyotobounce.com` redirects to the apex, preserving paths and queries and
+keeping returning players on the origin that holds their browser credentials.
+The platform address is https://kyoto-bounce.finbarrtaylor.chatgpt.site.
+
+Hosted migrations, read-only API/asset requests and an offline browser shot pass.
+With explicit test-record approval, all 30 hosted campaign proofs matched fresh
+independent simulations; their test scores were then cancelled. All ten existing
+scores, original recordings, player names and progress were imported and checked
+on the public domain. The temporary importer is absent from the normal release.
+See [score preservation](NATIVE-SCORE-MIGRATION.md). The former DigitalOcean
+server has been deleted, removing its $24/month base compute charge.
 
 `npm run build` builds the existing game
 directly into `dist/client` and bundles the production Fetch handler at
@@ -19,6 +23,12 @@ directly into `dist/client` and bundles the production Fetch handler at
 Node compatibility and D1 binding. The compact verifier geometry is served from
 the same deployment's versioned assets and checked against its bundled manifest.
 It is never rebuilt or fetched from a player-selected URL during verification.
+The small game HTML document is embedded in the Worker, which handles `/`,
+`/index.html`, and level/replay deep links. The static asset directory deliberately
+contains neither `index.html` nor `_redirects`: the managed host can serve matching
+assets before the Worker, bypassing host redirects. Local integration tests use
+asset-first routing to match that behavior. Model, audio and physics files remain
+static assets; serving the document does not initialize the physics world.
 Sites also limits expanded deployment archives to 256 MiB. The verifier chunks
 are stored as individual gzip files and decoded in at most 4 MiB chunks, with
 the original raw checksums verified afterward. This keeps the deployment below
@@ -45,8 +55,8 @@ The package passes local workerd tests for real asset delivery, deep links,
 same-origin scoring and restart through an exact station score. Headless Chrome
 passes offline desktop/touch shots, reconnect/reload, verified public replays,
 course creation/publication, creator ownership and revision adoption against the
-actual production bundle and local D1. These checks do not establish managed
-memory/CPU limits, successful hosted migrations or live cutover.
+actual production bundle and local D1. These local checks alone do not establish
+managed limits; the separate hosted acceptance above covers the deployed workload.
 
 Publish this repository through the Sites source/build/archive workflow; keep
 `dist/` and the archive ignored. The helper stages all tracked changes, so keep
@@ -54,8 +64,7 @@ unrelated local edits outside that staging step and restore them afterward.
 Saved artifacts are reused by source commit: a build-configuration change needs
 a new commit before publishing a different archive. In particular, do not reuse
 the import-enabled release's commit when removing the temporary importer.
-Do not change the current domain or retire the native host before managed-runtime
-acceptance and current-score handling are complete.
+Future releases must preserve the canonical origin and current authoritative data.
 
 A consistent backup of the old live database was explicitly approved and saved
 privately at `.local/native-migration/current.sqlite.gz`. Both remote and local
@@ -70,8 +79,8 @@ retain their native provenance rather than claim browser-physics verification.
 The browser migration can be packaged without Node, Unity or a gameplay API
 running on the host. Local implementation acceptance is recorded in
 [the migration audit](BROWSER-MIGRATION-AUDIT.md). The pinned asset pack is public;
-managed verifier acceptance and existing-score handling pass; live cutover remains.
-The private Site deployment above has not replaced the public native game.
+managed verifier acceptance, existing-score preservation and public cutover are
+complete. The combined Site above is the current public deployment.
 
 With the current station bundle installed (see [asset availability](ASSETS.md)):
 
@@ -199,16 +208,22 @@ only the current registry release and any explicitly required rollback image.
 The existing live service must not be stopped until the replacement is accepted
 and deployment/cutover is authorized.
 
-## Existing native deployment
+## Completed native retirement
 
-The existing live release uses a long-running Node service and a Linux Unity
-dedicated-server worker. Current main builds the browser game and on-demand
-verifier only. Its old native packaging scripts are not a supported deployment
-path; maintain or roll back the native service using its existing deployed
-release and matching instructions. No native service has been stopped by this
-migration.
+On November 13, 2026, Dynadot DNS was switched to the Sites-provided A/CNAME
+records, retaining its existing nameservers. Both authoritative servers converged
+and both custom-domain certificates became active. Public game, offline playback
+and read-only score/identity checks passed before retirement.
 
-The current task authorizes migration deployment and DNS changes. Before that
-cutover, accept the browser game, managed verifier and score handling. Preserve
-the current authoritative scores and verify a consistent database backup. Only
-then retire the old service and its compute allocation. CI never deploys.
+The native service was stopped after the DNS cache grace period. Full-table
+digests of its frozen database still matched the approved private backup; no
+newer scores or identities were omitted. DigitalOcean droplet `598562498`
+(`kyoto-bounce-sfo3`) was then deleted. A fresh provider lookup returns 404 and
+the resource is absent from the account list, with no Kyoto snapshots or attached
+volumes remaining. Receipt: `.local/sites/native-retirement.json`.
+
+The backup remains private for recovery. Current main builds the browser game
+and on-demand verifier; old native packaging is not a deployment path. No Google
+Cloud project or service was provisioned. Sites/D1 usage remains subject to its
+hosting terms; eliminating the dedicated server is not a promise of unlimited
+free usage. CI checks source but never deploys.

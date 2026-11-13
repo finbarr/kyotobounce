@@ -88,10 +88,11 @@ The startup check starts the normal game, verifies offline desktop/mobile play,
 full rest, recall, saved results and replays, and stops its own preview. Browser
 checks remain headless and cannot capture the desktop pointer. Hosted CI runs
 source and verifier-emulator checks; rendered station tests run locally.
-The shipped client has one gameplay runtime: the browser worker. Native source
-remains as reference for the existing live release; its connection module and
-legacy npm entry points are removed from the current browser project. Maintain
-that deployed release separately until a replacement cutover is authorized.
+The public game at [kyotobounce.com](https://kyotobounce.com) runs gameplay in a
+browser worker. ChatGPT Sites serves the game and independently verifies online
+scores on demand, with D1 storage. The previous Unity server was retired on
+November 13, 2026; no always-on game server is required. Native source remains
+for authoring/reference only. See [deployment details](docs/DEPLOYING.md).
 
 ## License
 
